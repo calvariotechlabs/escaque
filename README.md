@@ -4,14 +4,14 @@ App web para aprender ajedrez con motor propio (**Alfil Beta**), escrita desde c
 
 ## Estado
 
-**Hito actual: 1 — Reglas + perft, sin interfaz.** Bloques 1 y 2 hechos: tablero 0x88, FEN, generador de jugadas legales (enroque, al paso, coronación) y hacer/deshacer pasan todos los tests y todos los perft de referencia. Falta el bloque 3: regla de 50 jugadas y triple repetición.
+**Hito 1 — Reglas + perft, sin interfaz: hecho.** Tablero 0x88, FEN, generador de jugadas legales (enroque, al paso, coronación), hacer/deshacer y fin de partida completo: jaque mate, ahogado, material insuficiente, regla de 50 jugadas y triple repetición. Pasan todos los tests y todos los perft de referencia. Las tablas por 50 jugadas y por triple repetición son automáticas, sin reclamarlas, y la repetición sigue a la FIDE: cuentan el bando al mover, los derechos de enroque y solo las capturas al paso que sean legales.
 
 Velocidad de perft (Node 22, un hilo): unos 9 a 10 millones de nodos por segundo; la inicial a profundidad 6 (119.060.324 nodos) en unos 12 s, y Kiwipete a profundidad 5 (193.690.690) en unos 21 s.
 
 | Hito | Descripción | Estado |
 | --- | --- | --- |
 | 0 | Repositorio, estructura y herramientas | Hecho |
-| 1 | Reglas completas + perft | En curso |
+| 1 | Reglas completas + perft | Hecho |
 | 2 | Tablero jugable (dos jugadores) | Pendiente |
 | 3 | Máquina en Web Worker, 3 niveles | Pendiente |
 | 4 | Coach: explicación de errores | Pendiente |

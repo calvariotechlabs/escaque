@@ -286,6 +286,7 @@ export class Position implements PerftTarget<Move> {
     const us = this.side;
     const them = opposite(us);
     const legal: Move[] = [];
+    // Misma comprobación que isLegal(), escrita en línea: es el bucle caliente de perft.
     for (const move of this.pseudoLegalMoves()) {
       this.applyMove(move);
       if (!this.isAttacked(this.kings[us], them)) legal.push(move);
@@ -391,19 +392,107 @@ export class Position implements PerftTarget<Move> {
   }
 
   /**
-   * Estado de la partida (mate, ahogado, tablas o en juego).
-   * La regla de 50 jugadas y la triple repetición llegan en el bloque 3.
+   * Estado de la partida. El orden importa: si la jugada que llega a 100
+   * medias jugadas sin peón ni captura da mate o ahoga, manda el mate o el
+   * ahogado (artículo 9.3 de las Leyes del Ajedrez de la FIDE).
+   *
+   * La regla de 50 jugadas y la triple repetición se aplican como tablas
+   * automáticas, sin que nadie tenga que reclamarlas. La repetición solo mira
+   * las jugadas hechas en este objeto: lo anterior a la FEN cargada no se conoce.
+   *
+   * No llama a `legalMoves()`: las jugadas obtenidas antes siguen valiendo
+   * para `makeMove`, y `status()` no prepara ninguna lista nueva.
    */
   status(): GameStatus {
-    if (this.legalMoves().length === 0) {
+    if (!this.hasLegalMove()) {
       if (this.isCheck()) return { kind: "checkmate", winner: this.side === WHITE ? "b" : "w" };
       return { kind: "stalemate" };
     }
     if (this.isInsufficientMaterial()) return { kind: "insufficient-material" };
+    // Antes que la repetición: así esta nunca recorre más de 99 medias jugadas.
+    if (this.halfmove >= 100) return { kind: "fifty-move" };
+    if (this.isThreefoldRepetition()) return { kind: "threefold-repetition" };
     return { kind: "ongoing" };
   }
 
   // --- Interno ---------------------------------------------------------------
+
+  /**
+   * ¿Ha aparecido la posición actual al menos tres veces en esta partida?
+   *
+   * Dos posiciones son la misma si tienen las mismas piezas en las mismas
+   * casillas, el mismo bando al mover, los mismos derechos de enroque y las
+   * mismas capturas al paso posibles (una casilla al paso sin captura legal no
+   * cuenta). Solo se mira hacia atrás hasta la última jugada de peón o captura,
+   * porque ninguna posición anterior puede repetirse.
+   *
+   * Recorre la historia deshaciendo jugadas y la vuelve a aplicar: la posición
+   * queda igual que estaba. El motor usará más adelante claves Zobrist.
+   */
+  private isThreefoldRepetition(): boolean {
+    const plies = Math.min(this.halfmove, this.history.length);
+    // Con menos de 4 medias jugadas reversibles no cabe ninguna repetición.
+    if (plies < 4) return false;
+    const current = this.repetitionKey();
+    // Se rehacen las mismas jugadas, así que las listas de legalMoves() siguen
+    // valiendo; se guardan porque applyMove las descarta al pasar por cada ply.
+    const generated = this.generated.slice();
+    const undone: CoreMove[] = [];
+    let seen = 1;
+    try {
+      for (let i = 0; i < plies && seen < 3; i++) {
+        undone.push(this.history[this.history.length - 1]!.move);
+        this.unmakeMove();
+        // Solo las posiciones con el mismo bando al mover pueden coincidir.
+        if (i % 2 === 1 && this.repetitionKey() === current) seen++;
+      }
+    } finally {
+      for (let i = undone.length - 1; i >= 0; i--) this.applyMove(undone[i]!);
+      this.generated.length = generated.length;
+      for (let i = 0; i < generated.length; i++) this.generated[i] = generated[i]!;
+    }
+    return seen >= 3;
+  }
+
+  /** ¿Tiene el bando que mueve alguna jugada legal? No toca las listas de `legalMoves()`. */
+  private hasLegalMove(): boolean {
+    for (const move of this.pseudoLegalMoves()) {
+      if (this.isLegal(move)) return true;
+    }
+    return false;
+  }
+
+  /** ¿Deja la jugada pseudolegal al rey propio fuera de jaque? */
+  private isLegal(move: CoreMove): boolean {
+    const us = this.side;
+    this.applyMove(move);
+    const legal = !this.isAttacked(this.kings[us], opposite(us));
+    this.unmakeMove();
+    return legal;
+  }
+
+  /**
+   * Identidad de la posición para la triple repetición: los cuatro primeros
+   * campos de la FEN, con la casilla al paso solo si hay una captura al paso legal.
+   */
+  private repetitionKey(): string {
+    const fields = this.toFen().split(" ", 4);
+    if (this.epSquare !== -1 && !this.hasLegalEnPassant()) fields[3] = "-";
+    return fields.join(" ");
+  }
+
+  /** ¿Puede el bando que mueve capturar al paso legalmente? Solo mira los dos peones posibles. */
+  private hasLegalEnPassant(): boolean {
+    const to = this.epSquare;
+    if (to === -1) return false;
+    const pawn = makePiece(this.side, PAWN);
+    const behind = this.side === WHITE ? -16 : 16;
+    for (const from of [to + behind - 1, to + behind + 1]) {
+      if (offBoard(from) || this.board[from] !== pawn) continue;
+      if (this.isLegal({ from, to, promotion: null, flags: FLAG_EN_PASSANT })) return true;
+    }
+    return false;
+  }
 
   /** ¿Ataca algún pieza del bando `by` la casilla `sq`? */
   private isAttacked(sq: number, by: Side): boolean {
