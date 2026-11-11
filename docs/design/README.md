@@ -4,7 +4,7 @@ Copia en el repositorio de lo que se diseña en Claude Design. Regla del proyect
 
 | Qué | Origen en Claude Design | Versión | Exportado |
 | --- | --- | --- | --- |
-| Design System «S-Design - Escaque» | https://claude.ai/artifact/5eMkXXkB3rMzuRwKU5osqC | 1794395532-9b16 | 2026-11-11 |
+| Design System «S-Design - Escaque» | https://claude.ai/artifact/5eMkXXkB3rMzuRwKU5osqC | 1794396033-181b | 2026-11-11 |
 | Lienzo «Design - Escaque» (partida en escritorio, móvil y coronación) | https://claude.ai/artifact/EFBEpxb6n1xjdX35LYqNcG | 1794395696-33a5 | 2026-11-11 |
 
 Los enlaces son privados de la cuenta de Calvario TechLabs.
