@@ -50,6 +50,16 @@ describe("guard-bash: borrados recursivos", () => {
     "rm --r src",
     "{ rm -rf src; }",
     "rm -rf dist 2>/dev/null; rm -rf src",
+    "rm -rf 2>&1 src",
+    "rm -rf >/dev/null 2>&1 src",
+    "rm -rf >&2 src",
+    "rm -rf &>/dev/null src",
+    "out=$(rm -rf src)",
+    "x=`rm -rf src`",
+    "echo rm -- $(rm -rf src)",
+    "rm -f notas.txt && rm -rf src",
+    "xargs rm -rf < lista",
+    "cat lista | xargs rm -rf",
   ];
   for (const command of blocked) {
     it(`bloquea: ${command}`, () => assert.equal(exitCode(command), 2));
@@ -71,6 +81,8 @@ describe("guard-bash: borrados recursivos", () => {
     "rm -rf dist 2>/dev/null",
     "rm -rf dist >/dev/null 2>&1",
     "rm -rf dist > salida.log",
+    "rm -rf >/dev/null 2>&1 dist",
+    "out=$(rm -rf dist 2>&1)",
   ];
   for (const command of allowed) {
     it(`permite: ${command}`, () => assert.equal(exitCode(command), 0));
