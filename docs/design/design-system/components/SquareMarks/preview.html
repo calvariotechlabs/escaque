@@ -1,0 +1,14 @@
+<!-- @dsCard group="Tablero" height=220 subtitle="Seleccionada, destino, captura, última jugada, jaque y foco" -->
+<meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;600&family=Space+Grotesk:wght@600&display=swap">
+<script src="../pieces.js"></script>
+<style>.fila{display:flex;flex-wrap:wrap;gap:16px;padding:16px;align-items:flex-start}.caja{width:72px;display:flex;flex-direction:column;align-items:center;gap:4px;font:400 12px/16px var(--font-sans);color:var(--ink-muted);text-align:center}.sq{width:72px;height:72px}.sq.c{background:var(--square-light)}.sq.o{background:var(--square-dark)}</style>
+<div id="s" class="fila"></div>
+<script>
+EscaquePieces.mount();
+var L=[['','Sin marca','c','',''],['selected','Seleccionada','o','w','n'],['target','Destino','c','',''],['capture','Captura','o','b','p'],['last-move','Última jugada','c','w','p'],['check','Jaque','o','b','k'],['focus','Foco de teclado','c','w','b']];
+document.getElementById('s').innerHTML=L.map(function(x){var p=x[3]?EscaquePieces.svg(x[3],x[4]):'';
+ var attr=x[0]&&x[0]!=='focus'?' data-marks="'+x[0]+'"':'';var tab=x[0]==='focus'?' tabindex="0" id="foco"':'';
+ return '<div class="caja"><div class="casilla casilla--'+(x[2]==='c'?'clara':'oscura')+' sq"'+attr+tab+'>'+p+'</div>'+x[1]+'</div>';}).join('');
+var f=document.getElementById('foco');if(f)f.focus();
+</script>

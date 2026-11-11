@@ -1,0 +1,62 @@
+/* Tokens de Escaque, generados a partir de docs/design/design-system/tokens.json (tema claro por defecto). */
+:root {
+  --square-light: #e3e8e6;
+  --square-dark: #7c9a94;
+  --board-ink: #0b2a38;
+  --mark-selected: #f2c94c;
+  --mark-last-move: #9fd3c0;
+  --mark-check: #c8382c;
+  --piece-white-hi: #ffffff;
+  --piece-white-mid: #eceef2;
+  --piece-white-lo: #b7bfcc;
+  --piece-black-hi: #6b7280;
+  --piece-black-mid: #363b45;
+  --piece-black-lo: #14171d;
+  --piece-outline-white: #1d2027;
+  --piece-outline-black: #05060a;
+  --piece-mark-black: #aab1bd;
+  --surface: #f1f3f5;
+  --surface-raised: #ffffff;
+  --ink: #171a21;
+  --ink-muted: #566070;
+  --line: #d3d9e2;
+  --control-border: #6b7585;
+  --accent: #0b6e8a;
+  --on-accent: #ffffff;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --font-display: "Space Grotesk", system-ui, sans-serif;
+  --font-sans: "IBM Plex Sans", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --surface: #0f1218;
+    --surface-raised: #171b23;
+    --ink: #e8ebf1;
+    --ink-muted: #97a1b3;
+    --line: #2a303c;
+    --control-border: #8b95a7;
+    --accent: #5cc3df;
+    --on-accent: #0f1218;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --surface: #0f1218;
+  --surface-raised: #171b23;
+  --ink: #e8ebf1;
+  --ink-muted: #97a1b3;
+  --line: #2a303c;
+  --control-border: #8b95a7;
+  --accent: #5cc3df;
+  --on-accent: #0f1218;
+  color-scheme: dark;
+}

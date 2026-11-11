@@ -1,0 +1,17 @@
+<!-- @dsCard group="Tablero" height=620 subtitle="Posición inicial con coordenadas, vista de las blancas" -->
+<meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;600&family=Space+Grotesk:wght@600&display=swap">
+<script src="../pieces.js"></script>
+<style>.fila{display:flex;flex-wrap:wrap;gap:16px;padding:16px;align-items:flex-start}.caja{width:72px;display:flex;flex-direction:column;align-items:center;gap:4px;font:400 12px/16px var(--font-sans);color:var(--ink-muted);text-align:center}.sq{width:72px;height:72px}.sq.c{background:var(--square-light)}.sq.o{background:var(--square-dark)}</style>
+<div style="padding:16px;max-width:560px" id="m"></div>
+<script>
+EscaquePieces.mount();
+var FEN='rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR',rows=FEN.split('/'),F='abcdefgh',h='';
+for(var r=0;r<8;r++){
+ var line=[];for(var i=0;i<rows[r].length;i++){var ch=rows[r][i];if(ch>='1'&&ch<='8'){for(var k=0;k<+ch;k++)line.push(null)}else line.push(ch)}
+ var cs='';for(var c=0;c<8;c++){var rank=8-r,light=((c+rank-1)%2===1),p=line[c],n=F[c]+rank,lab=n+', '+(p?EscaquePieces.name(p===p.toLowerCase()?'b':'w',p.toLowerCase()):'vacía');
+  cs+='<div class="casilla casilla--'+(light?'clara':'oscura')+'" role="gridcell" data-square="'+n+'" aria-label="'+lab+'">'+(p?EscaquePieces.svg(p===p.toLowerCase()?'b':'w',p.toLowerCase()):'')+'</div>';}
+ h+='<div class="tablero__fila" role="row">'+cs+'</div>';}
+var rk='',fl='';for(var i=8;i>=1;i--)rk+='<span>'+i+'</span>';for(var j=0;j<8;j++)fl+='<span>'+F[j]+'</span>';
+document.getElementById('m').innerHTML='<div class="tablero"><div class="tablero__rejilla" role="grid" aria-label="Tablero de ajedrez, visto desde las blancas">'+h+'</div><div class="tablero__rangos" aria-hidden="true">'+rk+'</div><div class="tablero__columnas" aria-hidden="true">'+fl+'</div></div>';
+</script>

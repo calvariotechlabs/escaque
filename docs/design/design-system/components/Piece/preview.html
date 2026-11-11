@@ -1,0 +1,11 @@
+<!-- @dsCard group="Piezas" height=360 subtitle="Las 12 piezas sobre casilla clara y oscura" -->
+<meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;600&family=Space+Grotesk:wght@600&display=swap">
+<script src="../pieces.js"></script>
+<style>.fila{display:flex;flex-wrap:wrap;gap:16px;padding:16px;align-items:flex-start}.caja{width:72px;display:flex;flex-direction:column;align-items:center;gap:4px;font:400 12px/16px var(--font-sans);color:var(--ink-muted);text-align:center}.sq{width:72px;height:72px}.sq.c{background:var(--square-light)}.sq.o{background:var(--square-dark)}</style>
+<div id="a" class="fila"></div><div id="b" class="fila"></div>
+<script>
+EscaquePieces.mount();
+function row(id,side,dark){var h='';EscaquePieces.types.forEach(function(t,i){var d=(i%2===1)===dark;h+='<div class="caja"><div class="sq '+(d?'o':'c')+'">'+EscaquePieces.svg(side,t)+'</div>'+EscaquePieces.name(side,t)+'</div>';});document.getElementById(id).innerHTML=h;}
+row('a','w',false);row('b','b',true);
+</script>

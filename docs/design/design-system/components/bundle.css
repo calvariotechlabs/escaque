@@ -1,0 +1,75 @@
+/* Escaque · estilos de componentes. Solo usan los tokens de tokens.json. Sin atributos style en el marcado. */
+body{margin:0;background:var(--surface);color:var(--ink);font:400 16px/24px var(--font-sans)}
+.oculto{position:absolute;width:0;height:0;overflow:hidden}
+
+/* Degradados de las piezas (las paradas leen los tokens) */
+.gw-0{stop-color:var(--piece-white-hi)} .gw-1{stop-color:var(--piece-white-mid)} .gw-2{stop-color:var(--piece-white-lo)}
+.gb-0{stop-color:var(--piece-black-hi)} .gb-1{stop-color:var(--piece-black-mid)} .gb-2{stop-color:var(--piece-black-lo)}
+
+/* Pieza */
+.pieza{display:block;width:100%;height:100%;stroke:var(--piece-outline-white);stroke-width:1;stroke-linejoin:round}
+.pieza--b{stroke:var(--piece-outline-black)}
+.pieza .marca{fill:none;stroke:var(--piece-outline-white);stroke-width:1.2;stroke-linecap:round}
+.pieza--b .marca{stroke:var(--piece-mark-black)}
+.pieza .ojo{fill:var(--piece-outline-white);stroke:none}
+.pieza--b .ojo{fill:var(--piece-mark-black);stroke:none}
+
+/* Tablero: rejilla 8x8 y coordenadas fuera de las casillas */
+.tablero{display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;gap:var(--space-1) var(--space-2);width:min(100%,640px);color:var(--ink-muted);font:500 12px/16px var(--font-mono)}
+.tablero__rejilla{grid-column:2;grid-row:1;aspect-ratio:1;display:grid;grid-template-rows:repeat(8,1fr);outline:1px solid var(--line)}
+.tablero__fila{display:grid;grid-template-columns:repeat(8,1fr)}
+.tablero__rangos{grid-column:1;grid-row:1;display:flex;flex-direction:column;justify-content:space-around;align-items:center}
+.tablero__columnas{grid-column:2;grid-row:2;display:flex;justify-content:space-around}
+.casilla{position:relative;aspect-ratio:1;min-width:0}
+.casilla--clara{background:var(--square-light)}
+.casilla--oscura{background:var(--square-dark)}
+.casilla > .pieza,.casilla > img{position:relative;z-index:1;display:block;width:100%;height:100%}
+
+/* Marcas de casilla: el significado va en la forma, el color solo refuerza */
+.casilla::before,.casilla::after{content:"";position:absolute;pointer-events:none}
+.casilla[data-marks~="selected"]::before{inset:0;background:color-mix(in srgb,var(--mark-selected) 60%,transparent);box-shadow:inset 0 0 0 3px var(--board-ink)}
+.casilla[data-marks~="last-move"]::before{inset:0;background:color-mix(in srgb,var(--mark-last-move) 55%,transparent)}
+.casilla[data-marks~="check"]{background-image:radial-gradient(circle at 50% 50%,var(--mark-check) 0,transparent 72%)}
+.casilla[data-marks~="target"]:not([data-marks~="capture"])::after{inset:36%;border-radius:50%;background:var(--board-ink);opacity:.55;z-index:2}
+.casilla[data-marks~="capture"]::after{inset:4%;border-radius:50%;border:4px solid var(--board-ink);opacity:.75;z-index:2}
+.casilla:focus-visible{outline:3px solid var(--board-ink);outline-offset:-3px;z-index:3}
+
+/* Modo de contraste forzado: los rellenos desaparecen, así que las marcas pasan a contorno y el punto de destino a un borde. */
+@media (forced-colors: active){
+  .casilla[data-marks]{outline:2px solid CanvasText;outline-offset:-2px}
+  .casilla[data-marks~="selected"]{outline-width:4px}
+  .casilla[data-marks~="target"]:not([data-marks~="capture"])::after{background:CanvasText;opacity:1}
+}
+
+/* Lista de jugadas */
+.jugadas{background:var(--surface-raised);border:1px solid var(--line);border-radius:var(--radius-md);padding:var(--space-4);min-width:0}
+.jugadas__titulo{margin:0 0 var(--space-2);font:600 20px/28px var(--font-display)}
+.jugadas__lista{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:2.5em 1fr 1fr;gap:var(--space-1) var(--space-2);font:500 15px/24px var(--font-mono)}
+.jugadas__lista li{display:contents}
+.jugadas__n{color:var(--ink-muted)}
+.jugada{padding:0 var(--space-2);border-radius:var(--radius-sm);border:0;background:none;color:var(--ink);font:inherit;text-align:left;cursor:pointer;min-height:32px}
+.jugada[aria-current="true"]{background:var(--accent);color:var(--on-accent);font-weight:600}
+.jugada:focus-visible{outline:3px solid var(--accent);outline-offset:1px}
+.jugadas__vacia{margin:0;color:var(--ink-muted);font:400 14px/20px var(--font-sans)}
+
+/* Estado de la partida */
+.estado{display:flex;align-items:center;gap:var(--space-2);padding:var(--space-3) var(--space-4);background:var(--surface-raised);border:1px solid var(--line);border-radius:var(--radius-md);font:400 14px/20px var(--font-sans)}
+.estado__turno{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--piece-outline-white);flex:none}
+.estado__turno--w{background:var(--piece-white-hi)}
+.estado__turno--b{background:var(--piece-black-mid);border-color:var(--piece-outline-black)}
+.estado strong{font-weight:600}
+.estado--fin{border-color:var(--ink);border-width:2px}
+
+/* Botones */
+.boton{min-height:44px;padding:0 var(--space-4);border-radius:var(--radius-sm);border:1.5px solid var(--control-border);background:var(--surface-raised);color:var(--ink);font:600 14px/20px var(--font-sans);cursor:pointer}
+.boton--principal{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.boton:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.boton[disabled]{opacity:1;color:var(--ink-muted);border-style:dashed;cursor:not-allowed}
+
+/* Diálogo de coronación */
+.coronacion{background:var(--surface-raised);border:1px solid var(--control-border);border-radius:var(--radius-md);padding:var(--space-4);display:inline-block}
+.coronacion__titulo{margin:0 0 var(--space-3);font:600 20px/28px var(--font-display)}
+.coronacion__opciones{display:flex;flex-wrap:wrap;justify-content:center;gap:var(--space-2)}
+.coronacion__opcion{width:72px;display:flex;flex-direction:column;align-items:center;gap:var(--space-1);padding:var(--space-2);border-radius:var(--radius-sm);border:1.5px solid var(--control-border);background:var(--square-light);color:var(--board-ink);font:600 14px/20px var(--font-sans);cursor:pointer}
+.coronacion__opcion .pieza,.coronacion__opcion img{width:48px;height:48px}
+.coronacion__opcion:focus-visible{outline:3px solid var(--board-ink);outline-offset:2px}
