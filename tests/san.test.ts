@@ -143,6 +143,28 @@ describe("SAN: lectura", () => {
     assert.equal(moveToUci(after(START_FEN, "e2e4", "f7f6").moveFromSan("Qh5")!), "d1h5");
   });
 
+  it("coronación sin «=» avanzando, no solo capturando", () => {
+    const p = Position.fromFen("4k3/P7/8/8/8/8/8/4K3 w - - 0 1");
+    assert.equal(moveToUci(p.moveFromSan("a8Q")!), "a7a8q");
+    assert.equal(p.moveFromSan("ab8Q"), null);
+  });
+
+  it("acepta desambiguación de más y la captura al paso con «e.p.»", () => {
+    const start = Position.fromFen(START_FEN);
+    assert.equal(moveToUci(start.moveFromSan("Ngf3")!), "g1f3");
+    assert.equal(moveToUci(start.moveFromSan("Ng1f3")!), "g1f3");
+    assert.equal(moveToUci(start.moveFromSan("N1f3")!), "g1f3");
+    assert.equal(start.moveFromSan("Nbf3"), null);
+    const ep = Position.fromFen("4k3/8/8/3pP3/8/8/8/4K3 w - d6 0 1");
+    assert.equal(moveToUci(ep.moveFromSan("exd6 e.p.")!), "e5d6");
+  });
+
+  it("devuelve null con valores que no son texto", () => {
+    const start = Position.fromFen(START_FEN);
+    assert.equal(start.moveFromSan(123 as unknown as string), null);
+    assert.equal(start.moveFromSan(undefined as unknown as string), null);
+  });
+
   it("devuelve null si la jugada no es legal, es ambigua o no es SAN", () => {
     const start = Position.fromFen(START_FEN);
     assert.equal(start.moveFromSan("Ke2"), null);

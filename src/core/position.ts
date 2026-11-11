@@ -102,13 +102,19 @@ interface Undo {
 /** La SAN más larga posible es «Qa1xh8+» o «exd8=Q#»; se deja margen para «!?». */
 const SAN_MAX_LENGTH = 16;
 
-/** Quita jaque, mate y anotaciones, y unifica el enroque con ceros y la coronación sin «=». */
+/**
+ * Quita jaque, mate, anotaciones («!?») y el «e.p.» de la captura al paso, y
+ * unifica el enroque con ceros y la coronación sin «=».
+ */
 function normalizeSan(text: string): string {
-  let san = text.trim().replace(/[+#!?]+$/, "");
+  let san = text.trim().replace(/\s*e\.p\.$/, "").replace(/[+#!?]+$/, "");
   if (san === "0-0") san = "O-O";
   else if (san === "0-0-0") san = "O-O-O";
-  return san.replace(/^([a-h]x?[a-h][18])([QRBN])$/, "$1=$2");
+  return san.replace(/^([a-h](?:x[a-h])?[18])([QRBN])$/, "$1=$2");
 }
+
+/** Jugada de pieza con origen opcional, para aceptar desambiguación de más: «Ngf3», «N1f3», «Ng1f3». */
+const SAN_PIECE = /^([NBRQK])([a-h])?([1-8])?x?([a-h][1-8])$/;
 
 // --- FEN ---------------------------------------------------------------------
 
@@ -305,10 +311,11 @@ export class Position implements PerftTarget<Move> {
    * Jugada en notación algebraica estándar (SAN), con las letras inglesas de
    * PGN: «e4», «Nbd2», «exd6», «O-O», «e8=Q+», «Qxf7#». La jugada debe ser
    * legal en esta posición; si no, lanza un error. No cambia la posición ni
-   * invalida las jugadas ya obtenidas con `legalMoves()`.
+   * invalida las jugadas de `legalMoves()` de la posición actual.
    */
   moveToSan(move: Move): string {
-    const legal = this.computeLegalMoves();
+    // Reutiliza la lista del ply actual si existe: formatear todas las jugadas no la regenera.
+    const legal = (this.generated[this.history.length] as CoreMove[] | null | undefined) ?? this.computeLegalMoves();
     const own = legal.find((m) => m.from === move.from && m.to === move.to && m.promotion === move.promotion);
     if (own === undefined) throw new Error(`moveToSan: ${moveToUci(move)} no es legal en esta posición`);
     return this.san(own, legal, true);
@@ -321,14 +328,29 @@ export class Position implements PerftTarget<Move> {
    * es legal, es ambigua o no es SAN.
    */
   moveFromSan(text: string): Move | null {
-    if (text.length > SAN_MAX_LENGTH) return null;
+    if (typeof text !== "string" || text.length > SAN_MAX_LENGTH) return null;
     const wanted = normalizeSan(text);
     if (wanted === "") return null;
-    const legal = this.legalMoves();
+    const legal = this.legalMoves() as CoreMove[];
     for (const move of legal) {
-      if (this.san(move as CoreMove, legal as CoreMove[], false) === wanted) return move;
+      if (this.san(move, legal, false) === wanted) return move;
     }
-    return null;
+    // Desambiguación de más: vale si deja una única jugada legal.
+    const match = SAN_PIECE.exec(wanted);
+    if (match === null) return null;
+    const [, letter, file, rank, target] = match as unknown as [string, string, string | undefined, string | undefined, string];
+    const type = FEN_TO_TYPE[letter.toLowerCase()];
+    const candidates = legal.filter((m) => {
+      const from = squareName(m.from);
+      return (
+        m.flags !== FLAG_CASTLE &&
+        squareName(m.to) === target &&
+        typeOf(this.board[m.from]!) === type &&
+        (file === undefined || from[0] === file) &&
+        (rank === undefined || from[1] === rank)
+      );
+    });
+    return candidates.length === 1 ? candidates[0]! : null;
   }
 
   /** Jugadas legales sin guardarlas en `generated`. */
@@ -565,8 +587,9 @@ export class Position implements PerftTarget<Move> {
         // Otras piezas del mismo tipo que también pueden llegar a `to`.
         const rivals = legal.filter((m) => m.to === to && m.from !== from && typeOf(this.board[m.from]!) === type);
         if (rivals.length > 0) {
-          const fileName = "abcdefgh"[fileOf(from)]!;
-          const rankName = String(rankOf(from) + 1);
+          const name = squareName(from);
+          const fileName = name[0]!;
+          const rankName = name[1]!;
           if (!rivals.some((m) => fileOf(m.from) === fileOf(from))) text += fileName;
           else if (!rivals.some((m) => rankOf(m.from) === rankOf(from))) text += rankName;
           else text += fileName + rankName;
