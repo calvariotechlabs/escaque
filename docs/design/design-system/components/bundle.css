@@ -118,3 +118,41 @@ body{margin:0;background:var(--surface);color:var(--ink);font:400 16px/24px var(
 .resultado{display:flex;flex-direction:column;gap:var(--space-3);padding:var(--space-4);background:var(--surface-raised);border:2px solid var(--ink);border-radius:var(--radius-md)}
 .resultado__titulo{margin:0;font:600 20px/28px var(--font-display)}
 .resultado__texto{margin:0;font:400 14px/20px var(--font-sans)}
+
+/* Escaque · panel del coach (propuesta de diseño). Solo usa tokens del Design System. */
+.coach{display:flex;flex-direction:column;gap:var(--space-4);background:var(--surface-raised);border:1px solid var(--line);border-radius:var(--radius-md);padding:var(--space-4);min-width:0;color:var(--ink);font:400 14px/20px var(--font-sans)}
+.coach__cab{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:var(--space-1) var(--space-3)}
+.coach__titulo{margin:0;font:600 20px/28px var(--font-display)}
+.coach__jugada{margin:0;color:var(--ink-muted)}
+.coach__san{font:500 15px/24px var(--font-mono);color:var(--ink)}
+.coach__veredicto{margin:0;display:flex;gap:var(--space-2);align-items:flex-start;padding:var(--space-3);border-radius:var(--radius-sm);border:1px solid var(--line)}
+.coach__veredicto svg{flex:none;width:20px;height:20px;margin-top:0}
+.coach__veredicto strong{display:block;font-weight:600}
+.coach__veredicto--grave{border:2px solid var(--ink)}
+.coach__veredicto--dudosa{border:2px dashed var(--control-border)}
+.coach__mejor{margin:0;color:var(--ink-muted)}
+.coach__sub{margin:0 0 var(--space-2);font:600 12px/16px var(--font-sans);letter-spacing:.04em;text-transform:uppercase;color:var(--ink-muted)}
+.coach__eval{margin:0;display:grid;grid-template-columns:auto 1fr;gap:var(--space-1) var(--space-3);align-items:center}
+.coach__eval dt{font-weight:600}
+.coach__eval dd{margin:0;min-width:0}
+.coach__valor{font:500 15px/24px var(--font-mono)}
+.coach__barra{height:12px;border:1.5px solid var(--ink);border-radius:2px;background:var(--piece-black-mid);position:relative;overflow:hidden;margin-top:2px}
+.coach__barra > span{position:absolute;inset:0 auto 0 0;background:var(--piece-white-hi)}
+.coach__barra::after{content:"";position:absolute;left:50%;top:0;bottom:0;width:2px;background:var(--control-border)}
+.coach__leyenda{margin:var(--space-1) 0 0;color:var(--ink-muted);font:400 12px/16px var(--font-sans)}
+.coach__avisos{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:var(--space-3)}
+.coach__aviso{display:flex;flex-direction:column;align-items:flex-start;gap:var(--space-2);padding:var(--space-3);border:1px solid var(--control-border);border-radius:var(--radius-sm);background:var(--surface-raised)}
+.coach__aviso-titulo{margin:0;display:flex;gap:var(--space-2);align-items:center;font:600 14px/20px var(--font-sans)}
+.coach__aviso-titulo svg{flex:none;width:20px;height:20px}
+.coach__aviso p{margin:0}
+.coach__aviso .boton{min-height:44px}
+.coach__aviso--activo{border:3px solid var(--accent);padding:calc(var(--space-3) - 2px)}
+.coach__vacio{margin:0;color:var(--ink-muted)}
+.coach__barra-pensando{height:4px;border-radius:2px;background:var(--line);overflow:hidden;position:relative}
+.coach__barra-pensando::after{content:"";position:absolute;inset:0 auto 0 0;width:35%;border-radius:2px;background:var(--accent);animation:pensando 1.2s ease-in-out infinite alternate}
+@media (prefers-reduced-motion: reduce){.coach__barra-pensando::after{animation:none;width:100%;opacity:.45}}
+@media (forced-colors: active){.coach__barra{border-color:CanvasText;background:Canvas}.coach__barra > span{background:CanvasText}.coach__aviso,.coach__veredicto{border-color:CanvasText}}
+/* Tablet vertical: dos columnas dentro del panel */
+.coach--ancho{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:var(--space-4) var(--space-6)}
+.coach--ancho .coach__cab{grid-column:1 / -1}
+.coach--ancho .coach__col{display:flex;flex-direction:column;gap:var(--space-4);min-width:0}
