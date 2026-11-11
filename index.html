@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'">
-<title>Escaque · tablero</title>
+<title>Escaque · partida a dos jugadores</title>
 <link rel="stylesheet" href="src/ui/tokens.css">
 <link rel="stylesheet" href="src/ui/board.css">
 <link rel="stylesheet" href="src/ui/page.css">
@@ -13,21 +13,30 @@
 <body>
 <header class="pagina__cabecera">
   <h1>Escaque</h1>
-  <p>Tablero estático. Todavía no se puede jugar.</p>
+  <p><span class="solo-escritorio">Partida a dos jugadores en este dispositivo</span><span class="solo-movil">Dos jugadores</span></p>
 </header>
-<main class="pagina__principal">
-  <section class="pagina__tablero" aria-label="Tablero">
+<main class="partida">
+  <p id="estado" class="estado partida__estado" role="status"><span id="estado-turno" class="estado__turno estado__turno--w" aria-hidden="true"></span><span><strong id="estado-texto">Cargando la partida. Si este mensaje no desaparece, ejecuta «npm run serve».</strong><span id="estado-extra"></span></span></p>
+  <section class="partida__tablero" aria-label="Tablero">
     <div id="tablero"></div>
   </section>
-  <section class="pagina__panel" aria-label="Posición">
-    <p id="estado" class="pagina__estado" role="status">Cargando el tablero. Si este mensaje no desaparece, ejecuta «npm run serve».</p>
-    <div class="campo">
-      <label for="posicion">Posición</label>
-      <select id="posicion"></select>
-    </div>
-    <label class="casilla-check"><input type="checkbox" id="marcas" checked> Ver marcas de ejemplo</label>
+  <div class="partida__controles">
+    <button id="nueva" class="boton boton--principal" type="button">Nueva partida</button>
     <button id="girar" class="boton" type="button">Girar tablero</button>
+    <button id="deshacer" class="boton" type="button" disabled>Deshacer jugada</button>
+  </div>
+  <section class="jugadas partida__jugadas" aria-labelledby="titulo-jugadas">
+    <h2 class="jugadas__titulo" id="titulo-jugadas">Jugadas</h2>
+    <p id="sin-jugadas" class="jugadas__vacia">Aún no hay jugadas.</p>
+    <ol id="lista-jugadas" class="jugadas__lista" aria-label="Lista de jugadas"></ol>
   </section>
+  <p id="anuncio" class="solo-lector" aria-live="polite"></p>
 </main>
+<dialog id="coronacion" class="coronacion-dialogo" aria-labelledby="titulo-coronacion">
+  <div class="coronacion">
+    <h2 class="coronacion__titulo" id="titulo-coronacion">Corona el peón</h2>
+    <div id="opciones-coronacion" class="coronacion__opciones"></div>
+  </div>
+</dialog>
 </body>
 </html>

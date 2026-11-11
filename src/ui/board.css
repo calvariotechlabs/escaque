@@ -1,4 +1,4 @@
-/* Escaque · piezas, tablero y marcas. Copia fiel de docs/design/design-system/components/bundle.css; solo usa los tokens de tokens.css. */
+/* Escaque · piezas, tablero, marcas, botones, lista de jugadas, estado y coronación. Copia fiel de docs/design/design-system/components/bundle.css; solo usa los tokens de tokens.css. */
 .oculto{position:absolute;width:0;height:0;overflow:hidden}
 
 /* Degradados de las piezas (las paradas leen los tokens) */
@@ -46,3 +46,30 @@
   .casilla[data-marks~="selected"]{outline-width:4px}
   .casilla[data-marks~="target"]:not([data-marks~="capture"])::after{background:CanvasText;opacity:1}
 }
+
+/* Lista de jugadas */
+.jugadas{background:var(--surface-raised);border:1px solid var(--line);border-radius:var(--radius-md);padding:var(--space-4);min-width:0}
+.jugadas__titulo{margin:0 0 var(--space-2);font:600 20px/28px var(--font-display)}
+.jugadas__lista{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:2.5em 1fr 1fr;gap:var(--space-1) var(--space-2);font:500 15px/24px var(--font-mono)}
+.jugadas__lista li{display:contents}
+.jugadas__n{color:var(--ink-muted)}
+.jugada{padding:0 var(--space-2);border-radius:var(--radius-sm);border:0;background:none;color:var(--ink);font:inherit;text-align:left;cursor:pointer;min-height:32px}
+.jugada[aria-current="true"]{background:var(--accent);color:var(--on-accent);font-weight:600}
+.jugada:focus-visible{outline:3px solid var(--accent);outline-offset:1px}
+.jugadas__vacia{margin:0;color:var(--ink-muted);font:400 14px/20px var(--font-sans)}
+
+/* Estado de la partida */
+.estado{display:flex;align-items:center;gap:var(--space-2);padding:var(--space-3) var(--space-4);background:var(--surface-raised);border:1px solid var(--line);border-radius:var(--radius-md);font:400 14px/20px var(--font-sans)}
+.estado__turno{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--piece-outline-white);flex:none}
+.estado__turno--w{background:var(--piece-white-hi)}
+.estado__turno--b{background:var(--piece-black-mid);border-color:var(--piece-outline-black)}
+.estado strong{font-weight:600}
+.estado--fin{border-color:var(--ink);border-width:2px}
+
+/* Diálogo de coronación */
+.coronacion{background:var(--surface-raised);border:1px solid var(--control-border);border-radius:var(--radius-md);padding:var(--space-4);display:inline-block}
+.coronacion__titulo{margin:0 0 var(--space-3);font:600 20px/28px var(--font-display)}
+.coronacion__opciones{display:flex;flex-wrap:wrap;justify-content:center;gap:var(--space-2)}
+.coronacion__opcion{width:72px;display:flex;flex-direction:column;align-items:center;gap:var(--space-1);padding:var(--space-2);border-radius:var(--radius-sm);border:1.5px solid var(--control-border);background:var(--square-light);color:var(--board-ink);font:600 14px/20px var(--font-sans);cursor:pointer}
+.coronacion__opcion .pieza,.coronacion__opcion img{width:48px;height:48px}
+.coronacion__opcion:focus-visible{outline:3px solid var(--board-ink);outline-offset:2px}

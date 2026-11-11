@@ -204,24 +204,6 @@ describe("teclado", () => {
   });
 });
 
-describe("etiquetas accesibles", () => {
-  it("describen la casilla y su estado", () => {
-    const { ui } = setup();
-    assert.equal(ui.label("e2"), "e2, peón blanco");
-    ui.click("e2");
-    assert.equal(ui.label("e2"), "e2, peón blanco, seleccionada");
-    assert.equal(ui.label("e4"), "e4, vacía, destino posible");
-  });
-
-  it("indican captura posible y última jugada", () => {
-    const { ui } = setup("4k3/8/8/3p4/4P3/8/8/4K3 w - - 0 1");
-    ui.click("e4");
-    assert.equal(ui.label("d5"), "d5, peón negro, captura posible");
-    ui.click("e5");
-    assert.equal(ui.label("e5"), "e5, peón blanco, última jugada");
-  });
-});
-
 describe("deshacer y reiniciar desde la interacción", () => {
   it("deshacer quita selección y coronación pendiente", () => {
     const { game, ui } = setup();
@@ -233,5 +215,21 @@ describe("deshacer y reiniciar desde la interacción", () => {
     assert.equal(ui.selected, null);
     assert.equal(game.history.length, 0);
     assert.deepEqual(ui.undo(), { kind: "none" });
+  });
+
+  it("rehacer y saltar a una jugada quitan la selección", () => {
+    const { game, ui } = setup();
+    ui.click("e2");
+    ui.click("e4");
+    ui.undo();
+    ui.click("d2");
+    assert.equal(ui.redo().kind, "redone");
+    assert.equal(ui.selected, null);
+    assert.equal(game.ply, 1);
+    ui.click("e7");
+    assert.deepEqual(ui.goTo(0), { kind: "jumped", ply: 0 });
+    assert.equal(ui.selected, null);
+    assert.deepEqual(ui.redo().kind, "redone");
+    assert.deepEqual(ui.redo(), { kind: "none" });
   });
 });

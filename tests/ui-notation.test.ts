@@ -1,7 +1,7 @@
-// Notación y textos en español de la interfaz: SAN con C A T D R, anuncios y fin de partida.
+// Textos en español de la interfaz: SAN con C A T D R, anuncios y fin de partida.
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { sanToSpanish, pieceName, squareLabel, statusMessage, moveAnnouncement } from "../src/ui/notation.js";
+import { sanToSpanish, statusMessage, moveAnnouncement } from "../src/ui/notation.js";
 
 describe("SAN en español", () => {
   it("traduce las letras de las piezas", () => {
@@ -27,20 +27,6 @@ describe("SAN en español", () => {
   it("deja el enroque como está", () => {
     assert.equal(sanToSpanish("O-O"), "O-O");
     assert.equal(sanToSpanish("O-O-O+"), "O-O-O+");
-  });
-});
-
-describe("nombres para lectores de pantalla", () => {
-  it("nombra pieza y color con concordancia", () => {
-    assert.equal(pieceName({ color: "w", type: "n" }), "caballo blanco");
-    assert.equal(pieceName({ color: "b", type: "q" }), "dama negra");
-    assert.equal(pieceName({ color: "b", type: "r" }), "torre negra");
-    assert.equal(pieceName({ color: "w", type: "k" }), "rey blanco");
-  });
-
-  it("etiqueta de casilla vacía y ocupada", () => {
-    assert.equal(squareLabel("e4", null), "e4, vacía");
-    assert.equal(squareLabel("g1", { color: "w", type: "n" }), "g1, caballo blanco");
   });
 });
 
@@ -81,14 +67,14 @@ describe("anuncio de jugadas", () => {
 describe("mensajes de estado", () => {
   it("turno y jaque", () => {
     assert.equal(statusMessage({ kind: "ongoing" }, "w", false), "Juegan las blancas.");
-    assert.equal(statusMessage({ kind: "ongoing" }, "b", true), "Juegan las negras. Están en jaque.");
+    assert.equal(statusMessage({ kind: "ongoing" }, "b", true), "Juegan las negras. Jaque.");
   });
 
   it("fin de partida", () => {
     assert.equal(statusMessage({ kind: "checkmate", winner: "w" }, "b", true), "Jaque mate. Ganan las blancas.");
-    assert.equal(statusMessage({ kind: "stalemate" }, "b", false), "Tablas por rey ahogado.");
+    assert.equal(statusMessage({ kind: "stalemate" }, "b", false), "Tablas por ahogado.");
     assert.equal(statusMessage({ kind: "insufficient-material" }, "w", false), "Tablas por material insuficiente.");
-    assert.equal(statusMessage({ kind: "fifty-move" }, "w", false), "Tablas por la regla de las 50 jugadas.");
+    assert.equal(statusMessage({ kind: "fifty-move" }, "w", false), "Tablas por la regla de los 50 movimientos.");
     assert.equal(statusMessage({ kind: "threefold-repetition" }, "b", false), "Tablas por triple repetición.");
   });
 });

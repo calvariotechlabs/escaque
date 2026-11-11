@@ -1,4 +1,4 @@
-// Textos en español de la interfaz: SAN con letras españolas, nombres de piezas,
+// Textos en español de la interfaz: SAN con letras españolas,
 // anuncios de jugadas para lectores de pantalla y mensajes de estado.
 // Sin DOM: se prueba en Node.
 import type { Color, GameStatus, PieceType, PromotionPiece } from "../core/index.js";
@@ -30,18 +30,6 @@ export function sanToSpanish(san: string): string {
   return san
     .replace(/^[NBRQK]/, (letter) => SPANISH_LETTER[letter]!)
     .replace(/=([NBRQ])/, (_, letter: string) => `=${SPANISH_LETTER[letter]!}`);
-}
-
-/** «caballo blanco», «dama negra». */
-export function pieceName(piece: Piece): string {
-  const { name, feminine } = NAMES[piece.type];
-  const color = piece.color === "w" ? (feminine ? "blanca" : "blanco") : feminine ? "negra" : "negro";
-  return `${name} ${color}`;
-}
-
-/** Etiqueta accesible base de una casilla: «e4, vacía» o «g1, caballo blanco». */
-export function squareLabel(square: string, piece: Piece | null): string {
-  return `${square}, ${piece === null ? "vacía" : pieceName(piece)}`;
 }
 
 /** Datos de una jugada ya hecha, suficientes para anunciarla. */
@@ -82,20 +70,20 @@ export function moveAnnouncement(move: PlayedMove): string {
   return `${side}: ${sanToSpanish(move.san)}. ${description}.${suffix}`;
 }
 
-/** Mensaje de estado: de quién es el turno, o cómo ha terminado la partida. */
+/** Mensaje de estado: de quién es el turno, o cómo ha terminado la partida. Textos del componente GameStatus del diseño. */
 export function statusMessage(status: GameStatus, turn: Color, inCheck: boolean): string {
   switch (status.kind) {
     case "checkmate":
       return `Jaque mate. Ganan las ${status.winner === "w" ? "blancas" : "negras"}.`;
     case "stalemate":
-      return "Tablas por rey ahogado.";
+      return "Tablas por ahogado.";
     case "insufficient-material":
       return "Tablas por material insuficiente.";
     case "fifty-move":
-      return "Tablas por la regla de las 50 jugadas.";
+      return "Tablas por la regla de los 50 movimientos.";
     case "threefold-repetition":
       return "Tablas por triple repetición.";
     case "ongoing":
-      return `Juegan las ${turn === "w" ? "blancas" : "negras"}.${inCheck ? " Están en jaque." : ""}`;
+      return `Juegan las ${turn === "w" ? "blancas" : "negras"}.${inCheck ? " Jaque." : ""}`;
   }
 }

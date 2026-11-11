@@ -1,10 +1,8 @@
 // Modelo de interacción del tablero, sin DOM: qué pasa con cada clic, arrastre
-// o tecla, qué casillas se marcan y cómo se describe cada casilla a un lector
-// de pantalla. La capa DOM solo traduce eventos a estas llamadas y pinta el
+// o tecla, y qué casillas se marcan. La capa DOM solo traduce eventos a estas llamadas y pinta el
 // resultado; así toda la lógica se prueba en Node.
 import type { Color, PromotionPiece } from "../core/index.js";
 import type { Game, MoveRecord } from "./game.js";
-import { squareLabel } from "./notation.js";
 
 /** Marcas que el tablero sabe pintar en una casilla. */
 export type Mark = "selected" | "target" | "capture" | "last-move" | "check";
@@ -17,7 +15,9 @@ export type Outcome =
   | { readonly kind: "deselected" }
   | { readonly kind: "promotion"; readonly from: string; readonly to: string }
   | { readonly kind: "moved"; readonly record: MoveRecord }
-  | { readonly kind: "undone"; readonly record: MoveRecord };
+  | { readonly kind: "undone"; readonly record: MoveRecord }
+  | { readonly kind: "redone"; readonly record: MoveRecord }
+  | { readonly kind: "jumped"; readonly ply: number };
 
 const NONE: Outcome = { kind: "none" };
 const DESELECTED: Outcome = { kind: "deselected" };
@@ -138,9 +138,23 @@ export class Interaction {
   undo(): Outcome {
     const record = this.game.undo();
     if (record === null) return NONE;
-    this.selected = null;
-    this.pendingPromotion = null;
+    this.clear();
     return { kind: "undone", record };
+  }
+
+  /** Rehace la última jugada deshecha y limpia la selección. */
+  redo(): Outcome {
+    const record = this.game.redo();
+    if (record === null) return NONE;
+    this.clear();
+    return { kind: "redone", record };
+  }
+
+  /** Salta a la posición tras `ply` medias jugadas (lista de jugadas) y limpia la selección. */
+  goTo(ply: number): Outcome {
+    this.game.goTo(ply);
+    this.clear();
+    return { kind: "jumped", ply: this.game.ply };
   }
 
   /** Marcas de todas las casillas que tienen alguna. */
@@ -167,19 +181,9 @@ export class Interaction {
     return marks;
   }
 
-  /**
-   * Etiqueta accesible de una casilla: contenido y estado. Para etiquetar las
-   * 64 casillas, calcula `marks()` una vez y pásalo.
-   */
-  label(square: string, allMarks: ReadonlyMap<string, readonly Mark[]> = this.marks()): string {
-    const parts = [squareLabel(square, this.game.pieceAt(square))];
-    const marks = allMarks.get(square) ?? [];
-    if (marks.includes("selected")) parts.push("seleccionada");
-    if (marks.includes("target")) parts.push("destino posible");
-    if (marks.includes("capture")) parts.push("captura posible");
-    if (marks.includes("check")) parts.push("en jaque");
-    if (marks.includes("last-move")) parts.push("última jugada");
-    return parts.join(", ");
+  private clear(): void {
+    this.selected = null;
+    this.pendingPromotion = null;
   }
 
   private canSelect(square: string): boolean {
