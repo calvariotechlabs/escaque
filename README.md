@@ -8,12 +8,14 @@ App web para aprender ajedrez con motor propio (**Alfil Beta**), escrita desde c
 
 Velocidad de perft (Node 22, un hilo): unos 9 a 10 millones de nodos por segundo; la inicial a profundidad 6 (119.060.324 nodos) en unos 12 s, y Kiwipete a profundidad 5 (193.690.690) en unos 21 s.
 
+**Hito 3 — Alfil Beta: motor y Worker hechos.** Búsqueda, evaluación, tres niveles y el puente con el Web Worker, con tests y probado en el navegador. Falta la pantalla para jugar contra la máquina, que espera su diseño. Detalles y cifras en [Alfil Beta](#alfil-beta-el-motor).
+
 | Hito | Descripción | Estado |
 | --- | --- | --- |
 | 0 | Repositorio, estructura y herramientas | Hecho |
 | 1 | Reglas completas + perft | Hecho |
 | 2 | Tablero jugable (dos jugadores) | Hecho |
-| 3 | Máquina en Web Worker, 3 niveles | Pendiente |
+| 3 | Máquina en Web Worker, 3 niveles | Motor y Worker hechos; falta la pantalla (pendiente de diseño) |
 | 4 | Coach: explicación de errores | Pendiente |
 | 5 | 5–6 lecciones guiadas | Pendiente |
 | 6 | Pulido para portfolio, CI y despliegue | Pendiente |
@@ -50,6 +52,7 @@ npm test         # compila y ejecuta node --test (perft a profundidad rápida)
 npm run test:perft   # perft a profundidad completa (unos 43 millones de nodos)
 npm run perft -- <profundidad> ["<fen>"] [jugadas UCI...] [--ref <fichero>]
 npm run build:site   # compila y monta site/ (lo que se publica) con el service worker versionado
+npm run match    # partidas automáticas entre niveles (unos 15 min; «-- 4» para 4 por enfrentamiento)
 npm run serve    # monta site/ y lo sirve en http://127.0.0.1:8080 (sin dependencias)
 ```
 
@@ -64,6 +67,36 @@ La interacción está separada en dos capas. `src/ui/game.ts` (la partida por ca
 Escaque se adapta a móvil, tablet y escritorio y se instala como app (PWA). Puntos de corte: menos de 600 px (móvil), 600 a 859 px (tablet vertical, tablero de hasta 700 px) y desde 860 px (dos columnas); en horizontal bajo 500 px de alto el tablero se mide por el alto. Respeta las zonas seguras (muescas). `public/manifest.webmanifest` declara la app; `src/pwa/sw.ts` es un service worker propio, sin librerías, con caché versionada por contenido (`escaque-<hash>`), que deja jugar sin conexión. Cuando hay versión nueva, un aviso lo dice y avisa de que actualizar reinicia la partida (aún no se guarda). `npm run build:site` genera `site/` con la lista de ficheros a precachear. `vercel.json` publica `site/` (la región `fra1` está fijada, aunque al ser estático solo afectaría a funciones; HSTS lo pone Vercel) y fija las cabeceras de seguridad en todas las respuestas: CSP estricta (`default-src 'none'`, solo recursos propios, `frame-ancestors 'none'`), `X-Frame-Options: DENY`, `nosniff`, `Referrer-Policy: no-referrer`, `Permissions-Policy` cerrada y `Cross-Origin-Opener-Policy: same-origin`. Al ser una web estática no hay nonce por petición: la CSP no admite `unsafe-inline`, y `tools/vercel-config.test.mjs` comprueba que el sitio no lleve scripts ni estilos en línea. El cortafuegos y la protección de bots se configuran en el panel de Vercel.
 
 El diseño se hace antes en Claude Design y se copia en `docs/design` (README con origen, versión y fecha). Ningún cambio visual entra sin pasar por allí.
+
+### Alfil Beta, el motor
+
+Todo en `src/engine`, sin dependencias ni DOM: funciona igual en Node y en el navegador.
+
+- **Búsqueda.** Negamax con poda alfa-beta y profundización iterativa con límite de tiempo. Si el tiempo se acaba a media iteración, vale la última completa, y la profundidad 1 siempre se termina. En las hojas, búsqueda de quietud con capturas y coronaciones a dama. Quien está en jaque no puede «quedarse quieto»: se miran todas sus respuestas, y sin ninguna es mate. Estar en jaque alarga la búsqueda una media jugada. Orden de jugadas: primero la de la tabla de transposición, luego capturas por MVV-LVA y luego coronaciones. Los mates se puntúan por distancia, así que busca el más corto y retrasa el suyo. Dentro de la búsqueda, una posición repetida, la regla de 50 jugadas (salvo que la jugada 100 dé mate) y el material insuficiente valen 0.
+- **Clave Zobrist y tabla de transposición.** El núcleo mantiene una clave Zobrist de 64 bits en dos mitades de 32, porque los bitboards o las claves con BigInt serían lentos en JavaScript. Los números salen de un generador propio (mulberry32) con semilla fija. La casilla al paso solo entra en la clave si la captura al paso es legal, así que la misma clave sirve para la triple repetición de las reglas, para las repeticiones dentro de la búsqueda y para la tabla de transposición: 2^18 entradas en arrays tipados, unos 4 MB, sin crear objetos al buscar. Mantener la clave cuesta en torno a un 13 % de velocidad de perft.
+- **Evaluación.** Material (P 100, C 320, A 330, T 500, D 900) más tablas de valor por casilla. El rey tiene una tabla para el medio juego y otra para el final, y se mezclan según el material que queda. Es simétrica: cambiar los colores no cambia la valoración, y hay un test que lo comprueba.
+- **Niveles** (`chooseMove`):
+
+  | Nivel | Cómo juega |
+  | --- | --- |
+  | Fácil | Puntúa todas las jugadas a profundidad 1 (más la quietud) y elige al azar entre las que quedan a menos de 1,5 peones de la mejor. Si hay mate en 1, lo da. |
+  | Medio | Profundidad 3, como mucho 0,5 s. |
+  | Difícil | Profundización iterativa durante 0,9 s. |
+
+- **Worker** (`src/worker`). La interfaz manda la FEN inicial, las jugadas hechas en UCI (así el motor ve las repeticiones) y el nivel. El Worker valida cada mensaje (tipos, longitudes, nivel y legalidad de cada jugada), nunca lanza y responde con la jugada, la puntuación, la profundidad y la variante principal. `EngineClient` manda una petición cada vez. Para cancelar detiene el Worker, porque un Worker que está pensando no atiende mensajes, y crea otro en la siguiente petición. Se ha probado en Chromium con la misma CSP de producción (`worker-src 'self'`).
+
+**Punto de parada.** Lo fijamos antes de afinar el motor y no se sigue afinando sin pedirlo. Se cumple:
+
+| Criterio | Resultado |
+| --- | --- |
+| Difícil responde en menos de 1 s | Media de 818 ms y máximo de 909 ms en 505 jugadas |
+| Resuelve mates en 1 y en 2 y gana piezas que se dan gratis | Batería en `tests/engine-search.test.ts`. Las posiciones de mate se comprueban con un buscador por fuerza bruta independiente del motor. |
+| No regala piezas | Aparta la pieza atacada, no toma el peón envenenado y Fácil no deja la dama colgada |
+| Difícil gana 20 de 20 a un jugador al azar | +20 =0 −0 |
+| Difícil gana a Fácil | +10 =0 −0 |
+| Medio gana a Fácil | +10 =0 −0 |
+
+Las cifras de las partidas salen de `npm run match` (Node 22, un hilo, colores alternos). Profundidad típica en 0,9 s: 5 en la apertura, 4 en medios juegos tácticos como Kiwipete y más de 10 en finales de peones, con unos 120.000 a 500.000 nodos por segundo.
 
 ### Perft y perft dividido
 
