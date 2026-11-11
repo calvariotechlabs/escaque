@@ -1,11 +1,11 @@
 // Servidor estático mínimo para probar la web en local, sin dependencias.
 // Uso: npm run serve   (compila y sirve la carpeta del repositorio en http://127.0.0.1:8080)
 import { createServer } from "node:http";
-import { readFile } from "node:fs/promises";
+import { readFile, realpath } from "node:fs/promises";
 import { extname, join, normalize, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const root = resolve(fileURLToPath(new URL("..", import.meta.url)));
+const root = await realpath(resolve(fileURLToPath(new URL("..", import.meta.url))));
 const port = Number(process.env.PORT ?? 8080);
 const types = {
   ".html": "text/html; charset=utf-8",
@@ -33,7 +33,13 @@ createServer(async (req, res) => {
       res.writeHead(403).end("Prohibido");
       return;
     }
-    const body = await readFile(file);
+    // Un enlace simbólico dentro del repositorio no puede sacarnos de él.
+    const real = await realpath(file);
+    if (!real.startsWith(root + sep)) {
+      res.writeHead(403).end("Prohibido");
+      return;
+    }
+    const body = await readFile(real);
     res.writeHead(200, { "Content-Type": types[extname(file)] ?? "application/octet-stream", "Cache-Control": "no-store" });
     res.end(body);
   } catch {

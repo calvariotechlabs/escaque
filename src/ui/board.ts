@@ -25,6 +25,14 @@ export interface SquareModel {
 
 export type Mark = "selected" | "target" | "capture" | "last-move" | "check";
 
+const MARK_TEXT: Readonly<Record<Mark, string>> = {
+  selected: "seleccionada",
+  target: "destino",
+  capture: "captura posible",
+  "last-move": "última jugada",
+  check: "rey en jaque",
+};
+
 export interface BoardOptions {
   /** Bando que se ve abajo; por defecto las blancas. */
   readonly orientation?: Color;
@@ -36,9 +44,16 @@ export interface BoardView {
   /** Pinta la colocación de la FEN (solo el primer campo). Lanza `FenError` si está mal formada. */
   setPosition(fen: string): void;
   setOrientation(color: Color): void;
-  /** Casilla por nombre algebraico («e4»). Lanza si el nombre no es válido. */
+  /**
+   * Casilla por nombre algebraico («e4»). Lanza si el nombre no es válido.
+   * El elemento sirve hasta el siguiente `setPosition` o `setOrientation` que cambie algo, que
+   * reconstruyen el tablero: vuelve a pedirlo después en lugar de guardarlo.
+   */
   squareElement(square: string): HTMLElement;
-  /** Sustituye todas las marcas anteriores. */
+  /**
+   * Sustituye todas las marcas anteriores. Cada casilla recibe `data-marks` y su `aria-label`
+   * añade la marca en español («e4, vacía, destino»). Si una casilla tiene captura y destino a la vez, se pinta la captura.
+   */
   setMarks(marks: ReadonlyMap<string, readonly Mark[]>): void;
 }
 
@@ -141,28 +156,37 @@ export function createBoard(container: HTMLElement, options: BoardOptions = {}):
   let orientation: Color = options.orientation ?? "w";
   let fen = "8/8/8/8/8/8/8/8";
   let marks: ReadonlyMap<string, readonly Mark[]> = new Map();
+  let cells = new Map<string, HTMLElement>();
+  let baseLabels = new Map<string, string>();
 
   const element = doc.createElement("div");
   element.className = "tablero";
   container.replaceChildren(element);
 
-  const byName = (): Map<string, HTMLElement> => {
-    const map = new Map<string, HTMLElement>();
-    for (const el of element.querySelectorAll<HTMLElement>("[data-square]")) map.set(el.dataset["square"]!, el);
-    return map;
-  };
-
   const applyMarks = (): void => {
-    for (const el of element.querySelectorAll<HTMLElement>("[data-square]")) el.removeAttribute("data-marks");
-    const cells = byName();
-    for (const [square, list] of marks) {
-      if (list.length > 0) cells.get(square)?.setAttribute("data-marks", list.join(" "));
+    for (const [square, el] of cells) {
+      const list = marks.get(square) ?? [];
+      const base = baseLabels.get(square) ?? square;
+      if (list.length > 0) {
+        el.setAttribute("data-marks", list.join(" "));
+        el.setAttribute("aria-label", `${base}, ${list.map((m) => MARK_TEXT[m]).join(", ")}`);
+      } else {
+        el.removeAttribute("data-marks");
+        el.setAttribute("aria-label", base);
+      }
     }
   };
 
   const draw = (): void => {
     element.dataset["orientation"] = orientation;
     element.innerHTML = boardHtml(fen, orientation);
+    cells = new Map();
+    baseLabels = new Map();
+    for (const el of element.querySelectorAll<HTMLElement>("[data-square]")) {
+      const name = el.dataset["square"]!;
+      cells.set(name, el);
+      baseLabels.set(name, el.getAttribute("aria-label") ?? name);
+    }
     applyMarks();
   };
   draw();
@@ -171,15 +195,17 @@ export function createBoard(container: HTMLElement, options: BoardOptions = {}):
     element,
     setPosition(next: string): void {
       parsePlacement(next); // falla antes de tocar el DOM
+      if (next === fen) return;
       fen = next;
       draw();
     },
     setOrientation(color: Color): void {
+      if (color === orientation) return;
       orientation = color;
       draw();
     },
     squareElement(square: string): HTMLElement {
-      const el = byName().get(square);
+      const el = cells.get(square);
       if (!el) throw new RangeError(`Casilla no válida: ${square}`);
       return el;
     },

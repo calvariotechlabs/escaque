@@ -28,8 +28,8 @@
 .casilla::before,.casilla::after{content:"";position:absolute;pointer-events:none}
 .casilla[data-marks~="selected"]::before{inset:0;background:color-mix(in srgb,var(--mark-selected) 60%,transparent);box-shadow:inset 0 0 0 3px var(--board-ink)}
 .casilla[data-marks~="last-move"]::before{inset:0;background:color-mix(in srgb,var(--mark-last-move) 55%,transparent)}
-.casilla[data-marks~="check"]::before{inset:0;background:radial-gradient(circle at 50% 50%,var(--mark-check) 0,transparent 72%)}
-.casilla[data-marks~="target"]::after{inset:36%;border-radius:50%;background:var(--board-ink);opacity:.55;z-index:2}
+.casilla[data-marks~="check"]{background-image:radial-gradient(circle at 50% 50%,var(--mark-check) 0,transparent 72%)}
+.casilla[data-marks~="target"]:not([data-marks~="capture"])::after{inset:36%;border-radius:50%;background:var(--board-ink);opacity:.55;z-index:2}
 .casilla[data-marks~="capture"]::after{inset:4%;border-radius:50%;border:4px solid var(--board-ink);opacity:.75;z-index:2}
 .casilla:focus-visible{outline:3px solid var(--board-ink);outline-offset:-3px;z-index:3}
 
@@ -39,3 +39,10 @@
 .boton--principal{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
 .boton:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .boton[disabled]{opacity:1;color:var(--ink-muted);border-style:dashed;cursor:not-allowed}
+
+/* Modo de contraste forzado: los rellenos desaparecen, así que las marcas pasan a contorno y el punto de destino a un borde. */
+@media (forced-colors: active){
+  .casilla[data-marks]{outline:2px solid CanvasText;outline-offset:-2px}
+  .casilla[data-marks~="selected"]{outline-width:4px}
+  .casilla[data-marks~="target"]:not([data-marks~="capture"])::after{background:CanvasText;opacity:1}
+}
