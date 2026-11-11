@@ -31,7 +31,11 @@ import {
   type GameSetup,
   type SetupChoice,
 } from "./settings.js";
-import { createEngineClient } from "../worker/client.js";
+import type { CoachReport, SquareMark } from "../coach/index.js";
+import { reportView, reviewJob, reviewKey, withCoachMarks } from "./coach.js";
+import { createCoachPanel } from "./coach-panel.js";
+import { createEngineClient, EngineCancelledError } from "../worker/client.js";
+import { createCoachClient } from "../worker/coach-client.js";
 import { startPwa } from "../pwa/pwa.js";
 
 function byId<T extends HTMLElement>(id: string): T {
@@ -92,6 +96,25 @@ let thinkingVisible = false;
 let thinkingTimer: ReturnType<typeof setTimeout> | null = null;
 let machineFailed = false;
 
+// El coach: revisa en su propio Worker la última jugada de la persona (o la última, en partida a dos).
+let coachClient: ReturnType<typeof createCoachClient> | null = null;
+const coachCache = new Map<string, CoachReport>();
+/** Lo que enseña el panel ahora: la clave de la jugada revisada, `""` si no hay jugadas o `null` si hay que repintar. */
+let coachKey: string | null = null;
+let coachToken = 0;
+let coachMarks: readonly SquareMark[] = [];
+/** Posición en la que se pidieron las marcas de «Ver en el tablero»: si cambia, se quitan. */
+let coachMarksFen = "";
+const coachPanel = createCoachPanel((marks) => {
+  coachMarks = marks;
+  coachMarksFen = game.fen;
+  applyMarks();
+});
+
+function applyMarks(): void {
+  view.setMarks(withCoachMarks(ui.marks(), coachMarks));
+}
+
 function newInteraction(forGame: Game, forSetup: GameSetup): Interaction {
   const interaction = new Interaction(forGame);
   interaction.player = forSetup.mode === "maquina" ? forSetup.player : null;
@@ -110,7 +133,8 @@ const PROMOTIONS: ReadonlyArray<readonly [PromotionPiece, string]> = [
 function render(): void {
   view.setOrientation(ui.orientation);
   view.setPosition(game.fen);
-  view.setMarks(ui.marks());
+  renderCoach();
+  applyMarks();
   syncTabIndex();
   renderStatus();
   renderMoveList();
@@ -121,6 +145,64 @@ function render(): void {
   autosave(game, ui.orientation, setup);
   maybeThink();
 }
+
+const coachRoot = byId<HTMLElement>("coach");
+
+function renderCoach(): void {
+  if (coachMarks.length > 0 && coachMarksFen !== game.fen) coachPanel.clearMarks();
+  // Con el panel oculto (pantalla de ajustes, móvil apaisado) no se gasta CPU en revisar; al volver a verse se repinta.
+  if (coachRoot.getClientRects().length === 0) {
+    coachKey = null;
+    coachToken++;
+    coachClient?.cancel();
+    return;
+  }
+  const job = reviewJob(game, setup.mode === "maquina" ? setup.player : null);
+  const key = job === null ? "" : reviewKey(job);
+  if (key === coachKey) return; // el panel ya enseña esta jugada: no se repinta (ni se pierden los avisos abiertos)
+  coachKey = key;
+  const token = ++coachToken;
+  coachClient?.cancel();
+  if (job === null) {
+    coachPanel.showEmpty();
+    return;
+  }
+  /** Un fallo no deja la partida sin pintar y se reintenta en el próximo repintado. */
+  const fail = (): void => {
+    coachKey = null;
+    coachPanel.showFailed(job.label);
+  };
+  try {
+    const cached = coachCache.get(key);
+    if (cached !== undefined) {
+      coachPanel.showReport(reportView(cached, job.label));
+      return;
+    }
+    coachPanel.showReviewing(job.label);
+    coachClient ??= createCoachClient();
+    coachClient.analyze(job).then(
+      (report) => {
+        if (token !== coachToken) return;
+        try {
+          if (coachCache.size >= 300) coachCache.clear();
+          coachCache.set(key, report);
+          coachPanel.showReport(reportView(report, job.label));
+        } catch {
+          fail();
+        }
+      },
+      (error: unknown) => {
+        if (token !== coachToken || error instanceof EngineCancelledError) return;
+        fail();
+      },
+    );
+  } catch {
+    fail();
+  }
+}
+
+// Al girar el móvil el panel puede pasar de oculto a visible (y al revés).
+window.matchMedia("(orientation: landscape) and (max-height: 500px)").addEventListener("change", () => renderCoach());
 
 /** Tabindex itinerante: solo la casilla con el foco entra en el orden de tabulación. */
 function syncTabIndex(): void {
@@ -539,6 +621,9 @@ function fillSettings(choice: SetupChoice): void {
 
 function openSettings(): void {
   stopThinking();
+  coachToken++;
+  coachKey = null;
+  coachClient?.cancel();
   fillSettings(choiceOf(setup));
   showScreen("ajustes");
   settingsForm.querySelector<HTMLInputElement>('input[name="modo"]:checked')?.focus();

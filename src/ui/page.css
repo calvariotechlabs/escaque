@@ -38,10 +38,11 @@ body{margin:0;background:var(--surface);color:var(--ink);font:400 16px/24px var(
 @media (min-width:860px){
   .pagina__cabecera{padding-top:max(var(--space-6),env(safe-area-inset-top,0px))}
   .pagina__cabecera h1{font-size:32px;line-height:36px}
-  .partida{padding-top:var(--space-6);grid-template-columns:minmax(0,680px) minmax(300px,420px);grid-template-rows:auto auto auto 1fr;grid-template-areas:"tablero avisos" "tablero estado" "tablero jugadas" "tablero controles";column-gap:var(--space-8);align-items:start}
-  .partida:has(.avisos:empty){grid-template-rows:auto auto 1fr;grid-template-areas:"tablero estado" "tablero jugadas" "tablero controles"}
+  .partida{padding-top:var(--space-6);grid-template-columns:minmax(0,680px) minmax(300px,420px);grid-template-rows:auto auto auto auto 1fr;grid-template-areas:"tablero avisos" "tablero estado" "tablero coach" "tablero jugadas" "tablero controles";column-gap:var(--space-8);align-items:start}
+  .partida:has(.avisos:empty){grid-template-rows:auto auto auto 1fr;grid-template-areas:"tablero estado" "tablero coach" "tablero jugadas" "tablero controles"}
   .partida__avisos{grid-area:avisos}
   .partida__estado{grid-area:estado}
+  .partida__coach{grid-area:coach}
   .partida__tablero{grid-area:tablero}
   .partida__jugadas{grid-area:jugadas}
   .partida__controles{grid-area:controles}
@@ -57,6 +58,8 @@ body{margin:0;background:var(--surface);color:var(--ink);font:400 16px/24px var(
   .partida{box-sizing:border-box;height:100dvh;padding:max(var(--space-4),env(safe-area-inset-top,0px)) max(var(--space-6),env(safe-area-inset-right,0px)) max(var(--space-4),env(safe-area-inset-bottom,0px)) max(var(--space-6),env(safe-area-inset-left,0px));grid-template-columns:var(--tablero-ancho) minmax(0,1fr);grid-template-rows:32px auto auto auto minmax(0,1fr);grid-template-areas:"tablero titulo" "tablero avisos" "tablero estado" "tablero controles" "tablero jugadas";gap:var(--space-2) var(--space-6)}
   .partida:has(.avisos:empty){grid-template-rows:32px auto auto minmax(0,1fr);grid-template-areas:"tablero titulo" "tablero estado" "tablero controles" "tablero jugadas"}
   .pagina__cabecera ~ .partida::before{content:"";grid-area:titulo}
+  /* Sin diseño del coach en móvil apaisado: no se muestra hasta tenerlo. */
+  .partida .partida__coach{display:none}
   .partida .tablero{width:100%}
   .partida__avisos{grid-area:avisos}
   .partida__estado{grid-area:estado}

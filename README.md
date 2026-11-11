@@ -16,7 +16,7 @@ Velocidad de perft (Node 22, un hilo): unos 9 a 10 millones de nodos por segundo
 | 1 | Reglas completas + perft | Hecho |
 | 2 | Tablero jugable (dos jugadores) | Hecho |
 | 3 | Máquina en Web Worker, 3 niveles | Motor y Worker hechos; falta la pantalla (pendiente de diseño) |
-| 4 | Coach: explicación de errores | Lógica hecha; falta programar el panel (diseño aprobado) |
+| 4 | Coach: explicación de errores | Hecho: lógica en `src/coach`, panel en la interfaz y cálculo en su propio Worker |
 | 5 | 5–6 lecciones guiadas | Pendiente |
 | 6 | Pulido para portfolio, CI y despliegue | Pendiente |
 
@@ -100,7 +100,9 @@ Las cifras de las partidas salen de `npm run match` (Node 22, un hilo, colores a
 
 ### Coach
 
-Todo en `src/coach`, sin dependencias ni DOM. `analyzeMove({ fen, moves }, jugada)` devuelve datos y textos en español con la forma del panel aprobado en `docs/design`: veredicto y frase corta, mejor jugada, evaluación antes y después vista por las blancas («+0,3 a favor de las blancas», «Mate en 1 para las blancas»), y avisos con título, explicación, etiqueta accesible y casillas para «Ver en el tablero». Habla de tú a quien ha movido, así que sirve igual contra la máquina y a dos jugadores. La interfaz solo lo pinta.
+Todo en `src/coach`, sin dependencias ni DOM. `analyzeMove({ fen, moves }, jugada)` devuelve datos y textos en español con la forma del panel aprobado en `docs/design`: veredicto y frase corta, mejor jugada, evaluación antes y después vista por las blancas («+0,3 a favor de las blancas», «Mate en 1 para las blancas»), y avisos con título, explicación, etiqueta accesible y casillas para «Ver en el tablero». Habla de tú a quien ha movido, así que sirve igual contra la máquina y a dos jugadores.
+
+**En la interfaz.** El panel (`src/ui/coach-panel.ts`, lógica sin DOM en `src/ui/coach.ts`) sale en las partidas contra la máquina y en las de dos jugadores. Contra la máquina revisa tus jugadas y a dos revisa siempre la última; sigue a la jugada que se ve al deshacer, rehacer o saltar por la lista. El cálculo va en un Worker propio (`src/worker/coach-*.ts`), aparte del de Alfil Beta, para que revisar tu jugada no retrase la respuesta de la máquina; las respuestas del Worker se validan y el informe de cada jugada se guarda para no repetir el cálculo. Accesibilidad: solo el veredicto es una región `role="status"`, el coach nunca toma el foco (ni al pulsar «Ver en el tablero») y los botones miden 44 px. En móvil apaisado no se muestra todavía, porque el lienzo no tiene ese diseño.
 
 - **Valoración.** Alfil Beta busca la posición antes de la jugada (su mejor jugada y su puntuación) y la jugada hecha a la misma profundidad. La diferencia en centipeones se pasa a puntos esperados con una curva logística, como hacen los analizadores habituales, porque perder un peón con la partida igualada pesa mucho más que perderlo ganando por una torre. Según cuánto caen: mejor jugada, buena (menos de 0,05), imprecisión (0,05), error (0,10) o error grave (0,15). Por defecto, profundidad 4 y como mucho 0,6 s en la búsqueda de antes; la jugada hecha se busca luego a la profundidad alcanzada, sin reloj, para que las dos miren igual de lejos. Sin límite de tiempo el análisis es determinista, y así se prueba. En Node tarda de 0,05 a 0,8 s por jugada. Dejar escapar un mate en 1 nunca se califica como mejor ni buena jugada, aunque quede un mate más largo.
 - **Mate en 1 que se escapó.** Se prueban todas las jugadas legales: es exacto, no depende de la búsqueda.
