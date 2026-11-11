@@ -2,7 +2,7 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { Game } from "../src/ui/game.js";
-import { loadFromStorage, restoreGame, saveToStorage, serializeGame, STORAGE_KEY } from "../src/ui/save.js";
+import { createAutosave, loadFromStorage, restoreGame, saveToStorage, serializeGame, STORAGE_KEY } from "../src/ui/save.js";
 import type { KeyValueStore } from "../src/ui/save.js";
 
 function playAll(game: Game, moves: string[]): void {
@@ -152,5 +152,27 @@ describe("guardado: almacenamiento", () => {
     };
     assert.doesNotThrow(() => saveToStorage(throwing, game, "w"));
     assert.equal(loadFromStorage(throwing), null);
+  });
+});
+
+describe("guardado: escritura automática", () => {
+  it("no vuelve a escribir si la partida no ha cambiado", () => {
+    const store = memoryStore();
+    let writes = 0;
+    const counting: KeyValueStore = { ...store, setItem: (k, v) => { writes++; store.setItem(k, v); } };
+    const save = createAutosave(counting);
+    const game = new Game();
+    save(game, "w");
+    save(game, "w");
+    assert.equal(writes, 1);
+    save(game, "b");
+    assert.equal(writes, 2);
+    playAll(game, ["e2e4"]);
+    save(game, "b");
+    assert.equal(writes, 3);
+  });
+
+  it("sin almacenamiento no hace nada", () => {
+    assert.doesNotThrow(() => createAutosave(null)(new Game(), "w"));
   });
 });

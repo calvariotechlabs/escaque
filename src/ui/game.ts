@@ -93,7 +93,7 @@ export class Game {
   }
 
   /** Todas las jugadas de la partida en orden, también las que se pueden rehacer; sirve para guardarla. */
-  get allMoves(): ReadonlyArray<{ readonly from: string; readonly to: string; readonly promotion: PromotionPiece | null }> {
+  get allMoves(): readonly MoveRecord[] {
     return [...this.records, ...[...this.future].reverse()];
   }
 
@@ -245,7 +245,7 @@ export class Game {
 
   /** Lista de jugadas por número, con SAN en español; incluye las que se pueden rehacer. */
   moveList(): MoveListRow[] {
-    const all = [...this.records, ...[...this.future].reverse()];
+    const all = this.allMoves;
     const rows: MoveListRow[] = [];
     // Media jugada 0 es la del bando que empezó; las blancas van en las pares si empezaron ellas.
     const offset = this.startTurn === "w" ? 0 : 1;

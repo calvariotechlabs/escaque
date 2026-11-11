@@ -64,7 +64,11 @@ export function restoreGame(raw: unknown): RestoredGame | null {
     const promotion = move.length === 5 ? (move[4] as PromotionPiece) : undefined;
     if (game.play(move.slice(0, 2), move.slice(2, 4), promotion) === null) return null;
   }
-  game.goTo(ply);
+  try {
+    game.goTo(ply);
+  } catch {
+    return null;
+  }
   return { game, orientation };
 }
 
@@ -76,6 +80,18 @@ export function saveToStorage(store: KeyValueStore | null, game: Game, orientati
   } catch {
     // La partida sigue en memoria; solo se pierde la recuperación.
   }
+}
+
+/** Guardado que evita reescribir lo mismo: `render()` se llama también al girar o seleccionar, sin cambios en la partida. */
+export function createAutosave(store: KeyValueStore | null): (game: Game, orientation: Color) => void {
+  let last: string | null = null;
+  return (game, orientation) => {
+    if (store === null) return;
+    const text = serializeGame(game, orientation);
+    if (text === last) return;
+    last = text;
+    saveToStorage(store, game, orientation);
+  };
 }
 
 /** Lee la partida guardada. Una entrada corrupta se borra para no tropezar con ella cada vez. */
