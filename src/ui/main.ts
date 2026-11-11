@@ -3,7 +3,8 @@
 // Traduce clics, arrastres y teclas a llamadas de `Interaction` y pinta el
 // resultado con `BoardView`. Todo el texto se escribe con textContent o
 // atributos, nunca como HTML. La carga el navegador como módulo ES nativo.
-import { START_FEN, type Color, type PromotionPiece } from "../core/index.js";
+import { START_FEN } from "../core/index.js";
+import { attachBoardInput } from "./board-input.js";
 import { createBoard } from "./board.js";
 import { Game } from "./game.js";
 import { Interaction, type Outcome } from "./interaction.js";
@@ -19,7 +20,7 @@ import {
   sanToSpanish,
   statusMessage,
 } from "./notation.js";
-import { pieceSvg } from "./pieces.js";
+import { createPromotionDialog } from "./promotion.js";
 import { browserStore, createAutosave, loadFromStorage } from "./save.js";
 import {
   choiceOf,
@@ -37,6 +38,10 @@ import { createCoachPanel } from "./coach-panel.js";
 import { createEngineClient, EngineCancelledError } from "../worker/client.js";
 import { createCoachClient } from "../worker/coach-client.js";
 import { startPwa } from "../pwa/pwa.js";
+import { checkLessonMove, LESSONS } from "../lessons/index.js";
+import { createLessonsScreen } from "./lessons-screen.js";
+import { LESSONS_TITLE } from "./lessons-text.js";
+import { parseRoute, type Route } from "./routes.js";
 
 function byId<T extends HTMLElement>(id: string): T {
   const el = document.getElementById(id);
@@ -49,6 +54,9 @@ const gameScreen = byId<HTMLElement>("pantalla-partida");
 const settingsForm = byId<HTMLFormElement>("ajustes");
 const levelGroup = byId<HTMLFieldSetElement>("grupo-nivel");
 const colorGroup = byId<HTMLFieldSetElement>("grupo-color");
+const headingSub = byId<HTMLParagraphElement>("cabecera-sub");
+const linkPlay = byId<HTMLAnchorElement>("enlace-jugar");
+const linkLessons = byId<HTMLAnchorElement>("enlace-lecciones");
 const headingLong = byId<HTMLSpanElement>("cabecera-largo");
 const headingShort = byId<HTMLSpanElement>("cabecera-corto");
 const thinkingBar = byId<HTMLSpanElement>("pensando");
@@ -74,6 +82,13 @@ const announcer = byId<HTMLParagraphElement>("anuncio");
 const promotionDialog = byId<HTMLDialogElement>("coronacion");
 const promotionOptions = byId<HTMLDivElement>("opciones-coronacion");
 const view = createBoard(byId("tablero"));
+const promotion = createPromotionDialog(promotionDialog, promotionOptions);
+const lessonsScreen = createLessonsScreen({
+  lessons: LESSONS,
+  check: checkLessonMove,
+  store: browserStore(),
+  promotion,
+});
 createBoard(byId("vista-previa")).setPosition(START_FEN);
 
 // La partida en curso se guarda en el dispositivo y se recupera al abrir o al actualizar la app.
@@ -120,13 +135,6 @@ function newInteraction(forGame: Game, forSetup: GameSetup): Interaction {
   interaction.player = forSetup.mode === "maquina" ? forSetup.player : null;
   return interaction;
 }
-
-const PROMOTIONS: ReadonlyArray<readonly [PromotionPiece, string]> = [
-  ["q", "Dama"],
-  ["r", "Torre"],
-  ["b", "Alfil"],
-  ["n", "Caballo"],
-];
 
 // --- Pintar ------------------------------------------------------------------
 
@@ -389,166 +397,31 @@ function handle(outcome: Outcome): void {
 // --- Coronación ----------------------------------------------------------------
 
 function openPromotion(): void {
-  const color = game.turn;
-  const buttons = PROMOTIONS.map(([piece, name]) => {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = "coronacion__opcion";
-    button.dataset["piece"] = piece;
-    const svg = pieceSvg(color, piece);
-    svg.setAttribute("aria-hidden", "true");
-    const label = document.createElement("span");
-    label.textContent = name;
-    button.append(svg, label);
-    return button;
+  promotion.open(game.turn, {
+    choose: (piece) => closePromotion(() => ui.choosePromotion(piece)),
+    cancel: () => closePromotion(() => ui.cancel()),
   });
-  promotionOptions.replaceChildren(...buttons);
-  promotionDialog.showModal();
-  buttons[0]!.focus();
 }
 
 function closePromotion(action: () => Outcome): void {
   const origin = ui.pendingPromotion?.from;
   const outcome = action();
-  if (promotionDialog.open) promotionDialog.close();
+  promotion.close();
   if (outcome.kind === "deselected" && origin !== undefined) ui.focus = origin;
   handle(outcome);
   focusBoard();
 }
 
-promotionOptions.addEventListener("click", (event) => {
-  const button = (event.target as Element).closest<HTMLButtonElement>("[data-piece]");
-  if (button === null) return;
-  closePromotion(() => ui.choosePromotion(button.dataset["piece"] as PromotionPiece));
-});
-
-// Escape cierra el diálogo y cancela la jugada; el foco vuelve a la casilla de origen.
-promotionDialog.addEventListener("cancel", (event) => {
-  event.preventDefault();
-  closePromotion(() => ui.cancel());
-});
-
 // --- Tablero: clic, arrastre y teclado -----------------------------------------
 
-/** Distancia en píxeles a partir de la cual un gesto es un arrastre y no un clic. */
-const DRAG_THRESHOLD = 4;
-
-interface Gesture {
-  readonly pointerId: number;
-  readonly square: string;
-  readonly x: number;
-  readonly y: number;
-  dragging: boolean;
-  /** La pieza no se puede arrastrar: si el dedo se mueve un poco, sigue siendo un toque. */
-  tapOnly: boolean;
-  /** ¿Estaba el foco en el tablero al empezar? Entonces sigue a la casilla. */
-  hadFocus: boolean;
-}
-
-let gesture: Gesture | null = null;
-
-function squareAt(target: EventTarget | null): string | null {
-  if (!(target instanceof Element)) return null;
-  const cell = target.closest<HTMLElement>("[data-square]");
-  return cell !== null && view.element.contains(cell) ? cell.dataset["square"] ?? null : null;
-}
-
-/** Pieza que se arrastra: se mueve con el puntero y queda por encima del resto de casillas. */
-function draggedPiece(): { cell: HTMLElement; piece: Element | null } | null {
-  if (gesture === null) return null;
-  const cell = view.squareElement(gesture.square);
-  return { cell, piece: cell.querySelector(".pieza") };
-}
-
-function resetDraggedPiece(): void {
-  const dragged = draggedPiece();
-  if (dragged === null) return;
-  dragged.cell.style.removeProperty("z-index");
-  if (dragged.piece instanceof SVGElement) {
-    dragged.piece.style.removeProperty("transform");
-    dragged.piece.style.removeProperty("pointer-events");
-  }
-}
-
-view.element.addEventListener("pointerdown", (event) => {
-  if (event.button !== 0 || gesture !== null) return;
-  const square = squareAt(event.target);
-  if (square === null) return;
-  gesture = {
-    pointerId: event.pointerId,
-    square,
-    x: event.clientX,
-    y: event.clientY,
-    dragging: false,
-    tapOnly: false,
-    hadFocus: view.element.contains(document.activeElement),
-  };
-  view.element.setPointerCapture(event.pointerId);
-  event.preventDefault(); // sin selección de texto ni arrastre nativo de imágenes
-});
-
-view.element.addEventListener("pointermove", (event) => {
-  if (gesture === null || event.pointerId !== gesture.pointerId) return;
-  const dx = event.clientX - gesture.x;
-  const dy = event.clientY - gesture.y;
-  if (gesture.tapOnly) return;
-  if (!gesture.dragging) {
-    if (Math.hypot(dx, dy) < DRAG_THRESHOLD) return;
-    if (!ui.dragStart(gesture.square)) {
-      gesture.tapOnly = true;
-      return;
-    }
-    gesture.dragging = true;
-    ui.focus = gesture.square;
-    render();
-  }
-  const dragged = draggedPiece();
-  if (dragged === null) return;
-  dragged.cell.style.zIndex = "4";
-  if (dragged.piece instanceof SVGElement) {
-    dragged.piece.style.transform = `translate(${dx}px, ${dy}px)`;
-    dragged.piece.style.pointerEvents = "none";
-  }
-});
-
-function endGesture(event: PointerEvent, cancelled: boolean): void {
-  if (gesture === null || event.pointerId !== gesture.pointerId) return;
-  const { square, dragging, hadFocus } = gesture;
-  resetDraggedPiece();
-  gesture = null;
-  if (view.element.hasPointerCapture(event.pointerId)) view.element.releasePointerCapture(event.pointerId);
-  if (dragging) {
-    const target = cancelled ? null : squareAt(document.elementFromPoint(event.clientX, event.clientY));
-    handle(ui.drop(target));
-  } else if (!cancelled) {
-    ui.focus = square;
-    handle(ui.click(square));
-  }
-  // El tablero puede haberse reconstruido: se mira el foco de antes del gesto, no el de ahora.
-  if (hadFocus && !promotionDialog.open) focusBoard();
-}
-
-view.element.addEventListener("pointerup", (event) => endGesture(event, false));
-view.element.addEventListener("pointercancel", (event) => endGesture(event, true));
-// Si el navegador quita la captura sin pointerup ni pointercancel, el gesto se cancela para no bloquear el tablero.
-view.element.addEventListener("lostpointercapture", (event) => endGesture(event, true));
-
-view.element.addEventListener("keydown", (event) => {
-  if (squareAt(event.target) === null || event.altKey || event.ctrlKey || event.metaKey) return;
-  const outcome = ui.key(event.key);
-  if (outcome.kind === "none") return;
-  event.preventDefault();
-  handle(outcome);
-  if (!promotionDialog.open) focusBoard();
-});
-
-// Si el foco entra en el tablero por otra casilla (clic de ratón, lector de pantalla), la seguimos.
-view.element.addEventListener("focusin", (event) => {
-  const square = squareAt(event.target);
-  if (square !== null && square !== ui.focus) {
-    ui.focus = square;
-    syncTabIndex();
-  }
+attachBoardInput({
+  view,
+  interaction: () => ui,
+  handle,
+  render,
+  focusBoard,
+  syncTabIndex,
+  promotionOpen: () => promotion.isOpen,
 });
 
 // --- Lista de jugadas y botones -------------------------------------------------
@@ -584,21 +457,54 @@ function startGame(next: GameSetup): void {
     ui.orientation = setup.player;
     ui.focusKing(setup.player);
   }
-  showScreen("partida");
   announce(setup.mode === "maquina" && setup.player === "b" ? `Nueva partida. Juegas con las negras.` : "Nueva partida.");
-  render();
+  showScreen("partida"); // pinta la partida al enseñarla
   if (setup.mode === "maquina") focusBoard();
 }
 
 // --- Ajustes -------------------------------------------------------------------
 
+/** Pantalla de jugar que toca enseñar cuando la ruta es «jugar»: la de ajustes o la de la partida. */
+let playScreen: "ajustes" | "partida" = "ajustes";
+let route: Route = parseRoute(location.hash);
+/** ¿Se están enseñando las lecciones? Así se sabe cuándo se vuelve de ellas. */
+let onLessons = false;
+const BASE_TITLE = document.title;
+
 function showScreen(screen: "ajustes" | "partida"): void {
-  settingsScreen.hidden = screen !== "ajustes";
-  gameScreen.hidden = screen !== "partida";
-  if (screen === "ajustes") {
-    headingLong.textContent = "Aprende ajedrez jugando";
-    headingShort.textContent = "Aprende ajedrez jugando";
+  playScreen = screen;
+  applyRoute(false);
+}
+
+/** Enseña la pantalla que toca según la ruta (el fragmento de la URL). */
+function applyRoute(moveFocus: boolean): void {
+  route = parseRoute(location.hash);
+  const onPlay = route.kind === "jugar";
+  settingsScreen.hidden = !onPlay || playScreen !== "ajustes";
+  gameScreen.hidden = !onPlay || playScreen !== "partida";
+  headingSub.hidden = !(onPlay && playScreen === "partida");
+  linkPlay.removeAttribute("aria-current");
+  linkLessons.removeAttribute("aria-current");
+  (onPlay ? linkPlay : linkLessons).setAttribute("aria-current", "page");
+  if (onPlay) {
+    lessonsScreen.hide();
+    document.title = BASE_TITLE;
+    // Al volver de las lecciones se reanuda lo que hubiera: el coach y, si le toca, la máquina.
+    if (onLessons && playScreen === "partida") render();
+    onLessons = false;
+    return;
   }
+  onLessons = true;
+  // Al irse a las lecciones se suelta lo que hubiera a medias en el tablero (selección, coronación, el diálogo) y
+  // la máquina deja de pensar y el coach de revisar; al volver se retoman.
+  promotion.close();
+  ui.cancel();
+  stopThinking();
+  coachToken++;
+  coachKey = null;
+  coachClient?.cancel();
+  const shown = route.kind === "leccion" ? lessonsScreen.showLesson(route.id, moveFocus) : lessonsScreen.showList(moveFocus);
+  document.title = shown === null || route.kind !== "leccion" ? `${LESSONS_TITLE} · Escaque` : `${shown} · ${LESSONS_TITLE} · Escaque`;
 }
 
 function checkedValue(name: string): string | undefined {
@@ -694,11 +600,12 @@ redoButton.addEventListener("click", () => {
   if (redoButton.disabled) undoButton.focus();
 });
 
+window.addEventListener("hashchange", () => applyRoute(true));
+
 if (recovered !== null) {
   // Una partida contra la máquina guardada en pleno turno suyo se retoma: piensa y juega.
   if (setup.mode === "maquina") normalizePly(game, setup.player);
-  showScreen("partida");
-  render();
+  showScreen("partida"); // pinta la partida al enseñarla
   if (game.totalPlies > 0) announce("Partida recuperada.");
 } else {
   fillSettings(DEFAULT_CHOICE);

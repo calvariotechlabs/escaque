@@ -21,12 +21,14 @@
 <link rel="stylesheet" href="src/ui/page.css">
 <link rel="stylesheet" href="src/ui/ajustes.css">
 <link rel="stylesheet" href="src/ui/coach.css">
+<link rel="stylesheet" href="src/ui/lecciones.css">
 <script type="module" src="dist/src/ui/main.js"></script>
 </head>
 <body>
 <header class="pagina__cabecera">
   <h1>Escaque</h1>
-  <p><span id="cabecera-largo" class="solo-escritorio">Aprende ajedrez jugando</span><span id="cabecera-corto" class="solo-movil">Aprende ajedrez jugando</span></p>
+  <nav class="lecc-nav" aria-label="Principal"><a id="enlace-jugar" class="lecc-enlace" href="#/jugar" aria-current="page">Jugar</a><a id="enlace-lecciones" class="lecc-enlace" href="#/lecciones">Lecciones</a></nav>
+  <p id="cabecera-sub" hidden><span id="cabecera-largo" class="solo-escritorio"></span><span id="cabecera-corto" class="solo-movil"></span></p>
 </header>
 <main id="pantalla-ajustes" class="ajustes-pantalla" aria-labelledby="titulo-ajustes" hidden>
   <section class="ajustes-pantalla__form">
@@ -95,6 +97,40 @@
     <ol id="lista-jugadas" class="jugadas__lista" aria-label="Lista de jugadas"></ol>
   </section>
   <p id="anuncio" class="solo-lector" aria-live="polite"></p>
+</main>
+<main id="pantalla-lecciones" class="lecc-pagina" aria-labelledby="titulo-lecciones" hidden>
+  <div class="lecc-intro-bloque">
+    <h2 id="titulo-lecciones" class="lecc-titulo" tabindex="-1">Lecciones</h2>
+    <p id="lecciones-intro" class="lecc-intro"></p>
+  </div>
+  <div id="lecciones-progreso" class="progreso"></div>
+  <ol id="lecciones-lista" class="lecciones" aria-label="Lista de lecciones"></ol>
+  <p class="lecc-pre">Tu progreso se guarda en este dispositivo.</p>
+</main>
+<main id="pantalla-leccion" class="lecc-pagina" aria-labelledby="leccion-titulo" hidden>
+  <div class="lecc-encabezado">
+    <div><p id="leccion-posicion" class="lecc-pre"></p><h2 id="leccion-titulo" class="lecc-titulo" tabindex="-1"></h2></div>
+    <div id="leccion-progreso" class="progreso lecc-progreso"></div>
+  </div>
+  <section class="objetivo" aria-labelledby="leccion-objetivo-etiqueta">
+    <h3 class="objetivo__etiqueta" id="leccion-objetivo-etiqueta">Objetivo</h3>
+    <p id="leccion-objetivo" class="objetivo__texto"></p>
+  </section>
+  <div class="lecc-cuerpo">
+    <p class="estado lecc-estado"><span id="leccion-turno" class="estado__turno estado__turno--w" aria-hidden="true"></span><span><strong id="leccion-estado-texto"></strong></span></p>
+    <section class="lecc-tablero" aria-label="Tablero"><div id="leccion-tablero"></div></section>
+    <div id="leccion-retro" class="lecc-retro" role="status"></div>
+    <section class="pistas lecc-pistas" aria-labelledby="leccion-pistas-titulo">
+      <h3 class="pistas__titulo" id="leccion-pistas-titulo">Pistas</h3>
+      <div class="pistas__vivo" aria-live="polite">
+        <p id="leccion-sin-pistas" class="pistas__vacia">Todavía no has pedido ninguna pista.</p>
+        <ol id="leccion-pistas" class="pistas__lista" hidden></ol>
+      </div>
+      <button id="leccion-pedir-pista" class="boton" type="button"></button>
+    </section>
+    <div class="lecc-acciones lecc-acciones--leccion"><button id="leccion-reiniciar" class="boton" type="button">Reiniciar lección</button><a class="boton boton--enlace" href="#/lecciones">Todas las lecciones</a></div>
+  </div>
+  <p id="leccion-anuncio" class="solo-lector" aria-live="polite"></p>
 </main>
 <dialog id="coronacion" class="coronacion-dialogo" aria-labelledby="titulo-coronacion">
   <div class="coronacion">

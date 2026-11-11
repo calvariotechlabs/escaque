@@ -6,6 +6,7 @@
 <script src="./support.js"></script>
 <link rel="stylesheet" href="ds/escaque/tokens.css">
 <link rel="stylesheet" href="ds/escaque/components/bundle.css">
+<link rel="stylesheet" href="lecciones.css">
 </head>
 <body>
 <x-dc>
@@ -16,9 +17,9 @@ body{margin:0}
 </style>
 </helmet>
 <div style="width: 390px; min-height: 480px; box-sizing: border-box; padding: 16px; background: var(--surface); color: var(--ink); font-family: var(--font-sans); display: flex; flex-direction: column; gap: 16px">
-<header style="display: flex; align-items: baseline; justify-content: space-between; gap: 8px">
+<header style="display: flex; align-items: center; justify-content: space-between; gap: 8px">
 <h1 style="margin: 0; font: 600 24px/28px var(--font-display)">Escaque</h1>
-<p style="margin: 0; font: 400 14px/20px var(--font-sans); color: var(--ink-muted)">Aprende ajedrez jugando</p>
+<nav class="lecc-nav" aria-label="Principal"><a class="lecc-enlace" href="#" aria-current="page">Jugar</a><a class="lecc-enlace" href="#">Lecciones</a></nav>
 </header>
 <main style="display: flex; flex-direction: column; gap: 16px">
 <h2 id="th" style="margin: 0; font: 600 24px/32px var(--font-display)">Nueva partida</h2>

@@ -6,6 +6,7 @@
 <script src="./support.js"></script>
 <link rel="stylesheet" href="ds/escaque/tokens.css">
 <link rel="stylesheet" href="ds/escaque/components/bundle.css">
+<link rel="stylesheet" href="lecciones.css">
 </head>
 <body>
 <x-dc>
@@ -33,7 +34,7 @@ body{margin:0}
 </div>
 </section>
 <aside aria-label="Partida" style="flex: 1 1 0; min-width: 0; height: 100%; display: flex; flex-direction: column; gap: 8px">
-<header style="display: flex; align-items: baseline; justify-content: space-between; gap: 8px"><h1 style="margin: 0; font: 600 20px/24px var(--font-display)">Escaque</h1><p style="margin: 0; font: 400 14px/20px var(--font-sans); color: var(--ink-muted)">Dos jugadores</p></header>
+<header style="display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap"><h1 style="margin: 0; font: 600 20px/24px var(--font-display)">Escaque</h1><nav class="lecc-nav" aria-label="Principal"><a class="lecc-enlace" href="#" aria-current="page">Jugar</a><a class="lecc-enlace" href="#">Lecciones</a></nav><p style="margin: 0; font: 400 14px/20px var(--font-sans); color: var(--ink-muted)">Dos jugadores</p></header>
 <p class="estado" role="status" style="margin: 0"><span class="estado__turno estado__turno--w" aria-hidden="true"></span><span><strong>Juegan las blancas.</strong></span></p>
 <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px"><button class="boton boton--principal" type="button">Nueva partida</button><button class="boton" type="button">Girar tablero</button><button class="boton" type="button">Deshacer jugada</button><button class="boton" type="button" disabled>Rehacer jugada</button></div>
 <section class="jugadas" aria-labelledby="tj" style="flex: 1 1 0; min-height: 0; overflow: auto; padding: 8px 16px">
