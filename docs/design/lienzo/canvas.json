@@ -211,6 +211,81 @@
       "h": 1760,
       "title": "Móvil · coach: error grave",
       "page": "movil"
+    },
+    "LeccionesEscritorio.dc.html": {
+      "x": 0,
+      "y": 6140,
+      "w": 1280,
+      "h": 720,
+      "title": "Escritorio · elegir una lección",
+      "expand": "fill",
+      "page": "escritorio"
+    },
+    "LeccionEscritorio.dc.html": {
+      "x": 1360,
+      "y": 6140,
+      "w": 1280,
+      "h": 960,
+      "title": "Escritorio · lección en curso con pistas",
+      "expand": "fill",
+      "page": "escritorio"
+    },
+    "LeccionEstados.dc.html": {
+      "x": 0,
+      "y": 7220,
+      "w": 1280,
+      "h": 700,
+      "title": "Escritorio · estados de una lección",
+      "expand": "fill",
+      "page": "escritorio"
+    },
+    "LeccionesTablet.dc.html": {
+      "x": 0,
+      "y": 8940,
+      "w": 820,
+      "h": 920,
+      "title": "Tablet · elegir una lección",
+      "page": "tablet"
+    },
+    "LeccionTablet.dc.html": {
+      "x": 900,
+      "y": 8940,
+      "w": 820,
+      "h": 1440,
+      "title": "Tablet · lección: acierto",
+      "page": "tablet"
+    },
+    "LeccionesMovil.dc.html": {
+      "x": 0,
+      "y": 10740,
+      "w": 390,
+      "h": 1320,
+      "title": "Móvil · elegir una lección",
+      "page": "movil"
+    },
+    "LeccionMovil.dc.html": {
+      "x": 470,
+      "y": 10740,
+      "w": 390,
+      "h": 1260,
+      "title": "Móvil · lección en curso",
+      "page": "movil"
+    },
+    "LeccionMovilAcierto.dc.html": {
+      "x": 940,
+      "y": 10740,
+      "w": 390,
+      "h": 1200,
+      "title": "Móvil · lección: acierto",
+      "page": "movil"
+    },
+    "LeccionMovilFallo.dc.html": {
+      "x": 1410,
+      "y": 10740,
+      "w": 390,
+      "h": 1280,
+      "title": "Móvil · lección: fallo",
+      "page": "movil"
     }
   },
   "order": [
@@ -236,7 +311,16 @@
     "CoachEscritorio.dc.html",
     "CoachEstados.dc.html",
     "CoachTablet.dc.html",
-    "CoachMovil.dc.html"
+    "CoachMovil.dc.html",
+    "LeccionesEscritorio.dc.html",
+    "LeccionEscritorio.dc.html",
+    "LeccionEstados.dc.html",
+    "LeccionesTablet.dc.html",
+    "LeccionTablet.dc.html",
+    "LeccionesMovil.dc.html",
+    "LeccionMovil.dc.html",
+    "LeccionMovilAcierto.dc.html",
+    "LeccionMovilFallo.dc.html"
   ],
   "notes": {
     "t_escritorio_0": {
@@ -251,7 +335,7 @@
       "x": 0,
       "y": 1360,
       "w": 520,
-      "text": "Ajustes de una partida nueva y pantalla de inicio. Contra la máquina, nivel Medio y blancas vienen preseleccionados: se empieza con un clic. A la derecha, un tablero decorativo con la posición inicial que se gira si eliges negras; solo aparece desde 860 px. «Nueva partida» en la pantalla de juego lleva aquí (con la confirmación de antes si hay jugadas).",
+      "text": "Ajustes de una partida nueva y pantalla de inicio. Contra la máquina, nivel Medio y blancas vienen preseleccionados: se empieza con un clic. A la derecha, un tablero decorativo con la posición inicial que se gira si eliges negras; solo aparece desde 860 px. «Nueva partida» en la pantalla de juego lleva aquí (con la confirmación de antes si hay jugadas). La cabecera lleva ahora «Jugar» (página actual) y «Lecciones»; sustituyen al lema «Aprende ajedrez jugando».",
       "fill": "gray",
       "page": "escritorio"
     },
@@ -518,6 +602,78 @@
       "fill": "gray",
       "page": "movil",
       "text": "Móvil: el coach va justo debajo del tablero, antes de los botones, en una sola columna. Los avisos se apilan y cada botón mide 44 px de alto. El veredicto es la única región que se anuncia (role=status): «Error grave. Cf3 deja escapar el mate…». Los avisos se leen al navegar; el coach nunca roba el foco."
+    },
+    "t_escritorio_3": {
+      "x": 0,
+      "y": 5900,
+      "text": "Lecciones guiadas",
+      "kind": "title1",
+      "maxW": 2640,
+      "page": "escritorio"
+    },
+    "t_tablet_4": {
+      "x": 0,
+      "y": 8700,
+      "text": "Lecciones guiadas",
+      "kind": "title1",
+      "maxW": 1720,
+      "page": "tablet"
+    },
+    "t_movil_5": {
+      "x": 0,
+      "y": 10500,
+      "text": "Lecciones guiadas",
+      "kind": "title1",
+      "maxW": 1800,
+      "page": "movil"
+    },
+    "l1": {
+      "x": 2720,
+      "y": 6140,
+      "w": 520,
+      "text": "Elegir una lección. Cada tarjeta es un enlace con número, título, resumen, cuántas jugadas tiene y su estado. El estado se ve por icono (círculo vacío, medio círculo, círculo con marca), borde (fino, grueso en acento, oscuro) y palabra, no solo por color. El orden es libre; la lección abierta lleva borde grueso. El progreso son seis segmentos más el texto «2 de 6 lecciones completadas.» y se guarda en este dispositivo. Se entra desde la cabecera, junto a «Jugar». Tres columnas desde 1160 px.",
+      "fill": "gray",
+      "page": "escritorio"
+    },
+    "l2": {
+      "x": 2720,
+      "y": 6900,
+      "w": 520,
+      "text": "Lección en curso. Título, objetivo en una frase y, debajo, el tablero a la izquierda y el panel a la derecha: turno, retroalimentación, pistas y acciones. Las pistas se piden una a una y se acumulan; la última marca casillas en el tablero con las marcas de siempre (seleccionada y destino) y desactiva el botón. El tablero se orienta al bando del alumno. Se juega como en la partida: clic, arrastrar o teclado. Datos de ejemplo: lección 4, Mate del pasillo.",
+      "fill": "gray",
+      "page": "escritorio"
+    },
+    "l3": {
+      "x": 1360,
+      "y": 7220,
+      "w": 520,
+      "text": "Estados. Acierto: borde continuo de 2 px, icono de marca y «Correcto.»; el tablero queda bloqueado y el foco pasa a «Siguiente lección». Fallo: borde discontinuo, icono de cruz y el motivo; la jugada se deshace y se puede seguir. Paso intermedio (lecciones de dos jugadas): el rival responde con una jugada fija y se avisa; el texto de ejemplo es provisional. Todas completadas: se ofrece jugar contra Alfil Beta. La retroalimentación es la única región role=status.",
+      "fill": "gray",
+      "page": "escritorio"
+    },
+    "l4": {
+      "x": 1800,
+      "y": 8940,
+      "w": 520,
+      "text": "Tablet vertical: la lista pasa a dos columnas y la lección a una: título, objetivo, turno, tablero (hasta 700 px) y debajo la retroalimentación a todo el ancho con sus acciones. Aquí se ve el acierto. Desde 860 px, la lección es como en escritorio.",
+      "fill": "gray",
+      "page": "tablet"
+    },
+    "l5": {
+      "x": 1880,
+      "y": 10740,
+      "w": 390,
+      "text": "Móvil: la lista va a una columna con tarjetas a todo el ancho. La lección apila título, objetivo, turno, tablero, retroalimentación, pistas y botones; las pistas y la retroalimentación quedan al alcance sin salir de la pantalla. Todos los botones miden 44 px de alto.",
+      "fill": "gray",
+      "page": "movil"
+    },
+    "l6": {
+      "x": 1880,
+      "y": 11300,
+      "w": 390,
+      "text": "Acierto y fallo en móvil. Acierto: «Siguiente lección» es la única acción principal y recibe el foco; las pistas se ocultan. Fallo: la jugada se deshace, la torre vuelve a su casilla y las pistas siguen disponibles; el motivo sale de los datos de la lección.",
+      "fill": "gray",
+      "page": "movil"
     }
   },
   "designSystems": [

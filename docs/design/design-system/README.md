@@ -50,6 +50,13 @@ Escaque no usa iconos en la interfaz: los botones llevan solo texto. Las únicas
 - La gravedad no depende del color: icono (triángulo, círculo discontinuo, círculo con marca), borde y palabra. Solo el veredicto es `role="status"`; el coach nunca roba el foco. «Ver en el tablero» activa marcas de casilla de siempre y pasa a «Quitar del tablero».
 - Habla de «las blancas» y «las negras», para servir también en dos jugadores.
 
+## Lecciones guiadas
+
+- `Lessons` agrupa la lista de lecciones (tarjetas con estado), el progreso (seis segmentos), el objetivo, las pistas y la retroalimentación. Las lecciones son entre 5 y 6, de orden libre; el progreso se guarda en este dispositivo.
+- El estado de una lección (sin empezar, en curso, completada) y el resultado de una jugada (acierto, fallo) se distinguen por icono, borde y palabra, nunca solo por color. La retroalimentación es la única región `role="status"`; tras acertar, el foco pasa a «Siguiente lección».
+- La cabecera de la web lleva la navegación principal («Jugar» y «Lecciones») con `aria-current="page"` en la actual.
+- Los textos de cada lección (objetivo, pistas, explicación y motivos de fallo) vienen de los datos de la lección: frases completas, de tú y con punto final.
+
 ## Cómo usar este sistema
 
 Carga `components/bundle.css` tras los tokens y reproduce el marcado de cada componente tal como aparece en su vista previa. Las siluetas de las piezas están en `components/pieces.js` y como SVG sueltos en `assets/Piezas/`.

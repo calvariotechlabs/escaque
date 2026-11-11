@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Lecciones en móvil</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/escaque/tokens.css">
+<link rel="stylesheet" href="ds/escaque/components/bundle.css">
+<link rel="stylesheet" href="lecciones.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;600&family=Space+Grotesk:wght@600&display=swap">
+<style>
+body{margin:0}
+.casilla img{position:relative;z-index:1;display:block;width:100%;height:100%}
+</style>
+</helmet>
+<div style="width: 390px; min-height: 1320px; background: var(--surface); color: var(--ink); font-family: var(--font-sans); box-sizing: border-box">
+<header class="lecc-cab" style="padding: 16px 16px 0">
+<h1 style="font: 600 24px/28px var(--font-display)">Escaque</h1>
+<nav class="lecc-nav" aria-label="Principal"><a class="lecc-enlace" href="#">Jugar</a><a class="lecc-enlace" href="#" aria-current="page">Lecciones</a></nav>
+</header>
+<main class="lecc-pagina" style="padding: 16px 16px 32px; gap: 16px">
+<div style="display: flex; flex-direction: column; gap: 8px"><h2 class="lecc-titulo" style="font: 600 24px/28px var(--font-display)">Lecciones</h2><p class="lecc-intro">Seis ejercicios cortos para practicar en el tablero. Elige el que quieras: el orden es libre.</p></div>
+<div class="progreso"><p class="progreso__texto"><strong>2 de 6</strong> lecciones completadas.</p><div class="progreso__barra" aria-hidden="true"><span class="progreso__seg progreso__seg--hecho"></span><span class="progreso__seg progreso__seg--hecho"></span><span class="progreso__seg"></span><span class="progreso__seg progreso__seg--actual"></span><span class="progreso__seg"></span><span class="progreso__seg"></span></div><p class="progreso__leyenda">Segmento lleno: completada. Borde grueso: la lección que tienes abierta.</p></div>
+<ol class="lecciones" aria-label="Lista de lecciones">
+<li><a class="leccion leccion--hecha" href="#"><span class="leccion__num" aria-hidden="true">1</span><span class="leccion__cuerpo"><span class="leccion__titulo"><span class="oculto">Lección 1: </span>El enroque</span><span class="leccion__resumen">Pon el rey a salvo y activa la torre.</span><span class="leccion__meta">Una jugada.</span><span class="leccion__estado"><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M6 10.5l2.8 2.8L14 7.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Completada, sin pistas.</span></span></a></li>
+<li><a class="leccion leccion--hecha" href="#"><span class="leccion__num" aria-hidden="true">2</span><span class="leccion__cuerpo"><span class="leccion__titulo"><span class="oculto">Lección 2: </span>Captura al paso</span><span class="leccion__resumen">Captura un peón que acaba de avanzar dos casillas.</span><span class="leccion__meta">Una jugada.</span><span class="leccion__estado"><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M6 10.5l2.8 2.8L14 7.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Completada, con 1 pista.</span></span></a></li>
+<li><a class="leccion" href="#"><span class="leccion__num" aria-hidden="true">3</span><span class="leccion__cuerpo"><span class="leccion__titulo"><span class="oculto">Lección 3: </span>Corona sin ahogar</span><span class="leccion__resumen">Corona el peón sin dejar al rival sin jugadas.</span><span class="leccion__meta">Dos jugadas.</span><span class="leccion__estado"><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>Sin empezar.</span></span></a></li>
+<li><a class="leccion leccion--curso" href="#"><span class="leccion__num" aria-hidden="true">4</span><span class="leccion__cuerpo"><span class="leccion__titulo"><span class="oculto">Lección 4: </span>Mate del pasillo</span><span class="leccion__resumen">Da mate en una jugada con la torre.</span><span class="leccion__meta">Una jugada.</span><span class="leccion__estado"><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M10 2a8 8 0 0 1 0 16z" fill="currentColor"/></svg>En curso.</span></span></a></li>
+<li><a class="leccion" href="#"><span class="leccion__num" aria-hidden="true">5</span><span class="leccion__cuerpo"><span class="leccion__titulo"><span class="oculto">Lección 5: </span>Horquilla de caballo</span><span class="leccion__resumen">Ataca dos piezas a la vez con un caballo.</span><span class="leccion__meta">Dos jugadas.</span><span class="leccion__estado"><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>Sin empezar.</span></span></a></li>
+<li><a class="leccion" href="#"><span class="leccion__num" aria-hidden="true">6</span><span class="leccion__cuerpo"><span class="leccion__titulo"><span class="oculto">Lección 6: </span>Mate de la escalera</span><span class="leccion__resumen">Da mate en dos jugadas con dos torres.</span><span class="leccion__meta">Dos jugadas.</span><span class="leccion__estado"><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>Sin empezar.</span></span></a></li>
+</ol>
+<p class="lecc-pre">Tu progreso se guarda en este dispositivo.</p>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1320}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>
