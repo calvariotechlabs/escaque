@@ -409,8 +409,9 @@ export class Position implements PerftTarget<Move> {
       return { kind: "stalemate" };
     }
     if (this.isInsufficientMaterial()) return { kind: "insufficient-material" };
-    if (this.isThreefoldRepetition()) return { kind: "threefold-repetition" };
+    // Antes que la repetición: así esta nunca recorre más de 99 medias jugadas.
     if (this.halfmove >= 100) return { kind: "fifty-move" };
+    if (this.isThreefoldRepetition()) return { kind: "threefold-repetition" };
     return { kind: "ongoing" };
   }
 
@@ -447,7 +448,8 @@ export class Position implements PerftTarget<Move> {
       }
     } finally {
       for (let i = undone.length - 1; i >= 0; i--) this.applyMove(undone[i]!);
-      this.generated.splice(0, this.generated.length, ...generated);
+      this.generated.length = generated.length;
+      for (let i = 0; i < generated.length; i++) this.generated[i] = generated[i]!;
     }
     return seen >= 3;
   }
