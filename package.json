@@ -12,7 +12,7 @@
     "build": "tsc -p tsconfig.json",
     "clean": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\"",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "npm run clean && npm run build && node --test \"dist/tests/**/*.test.js\"",
+    "test": "npm run clean && npm run build && node --test \"dist/tests/**/*.test.js\" \".claude/hooks/*.test.mjs\"",
     "test:perft": "npm run clean && npm run build && node --test \"dist/tests/perft-full.js\"",
     "perft": "npm run build && node dist/tools/perft.js",
     "serve": "npm run build && node tools/serve.mjs"
