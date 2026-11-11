@@ -5,14 +5,14 @@ Copia en el repositorio de lo que se diseña en Claude Design. Regla del proyect
 | Qué | Origen en Claude Design | Versión | Exportado |
 | --- | --- | --- | --- |
 | Design System «S-Design - Escaque» | https://claude.ai/artifact/5eMkXXkB3rMzuRwKU5osqC | 1794396033-181b | 2026-11-11 |
-| Lienzo «Design - Escaque» (partida en escritorio, móvil y coronación) | https://claude.ai/artifact/EFBEpxb6n1xjdX35LYqNcG | 1794395696-33a5 | 2026-11-11 |
+| Lienzo «Design - Escaque» (partida en escritorio y móvil, coronación y confirmar nueva partida) | https://claude.ai/artifact/EFBEpxb6n1xjdX35LYqNcG | 1794397093-c633 | 2026-11-11 |
 
 Los enlaces son privados de la cuenta de Calvario TechLabs.
 
 ## Contenido
 
 - `design-system/`: `README.md` (el libro de marca), `tokens.json` (fuente de los valores), `tokens.css` (generado a partir de `tokens.json`), `components/` (`bundle.css`, `pieces.js` con las siluetas y, por componente, README y vista previa `preview.html`) y `assets/Piezas/` (las doce piezas en SVG).
-- `lienzo/`: `canvas.json` y las tres pantallas (`*.dc.html`). Son fuentes del editor de Claude Design: para verlas en HTML puro, abre el enlace de arriba. Las imágenes de pieza apuntan a ids de subida de ese lienzo, no a ficheros de este repositorio.
+- `lienzo/`: `canvas.json` y las cuatro pantallas (`*.dc.html`). Son fuentes del editor de Claude Design: para verlas en HTML puro, abre el enlace de arriba. Las imágenes de pieza apuntan a ids de subida de ese lienzo, no a ficheros de este repositorio.
 
 ## Cómo se usa en el código
 

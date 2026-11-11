@@ -120,6 +120,11 @@ export class Game {
     return this.records.length;
   }
 
+  /** Medias jugadas de toda la partida, contando las que se pueden rehacer. */
+  get totalPlies(): number {
+    return this.records.length + this.future.length;
+  }
+
   get canRedo(): boolean {
     return this.future.length > 0;
   }

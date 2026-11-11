@@ -22,8 +22,9 @@
   </section>
   <div class="partida__controles">
     <button id="nueva" class="boton boton--principal" type="button">Nueva partida</button>
-    <button id="girar" class="boton" type="button">Girar tablero</button>
     <button id="deshacer" class="boton" type="button" disabled>Deshacer jugada</button>
+    <button id="rehacer" class="boton" type="button" disabled>Rehacer jugada</button>
+    <button id="girar" class="boton partida__ancho" type="button">Girar tablero</button>
   </div>
   <section class="jugadas partida__jugadas" aria-labelledby="titulo-jugadas">
     <h2 class="jugadas__titulo" id="titulo-jugadas">Jugadas</h2>
@@ -36,6 +37,14 @@
   <div class="coronacion">
     <h2 class="coronacion__titulo" id="titulo-coronacion">Corona el peón</h2>
     <div id="opciones-coronacion" class="coronacion__opciones"></div>
+  </div>
+</dialog>
+<dialog id="confirmar-nueva" class="confirmacion" aria-labelledby="titulo-confirmar" aria-describedby="texto-confirmar">
+  <h2 class="confirmacion__titulo" id="titulo-confirmar">¿Empezar una partida nueva?</h2>
+  <p class="confirmacion__texto" id="texto-confirmar"></p>
+  <div class="confirmacion__botones">
+    <button id="seguir-jugando" class="boton" type="button">Seguir jugando</button>
+    <button id="empezar" class="boton boton--principal" type="button">Empezar</button>
   </div>
 </dialog>
 </body>
