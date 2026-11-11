@@ -97,6 +97,19 @@ interface Undo {
   readonly halfmove: number;
 }
 
+// --- SAN ---------------------------------------------------------------------
+
+/** La SAN más larga posible es «Qa1xh8+» o «exd8=Q#»; se deja margen para «!?». */
+const SAN_MAX_LENGTH = 16;
+
+/** Quita jaque, mate y anotaciones, y unifica el enroque con ceros y la coronación sin «=». */
+function normalizeSan(text: string): string {
+  let san = text.trim().replace(/[+#!?]+$/, "");
+  if (san === "0-0") san = "O-O";
+  else if (san === "0-0-0") san = "O-O-O";
+  return san.replace(/^([a-h]x?[a-h][18])([QRBN])$/, "$1=$2");
+}
+
 // --- FEN ---------------------------------------------------------------------
 
 const CLOCK = /^\d+$/;
@@ -283,17 +296,53 @@ export class Position implements PerftTarget<Move> {
 
   /** Todas las jugadas legales del bando que mueve (incluye enroques, al paso y las 4 coronaciones). */
   legalMoves(): Move[] {
+    const legal = this.computeLegalMoves();
+    this.generated[this.history.length] = legal;
+    return legal.slice();
+  }
+
+  /**
+   * Jugada en notación algebraica estándar (SAN), con las letras inglesas de
+   * PGN: «e4», «Nbd2», «exd6», «O-O», «e8=Q+», «Qxf7#». La jugada debe ser
+   * legal en esta posición; si no, lanza un error. No cambia la posición ni
+   * invalida las jugadas ya obtenidas con `legalMoves()`.
+   */
+  moveToSan(move: Move): string {
+    const legal = this.computeLegalMoves();
+    const own = legal.find((m) => m.from === move.from && m.to === move.to && m.promotion === move.promotion);
+    if (own === undefined) throw new Error(`moveToSan: ${moveToUci(move)} no es legal en esta posición`);
+    return this.san(own, legal, true);
+  }
+
+  /**
+   * Busca entre las jugadas legales la que corresponde a una jugada en SAN.
+   * Tolera el jaque o el mate de más o de menos, anotaciones como «!?», «0-0»
+   * con ceros y la coronación sin «=» («e8Q»). Devuelve `null` si la jugada no
+   * es legal, es ambigua o no es SAN.
+   */
+  moveFromSan(text: string): Move | null {
+    if (text.length > SAN_MAX_LENGTH) return null;
+    const wanted = normalizeSan(text);
+    if (wanted === "") return null;
+    const legal = this.legalMoves();
+    for (const move of legal) {
+      if (this.san(move as CoreMove, legal as CoreMove[], false) === wanted) return move;
+    }
+    return null;
+  }
+
+  /** Jugadas legales sin guardarlas en `generated`. */
+  private computeLegalMoves(): CoreMove[] {
     const us = this.side;
     const them = opposite(us);
-    const legal: Move[] = [];
+    const legal: CoreMove[] = [];
     // Misma comprobación que isLegal(), escrita en línea: es el bucle caliente de perft.
     for (const move of this.pseudoLegalMoves()) {
       this.applyMove(move);
       if (!this.isAttacked(this.kings[us], them)) legal.push(move);
       this.unmakeMove();
     }
-    this.generated[this.history.length] = legal;
-    return legal.slice();
+    return legal;
   }
 
   /**
@@ -492,6 +541,45 @@ export class Position implements PerftTarget<Move> {
       if (this.isLegal({ from, to, promotion: null, flags: FLAG_EN_PASSANT })) return true;
     }
     return false;
+  }
+
+  /**
+   * SAN de una jugada legal. `legal` son todas las jugadas legales de la
+   * posición, para saber si otra pieza igual llega a la misma casilla.
+   * Con `suffix`, añade «+» o «#» aplicando y deshaciendo la jugada.
+   */
+  private san(move: CoreMove, legal: readonly CoreMove[], suffix: boolean): string {
+    const { from, to } = move;
+    const type = typeOf(this.board[from]!);
+    let text: string;
+    if (move.flags === FLAG_CASTLE) {
+      text = to > from ? "O-O" : "O-O-O";
+    } else {
+      const capture = this.board[to] !== EMPTY || move.flags === FLAG_EN_PASSANT;
+      const target = squareName(to);
+      if (type === PAWN) {
+        text = (capture ? "abcdefgh"[fileOf(from)]! + "x" : "") + target;
+        if (move.promotion !== null) text += "=" + move.promotion.toUpperCase();
+      } else {
+        text = TYPE_TO_FEN[type]!.toUpperCase();
+        // Otras piezas del mismo tipo que también pueden llegar a `to`.
+        const rivals = legal.filter((m) => m.to === to && m.from !== from && typeOf(this.board[m.from]!) === type);
+        if (rivals.length > 0) {
+          const fileName = "abcdefgh"[fileOf(from)]!;
+          const rankName = String(rankOf(from) + 1);
+          if (!rivals.some((m) => fileOf(m.from) === fileOf(from))) text += fileName;
+          else if (!rivals.some((m) => rankOf(m.from) === rankOf(from))) text += rankName;
+          else text += fileName + rankName;
+        }
+        text += (capture ? "x" : "") + target;
+      }
+    }
+    if (suffix) {
+      this.applyMove(move);
+      if (this.isCheck()) text += this.hasLegalMove() ? "+" : "#";
+      this.unmakeMove();
+    }
+    return text;
   }
 
   /** ¿Ataca algún pieza del bando `by` la casilla `sq`? */
