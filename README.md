@@ -16,7 +16,7 @@ Velocidad de perft (Node 22, un hilo): unos 9 a 10 millones de nodos por segundo
 | 1 | Reglas completas + perft | Hecho |
 | 2 | Tablero jugable (dos jugadores) | Hecho |
 | 3 | Máquina en Web Worker, 3 niveles | Motor y Worker hechos; falta la pantalla (pendiente de diseño) |
-| 4 | Coach: explicación de errores | Pendiente |
+| 4 | Coach: explicación de errores | Lógica hecha; falta el panel (pendiente de diseño) |
 | 5 | 5–6 lecciones guiadas | Pendiente |
 | 6 | Pulido para portfolio, CI y despliegue | Pendiente |
 
@@ -97,6 +97,14 @@ Todo en `src/engine`, sin dependencias ni DOM: funciona igual en Node y en el na
 | Medio gana a Fácil | +10 =0 −0 |
 
 Las cifras de las partidas salen de `npm run match` (Node 22, un hilo, colores alternos). Profundidad típica en 0,9 s: 5 en la apertura, 4 en medios juegos tácticos como Kiwipete y más de 10 en finales de peones, con unos 120.000 a 500.000 nodos por segundo.
+
+### Coach
+
+Todo en `src/coach`, sin dependencias ni DOM. `analyzeMove({ fen, moves }, jugada)` devuelve datos y textos en español; la interfaz solo los pinta.
+
+- **Valoración.** Alfil Beta busca la posición antes de la jugada (su mejor jugada y su puntuación) y la jugada hecha a la misma profundidad. La diferencia en centipeones se pasa a puntos esperados con una curva logística, como hacen los analizadores habituales, porque perder un peón con la partida igualada pesa mucho más que perderlo ganando por una torre. Según cuánto caen: mejor jugada, buena (menos de 0,05), imprecisión (0,05), error (0,10) o error grave (0,15). Por defecto, profundidad 4 y como mucho 0,6 s por búsqueda; sin límite de tiempo el análisis es determinista, y así se prueba.
+- **Mate en 1 que se escapó.** Se prueban todas las jugadas legales: es exacto, no depende de la búsqueda.
+- **Pieza colgando y captura que ganaba material.** Un intercambio estático (SEE) hecho con jugadas legales, así que respeta clavadas y jaques: en la casilla capturan los dos bandos por turnos con la pieza de menos valor, y cada uno para cuando ya no le conviene. Solo se avisa si el motor confirma que la jugada pierde al menos 0,8 peones: así no se marca un sacrificio que da mate ni un cambio igualado. La captura no vista, además, se busca con el motor para comprobar que de verdad era mejor.
 
 ### Perft y perft dividido
 
