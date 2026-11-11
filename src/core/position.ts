@@ -114,7 +114,10 @@ function normalizeSan(text: string): string {
 }
 
 /** Jugada de pieza con origen opcional, para aceptar desambiguación de más: «Ngf3», «N1f3», «Ng1f3». */
-const SAN_PIECE = /^([NBRQK])([a-h])?([1-8])?x?([a-h][1-8])$/;
+const SAN_PIECE = /^([NBRQK])([a-h])?([1-8])?(x)?([a-h][1-8])$/;
+
+/** ¿Son la misma jugada? Origen, destino y coronación la determinan en una posición dada. */
+const sameMove = (a: Move, b: Move): boolean => a.from === b.from && a.to === b.to && a.promotion === b.promotion;
 
 // --- FEN ---------------------------------------------------------------------
 
@@ -142,9 +145,17 @@ export class Position implements PerftTarget<Move> {
    * `makeMove` solo acepta jugadas de la lista del ply actual (por identidad):
    * así una jugada de otra posición, antigua o construida a mano no puede
    * corromper el tablero. La lista de un ply sigue valiendo al volver a él con
-   * `unmakeMove`, y se descarta cuando se llega a ese ply con otra jugada.
+   * `unmakeMove` o al rehacer la misma jugada, y se descarta cuando se llega a
+   * ese ply con otra jugada. Las jugadas internas (legalidad, jaque, SAN,
+   * repetición) no la tocan.
    */
-  private readonly generated: Array<Move[] | null> = [];
+  private readonly generated: Move[][] = [];
+  /**
+   * Línea de jugadas hechas con `makeMove`, incluidas las deshechas con
+   * `unmakeMove`. `history` es siempre un prefijo de ella, y `generated[ply]`
+   * solo existe para posiciones de esta línea.
+   */
+  private readonly line: Move[] = [];
 
   private constructor() {}
 
@@ -315,7 +326,7 @@ export class Position implements PerftTarget<Move> {
    */
   moveToSan(move: Move): string {
     // Reutiliza la lista del ply actual si existe: formatear todas las jugadas no la regenera.
-    const legal = (this.generated[this.history.length] as CoreMove[] | null | undefined) ?? this.computeLegalMoves();
+    const legal = (this.generated[this.history.length] as CoreMove[] | undefined) ?? this.computeLegalMoves();
     const own = legal.find((m) => m.from === move.from && m.to === move.to && m.promotion === move.promotion);
     if (own === undefined) throw new Error(`moveToSan: ${moveToUci(move)} no es legal en esta posición`);
     return this.san(own, legal, true);
@@ -331,14 +342,21 @@ export class Position implements PerftTarget<Move> {
     if (typeof text !== "string" || text.length > SAN_MAX_LENGTH) return null;
     const wanted = normalizeSan(text);
     if (wanted === "") return null;
-    const legal = this.legalMoves() as CoreMove[];
+    const legal = this.currentMoves();
     for (const move of legal) {
       if (this.san(move, legal, false) === wanted) return move;
     }
     // Desambiguación de más: vale si deja una única jugada legal.
     const match = SAN_PIECE.exec(wanted);
     if (match === null) return null;
-    const [, letter, file, rank, target] = match as unknown as [string, string, string | undefined, string | undefined, string];
+    const [, letter, file, rank, capture, target] = match as unknown as [
+      string,
+      string,
+      string | undefined,
+      string | undefined,
+      string | undefined,
+      string,
+    ];
     const type = FEN_TO_TYPE[letter.toLowerCase()];
     const candidates = legal.filter((m) => {
       const from = squareName(m.from);
@@ -346,11 +364,27 @@ export class Position implements PerftTarget<Move> {
         m.flags !== FLAG_CASTLE &&
         squareName(m.to) === target &&
         typeOf(this.board[m.from]!) === type &&
+        // Una pieza (no un peón) solo captura lo que hay en el destino: con «x» debe haber algo, y sin «x», nada.
+        (this.board[m.to] !== EMPTY) === (capture !== undefined) &&
         (file === undefined || from[0] === file) &&
         (rank === undefined || from[1] === rank)
       );
     });
     return candidates.length === 1 ? candidates[0]! : null;
+  }
+
+  /**
+   * Lista del ply actual: la ya entregada por `legalMoves()` si existe, o una
+   * nueva que se guarda. Así buscar una jugada no invalida las que ya tiene el
+   * llamador, y la jugada encontrada vale para `makeMove`.
+   */
+  private currentMoves(): CoreMove[] {
+    const ply = this.history.length;
+    const existing = this.generated[ply];
+    if (existing !== undefined) return existing as CoreMove[];
+    const legal = this.computeLegalMoves();
+    this.generated[ply] = legal;
+    return legal;
   }
 
   /** Jugadas legales sin guardarlas en `generated`. */
@@ -372,7 +406,7 @@ export class Position implements PerftTarget<Move> {
    * («e2e4», «e7e8q», «e1g1»). Devuelve `null` si no es legal aquí.
    */
   moveFromUci(uci: string): Move | null {
-    for (const move of this.legalMoves()) {
+    for (const move of this.currentMoves()) {
       if (moveToUci(move) === uci) return move;
     }
     return null;
@@ -382,8 +416,16 @@ export class Position implements PerftTarget<Move> {
   makeMove(move: Move): void {
     // Solo jugadas (por identidad) de la última lista de legalMoves() de esta posición.
     const legal = this.generated[this.history.length];
-    if (legal === undefined || legal === null || !legal.includes(move)) {
+    if (legal === undefined || !legal.includes(move)) {
       throw new Error(`makeMove: ${moveToUci(move)} no procede de legalMoves() de esta posición`);
+    }
+    const ply = this.history.length;
+    const next = this.line[ply];
+    if (next === undefined || !sameMove(next, move)) {
+      // Otra línea: las listas de los plies siguientes eran de posiciones que ya no se alcanzan.
+      this.line.length = ply;
+      this.line.push(move);
+      if (this.generated.length > ply + 1) this.generated.length = ply + 1;
     }
     this.applyMove(move as CoreMove);
   }
@@ -505,9 +547,7 @@ export class Position implements PerftTarget<Move> {
     // Con menos de 4 medias jugadas reversibles no cabe ninguna repetición.
     if (plies < 4) return false;
     const current = this.repetitionKey();
-    // Se rehacen las mismas jugadas, así que las listas de legalMoves() siguen
-    // valiendo; se guardan porque applyMove las descarta al pasar por cada ply.
-    const generated = this.generated.slice();
+    // Se rehacen las mismas jugadas con applyMove, que no toca las listas de legalMoves().
     const undone: CoreMove[] = [];
     let seen = 1;
     try {
@@ -519,8 +559,6 @@ export class Position implements PerftTarget<Move> {
       }
     } finally {
       for (let i = undone.length - 1; i >= 0; i--) this.applyMove(undone[i]!);
-      this.generated.length = generated.length;
-      for (let i = 0; i < generated.length; i++) this.generated[i] = generated[i]!;
     }
     return seen >= 3;
   }
@@ -785,7 +823,10 @@ export class Position implements PerftTarget<Move> {
     }
   }
 
-  /** Aplica una jugada pseudolegal y guarda lo necesario para deshacerla. */
+  /**
+   * Aplica una jugada pseudolegal y guarda lo necesario para deshacerla. No
+   * toca `generated` ni `line`: quien la use para mirar debe deshacerla.
+   */
   private applyMove(move: CoreMove): void {
     const board = this.board;
     const us = this.side;
@@ -802,8 +843,6 @@ export class Position implements PerftTarget<Move> {
     }
 
     this.history.push({ move, captured, castling: this.castling, epSquare: this.epSquare, halfmove: this.halfmove });
-    // Se llega a este ply con otra jugada: la lista generada antes aquí ya no vale.
-    if (this.generated.length > this.history.length) this.generated[this.history.length] = null;
 
     board[to] = move.promotion !== null ? makePiece(us, PROMOTION_TO_TYPE[move.promotion]) : piece;
     board[from] = EMPTY;
