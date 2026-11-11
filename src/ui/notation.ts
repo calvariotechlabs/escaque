@@ -87,3 +87,8 @@ export function statusMessage(status: GameStatus, turn: Color, inCheck: boolean)
       return `Juegan las ${turn === "w" ? "blancas" : "negras"}.${inCheck ? " Jaque." : ""}`;
   }
 }
+
+/** Texto del diálogo de nueva partida (lienzo «Nueva partida · móvil»): cuántas jugadas se pierden. */
+export function newGameWarning(plies: number): string {
+  return plies === 1 ? "Se perderá la jugada de esta partida." : `Se perderán las ${plies} jugadas de esta partida.`;
+}

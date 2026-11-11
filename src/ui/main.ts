@@ -6,7 +6,7 @@ import type { PromotionPiece } from "../core/index.js";
 import { createBoard } from "./board.js";
 import { Game } from "./game.js";
 import { Interaction, type Outcome } from "./interaction.js";
-import { moveAnnouncement, sanToSpanish, statusMessage } from "./notation.js";
+import { moveAnnouncement, newGameWarning, sanToSpanish, statusMessage } from "./notation.js";
 import { pieceSvg } from "./pieces.js";
 import { startPwa } from "../pwa/pwa.js";
 
@@ -23,6 +23,11 @@ const statusExtra = byId<HTMLSpanElement>("estado-extra");
 const newGameButton = byId<HTMLButtonElement>("nueva");
 const rotateButton = byId<HTMLButtonElement>("girar");
 const undoButton = byId<HTMLButtonElement>("deshacer");
+const redoButton = byId<HTMLButtonElement>("rehacer");
+const confirmDialog = byId<HTMLDialogElement>("confirmar-nueva");
+const confirmText = byId<HTMLParagraphElement>("texto-confirmar");
+const keepPlayingButton = byId<HTMLButtonElement>("seguir-jugando");
+const startButton = byId<HTMLButtonElement>("empezar");
 const moveList = byId<HTMLOListElement>("lista-jugadas");
 const noMoves = byId<HTMLParagraphElement>("sin-jugadas");
 const announcer = byId<HTMLParagraphElement>("anuncio");
@@ -50,6 +55,7 @@ function render(): void {
   renderStatus();
   renderMoveList();
   undoButton.disabled = game.ply === 0;
+  redoButton.disabled = !game.canRedo;
 }
 
 /** Tabindex itinerante: solo la casilla con el foco entra en el orden de tabulación. */
@@ -318,13 +324,38 @@ moveList.addEventListener("click", (event) => {
   moveList.querySelector<HTMLButtonElement>(`[data-ply="${game.ply}"]`)?.focus();
 });
 
-newGameButton.addEventListener("click", () => {
+function startNewGame(): void {
   const orientation = ui.orientation;
   game = new Game();
   ui = new Interaction(game);
   ui.orientation = orientation;
   announce("Nueva partida.");
   render();
+}
+
+// Con jugadas en la partida se pide confirmación; el foco empieza en «Seguir jugando», la opción segura.
+newGameButton.addEventListener("click", () => {
+  if (game.totalPlies === 0) {
+    startNewGame();
+    return;
+  }
+  confirmText.textContent = newGameWarning(game.totalPlies);
+  confirmDialog.showModal();
+  keepPlayingButton.focus();
+});
+
+function closeConfirm(start: boolean): void {
+  confirmDialog.close();
+  if (start) startNewGame();
+  newGameButton.focus();
+}
+
+keepPlayingButton.addEventListener("click", () => closeConfirm(false));
+startButton.addEventListener("click", () => closeConfirm(true));
+// Escape equivale a seguir jugando.
+confirmDialog.addEventListener("cancel", (event) => {
+  event.preventDefault();
+  closeConfirm(false);
 });
 
 rotateButton.addEventListener("click", () => {
@@ -335,7 +366,12 @@ rotateButton.addEventListener("click", () => {
 
 undoButton.addEventListener("click", () => {
   handle(ui.undo());
-  if (undoButton.disabled) newGameButton.focus();
+  if (undoButton.disabled) redoButton.focus();
+});
+
+redoButton.addEventListener("click", () => {
+  handle(ui.redo());
+  if (redoButton.disabled) undoButton.focus();
 });
 
 render();

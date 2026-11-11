@@ -14,7 +14,7 @@ body{margin:0;background:var(--surface);color:var(--ink);font:400 16px/24px var(
 .partida__estado{margin:0}
 .partida__tablero{min-width:0}
 .partida__controles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-2)}
-.partida__controles .boton--principal{grid-column:1 / -1}
+.partida__controles .boton--principal,.partida__ancho{grid-column:1 / -1}
 
 /* Avisos de la app instalable (instalar, sin conexión, versión nueva): una región viva sobre el estado.
    Vacía, sale del flujo para no dejar un hueco en la rejilla, pero sigue en el árbol de accesibilidad. */
@@ -80,6 +80,14 @@ body{margin:0;background:var(--surface);color:var(--ink);font:400 16px/24px var(
 /* Diálogo modal de coronación: fondo del lienzo «Coronación · móvil». */
 .coronacion-dialogo{padding:0;border:0;background:none;max-width:calc(100vw - 2 * var(--space-4))}
 .coronacion-dialogo::backdrop{background:color-mix(in srgb,var(--ink) 55%,transparent)}
+
+/* Diálogo modal para confirmar una partida nueva (lienzo «Nueva partida · móvil»). */
+.confirmacion{box-sizing:border-box;width:calc(100% - 2 * var(--space-4));max-width:340px;background:var(--surface-raised);color:var(--ink);border:1px solid var(--control-border);border-radius:var(--radius-md);padding:var(--space-4)}
+.confirmacion[open]{display:flex;flex-direction:column;gap:var(--space-3)}
+.confirmacion::backdrop{background:color-mix(in srgb,var(--ink) 55%,transparent)}
+.confirmacion__titulo{margin:0;font:600 20px/28px var(--font-display)}
+.confirmacion__texto{margin:0;font:400 14px/20px var(--font-sans);color:var(--ink-muted)}
+.confirmacion__botones{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-2);margin-top:var(--space-1)}
 
 /* Texto solo para lectores de pantalla (anuncios de jugadas). */
 .solo-lector{position:absolute;width:1px;height:1px;margin:-1px;padding:0;border:0;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
