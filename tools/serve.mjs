@@ -18,11 +18,18 @@ const types = {
 
 createServer(async (req, res) => {
   try {
+    // Solo respondemos a peticiones dirigidas a nosotros: un sitio externo no puede leer el repositorio por reenlazado de DNS.
+    const host = (req.headers.host ?? "").replace(/:\d+$/, "");
+    if (host !== "127.0.0.1" && host !== "localhost") {
+      res.writeHead(403).end("Prohibido");
+      return;
+    }
     const url = new URL(req.url ?? "/", "http://localhost");
     const path = decodeURIComponent(url.pathname === "/" ? "/index.html" : url.pathname);
     const file = normalize(join(root, path));
-    // Nunca servir nada fuera del repositorio ni la carpeta .git.
-    if (!file.startsWith(root + sep) || file.includes(`${sep}.git${sep}`) || file.includes(`${sep}node_modules${sep}`)) {
+    // Nunca servir nada fuera del repositorio, ficheros ocultos (.env, .git, .claude) ni node_modules.
+    const hidden = file.slice(root.length).split(sep).some((part) => part.startsWith(".") || part === "node_modules");
+    if (!file.startsWith(root + sep) || hidden) {
       res.writeHead(403).end("Prohibido");
       return;
     }
