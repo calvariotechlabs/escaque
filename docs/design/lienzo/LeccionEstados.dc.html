@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Estados de una lección</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/escaque/tokens.css">
+<link rel="stylesheet" href="ds/escaque/components/bundle.css">
+<link rel="stylesheet" href="lecciones.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;600&family=Space+Grotesk:wght@600&display=swap">
+<style>
+body{margin:0}
+.casilla img{position:relative;z-index:1;display:block;width:100%;height:100%}
+</style>
+</helmet>
+<div style="min-height: 700px; background: var(--surface); color: var(--ink); font-family: var(--font-sans)">
+<main class="lecc-pagina" style="max-width: 1160px">
+<div class="lecc-estados">
+<section aria-label="Acierto"><h2 class="lecc-etiqueta">Acierto</h2><div role="status"><section class="retro" aria-labelledby="ra"><h3 class="retro__titulo" id="ra"><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M6 10.5l2.8 2.8L14 7.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Correcto.</h3>
+<p class="retro__texto">Te8# es jaque mate. Los peones tapan las casillas de escape del rey y ninguna pieza negra puede capturar la torre.</p>
+<p class="retro__meta">Has usado 1 pista.</p>
+<div class="retro__acciones"><button class="boton boton--principal" type="button">Siguiente lección: Horquilla de caballo</button><button class="boton" type="button">Repetir lección</button><a class="boton boton--enlace" href="#">Todas las lecciones</a></div></section></div></section>
+<section aria-label="Fallo"><h2 class="lecc-etiqueta">Fallo</h2><div role="status"><section class="retro retro--fallo" aria-labelledby="rf"><h3 class="retro__titulo" id="rf"><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M7 7l6 6M13 7l-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Esa jugada no da mate.</h3>
+<p class="retro__texto">Te7 ataca el peón de f7, pero el rey negro no está en jaque. La torre vuelve a e1. Prueba otra jugada.</p>
+<p class="retro__meta">Intento 2.</p></section></div></section>
+<section aria-label="Paso intermedio"><h2 class="lecc-etiqueta">Lección de varias jugadas: paso intermedio</h2><div role="status"><section class="retro" aria-labelledby="rp"><h3 class="retro__titulo" id="rp"><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M7.5 10h5M10.5 7.5l2.5 2.5-2.5 2.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Bien. Sigue con el paso 2 de 2.</h3>
+<p class="retro__texto">Alfil Beta responde Rh7. Ahora te toca a ti.</p>
+<p class="retro__meta">Texto de ejemplo para una lección de dos jugadas.</p></section></div></section>
+<section aria-label="Última lección"><h2 class="lecc-etiqueta">Todas completadas</h2><section class="retro" aria-labelledby="rz"><h3 class="retro__titulo" id="rz"><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M6 10.5l2.8 2.8L14 7.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Has completado las 6 lecciones.</h3>
+<p class="retro__texto">Puedes repetir las que quieras o poner a prueba lo aprendido contra Alfil Beta.</p>
+<div class="retro__acciones"><a class="boton boton--principal boton--enlace" href="#">Jugar contra Alfil Beta</a><a class="boton boton--enlace" href="#">Todas las lecciones</a></div></section></section>
+</div>
+</main></div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":700}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

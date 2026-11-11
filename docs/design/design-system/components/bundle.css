@@ -156,3 +156,77 @@ body{margin:0;background:var(--surface);color:var(--ink);font:400 16px/24px var(
 .coach--ancho{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:var(--space-4) var(--space-6)}
 .coach--ancho .coach__cab{grid-column:1 / -1}
 .coach--ancho .coach__col{display:flex;flex-direction:column;gap:var(--space-4);min-width:0}
+
+/* Escaque · lecciones guiadas (hito 5). Solo usa tokens del Design System. */
+.lecc-cab{max-width:1160px;margin:0 auto;box-sizing:border-box;padding:24px 32px 0;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--space-2) var(--space-6)}
+.lecc-cab h1{margin:0;font:600 32px/36px var(--font-display)}
+.lecc-nav{display:flex;gap:var(--space-2)}
+.lecc-enlace{display:inline-flex;align-items:center;min-height:44px;padding:0 var(--space-3);box-sizing:border-box;color:var(--ink);font:600 14px/20px var(--font-sans);text-decoration:none;border-bottom:3px solid transparent}
+.lecc-enlace[aria-current="page"]{border-bottom-color:var(--accent)}
+.lecc-enlace:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.lecc-pagina{max-width:1160px;margin:0 auto;box-sizing:border-box;padding:24px 32px 48px;display:flex;flex-direction:column;gap:var(--space-6);color:var(--ink);font:400 14px/20px var(--font-sans)}
+.lecc-titulo{margin:0;font:600 32px/36px var(--font-display)}
+.lecc-pre{margin:0;color:var(--ink-muted);font:400 14px/20px var(--font-sans)}
+.lecc-intro{margin:0;font:400 16px/24px var(--font-sans)}
+.lecc-cuerpo{display:flex;flex-wrap:wrap;align-items:flex-start;gap:var(--space-8)}
+.lecc-aparte{display:flex;flex-direction:column;gap:var(--space-4);min-width:0}
+
+/* Progreso: seis segmentos, uno por lección. Relleno = completada; borde grueso = en curso; borde fino = sin empezar. */
+.progreso{display:flex;flex-direction:column;gap:var(--space-2)}
+.progreso__texto{margin:0;font:400 14px/20px var(--font-sans)}
+.progreso__texto strong{font-weight:600}
+.progreso__barra{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:var(--space-1)}
+.progreso__seg{height:12px;box-sizing:border-box;border:1.5px solid var(--control-border);border-radius:2px;background:var(--surface-raised)}
+.progreso__seg--hecho{background:var(--accent);border-color:var(--accent)}
+.progreso__seg--actual{border:3px solid var(--accent)}
+.progreso__leyenda{margin:0;color:var(--ink-muted);font:400 12px/16px var(--font-sans)}
+
+/* Lista de lecciones */
+.lecciones{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:var(--space-3)}
+.lecciones li{min-width:0}
+.leccion{display:grid;grid-template-columns:auto minmax(0,1fr);gap:var(--space-4);align-items:start;box-sizing:border-box;height:100%;padding:var(--space-4);border:1.5px solid var(--control-border);border-radius:var(--radius-md);background:var(--surface-raised);color:var(--ink);text-decoration:none}
+.leccion:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.leccion__num{width:32px;height:32px;box-sizing:border-box;border-radius:50%;border:1.5px solid var(--control-border);display:flex;align-items:center;justify-content:center;font:500 15px/24px var(--font-mono)}
+.leccion__cuerpo{display:flex;flex-direction:column;gap:var(--space-1);min-width:0}
+.leccion__titulo{font:600 20px/28px var(--font-display)}
+.leccion__resumen{color:var(--ink-muted);font:400 14px/20px var(--font-sans)}
+.leccion__estado{display:inline-flex;align-items:center;gap:var(--space-2);margin-top:var(--space-2);font:600 14px/20px var(--font-sans)}
+.leccion__estado svg{width:20px;height:20px;flex:none}
+.leccion__meta{font:400 14px/20px var(--font-sans);color:var(--ink-muted)}
+.leccion--curso{border:3px solid var(--accent);padding:calc(var(--space-4) - 1.5px)}
+.leccion--hecha{border-color:var(--ink)}
+
+/* Objetivo de la lección */
+.objetivo{display:flex;flex-direction:column;gap:var(--space-1);padding:var(--space-3) var(--space-4);background:var(--surface-raised);border:1px solid var(--line);border-radius:var(--radius-md)}
+.objetivo__etiqueta{margin:0;font:600 12px/16px var(--font-sans);letter-spacing:.04em;text-transform:uppercase;color:var(--ink-muted)}
+.objetivo__texto{margin:0;font:600 20px/28px var(--font-display)}
+
+/* Pistas */
+.pistas{display:flex;flex-direction:column;gap:var(--space-3);padding:var(--space-4);background:var(--surface-raised);border:1px solid var(--line);border-radius:var(--radius-md);min-width:0}
+.pistas__titulo{margin:0;font:600 20px/28px var(--font-display)}
+.pistas__lista{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:var(--space-2)}
+.pistas__lista li{padding:var(--space-2) var(--space-3);border:1.5px solid var(--control-border);border-radius:var(--radius-sm);font:400 14px/20px var(--font-sans)}
+.pistas__lista strong{display:block;font-weight:600}
+.pistas__vacia{margin:0;color:var(--ink-muted);font:400 14px/20px var(--font-sans)}
+
+/* Acierto y fallo: la forma (borde continuo o discontinuo e icono) y la palabra dicen el resultado, no el color */
+.retro{display:flex;flex-direction:column;gap:var(--space-2);padding:var(--space-4);background:var(--surface-raised);border:2px solid var(--ink);border-radius:var(--radius-md);min-width:0}
+.retro--fallo{border-style:dashed}
+.retro__titulo{margin:0;display:flex;align-items:center;gap:var(--space-2);font:600 20px/28px var(--font-display)}
+.retro__titulo svg{width:24px;height:24px;flex:none}
+.retro__texto{margin:0;font:400 14px/20px var(--font-sans)}
+.retro__meta{margin:0;color:var(--ink-muted);font:400 14px/20px var(--font-sans)}
+.retro__acciones{display:flex;flex-direction:column;gap:var(--space-2);margin-top:var(--space-1)}
+.boton--enlace{display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;text-decoration:none;text-align:center}
+.lecc-acciones{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-2)}
+
+/* Lámina de estados (solo para el lienzo) */
+.lecc-estados{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-8) var(--space-8);align-items:start}
+.lecc-estados > section{display:flex;flex-direction:column;gap:var(--space-3);min-width:0}
+.lecc-etiqueta{margin:0;font:600 12px/16px var(--font-sans);letter-spacing:.04em;text-transform:uppercase;color:var(--ink-muted)}
+
+@media (forced-colors: active){
+  .leccion,.objetivo,.pistas,.retro,.progreso__seg{border-color:CanvasText}
+  .progreso__seg--hecho{background:CanvasText}
+  .leccion--curso,.progreso__seg--actual{border-color:Highlight}
+}
