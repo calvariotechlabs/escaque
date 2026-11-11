@@ -16,7 +16,7 @@ Velocidad de perft (Node 22, un hilo): unos 9 a 10 millones de nodos por segundo
 | 1 | Reglas completas + perft | Hecho |
 | 2 | Tablero jugable (dos jugadores) | Hecho |
 | 3 | Máquina en Web Worker, 3 niveles | Motor y Worker hechos; falta la pantalla (pendiente de diseño) |
-| 4 | Coach: explicación de errores | Lógica hecha; falta el panel (pendiente de diseño) |
+| 4 | Coach: explicación de errores | Lógica hecha; falta programar el panel (diseño aprobado) |
 | 5 | 5–6 lecciones guiadas | Pendiente |
 | 6 | Pulido para portfolio, CI y despliegue | Pendiente |
 
