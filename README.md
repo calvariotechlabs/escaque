@@ -4,12 +4,12 @@ App web para aprender ajedrez con motor propio (**Alfil Beta**), escrita desde c
 
 ## Estado
 
-**Hito actual: 1 — Reglas + perft, sin interfaz** (en preparación).
+**Hito actual: 1 — Reglas + perft, sin interfaz.** Bloque 1 (tests primero): están escritos los tests de perft y de reglas especiales y la herramienta de perft dividido; los tests de reglas están en rojo a propósito hasta que el bloque 2 implemente el núcleo.
 
 | Hito | Descripción | Estado |
 | --- | --- | --- |
-| 0 | Repositorio, estructura y herramientas | En curso |
-| 1 | Reglas completas + perft | Pendiente |
+| 0 | Repositorio, estructura y herramientas | Hecho |
+| 1 | Reglas completas + perft | En curso |
 | 2 | Tablero jugable (dos jugadores) | Pendiente |
 | 3 | Máquina en Web Worker, 3 niveles | Pendiente |
 | 4 | Coach: explicación de errores | Pendiente |
@@ -36,12 +36,25 @@ tests/       perft y reglas especiales
 
 ## Desarrollo
 
-Requiere Node LTS (22 o superior).
+Requiere Node LTS (22.3 o superior).
 
 ```sh
 npm install      # solo instala TypeScript (devDependency)
 npm run build    # tsc -> dist/ (módulos ES nativos)
-npm test         # compila y ejecuta node --test
+npm test         # compila y ejecuta node --test (perft a profundidad rápida)
+npm run test:perft   # perft a profundidad completa (unos 43 millones de nodos)
+npm run perft -- <profundidad> ["<fen>"] [jugadas UCI...] [--ref <fichero>]
+```
+
+### Perft y perft dividido
+
+[Perft](https://www.chessprogramming.org/Perft) cuenta las posiciones alcanzables a una profundidad dada. Para posiciones conocidas esos números están publicados, así que cualquier fallo del generador de jugadas (un enroque mal permitido, una captura al paso olvidada, una coronación que falta) cambia el conteo. Las posiciones de referencia y sus conteos están en `tests/perft-positions.ts`: la inicial, las posiciones 2 a 6 de la Chess Programming Wiki (Kiwipete entre ellas) y las posiciones «trampa» de Martin Sedlak (al paso ilegal por clavada, enroques que dan jaque, coronaciones que ahogan…).
+
+Cuando un conteo no cuadra, `npm run perft` desglosa el total por cada jugada inicial, con el mismo formato que `go perft` de Stockfish. Con `--ref` se compara con un desglose de referencia guardado en un fichero y se listan solo las jugadas que no coinciden. Para encontrar la jugada culpable se baja por la rama que falla, añadiendo esa jugada y restando uno a la profundidad:
+
+```sh
+npm run perft -- 3 "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1" --ref stockfish.txt
+npm run perft -- 2 "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1" e1g1 --ref stockfish-e1g1.txt
 ```
 
 ## Licencia
