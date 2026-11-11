@@ -1,11 +1,11 @@
 // Servidor estático mínimo para probar la web en local, sin dependencias.
-// Uso: npm run serve   (compila y sirve la carpeta del repositorio en http://127.0.0.1:8080)
+// Uso: npm run serve   (compila, monta site/ y lo sirve en http://127.0.0.1:8080: el mismo sitio que se publica)
 import { createServer } from "node:http";
 import { readFile, realpath } from "node:fs/promises";
 import { extname, join, normalize, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const root = await realpath(resolve(fileURLToPath(new URL("..", import.meta.url))));
+const root = await realpath(resolve(process.env.SITE_DIR ?? fileURLToPath(new URL("../site", import.meta.url))));
 const port = Number(process.env.PORT ?? 8080);
 const types = {
   ".html": "text/html; charset=utf-8",
@@ -14,6 +14,9 @@ const types = {
   ".json": "application/json; charset=utf-8",
   ".map": "application/json; charset=utf-8",
   ".svg": "image/svg+xml",
+  ".png": "image/png",
+  ".ico": "image/x-icon",
+  ".webmanifest": "application/manifest+json; charset=utf-8",
 };
 
 createServer(async (req, res) => {

@@ -2,9 +2,20 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f1f3f5" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f1218" media="(prefers-color-scheme: dark)">
+<meta name="description" content="Aprende ajedrez con un motor propio. Funciona sin conexión.">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'">
 <title>Escaque · partida a dos jugadores</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon.ico" sizes="48x48">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Escaque">
 <link rel="stylesheet" href="src/ui/tokens.css">
 <link rel="stylesheet" href="src/ui/board.css">
 <link rel="stylesheet" href="src/ui/page.css">
@@ -16,6 +27,7 @@
   <p><span class="solo-escritorio">Partida a dos jugadores en este dispositivo</span><span class="solo-movil">Dos jugadores</span></p>
 </header>
 <main class="partida">
+  <div id="avisos" class="avisos partida__avisos" role="status"></div>
   <p id="estado" class="estado partida__estado" role="status"><span id="estado-turno" class="estado__turno estado__turno--w" aria-hidden="true"></span><span><strong id="estado-texto">Cargando la partida. Si este mensaje no desaparece, ejecuta «npm run serve».</strong><span id="estado-extra"></span></span></p>
   <section class="partida__tablero" aria-label="Tablero">
     <div id="tablero"></div>

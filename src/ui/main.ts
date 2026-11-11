@@ -8,6 +8,7 @@ import { Game } from "./game.js";
 import { Interaction, type Outcome } from "./interaction.js";
 import { moveAnnouncement, sanToSpanish, statusMessage } from "./notation.js";
 import { pieceSvg } from "./pieces.js";
+import { startPwa } from "../pwa/pwa.js";
 
 function byId<T extends HTMLElement>(id: string): T {
   const el = document.getElementById(id);
@@ -338,3 +339,6 @@ undoButton.addEventListener("click", () => {
 });
 
 render();
+
+// App instalable: service worker y avisos de instalar, sin conexión y versión nueva.
+startPwa(byId("avisos"));

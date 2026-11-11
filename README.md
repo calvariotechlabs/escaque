@@ -30,6 +30,9 @@ src/engine   Alfil Beta: evaluación + búsqueda (no depende de la interfaz)
 src/coach    explicación de errores
 src/lessons  lecciones como datos (FEN + objetivo + comprobación)
 src/ui       tablero, controles, paneles
+src/pwa      service worker, avisos (instalar, sin conexión, versión nueva) y registro
+public/      manifest, favicon e iconos de la app
+tools/       build-site (monta site/), serve, perft
 src/worker   puente entre la interfaz y el motor
 tests/       perft y reglas especiales
 ```
@@ -46,7 +49,8 @@ npm run build    # tsc -> dist/ (módulos ES nativos)
 npm test         # compila y ejecuta node --test (perft a profundidad rápida)
 npm run test:perft   # perft a profundidad completa (unos 43 millones de nodos)
 npm run perft -- <profundidad> ["<fen>"] [jugadas UCI...] [--ref <fichero>]
-npm run serve    # compila y sirve la web en http://127.0.0.1:8080 (sin dependencias)
+npm run build:site   # compila y monta site/ (lo que se publica) con el service worker versionado
+npm run serve    # monta site/ y lo sirve en http://127.0.0.1:8080 (sin dependencias)
 ```
 
 ### Interfaz y diseño
@@ -54,6 +58,10 @@ npm run serve    # compila y sirve la web en http://127.0.0.1:8080 (sin dependen
 Las piezas (doce SVG dibujados a mano, estilo de volumen con degradado) y el tablero se pintan con DOM y CSS a mano desde la colocación de una FEN: `src/ui/pieces.ts` y `src/ui/board.ts`. Los colores y medidas salen de `src/ui/tokens.css`, con tema claro y oscuro. `index.html` es la partida a dos jugadores, sin bundler (`npm run serve`), con la CSP puesta en una etiqueta `meta`.
 
 La interacción está separada en dos capas. `src/ui/game.ts` (la partida por casillas, con deshacer, rehacer y lista de jugadas) y `src/ui/interaction.ts` (qué hace cada clic, arrastre o tecla, y qué casillas se marcan) no tocan el DOM y se prueban en Node. `src/ui/main.ts` solo traduce eventos a esas llamadas y pinta el resultado. Se juega con clic, arrastrando (también con el dedo) o con el teclado: flechas, Inicio/Fin, Re Pág/Av Pág, Intro o Espacio para elegir y Escape para cancelar. Cada jugada se anuncia a los lectores de pantalla en notación algebraica con letras españolas (C, A, T, D, R) y con palabras, y la coronación abre un diálogo modal.
+
+### PWA y dispositivos
+
+Escaque se adapta a móvil, tablet y escritorio y se instala como app (PWA). Puntos de corte: menos de 600 px (móvil), 600 a 859 px (tablet vertical, tablero de hasta 700 px) y desde 860 px (dos columnas); en horizontal bajo 500 px de alto el tablero se mide por el alto. Respeta las zonas seguras (muescas). `public/manifest.webmanifest` declara la app; `src/pwa/sw.ts` es un service worker propio, sin librerías, con caché versionada por contenido (`escaque-<hash>`), que deja jugar sin conexión. Cuando hay versión nueva, un aviso lo dice y avisa de que actualizar reinicia la partida (aún no se guarda). `npm run build:site` genera `site/` con la lista de ficheros a precachear. `vercel.json` publica `site/` y solo fija cabeceras de caché; las de seguridad y el cortafuegos de Vercel están pendientes de su diagnóstico.
 
 El diseño se hace antes en Claude Design y se copia en `docs/design` (README con origen, versión y fecha). Ningún cambio visual entra sin pasar por allí.
 
