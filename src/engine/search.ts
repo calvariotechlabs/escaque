@@ -99,6 +99,25 @@ export function search(position: Position, limits: SearchLimits, options: Search
   );
 }
 
+/** Puntuación de una jugada de la raíz (ver `scoreMoves`). */
+export interface ScoredMove {
+  readonly uci: string;
+  readonly score: number;
+}
+
+/**
+ * Puntúa cada jugada legal con una búsqueda de ventana completa a la
+ * profundidad dada (más la quietud), sin límite de tiempo. Sirve para el
+ * azar controlado del nivel fácil, que necesita la puntuación de todas las
+ * jugadas y no solo la mejor. Misma advertencia que `search` sobre `position`.
+ */
+export function scoreMoves(position: Position, depth: number, options: SearchOptions = {}): ScoredMove[] {
+  checkLimits({ maxDepth: depth });
+  return new Searcher(position, options.table ?? new TranspositionTable(), options.now ?? (() => performance.now())).scoreRoot(
+    depth,
+  );
+}
+
 class Searcher {
   private nodes = 0;
   private deadline = Infinity;
@@ -136,6 +155,18 @@ class Searcher {
     }
     // La profundidad 1 nunca se corta, así que siempre hay resultado.
     return { ...result!, nodes: this.nodes };
+  }
+
+  scoreRoot(depth: number): ScoredMove[] {
+    const position = this.position;
+    const scored: ScoredMove[] = [];
+    for (const move of position.legalMoves()) {
+      position.makeMove(move);
+      const score = -this.negamax(depth - 1, 1, -INFINITY, INFINITY);
+      position.unmakeMove();
+      scored.push({ uci: moveToUci(move), score: score === 0 ? 0 : score });
+    }
+    return scored;
   }
 
   private negamax(depth: number, ply: number, alpha: number, beta: number): number {
