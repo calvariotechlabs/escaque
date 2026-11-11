@@ -4,17 +4,19 @@ Copia en el repositorio de lo que se diseña en Claude Design. Regla del proyect
 
 | Qué | Origen en Claude Design | Versión | Exportado |
 | --- | --- | --- | --- |
-| Design System «S-Design - Escaque» | https://claude.ai/artifact/5eMkXXkB3rMzuRwKU5osqC | 1794396033-181b | 2026-11-11 |
-| Lienzo «Design - Escaque» (partida en escritorio y móvil, coronación y confirmar nueva partida) | https://claude.ai/artifact/EFBEpxb6n1xjdX35LYqNcG | 1794397093-c633 | 2026-11-11 |
+| Design System «S-Design - Escaque» | https://claude.ai/artifact/5eMkXXkB3rMzuRwKU5osqC | 1794397996-2af7 | 2026-11-11 |
+| Lienzo «Design - Escaque» (partida en escritorio, móvil, tablet, móvil horizontal, coronación, confirmación, avisos de la app y arranque) | https://claude.ai/artifact/EFBEpxb6n1xjdX35LYqNcG | 1794398998-0eef | 2026-11-11 |
 
 Los enlaces son privados de la cuenta de Calvario TechLabs.
 
 ## Contenido
 
-- `design-system/`: `README.md` (el libro de marca), `tokens.json` (fuente de los valores), `tokens.css` (generado a partir de `tokens.json`), `components/` (`bundle.css`, `pieces.js` con las siluetas y, por componente, README y vista previa `preview.html`) y `assets/Piezas/` (las doce piezas en SVG).
-- `lienzo/`: `canvas.json` y las cuatro pantallas (`*.dc.html`). Son fuentes del editor de Claude Design: para verlas en HTML puro, abre el enlace de arriba. Las imágenes de pieza apuntan a ids de subida de ese lienzo, no a ficheros de este repositorio.
+- `design-system/`: `README.md` (el libro de marca), `tokens.json` (fuente de los valores), `tokens.css` (generado a partir de `tokens.json`), `components/` (`bundle.css`, `pieces.js` con las siluetas y, por componente, README y vista previa `preview.html`) `assets/Piezas/` (las doce piezas en SVG) y `assets/Icono/` (icono de la app, versión maskable, símbolo, logos horizontales y favicon; salen del pack de logos). Los componentes `Notice` (avisos de instalar, sin conexión y versión nueva) y `AppIcon` son de la PWA; la vista previa de `AppIcon` apunta a ids de subida del Design System.
+- `lienzo/`: `canvas.json` y las pantallas (`*.dc.html`: escritorio, móvil, tablet vertical y horizontal, móvil horizontal, coronación, confirmación, avisos y arranque). Son fuentes del editor de Claude Design: para verlas en HTML puro, abre el enlace de arriba. Las imágenes de pieza apuntan a ids de subida de ese lienzo, no a ficheros de este repositorio.
 
 ## Cómo se usa en el código
 
 - `src/ui/tokens.css` se genera a partir de `tokens.json` (valores y temas) y `src/ui/board.css` copia de `components/bundle.css` las reglas de piezas, tablero, marcas y botones. Si cambia el diseño, se actualiza primero aquí y después en `src/ui`.
 - Las siluetas de `src/ui/pieces.ts` son las mismas de `components/pieces.js`.
+
+- La PWA (`public/manifest.webmanifest`, `public/icons/`, `src/pwa/`) sale de las páginas de tablet, móvil horizontal, avisos y arranque, y del grupo Icono. Puntos de corte y colores de tema: ver el README del Design System.

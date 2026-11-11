@@ -24,6 +24,26 @@
     {
       "id": "confirmacion-movil",
       "name": "Nueva partida · móvil"
+    },
+    {
+      "id": "tablet-vertical",
+      "name": "Partida · tablet vertical"
+    },
+    {
+      "id": "tablet-horizontal",
+      "name": "Partida · tablet horizontal"
+    },
+    {
+      "id": "movil-horizontal",
+      "name": "Partida · móvil horizontal"
+    },
+    {
+      "id": "app-avisos",
+      "name": "App instalada · avisos"
+    },
+    {
+      "id": "app-arranque",
+      "name": "App instalada · arranque"
     }
   ],
   "boards": {
@@ -59,13 +79,58 @@
       "h": 1010,
       "title": "Móvil · confirmar nueva partida",
       "page": "confirmacion-movil"
+    },
+    "TabletVertical.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 820,
+      "h": 1200,
+      "title": "Tablet · vertical",
+      "page": "tablet-vertical"
+    },
+    "TabletHorizontal.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 1180,
+      "h": 820,
+      "title": "Tablet · horizontal",
+      "page": "tablet-horizontal"
+    },
+    "MovilHorizontal.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 844,
+      "h": 390,
+      "title": "Móvil · horizontal",
+      "page": "movil-horizontal"
+    },
+    "Avisos.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 1060,
+      "title": "App instalable · avisos",
+      "page": "app-avisos"
+    },
+    "Arranque.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 820,
+      "h": 844,
+      "title": "App instalada · pantalla de arranque",
+      "page": "app-arranque"
     }
   },
   "order": [
     "Main.dc.html",
     "Movil.dc.html",
     "Coronacion.dc.html",
-    "Confirmacion.dc.html"
+    "Confirmacion.dc.html",
+    "TabletVertical.dc.html",
+    "TabletHorizontal.dc.html",
+    "MovilHorizontal.dc.html",
+    "Avisos.dc.html",
+    "Arranque.dc.html"
   ],
   "notes": {
     "n1": {
@@ -107,6 +172,46 @@
       "text": "Botones: «Nueva partida» a todo el ancho; «Deshacer jugada» y «Rehacer jugada» juntos; «Girar tablero» a todo el ancho. «Rehacer» está desactivado cuando no hay nada que rehacer.",
       "fill": "gray",
       "page": "partida-movil"
+    },
+    "p1": {
+      "x": 0,
+      "y": 1240,
+      "w": 520,
+      "text": "De 600 a 859 px de ancho: una sola columna como en móvil, con el tablero hasta 700 px, los cuatro botones en una fila y las jugadas debajo.",
+      "fill": "gray",
+      "page": "tablet-vertical"
+    },
+    "p2": {
+      "x": 0,
+      "y": 860,
+      "w": 520,
+      "text": "Desde 860 px: dos columnas. El tablero ocupa la izquierda (hasta 680 px) y a la derecha van estado, jugadas y botones. Es la misma disposición que en escritorio.",
+      "fill": "gray",
+      "page": "tablet-horizontal"
+    },
+    "p3": {
+      "x": 0,
+      "y": 430,
+      "w": 520,
+      "text": "Móvil apaisado (alto menor de 500 px): el tablero se limita por el alto de la pantalla y el panel pasa a la derecha; la lista de jugadas se desplaza dentro de su caja. Los márgenes laterales respetan la muesca (safe-area).",
+      "fill": "gray",
+      "page": "movil-horizontal"
+    },
+    "p4": {
+      "x": 470,
+      "y": 0,
+      "w": 420,
+      "text": "Un aviso a la vez, encima del estado. Sin conexión lleva borde discontinuo y versión nueva borde sólido en el color de acento, así que no depende solo del color. Al actualizar se reinicia la partida en curso: por eso se avisa antes.",
+      "fill": "gray",
+      "page": "app-avisos"
+    },
+    "p5": {
+      "x": 0,
+      "y": 884,
+      "w": 520,
+      "text": "Pantalla de arranque: solo el icono centrado sobre el fondo de la página, en claro y en oscuro. Color de tema y de fondo del manifiesto: #f1f3f5 (claro) y #0f1218 (oscuro). El icono está en el Design System, grupo Icono.",
+      "fill": "gray",
+      "page": "app-arranque"
     }
   },
   "designSystems": [

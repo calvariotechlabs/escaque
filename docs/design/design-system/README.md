@@ -27,7 +27,13 @@ Escaque es una app web para aprender ajedrez con motor propio (Alfil Beta). Es u
 
 ## Iconografía
 
-Escaque no usa iconos: los botones llevan solo texto. Las únicas imágenes son las doce piezas del grupo Piezas.
+Escaque no usa iconos en la interfaz: los botones llevan solo texto. Las únicas imágenes son las doce piezas del grupo Piezas y el icono de la app del grupo Icono (un alfil blanco con una diagonal `accent` sobre fondo `board-ink`, más el símbolo suelto, el logotipo horizontal y el favicon).
+
+## App instalada
+
+- La app se instala desde el navegador y funciona sin conexión. Al abrirla, el color de la barra del sistema y el de la pantalla de arranque son `surface` (claro `#f1f3f5`, oscuro `#0f1218`); la pantalla de arranque es solo el icono centrado.
+- Los avisos de instalar, sin conexión y versión nueva usan el componente `Notice`. Un aviso a la vez, con texto en español que termina en punto.
+- Puntos de corte: móvil por debajo de 600 px (una columna: estado, tablero, botones y jugadas); tablet vertical de 600 a 859 px (una columna, tablero hasta 700 px, botones en fila y jugadas debajo); desde 860 px, dos columnas con el tablero a la izquierda. En un móvil apaisado (alto menor de 500 px) el tablero se limita por el alto y el panel pasa a la derecha. Los márgenes respetan las áreas seguras del dispositivo.
 
 ## Cómo usar este sistema
 
