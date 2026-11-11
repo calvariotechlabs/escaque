@@ -13,6 +13,7 @@ declare module "node:assert/strict" {
     ok(value: unknown, message?: string): asserts value;
     match(value: string, regexp: RegExp, message?: string): void;
     throws(fn: () => unknown, expected?: unknown, message?: string): void;
+    rejects(promise: Promise<unknown>, expected?: unknown, message?: string): Promise<void>;
   };
   export default assert;
 }
