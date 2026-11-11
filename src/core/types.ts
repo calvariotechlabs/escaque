@@ -7,6 +7,12 @@ export type PieceType = "p" | "n" | "b" | "r" | "q" | "k";
 
 export type PromotionPiece = "q" | "r" | "b" | "n";
 
+/** Pieza en una casilla. */
+export interface Piece {
+  readonly color: Color;
+  readonly type: PieceType;
+}
+
 /** Casilla en la representación 0x88: índice = 16 * fila + columna (a1 = 0, h8 = 119). */
 export type Square = number;
 

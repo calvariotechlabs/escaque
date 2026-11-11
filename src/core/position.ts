@@ -14,7 +14,7 @@
 import { FenError } from "./errors.js";
 import { createRandom } from "./random.js";
 import type { PerftTarget } from "./perft.js";
-import type { Color, GameStatus, Move, PromotionPiece, Square } from "./types.js";
+import type { Color, GameStatus, Move, Piece, PromotionPiece, Square } from "./types.js";
 
 export const START_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
@@ -44,6 +44,12 @@ const FEN_TO_TYPE: Readonly<Record<string, number>> = { p: PAWN, n: KNIGHT, b: B
 const TYPE_TO_FEN = ["", "p", "n", "b", "r", "q", "k"] as const;
 const PROMOTION_TO_TYPE: Readonly<Record<PromotionPiece, number>> = { q: QUEEN, r: ROOK, b: BISHOP, n: KNIGHT };
 const PROMOTIONS: readonly PromotionPiece[] = ["q", "r", "b", "n"];
+/** Pieza pública por código interno; `undefined` en los códigos sin pieza. */
+const PIECES: ReadonlyArray<Piece | undefined> = Array.from({ length: 16 }, (_, code) => {
+  const type = TYPE_TO_FEN[code & TYPE_MASK];
+  if (type === undefined || type === "") return undefined;
+  return Object.freeze({ color: (code & COLOR_BIT) === 0 ? "w" : "b", type } as Piece);
+});
 
 // --- Casillas ----------------------------------------------------------------
 
@@ -369,6 +375,21 @@ export class Position implements PerftTarget<Move> {
       if (undo.hashHi === this.zHi && undo.hashLo === this.zLo) count++;
     }
     return count;
+  }
+
+  /**
+   * Pieza en una casilla 0x88 (a1 = 0, h8 = 119), o `null` si está vacía o
+   * fuera del tablero. Devuelve siempre los mismos objetos congelados: no crea
+   * nada nuevo en cada llamada, para que la evaluación del motor sea barata.
+   */
+  pieceAt(square: Square): Piece | null {
+    if (!Number.isInteger(square) || square < 0 || square > 119 || offBoard(square)) return null;
+    return PIECES[this.board[square]!] ?? null;
+  }
+
+  /** Medias jugadas seguidas sin mover un peón ni capturar (para la regla de 50 jugadas). */
+  get halfmoveClock(): number {
+    return this.halfmove;
   }
 
   /** Bando al que le toca mover. */
