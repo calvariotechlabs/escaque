@@ -4,25 +4,55 @@ App web para aprender ajedrez con motor propio (**Alfil Beta**), escrita desde c
 
 ## Estado
 
-**Hito 1 — Reglas + perft, sin interfaz: hecho.** Tablero 0x88, FEN, generador de jugadas legales (enroque, al paso, coronación), hacer/deshacer, notación algebraica estándar (SAN, escritura y lectura) y fin de partida completo: jaque mate, ahogado, material insuficiente, regla de 50 jugadas y triple repetición. Pasan todos los tests y todos los perft de referencia. Las tablas por 50 jugadas y por triple repetición son automáticas, sin reclamarlas, y la repetición sigue a la FIDE: cuentan el bando al mover, los derechos de enroque y solo las capturas al paso que sean legales.
+Los seis hitos están hechos. Alfil Beta juega con tres niveles en un Web Worker, el coach explica los errores y hay seis lecciones guiadas. La web se instala como app (PWA) y se publica como sitio estático en Vercel.
 
-Velocidad de perft (Node 22, un hilo): unos 9 a 10 millones de nodos por segundo; la inicial a profundidad 6 (119.060.324 nodos) en unos 12 s, y Kiwipete a profundidad 5 (193.690.690) en unos 21 s.
-
-**Hito 3 — Alfil Beta: motor y Worker hechos.** Búsqueda, evaluación, tres niveles y el puente con el Web Worker, con tests y probado en el navegador. La pantalla para jugar contra la máquina (ajustes de modo, nivel y color, «Alfil Beta está pensando» y resultado con revancha) está programada y aprobada en diseño. Detalles y cifras en [Alfil Beta](#alfil-beta-el-motor).
+**Demo:** <https://escaque-ochre.vercel.app> (detrás de un desafío anti-bots de Vercel: la primera visita puede tardar un instante).
 
 | Hito | Descripción | Estado |
 | --- | --- | --- |
 | 0 | Repositorio, estructura y herramientas | Hecho |
 | 1 | Reglas completas + perft | Hecho |
 | 2 | Tablero jugable (dos jugadores) | Hecho |
-| 3 | Máquina en Web Worker, 3 niveles | Motor y Worker hechos; falta la pantalla (pendiente de diseño) |
-| 4 | Coach: explicación de errores | Hecho: lógica en `src/coach`, panel en la interfaz y cálculo en su propio Worker |
-| 5 | 5–6 lecciones guiadas | Pendiente |
-| 6 | Pulido para portfolio, CI y despliegue | Pendiente |
+| 3 | Máquina en Web Worker, 3 niveles | Hecho |
+| 4 | Coach: explicación de errores | Hecho |
+| 5 | Seis lecciones guiadas | Hecho |
+| 6 | Pulido para portfolio, CI y despliegue | Hecho (este README, CI en GitHub Actions, Vercel) |
+
+## Cifras
+
+Todas medidas, no estimadas. Las de velocidad salen de un contenedor cloud de 4 núcleos con Node 22; en un portátil moderno salen bastante mejor (el perft pasaba de 9 millones de nodos por segundo), así que léelas como suelo, no como techo.
+
+| Qué | Cifra |
+| --- | --- |
+| Dependencias en ejecución | **0** (`dependencies` vacío; la única `devDependency` es TypeScript, solo para compilar; lo comprueba la CI) |
+| Código | 6.766 líneas de TypeScript en `src` y 4.429 en `tests` |
+| Tests | **701** en 116 suites con `node --test`, unos 5 s (más 109 tests de perft a profundidad completa, unos 10 s) |
+| Perft | 21 posiciones de referencia, todas exactas: la inicial (20 / 400 / 8.902 / 197.281), Kiwipete (48 / 2.039 / 97.862), las posiciones 3 a 6 de la Chess Programming Wiki y las «trampa» de Sedlak (al paso ilegal, enroques que dan jaque, coronaciones que ahogan). `npm run perft` llega más lejos: 119.060.324 nodos desde la inicial a profundidad 6 y 193.690.690 en Kiwipete a profundidad 5 |
+| Velocidad de perft | Entre 5,9 y 6,5 millones de nodos por segundo en este contenedor: la inicial a profundidad 6 (119.060.324 nodos) en 18,8 s y Kiwipete a profundidad 5 (193.690.690) en 30 s |
+| Alfil Beta, nivel Difícil | Responde en 831 ms de media y 910 ms como máximo (158 jugadas medidas en esta pasada, contenedor de 4 núcleos); la pasada completa del punto de parada (más abajo) dio 818 ms y 909 ms. Gana 4 de 4 a un jugador al azar y 4 de 4 a Fácil; Medio gana 4 de 4 a Fácil |
+| Sitio publicado | 64 ficheros, 516 KB en disco; JS + CSS + HTML suman unos 75 KB comprimidos con gzip |
+| Cabeceras | CSP sin `unsafe-inline`, `X-Frame-Options: DENY`, `nosniff`, `Referrer-Policy`, `Permissions-Policy` y `COOP`, comprobadas por tests |
 
 ## Cómo se hizo
 
-El diseño y las decisiones técnicas (arquitectura, tablero 0x88, estrategia de búsqueda, criterios de «terminado») son míos. La implementación está asistida con Claude y revisada por mí. Las decisiones y las cifras se irán documentando aquí a medida que avancen los hitos.
+El diseño y las decisiones técnicas (arquitectura, tablero 0x88, estrategia de búsqueda, criterios de «terminado») son míos. La implementación está asistida con Claude y revisada por mí. Las decisiones y las cifras de abajo están medidas y documentadas aquí.
+
+## Decisiones técnicas
+
+- **Cero dependencias.** El proyecto es una demostración de oficio: reglas, motor, interfaz, service worker y servidor de desarrollo son propios. Coste: más código; beneficio: nada que actualizar ni auditar, y el sitio publicado pesa unos 75 KB comprimidos.
+- **Tablero 0x88, no bitboards.** En JavaScript un bitboard de 64 bits obliga a `BigInt`, que es lento. Con 0x88 la comprobación de «fuera del tablero» es una máscara y las tablas se indexan sin conversiones.
+- **Legalidad por aplicar y deshacer.** Se generan todas las jugadas posibles, se aplica cada una y se descarta la que deja al rey en jaque. Es lo más simple de razonar y lo valida el perft contra cifras publicadas.
+- **Una sola clave Zobrist** (64 bits en dos mitades de 32, generador propio) para la triple repetición, las repeticiones dentro de la búsqueda y la tabla de transposición.
+- **Motor en un Worker, coach en otro.** Pensar no congela la interfaz y revisar tu jugada no retrasa la respuesta de la máquina.
+- **Sitio estático sin bundler.** `tsc` emite módulos ES que el navegador carga tal cual. Sin backend, cuentas, analítica ni cookies. Al no haber servidor no hay nonce por petición: la CSP prohíbe `unsafe-inline` y un test comprueba que el sitio no lleva código en línea.
+- **Las lecciones son datos.** Cada una es una FEN, unos pasos y sus motivos de fallo (`src/lessons`); los tests comprueban con el motor que lo aceptado es exactamente lo correcto.
+- **Diseño primero.** Ningún cambio visual entra sin pasar por Claude Design y exportarse a `docs/design`.
+
+## CI y despliegue
+
+- **CI** (`.github/workflows/ci.yml`, GitHub Actions, permisos solo de lectura, sin secretos). En cada pull request y en cada push a `main`: tipos con `tsc` estricto, `npm test`, montaje del sitio (`npm run build:site`), perft a profundidad completa (`npm run test:perft`) y comprobación de que `dependencies` sigue vacío.
+- **Despliegue.** Vercel publica `site/` desde el repositorio como web estática (`vercel.json`: región `fra1`, cabeceras de seguridad, sin funciones). Las vistas previas están protegidas con Vercel Authentication, hay Bot Protection en modo desafío con excepción para iconos y manifest, y un tope de gasto en el equipo.
+- **Qué no hace la CI:** no despliega. Cada fusión a `main` la despliega Vercel; la CI solo dice si el código está sano.
 
 ## Estructura
 
@@ -35,8 +65,9 @@ src/ui       tablero, controles, paneles
 src/pwa      service worker, avisos (instalar, sin conexión, versión nueva) y registro
 public/      manifest, favicon e iconos de la app
 tools/       build-site (monta site/), serve, perft
-src/worker   puente entre la interfaz y el motor
-tests/       perft y reglas especiales
+src/worker   puente entre la interfaz y los motores (Alfil Beta y coach)
+tests/       perft, reglas especiales, motor, coach, lecciones e interfaz
+.github/     CI (GitHub Actions)
 ```
 
 `core` y `engine` funcionan igual en Node y en el navegador.
@@ -64,7 +95,7 @@ La interacción está separada en dos capas. `src/ui/game.ts` (la partida por ca
 
 ### PWA y dispositivos
 
-Escaque se adapta a móvil, tablet y escritorio y se instala como app (PWA). Puntos de corte: menos de 600 px (móvil), 600 a 859 px (tablet vertical, tablero de hasta 700 px) y desde 860 px (dos columnas); en horizontal bajo 500 px de alto el tablero se mide por el alto. Respeta las zonas seguras (muescas). `public/manifest.webmanifest` declara la app; `src/pwa/sw.ts` es un service worker propio, sin librerías, con caché versionada por contenido (`escaque-<hash>`), que deja jugar sin conexión. Cuando hay versión nueva, un aviso lo dice y avisa de que actualizar reinicia la partida (aún no se guarda). `npm run build:site` genera `site/` con la lista de ficheros a precachear. `vercel.json` publica `site/` (la región `fra1` está fijada, aunque al ser estático solo afectaría a funciones; HSTS lo pone Vercel) y fija las cabeceras de seguridad en todas las respuestas: CSP estricta (`default-src 'none'`, solo recursos propios, `frame-ancestors 'none'`), `X-Frame-Options: DENY`, `nosniff`, `Referrer-Policy: no-referrer`, `Permissions-Policy` cerrada y `Cross-Origin-Opener-Policy: same-origin`. Al ser una web estática no hay nonce por petición: la CSP no admite `unsafe-inline`, y `tools/vercel-config.test.mjs` comprueba que el sitio no lleve scripts ni estilos en línea. El cortafuegos y la protección de bots se configuran en el panel de Vercel.
+Escaque se adapta a móvil, tablet y escritorio y se instala como app (PWA). Puntos de corte: menos de 600 px (móvil), 600 a 859 px (tablet vertical, tablero de hasta 700 px) y desde 860 px (dos columnas); en horizontal bajo 500 px de alto el tablero se mide por el alto. Respeta las zonas seguras (muescas). `public/manifest.webmanifest` declara la app; `src/pwa/sw.ts` es un service worker propio, sin librerías, con caché versionada por contenido (`escaque-<hash>`), que deja jugar sin conexión. Cuando hay versión nueva, un aviso lo dice y la partida en curso se guarda en el dispositivo (`localStorage`), así que actualizar no la pierde. `npm run build:site` genera `site/` con la lista de ficheros a precachear. `vercel.json` publica `site/` (la región `fra1` está fijada, aunque al ser estático solo afectaría a funciones; HSTS lo pone Vercel) y fija las cabeceras de seguridad en todas las respuestas: CSP estricta (`default-src 'none'`, solo recursos propios, `frame-ancestors 'none'`), `X-Frame-Options: DENY`, `nosniff`, `Referrer-Policy: no-referrer`, `Permissions-Policy` cerrada y `Cross-Origin-Opener-Policy: same-origin`. Al ser una web estática no hay nonce por petición: la CSP no admite `unsafe-inline`, y `tools/vercel-config.test.mjs` comprueba que el sitio no lleve scripts ni estilos en línea. El cortafuegos y la protección de bots se configuran en el panel de Vercel.
 
 El diseño se hace antes en Claude Design y se copia en `docs/design` (README con origen, versión y fecha). Ningún cambio visual entra sin pasar por allí.
 

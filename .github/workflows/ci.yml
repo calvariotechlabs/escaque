@@ -1,0 +1,72 @@
+# Integración continua: tipos, tests, perft completo y montaje del sitio.
+# Sin secretos ni despliegue: publicar lo hace Vercel desde el repositorio.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Tipos, tests y sitio
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Tipos (tsc strict)
+        run: npm run typecheck
+      - name: Tests (node --test)
+        run: npm test
+      - name: Montar el sitio (lo que publica Vercel)
+        run: npm run build:site
+
+  perft:
+    name: Perft a profundidad completa
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Perft de referencia (unos 43 millones de nodos)
+        run: npm run test:perft
+
+  dependencias:
+    name: Cero dependencias en ejecución
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Comprobar que `dependencies` está vacío
+        run: |
+          node -e "
+            const p = JSON.parse(require('node:fs').readFileSync('package.json', 'utf8'));
+            const n = Object.keys(p.dependencies ?? {});
+            if (n.length) { console.error('Dependencias en ejecución:', n.join(', ')); process.exit(1); }
+            console.log('dependencies: vacío; devDependencies:', Object.keys(p.devDependencies ?? {}).join(', '));
+          "
