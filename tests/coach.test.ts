@@ -66,15 +66,18 @@ describe("valoración de la jugada", () => {
     const report = analyze([], first.best.uci);
     assert.equal(report.verdict, "mejor");
     assert.equal(report.loss, 0);
-    assert.deepEqual(report.before, report.after);
     assert.equal(report.title, "Mejor jugada");
+    assert.equal(report.summary, "Es la jugada que elige Alfil Beta.");
   });
 
   it("dar mate es la mejor jugada", () => {
     const report = analyze([], "a1a8", "6k1/5ppp/8/8/8/8/8/R5K1 w - - 0 1");
     assert.equal(report.verdict, "mejor");
-    assert.equal(report.summary, "¡Jaque mate!");
-    assert.deepEqual(report.after, { kind: "mate", moves: 1 });
+    assert.equal(report.summary, "Da jaque mate.");
+    assert.deepEqual(report.before.mate, { winner: "w", moves: 1 });
+    assert.equal(report.before.text, "Mate en 1 para las blancas");
+    assert.deepEqual(report.after.mate, { winner: "w", moves: 0 });
+    assert.equal(report.after.text, "Jaque mate: ganan las blancas");
     assert.deepEqual(report.findings, []);
   });
 
@@ -89,21 +92,64 @@ describe("valoración de la jugada", () => {
     // Dd8+ entrega la dama (Axd8) y luego Te8#.
     const report = analyze([], "d5d8", "r1b2k1r/ppp1bppp/8/1B1Q4/5q2/2P5/PPP2PPP/R3R1K1 w - - 1 1");
     assert.equal(report.verdict, "mejor");
-    assert.deepEqual(report.after, { kind: "mate", moves: 2 });
+    assert.deepEqual(report.after.mate, { winner: "w", moves: 1 });
     assert.deepEqual(report.findings, []);
+  });
+
+  it("las negras también reciben su análisis", () => {
+    // 1.e4 e5 2.Cf3 Dg5??: la dama queda colgando.
+    const report = analyze(["e2e4", "e7e5", "g1f3"], "d8g5");
+    assert.equal(report.color, "b");
+    assert.equal(report.verdict, "error-grave");
+    assert.ok(report.after.cp > 500, report.after.text);
+    assert.match(report.after.text, /^\+\d+,\d a favor de las blancas$/);
+    const finding = report.findings[0]!;
+    if (finding.kind !== "pieza-colgando") throw new Error(JSON.stringify(report.findings));
+    assert.equal(finding.message, "Tu dama de g5 está atacada por el caballo blanco de f3 y no la defiende ninguna pieza.");
+    assert.equal(report.summary, "Dg5 deja la dama sin protección.");
   });
 });
 
 describe("detectores", () => {
-  it("mate en 1 que se escapó", () => {
+  it("el ejemplo del diseño: mate que se escapa y dama colgando", () => {
+    // 1.e4 e5 2.Ac4 Cc6 3.Dh5 Cf6 4.Cf3??: Dxf7# era mate y la dama de h5 queda atacada.
+    const report = analyze(["e2e4", "e7e5", "f1c4", "b8c6", "d1h5", "g8f6"], "g1f3");
+    assert.equal(report.verdict, "error-grave");
+    assert.equal(report.title, "Error grave");
+    assert.equal(report.summary, "Cf3 deja escapar el mate y deja la dama sin protección.");
+    assert.deepEqual(report.best, { uci: "h5f7", san: "Qxf7#" });
+    assert.equal(report.before.text, "Mate en 1 para las blancas");
+    assert.match(report.after.text, /^\u2212\d+,\d a favor de las negras$/);
+    assert.deepEqual(kinds(report), ["mate-en-1", "pieza-colgando"]);
+
+    const [mate, hanging] = report.findings;
+    if (mate?.kind !== "mate-en-1" || hanging?.kind !== "pieza-colgando") throw new Error(JSON.stringify(report.findings));
+    assert.equal(mate.title, "Mate en 1 que se escapó");
+    assert.equal(mate.message, "Con Dxf7# ganabas la partida en el acto. Con Cf3 el rey negro sigue vivo.");
+    assert.equal(mate.label, "mate en 1 con Dxf7#");
+    assert.deepEqual(mate.marks, [
+      { square: "h5", mark: "selected" },
+      { square: "f7", mark: "capture" },
+    ]);
+    assert.equal(hanging.title, "Pieza colgando");
+    assert.equal(hanging.message, "Tu dama de h5 está atacada por el caballo negro de f6 y no la defiende ninguna pieza.");
+    assert.equal(hanging.label, "dama colgando en h5");
+    assert.deepEqual(hanging.attacker, { piece: "n", square: "f6" });
+    assert.equal(hanging.defended, false);
+    assert.deepEqual(hanging.marks, [
+      { square: "f6", mark: "selected" },
+      { square: "h5", mark: "capture" },
+    ]);
+  });
+
+  it("mate en 1 que se escapó aunque quede otro mate más largo", () => {
     const report = analyze([], "a1a2", "6k1/5ppp/8/8/8/8/8/R5K1 w - - 0 1");
-    assert.deepEqual(kinds(report), ["mate-en-1"]);
+    assert.equal(kinds(report)[0], "mate-en-1");
     const finding = report.findings[0]!;
-    assert.equal(finding.kind, "mate-en-1");
-    if (finding.kind !== "mate-en-1") return;
+    if (finding.kind !== "mate-en-1") throw new Error(finding.kind);
     assert.deepEqual(finding.move, { uci: "a1a8", san: "Ra8#" });
-    assert.equal(finding.message, "Tenías mate en 1 con Ta8#.");
     assert.notEqual(report.verdict, "mejor");
+    assert.notEqual(report.verdict, "buena");
   });
 
   it("pieza que queda colgando", () => {
@@ -116,18 +162,20 @@ describe("detectores", () => {
     assert.equal(finding.square, "g5");
     assert.deepEqual(finding.capture, { uci: "d8g5", san: "Qxg5" });
     assert.equal(finding.gain, 320);
-    assert.equal(finding.message, "Tu caballo en g5 queda colgando: el rival puede jugar Dxg5 y ganar material.");
+    assert.equal(finding.message, "Tu caballo de g5 está atacado por la dama negra de d8 y no lo defiende ninguna pieza.");
     assert.equal(report.verdict, "error-grave");
   });
 
-  it("pieza que ya colgaba y se deja colgando", () => {
+  it("pieza defendida pero atacada por otra de menos valor", () => {
     // El alfil de f3 ataca la torre de d1, que solo defiende el rey: h3 no lo arregla.
     const report = analyze([], "h2h3", "4k3/8/8/8/8/5b2/7P/3RK3 w - - 0 1");
     const finding = report.findings.find((f) => f.kind === "pieza-colgando");
     if (finding?.kind !== "pieza-colgando") throw new Error(JSON.stringify(report.findings));
     assert.equal(finding.square, "d1");
     assert.equal(finding.gain, 500 - 330);
-    assert.equal(finding.message, "Tras tu jugada, tu torre de d1 queda colgando: el rival puede jugar Axd1 y ganar material.");
+    assert.equal(finding.defended, true);
+    assert.equal(finding.message, "Tu torre de d1 está atacada por el alfil negro de f3, que vale menos: defenderla no basta.");
+    assert.equal(report.summary, "h3 deja la torre en peligro.");
   });
 
   it("captura gratis que no se vio", () => {
@@ -135,17 +183,25 @@ describe("detectores", () => {
     const report = analyze(["e2e4", "e7e5", "g1f3", "d8g5"], "a2a3");
     const finding = report.findings.find((f) => f.kind === "captura-gratis");
     if (finding?.kind !== "captura-gratis") throw new Error(JSON.stringify(report.findings));
+    assert.equal(finding.title, "Captura gratis no vista");
     assert.equal(finding.piece, "q");
     assert.equal(finding.square, "g5");
+    assert.equal(finding.attacker, "n");
     assert.deepEqual(finding.capture, { uci: "f3g5", san: "Nxg5" });
     assert.equal(finding.free, true);
     assert.equal(finding.gain, 900);
-    assert.equal(finding.message, "Podías capturar gratis la dama de g5 con Cxg5: no estaba defendida.");
+    assert.equal(finding.message, "Podías capturar la dama de g5 con el caballo y nadie la recuperaba. No lo has visto.");
+    assert.equal(finding.label, "captura gratis en g5");
+    assert.deepEqual(finding.marks, [
+      { square: "f3", mark: "selected" },
+      { square: "g5", mark: "capture" },
+    ]);
     assert.equal(report.verdict, "error-grave");
+    assert.match(report.summary, /^a3 .*no aprovecha la captura de la dama de g5\.$/);
   });
 
-  it("captura que ganaba material aunque estuviera defendida", () => {
-    // El peón de d4 captura el caballo de e5, defendido por el peón de d6: gana 320 − 100.
+  it("captura que ganaba material aunque el rival recuperara", () => {
+    // dxe5 gana el caballo; el peón de d6 recupera: 320 − 100.
     const report = analyze([], "h2h3", "4k3/8/3p4/4n3/3P4/8/7P/4K3 w - - 0 1");
     const finding = report.findings.find((f) => f.kind === "captura-gratis");
     if (finding?.kind !== "captura-gratis") throw new Error(JSON.stringify(report.findings));
@@ -153,7 +209,7 @@ describe("detectores", () => {
     assert.equal(finding.gain, 220);
     assert.equal(
       finding.message,
-      "Con dxe5 ganabas material: capturabas el caballo de e5 y el rival no podía recuperarlo todo.",
+      "Podías capturar el caballo de e5 con el peón: aunque el rival responda capturando, ganabas material. No lo has visto.",
     );
   });
 
@@ -194,11 +250,18 @@ describe("entradas", () => {
 });
 
 describe("utilidades", () => {
-  it("valoraciones legibles", () => {
-    assert.deepEqual(toEvaluation(35), { kind: "cp", value: 35 });
-    assert.deepEqual(toEvaluation(MATE_SCORE - 1), { kind: "mate", moves: 1 });
-    assert.deepEqual(toEvaluation(MATE_SCORE - 3), { kind: "mate", moves: 2 });
-    assert.deepEqual(toEvaluation(-(MATE_SCORE - 2)), { kind: "mate", moves: -1 });
+  it("evaluaciones vistas por las blancas", () => {
+    assert.deepEqual(toEvaluation(30, "w"), { cp: 30, mate: null, text: "+0,3 a favor de las blancas" });
+    assert.deepEqual(toEvaluation(30, "b"), { cp: -30, mate: null, text: "\u22120,3 a favor de las negras" });
+    assert.deepEqual(toEvaluation(-580, "w"), { cp: -580, mate: null, text: "\u22125,8 a favor de las negras" });
+    assert.equal(toEvaluation(4, "w").text, "0,0, igualdad");
+    assert.equal(toEvaluation(0, "b").cp, 0);
+    assert.deepEqual(toEvaluation(MATE_SCORE - 1, "w").mate, { winner: "w", moves: 1 });
+    assert.deepEqual(toEvaluation(MATE_SCORE - 3, "b").mate, { winner: "b", moves: 2 });
+    assert.equal(toEvaluation(MATE_SCORE - 3, "b").cp, -10_000);
+    assert.deepEqual(toEvaluation(-(MATE_SCORE - 2), "w").mate, { winner: "b", moves: 1 });
+    // Tras la jugada (una media jugada después), el mate en 2 pasa a mate en 1.
+    assert.equal(toEvaluation(MATE_SCORE - 3, "w", 1).text, "Mate en 1 para las blancas");
   });
 
   it("SAN española", () => {
