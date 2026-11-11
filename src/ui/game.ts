@@ -59,20 +59,21 @@ export class Game {
   private pieces: Map<string, Piece>;
   private legal: Move[];
   private currentStatus: GameStatus;
+  private currentFen: string;
 
   /** Lanza `FenError` si la FEN no es válida. */
   constructor(fen: string = START_FEN) {
     this.position = Position.fromFen(fen);
-    const normalized = this.position.toFen();
+    this.currentFen = this.position.toFen();
     this.startTurn = this.position.turn;
-    this.startFullmove = Number(normalized.split(" ")[5]);
-    this.pieces = parsePlacement(normalized);
+    this.startFullmove = Number(this.currentFen.split(" ")[5]);
+    this.pieces = parsePlacement(this.currentFen);
     this.legal = this.position.legalMoves();
     this.currentStatus = this.position.status();
   }
 
   get fen(): string {
-    return this.position.toFen();
+    return this.currentFen;
   }
 
   get turn(): Color {
@@ -145,6 +146,7 @@ export class Game {
     const captured = target !== undefined ? target.type : piece.type === "p" && from[0] !== to[0] ? "p" : null;
     const san = this.position.moveToSan(move);
     this.position.makeMove(move);
+    this.refresh();
 
     const record: MoveRecord = {
       color: piece.color,
@@ -154,10 +156,9 @@ export class Game {
       piece: piece.type,
       captured,
       promotion: move.promotion,
-      fenAfter: this.position.toFen(),
+      fenAfter: this.currentFen,
     };
     this.records.push(record);
-    this.refresh();
     return record;
   }
 
@@ -201,7 +202,8 @@ export class Game {
   }
 
   private refresh(): void {
-    this.pieces = parsePlacement(this.position.toFen());
+    this.currentFen = this.position.toFen();
+    this.pieces = parsePlacement(this.currentFen);
     this.legal = this.position.legalMoves();
     this.currentStatus = this.position.status();
   }

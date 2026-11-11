@@ -167,10 +167,13 @@ export class Interaction {
     return marks;
   }
 
-  /** Etiqueta accesible de una casilla: contenido y estado. */
-  label(square: string): string {
+  /**
+   * Etiqueta accesible de una casilla: contenido y estado. Para etiquetar las
+   * 64 casillas, calcula `marks()` una vez y pásalo.
+   */
+  label(square: string, allMarks: ReadonlyMap<string, readonly Mark[]> = this.marks()): string {
     const parts = [squareLabel(square, this.game.pieceAt(square))];
-    const marks = this.marks().get(square) ?? [];
+    const marks = allMarks.get(square) ?? [];
     if (marks.includes("selected")) parts.push("seleccionada");
     if (marks.includes("target")) parts.push("destino posible");
     if (marks.includes("capture")) parts.push("captura posible");
