@@ -1,23 +1,113 @@
 {
   "v": 3,
-  "createdOnFiles": { "v": 1, "at": "2026-11-11T11:40:00Z" },
+  "createdOnFiles": {
+    "v": 1,
+    "at": "2026-11-11T11:40:00Z"
+  },
   "title": "Design - Escaque",
-  "launch": { "view": "canvas" },
+  "launch": {
+    "view": "canvas"
+  },
   "pages": [
-    { "id": "partida-escritorio", "name": "Partida · escritorio" },
-    { "id": "partida-movil", "name": "Partida · móvil" },
-    { "id": "coronacion-movil", "name": "Coronación · móvil" }
+    {
+      "id": "partida-escritorio",
+      "name": "Partida · escritorio"
+    },
+    {
+      "id": "partida-movil",
+      "name": "Partida · móvil"
+    },
+    {
+      "id": "coronacion-movil",
+      "name": "Coronación · móvil"
+    },
+    {
+      "id": "confirmacion-movil",
+      "name": "Nueva partida · móvil"
+    }
   ],
   "boards": {
-    "Main.dc.html": { "x": 0, "y": 0, "w": 1280, "h": 860, "title": "Escritorio · partida en curso", "expand": "fill", "page": "partida-escritorio" },
-    "Movil.dc.html": { "x": 0, "y": 0, "w": 390, "h": 1010, "title": "Móvil · partida en curso", "page": "partida-movil" },
-    "Coronacion.dc.html": { "x": 0, "y": 0, "w": 390, "h": 1010, "title": "Móvil · coronación de peón", "page": "coronacion-movil" }
+    "Main.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 1280,
+      "h": 860,
+      "title": "Escritorio · partida en curso",
+      "expand": "fill",
+      "page": "partida-escritorio"
+    },
+    "Movil.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 1010,
+      "title": "Móvil · partida en curso",
+      "page": "partida-movil"
+    },
+    "Coronacion.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 1010,
+      "title": "Móvil · coronación de peón",
+      "page": "coronacion-movil"
+    },
+    "Confirmacion.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 1010,
+      "title": "Móvil · confirmar nueva partida",
+      "page": "confirmacion-movil"
+    }
   },
-  "order": ["Main.dc.html", "Movil.dc.html", "Coronacion.dc.html"],
+  "order": [
+    "Main.dc.html",
+    "Movil.dc.html",
+    "Coronacion.dc.html",
+    "Confirmacion.dc.html"
+  ],
   "notes": {
-    "n1": { "x": 0, "y": 900, "w": 520, "text": "Tablero estático con marcas de ejemplo: el caballo de f3 está seleccionado (anillo), d4, g5, h4 y g1 son destinos (punto), e5 es una captura (anillo alrededor de la pieza) y f8 y c5 muestran la última jugada. Las coordenadas van fuera del tablero.", "fill": "gray", "page": "partida-escritorio" },
-    "n2": { "x": 470, "y": 0, "w": 420, "text": "En móvil el orden es estado, tablero, botones y jugadas. El tablero ocupa todo el ancho útil y las casillas miden más de 38 px.", "fill": "gray", "page": "partida-movil" },
-    "n3": { "x": 470, "y": 0, "w": 420, "text": "El diálogo es modal: Escape lo cierra y cancela la jugada, y el foco vuelve a la casilla de origen. Dama es la opción con foco al abrir.", "fill": "gray", "page": "coronacion-movil" }
+    "n1": {
+      "x": 0,
+      "y": 900,
+      "w": 520,
+      "text": "Tablero estático con marcas de ejemplo: el caballo de f3 está seleccionado (anillo), d4, g5, h4 y g1 son destinos (punto), e5 es una captura (anillo alrededor de la pieza) y f8 y c5 muestran la última jugada. Las coordenadas van fuera del tablero.",
+      "fill": "gray",
+      "page": "partida-escritorio"
+    },
+    "n2": {
+      "x": 470,
+      "y": 0,
+      "w": 420,
+      "text": "En móvil el orden es estado, tablero, botones y jugadas. El tablero ocupa todo el ancho útil y las casillas miden más de 38 px.",
+      "fill": "gray",
+      "page": "partida-movil"
+    },
+    "n3": {
+      "x": 470,
+      "y": 0,
+      "w": 420,
+      "text": "El diálogo es modal: Escape lo cierra y cancela la jugada, y el foco vuelve a la casilla de origen. Dama es la opción con foco al abrir.",
+      "fill": "gray",
+      "page": "coronacion-movil"
+    },
+    "n4": {
+      "x": 470,
+      "y": 0,
+      "w": 420,
+      "text": "Solo aparece si la partida tiene jugadas. Es modal: el foco empieza en «Seguir jugando», Escape equivale a seguir jugando y el foco vuelve a «Nueva partida». El texto dice cuántas jugadas se pierden.",
+      "fill": "gray",
+      "page": "confirmacion-movil"
+    },
+    "n5": {
+      "x": 470,
+      "y": 620,
+      "w": 420,
+      "text": "Botones: «Nueva partida» a todo el ancho; «Deshacer jugada» y «Rehacer jugada» juntos; «Girar tablero» a todo el ancho. «Rehacer» está desactivado cuando no hay nada que rehacer.",
+      "fill": "gray",
+      "page": "partida-movil"
+    }
   },
   "designSystems": [
     {

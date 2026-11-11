@@ -146,6 +146,13 @@ describe("Game: rehacer y saltar", () => {
     assert.equal(game.turn, "b");
   });
 
+  it("cuenta las jugadas de la partida, también las que se pueden rehacer", () => {
+    const game = opening();
+    game.undo();
+    assert.equal(game.ply, 2);
+    assert.equal(game.totalPlies, 3);
+  });
+
   it("una jugada nueva tras deshacer borra lo que se podía rehacer", () => {
     const game = opening();
     game.undo();

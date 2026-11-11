@@ -1,7 +1,7 @@
 // Textos en español de la interfaz: SAN con C A T D R, anuncios y fin de partida.
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { sanToSpanish, statusMessage, moveAnnouncement } from "../src/ui/notation.js";
+import { sanToSpanish, statusMessage, moveAnnouncement, newGameWarning } from "../src/ui/notation.js";
 
 describe("SAN en español", () => {
   it("traduce las letras de las piezas", () => {
@@ -76,5 +76,12 @@ describe("mensajes de estado", () => {
     assert.equal(statusMessage({ kind: "insufficient-material" }, "w", false), "Tablas por material insuficiente.");
     assert.equal(statusMessage({ kind: "fifty-move" }, "w", false), "Tablas por la regla de los 50 movimientos.");
     assert.equal(statusMessage({ kind: "threefold-repetition" }, "b", false), "Tablas por triple repetición.");
+  });
+});
+
+describe("aviso de nueva partida", () => {
+  it("dice cuántas jugadas se pierden, en singular y en plural", () => {
+    assert.equal(newGameWarning(1), "Se perderá la jugada de esta partida.");
+    assert.equal(newGameWarning(6), "Se perderán las 6 jugadas de esta partida.");
   });
 });
