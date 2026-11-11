@@ -13,7 +13,6 @@ const base = {
   hints: [{ text: "Pista." }, { text: "Mueve la torre.", marks: { from: "d1", to: "d8" } }],
   success: "Bien hecho.",
   failure: "Esa no es.",
-  mistakes: {},
 } as const;
 
 /** Mate del pasillo: solo Td8 da mate. */
@@ -21,8 +20,7 @@ const mateIn1: Lesson = {
   ...base,
   id: "mate-1",
   fen: "6k1/5ppp/8/8/8/8/r4PPP/3R2K1 w - - 0 1",
-  mistakes: { g2g4: "El peón no ataca al rey." },
-  steps: [{ kind: "mate" }],
+  steps: [{ kind: "mate", mistakes: { g2g4: "El peón no ataca al rey." } }],
 };
 
 /** Horquilla: Cc7+, Rd7 (fija), Cxd5. */
@@ -31,7 +29,7 @@ const fork: Lesson = {
   id: "fork",
   fen: "4k3/pp3ppp/8/1N1q4/8/8/PPP2PPP/4K3 w - - 0 1",
   steps: [
-    { kind: "moves", accept: { b5c7: "e8d7" } },
+    { kind: "moves", accept: { b5c7: "e8d7" }, mistakes: { b5d6: "No ataca a la dama." } },
     { kind: "moves", accept: { c7d5: null } },
   ],
 };
@@ -71,7 +69,7 @@ describe("checkLessonMove", () => {
   });
 
   it("rechaza una jugada fuera de la lista en un paso de jugadas", () => {
-    assert.deepEqual(checkLessonMove(fork, [], "b5d6"), { kind: "fallo", reason: "Esa no es." });
+    assert.deepEqual(checkLessonMove(fork, [], "b5a7"), { kind: "fallo", reason: "Esa no es." });
   });
 
   it("funciona con el alumno llevando negras", () => {
@@ -87,6 +85,20 @@ describe("checkLessonMove", () => {
     assert.throws(() => checkLessonMove(fork, ["b5d6", "e8d7"], "c7d5"), LessonError);
     assert.throws(() => checkLessonMove(fork, ["b5c7", "e8f8"], "c7d5"), LessonError);
     assert.throws(() => checkLessonMove(fork, ["b5c7"], "c7d5"), LessonError);
+  });
+
+  it("usa los motivos propios solo en su paso", () => {
+    assert.deepEqual(checkLessonMove(fork, [], "b5d6"), { kind: "fallo", reason: "No ataca a la dama." });
+    assert.deepEqual(checkLessonMove(fork, ["b5c7", "e8d7"], "c7e6"), { kind: "fallo", reason: "Esa no es." });
+  });
+
+  it("lanza LessonError si el turno de la FEN no es el del alumno", () => {
+    assert.throws(() => checkLessonMove({ ...mateIn1, side: "b" }, [], "d1d8"), LessonError);
+  });
+
+  it("lanza LessonError si el último paso trae respuesta del rival", () => {
+    const broken: Lesson = { ...fork, steps: [{ kind: "moves", accept: { b5c7: "e8d7" } }] };
+    assert.throws(() => checkLessonMove(broken, [], "b5c7"), LessonError);
   });
 
   it("lanza LessonError si la lección ya está resuelta", () => {

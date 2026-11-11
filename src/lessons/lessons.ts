@@ -3,7 +3,7 @@
 // Estilo de los textos: español de tú, sin exclamaciones y con punto final.
 import type { Lesson } from "./types.js";
 
-export const LESSONS: readonly Lesson[] = Object.freeze([
+export const LESSONS: readonly Lesson[] = deepFreeze([
   {
     id: "enroque",
     number: 1,
@@ -20,11 +20,16 @@ export const LESSONS: readonly Lesson[] = Object.freeze([
     success:
       "El rey queda protegido detrás de sus peones y la torre entra en juego. El enroque largo no se podía hacer porque el rey habría pasado por d1, atacada por la torre negra.",
     failure: "Esa jugada no es un enroque.",
-    mistakes: {
-      e1f1: "Así el rey se aparta, pero pierde para siempre el derecho a enrocar.",
-      h1g1: "Si mueves la torre de h1, ya no podrás enrocar corto.",
-    },
-    steps: [{ kind: "moves", accept: { e1g1: null } }],
+    steps: [
+      {
+        kind: "moves",
+        accept: { e1g1: null },
+        mistakes: {
+          e1f1: "Así el rey se aparta, pero pierde para siempre el derecho a enrocar.",
+          h1g1: "Si mueves la torre de h1, ya no podrás enrocar corto.",
+        },
+      },
+    ],
   },
   {
     id: "captura-al-paso",
@@ -42,10 +47,15 @@ export const LESSONS: readonly Lesson[] = Object.freeze([
     success:
       "Tu peón captura en d6 al peón que pasó por esa casilla y ya nadie puede frenarlo. La captura al paso solo vale justo después del avance de dos casillas.",
     failure: "Esa jugada no es la captura al paso.",
-    mistakes: {
-      e5e6: "Si avanzas, pierdes la ocasión de capturar al paso y el peón negro de d5 queda libre.",
-    },
-    steps: [{ kind: "moves", accept: { e5d6: null } }],
+    steps: [
+      {
+        kind: "moves",
+        accept: { e5d6: null },
+        mistakes: {
+          e5e6: "Si avanzas, pierdes la ocasión de capturar al paso y el peón negro de d5 queda libre.",
+        },
+      },
+    ],
   },
   {
     id: "corona-sin-ahogar",
@@ -58,17 +68,23 @@ export const LESSONS: readonly Lesson[] = Object.freeze([
     hints: [
       { text: "Antes de coronar, mira qué casillas le quedarían libres al rey negro." },
       { text: "Con una dama en c8, el rey negro no tendría ninguna jugada sin estar en jaque: sería ahogado y tablas." },
-      { text: "Corona a torre: lleva el peón de c7 a c8.", marks: { from: "c7", to: "c8" } },
+      { text: "Corona a torre: lleva el peón de c7 a c8.", marks: { from: "c7", to: "c8", promotion: "r" } },
     ],
     success:
       "La torre le deja al rey negro una sola casilla, a6, y desde a8 le da mate. Con dama habría sido ahogado: el rey no está en jaque, no puede moverse y la partida acaba en tablas.",
     failure: "Así no llegas al mate en dos jugadas.",
-    mistakes: {
-      c7c8q: "Con dama, el rey negro no está en jaque pero no tiene ninguna jugada: es ahogado y la partida acaba en tablas.",
-      c7c8b: "Con rey y alfil no se puede dar mate: la partida acaba en tablas.",
-      c7c8n: "Con rey y caballo no se puede dar mate: la partida acaba en tablas.",
-    },
-    steps: [{ kind: "moves", accept: { c7c8r: "a7a6" } }, { kind: "mate" }],
+    steps: [
+      {
+        kind: "moves",
+        accept: { c7c8r: "a7a6" },
+        mistakes: {
+          c7c8q: "Con dama, el rey negro no está en jaque pero no tiene ninguna jugada: es ahogado y la partida acaba en tablas.",
+          c7c8b: "Con rey y alfil no se puede dar mate: la partida acaba en tablas.",
+          c7c8n: "Con rey y caballo no se puede dar mate: la partida acaba en tablas.",
+        },
+      },
+      { kind: "mate" },
+    ],
   },
   {
     id: "mate-del-pasillo",
@@ -86,10 +102,14 @@ export const LESSONS: readonly Lesson[] = Object.freeze([
     success:
       "El rey no puede escapar porque sus peones le tapan la salida, y nadie puede capturar ni tapar la torre. Por eso conviene dejarle al rey una casilla de escape.",
     failure: "Esa jugada no da mate.",
-    mistakes: {
-      d1d7: "La torre en d7 amenaza, pero no da jaque al rey.",
-    },
-    steps: [{ kind: "mate" }],
+    steps: [
+      {
+        kind: "mate",
+        mistakes: {
+          d1d7: "La torre en d7 amenaza, pero no da jaque al rey.",
+        },
+      },
+    ],
   },
   {
     id: "horquilla",
@@ -107,12 +127,14 @@ export const LESSONS: readonly Lesson[] = Object.freeze([
     success:
       "El caballo atacó a la vez al rey y a la dama, y como el jaque obliga a responder, la dama se quedó sin tiempo para escapar. Ese ataque doble se llama horquilla.",
     failure: "Esa jugada no gana la dama.",
-    mistakes: {
-      b5d6: "Es jaque, pero desde d6 el caballo no ataca a la dama.",
-    },
     steps: [
-      { kind: "moves", accept: { b5c7: "e8d7" } },
-      { kind: "moves", accept: { c7d5: null } },
+      {
+        kind: "moves",
+        accept: { b5c7: "e8d7" },
+        mistakes: { b5d6: "Es jaque, pero desde d6 el caballo no ataca a la dama." },
+      },
+      { kind: "moves",
+        accept: { c7d5: null } },
     ],
   },
   {
@@ -131,12 +153,25 @@ export const LESSONS: readonly Lesson[] = Object.freeze([
     success:
       "Una torre cierra una fila y la otra da jaque en la siguiente, así que el rey no tiene adónde ir. Repitiendo ese movimiento, las torres llevan al rey hasta el borde como por una escalera.",
     failure: "Así no hay mate en dos jugadas.",
-    mistakes: {
-      b1b8: "Es jaque, pero el rey escapa a la fila 7.",
-    },
-    steps: [{ kind: "moves", accept: { a2a7: "h8g8", b1b7: "h8g8" } }, { kind: "mate" }],
+    steps: [
+      {
+        kind: "moves",
+        accept: { a2a7: "h8g8", b1b7: "h8g8" },
+        mistakes: { b1b8: "Es jaque, pero el rey escapa a la fila 7." },
+      },
+      { kind: "mate" },
+    ],
   },
 ] satisfies Lesson[]);
+
+/** Congela los datos en profundidad: nadie puede cambiar una lección en ejecución. */
+function deepFreeze<T>(value: T): T {
+  if (typeof value === "object" && value !== null && !Object.isFrozen(value)) {
+    Object.freeze(value);
+    for (const child of Object.values(value)) deepFreeze(child);
+  }
+  return value;
+}
 
 /** La lección con ese id, o `undefined`. */
 export function lessonById(id: string): Lesson | undefined {
