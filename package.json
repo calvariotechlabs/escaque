@@ -1,0 +1,21 @@
+{
+  "name": "escaque",
+  "version": "0.1.0",
+  "description": "App web para aprender ajedrez con motor propio (Alfil Beta), escrita desde cero en TypeScript sin dependencias en ejecución.",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "clean": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\"",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "npm run clean && npm run build && node --test \"dist/tests/**/*.test.js\""
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^6.0.2"
+  }
+}
