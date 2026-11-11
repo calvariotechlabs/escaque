@@ -170,8 +170,23 @@ export class Game {
 
   /** Va a la posición tras `ply` medias jugadas, deshaciendo o rehaciendo (se ajusta a lo que hay). */
   goTo(ply: number): void {
-    while (this.records.length > ply && this.undo() !== null);
-    while (this.records.length < ply && this.redo() !== null);
+    const target = Math.max(0, Math.min(ply, this.records.length + this.future.length));
+    if (target === this.records.length) return;
+    // Paso a paso sobre la posición, sin recalcular estado ni piezas de las intermedias.
+    while (this.records.length > target) {
+      this.future.push(this.records.pop()!);
+      this.position.unmakeMove();
+    }
+    while (this.records.length < target) {
+      const next = this.future.pop()!;
+      const move = this.position
+        .legalMoves()
+        .find((m) => toSquare(next.from) === m.from && toSquare(next.to) === m.to && m.promotion === next.promotion);
+      if (move === undefined) throw new Error(`goTo: ${next.san} ya no es legal`);
+      this.position.makeMove(move);
+      this.records.push(next);
+    }
+    this.refresh();
   }
 
   private apply(from: string, to: string, promotion: PromotionPiece | null): MoveRecord | null {

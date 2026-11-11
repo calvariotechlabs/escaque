@@ -37,3 +37,6 @@ body{margin:0;background:var(--surface);color:var(--ink);font:400 16px/24px var(
 
 /* Texto solo para lectores de pantalla (anuncios de jugadas). */
 .solo-lector{position:absolute;width:1px;height:1px;margin:-1px;padding:0;border:0;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
+
+/* `hidden` debe ganar al display:grid de la lista del diseño. */
+.jugadas__lista[hidden]{display:none}

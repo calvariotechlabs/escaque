@@ -45,13 +45,17 @@ function render(): void {
   view.setOrientation(ui.orientation);
   view.setPosition(game.fen);
   view.setMarks(ui.marks());
-  // Tabindex itinerante: solo la casilla con el foco entra en el orden de tabulación.
-  for (const cell of view.element.querySelectorAll<HTMLElement>("[data-square]")) {
-    cell.tabIndex = cell.dataset["square"] === ui.focus ? 0 : -1;
-  }
+  syncTabIndex();
   renderStatus();
   renderMoveList();
   undoButton.disabled = game.ply === 0;
+}
+
+/** Tabindex itinerante: solo la casilla con el foco entra en el orden de tabulación. */
+function syncTabIndex(): void {
+  for (const cell of view.element.querySelectorAll<HTMLElement>("[data-square]")) {
+    cell.tabIndex = cell.dataset["square"] === ui.focus ? 0 : -1;
+  }
 }
 
 function renderStatus(): void {
@@ -75,8 +79,11 @@ function moveButton(entry: { readonly san: string; readonly ply: number }, label
 function renderMoveList(): void {
   const rows = game.moveList();
   noMoves.hidden = rows.length > 0;
+  moveList.hidden = rows.length === 0; // sin «lista vacía» para los lectores de pantalla
   const items = rows.map((row) => {
     const item = document.createElement("li");
+    // El diseño pone display:contents en los li, y algunos lectores pierden entonces el rol de elemento de lista.
+    item.setAttribute("role", "listitem");
     const number = document.createElement("span");
     number.className = "jugadas__n";
     number.textContent = `${row.number}.`;
@@ -99,11 +106,6 @@ function focusBoard(): void {
   view.squareElement(ui.focus).focus({ preventScroll: true });
 }
 
-/** Tras un clic o arrastre, el foco sigue a la casilla solo si ya estaba en el tablero: así el ratón no enciende el anillo de foco. */
-function keepBoardFocus(): void {
-  if (!promotionDialog.open && view.element.contains(document.activeElement)) focusBoard();
-}
-
 function announce(text: string): void {
   announcer.textContent = text;
 }
@@ -112,6 +114,10 @@ function announce(text: string): void {
 
 function handle(outcome: Outcome): void {
   switch (outcome.kind) {
+    case "focus":
+      // Solo se mueve el foco: no hace falta repintar nada más.
+      syncTabIndex();
+      return;
     case "moved":
       ui.focus = outcome.record.to;
       announce(moveAnnouncement(outcome.record));
@@ -190,6 +196,10 @@ interface Gesture {
   readonly x: number;
   readonly y: number;
   dragging: boolean;
+  /** La pieza no se puede arrastrar: si el dedo se mueve un poco, sigue siendo un toque. */
+  tapOnly: boolean;
+  /** ¿Estaba el foco en el tablero al empezar? Entonces sigue a la casilla. */
+  hadFocus: boolean;
 }
 
 let gesture: Gesture | null = null;
@@ -221,7 +231,15 @@ view.element.addEventListener("pointerdown", (event) => {
   if (event.button !== 0 || gesture !== null) return;
   const square = squareAt(event.target);
   if (square === null) return;
-  gesture = { pointerId: event.pointerId, square, x: event.clientX, y: event.clientY, dragging: false };
+  gesture = {
+    pointerId: event.pointerId,
+    square,
+    x: event.clientX,
+    y: event.clientY,
+    dragging: false,
+    tapOnly: false,
+    hadFocus: view.element.contains(document.activeElement),
+  };
   view.element.setPointerCapture(event.pointerId);
   event.preventDefault(); // sin selección de texto ni arrastre nativo de imágenes
 });
@@ -230,10 +248,11 @@ view.element.addEventListener("pointermove", (event) => {
   if (gesture === null || event.pointerId !== gesture.pointerId) return;
   const dx = event.clientX - gesture.x;
   const dy = event.clientY - gesture.y;
+  if (gesture.tapOnly) return;
   if (!gesture.dragging) {
     if (Math.hypot(dx, dy) < DRAG_THRESHOLD) return;
     if (!ui.dragStart(gesture.square)) {
-      gesture = null;
+      gesture.tapOnly = true;
       return;
     }
     gesture.dragging = true;
@@ -251,7 +270,7 @@ view.element.addEventListener("pointermove", (event) => {
 
 function endGesture(event: PointerEvent, cancelled: boolean): void {
   if (gesture === null || event.pointerId !== gesture.pointerId) return;
-  const { square, dragging } = gesture;
+  const { square, dragging, hadFocus } = gesture;
   resetDraggedPiece();
   gesture = null;
   if (view.element.hasPointerCapture(event.pointerId)) view.element.releasePointerCapture(event.pointerId);
@@ -262,11 +281,14 @@ function endGesture(event: PointerEvent, cancelled: boolean): void {
     ui.focus = square;
     handle(ui.click(square));
   }
-  keepBoardFocus();
+  // El tablero puede haberse reconstruido: se mira el foco de antes del gesto, no el de ahora.
+  if (hadFocus && !promotionDialog.open) focusBoard();
 }
 
 view.element.addEventListener("pointerup", (event) => endGesture(event, false));
 view.element.addEventListener("pointercancel", (event) => endGesture(event, true));
+// Si el navegador quita la captura sin pointerup ni pointercancel, el gesto se cancela para no bloquear el tablero.
+view.element.addEventListener("lostpointercapture", (event) => endGesture(event, true));
 
 view.element.addEventListener("keydown", (event) => {
   if (squareAt(event.target) === null || event.altKey || event.ctrlKey || event.metaKey) return;
@@ -282,9 +304,7 @@ view.element.addEventListener("focusin", (event) => {
   const square = squareAt(event.target);
   if (square !== null && square !== ui.focus) {
     ui.focus = square;
-    for (const cell of view.element.querySelectorAll<HTMLElement>("[data-square]")) {
-      cell.tabIndex = cell.dataset["square"] === square ? 0 : -1;
-    }
+    syncTabIndex();
   }
 });
 
