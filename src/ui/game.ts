@@ -62,6 +62,7 @@ export class Game {
   private readonly position: Position;
   private readonly startFullmove: number;
   private readonly startTurn: Color;
+  private readonly initialFen: string;
   private readonly records: MoveRecord[] = [];
   /** Jugadas deshechas que se pueden rehacer; la siguiente, al final. */
   private readonly future: MoveRecord[] = [];
@@ -75,6 +76,7 @@ export class Game {
     this.position = Position.fromFen(fen);
     this.currentFen = this.position.toFen();
     this.startTurn = this.position.turn;
+    this.initialFen = this.currentFen;
     this.startFullmove = Number(this.currentFen.split(" ")[5]);
     this.pieces = parsePlacement(this.currentFen);
     this.legal = this.position.legalMoves();
@@ -83,6 +85,16 @@ export class Game {
 
   get fen(): string {
     return this.currentFen;
+  }
+
+  /** FEN de la posición con la que empezó la partida. */
+  get startFen(): string {
+    return this.initialFen;
+  }
+
+  /** Todas las jugadas de la partida en orden, también las que se pueden rehacer; sirve para guardarla. */
+  get allMoves(): ReadonlyArray<{ readonly from: string; readonly to: string; readonly promotion: PromotionPiece | null }> {
+    return [...this.records, ...[...this.future].reverse()];
   }
 
   get turn(): Color {
