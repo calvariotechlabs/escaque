@@ -153,7 +153,8 @@ export class Position implements PerftTarget<Move> {
         if (ch >= "1" && ch <= "8") {
           file += Number(ch);
         } else {
-          const type = FEN_TO_TYPE[ch.toLowerCase()];
+          // Solo letras ASCII: toLowerCase() convertiría el signo Kelvin (U+212A) en «k».
+          const type = /^[pnbrqkPNBRQK]$/.test(ch) ? FEN_TO_TYPE[ch.toLowerCase()] : undefined;
           if (type === undefined) throw new FenError(`Pieza desconocida en la FEN: «${ch}»`);
           if (file > 7) throw new FenError(`La fila ${rank + 1} tiene más de 8 casillas`);
           const side: Side = ch === ch.toLowerCase() ? BLACK : WHITE;

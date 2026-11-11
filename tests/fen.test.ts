@@ -45,6 +45,7 @@ describe("FEN", () => {
     ["siete filas", "rnbqkbnr/pppppppp/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"],
     ["fila con nueve casillas", "rnbqkbnr/pppppppp/9/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"],
     ["pieza desconocida", "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNX w KQkq - 0 1"],
+    ["letra que solo parece una pieza (signo Kelvin)", "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQ\u212ABNR w KQkq - 0 1"],
     ["turno inválido", "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR x KQkq - 0 1"],
     ["enroque inválido", "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQxq - 0 1"],
     ["derecho de enroque sin la torre", "4k3/8/8/8/8/8/8/R3K3 w K - 0 1"],
