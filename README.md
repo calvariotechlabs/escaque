@@ -4,7 +4,9 @@ App web para aprender ajedrez con motor propio (**Alfil Beta**), escrita desde c
 
 ## Estado
 
-**Hito actual: 1 — Reglas + perft, sin interfaz.** Bloque 1 (tests primero): están escritos los tests de perft y de reglas especiales y la herramienta de perft dividido; los tests de reglas están en rojo a propósito hasta que el bloque 2 implemente el núcleo.
+**Hito actual: 1 — Reglas + perft, sin interfaz.** Bloques 1 y 2 hechos: tablero 0x88, FEN, generador de jugadas legales (enroque, al paso, coronación) y hacer/deshacer pasan todos los tests y todos los perft de referencia. Falta el bloque 3: regla de 50 jugadas y triple repetición.
+
+Velocidad de perft (Node 22, un hilo): unos 8,5 millones de nodos por segundo; la inicial a profundidad 6 (119.060.324 nodos) en 13 s y Kiwipete a profundidad 5 (193.690.690) en 23 s.
 
 | Hito | Descripción | Estado |
 | --- | --- | --- |

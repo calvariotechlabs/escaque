@@ -48,6 +48,8 @@ describe("FEN", () => {
     ["turno inválido", "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR x KQkq - 0 1"],
     ["enroque inválido", "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQxq - 0 1"],
     ["al paso fuera de la fila 3 o 6", "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq e4 0 1"],
+    ["al paso sin el peón que avanzó", "4k3/8/8/4P3/8/8/8/4K3 w - d6 0 1"],
+    ["al paso con la casilla de salida ocupada", "4k3/3p4/8/3pP3/8/8/8/4K3 w - d6 0 1"],
     ["reloj negativo", "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - -1 1"],
     ["sin rey blanco", "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQ1BNR w kq - 0 1"],
     ["dos reyes negros", "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNk w - - 0 1"],
