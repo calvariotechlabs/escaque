@@ -133,8 +133,7 @@ export const LESSONS: readonly Lesson[] = deepFreeze([
         accept: { b5c7: "e8d7" },
         mistakes: { b5d6: "Es jaque, pero desde d6 el caballo no ataca a la dama." },
       },
-      { kind: "moves",
-        accept: { c7d5: null } },
+      { kind: "moves", accept: { c7d5: null } },
     ],
   },
   {

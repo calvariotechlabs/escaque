@@ -1,7 +1,7 @@
 // Una lección en marcha, sin DOM: la partida de la lección, las pistas pedidas,
 // los intentos y qué pasa tras cada jugada. La validación la hace `src/lessons`
 // (`checkLessonMove`); aquí solo se aplica su veredicto al tablero.
-import type { Lesson, LessonCheck, PlayedMove as LessonMove } from "../lessons/types.js";
+import type { Lesson, LessonCheck, LessonReply as LessonMove } from "../lessons/types.js";
 import type { PromotionPiece } from "../core/index.js";
 import { Game, type MoveRecord } from "./game.js";
 
