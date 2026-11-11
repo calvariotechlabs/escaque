@@ -12,7 +12,7 @@ Velocidad de perft (Node 22, un hilo): unos 9 a 10 millones de nodos por segundo
 | --- | --- | --- |
 | 0 | Repositorio, estructura y herramientas | Hecho |
 | 1 | Reglas completas + perft | Hecho |
-| 2 | Tablero jugable (dos jugadores) | En curso: diseño, piezas SVG y tablero estático hechos; falta la interacción |
+| 2 | Tablero jugable (dos jugadores) | Hecho |
 | 3 | Máquina en Web Worker, 3 niveles | Pendiente |
 | 4 | Coach: explicación de errores | Pendiente |
 | 5 | 5–6 lecciones guiadas | Pendiente |
@@ -51,7 +51,9 @@ npm run serve    # compila y sirve la web en http://127.0.0.1:8080 (sin dependen
 
 ### Interfaz y diseño
 
-Las piezas (doce SVG dibujados a mano, estilo de volumen con degradado) y el tablero se pintan con DOM y CSS a mano desde la colocación de una FEN: `src/ui/pieces.ts` y `src/ui/board.ts`. Los colores y medidas salen de `src/ui/tokens.css`, con tema claro y oscuro. `index.html` es una demo sin bundler (`npm run serve`) con la CSP puesta en una etiqueta `meta`.
+Las piezas (doce SVG dibujados a mano, estilo de volumen con degradado) y el tablero se pintan con DOM y CSS a mano desde la colocación de una FEN: `src/ui/pieces.ts` y `src/ui/board.ts`. Los colores y medidas salen de `src/ui/tokens.css`, con tema claro y oscuro. `index.html` es la partida a dos jugadores, sin bundler (`npm run serve`), con la CSP puesta en una etiqueta `meta`.
+
+La interacción está separada en dos capas. `src/ui/game.ts` (la partida por casillas, con deshacer, rehacer y lista de jugadas) y `src/ui/interaction.ts` (qué hace cada clic, arrastre o tecla, y qué casillas se marcan) no tocan el DOM y se prueban en Node. `src/ui/main.ts` solo traduce eventos a esas llamadas y pinta el resultado. Se juega con clic, arrastrando (también con el dedo) o con el teclado: flechas, Inicio/Fin, Re Pág/Av Pág, Intro o Espacio para elegir y Escape para cancelar. Cada jugada se anuncia a los lectores de pantalla en notación algebraica con letras españolas (C, A, T, D, R) y con palabras, y la coronación abre un diálogo modal.
 
 El diseño se hace antes en Claude Design y se copia en `docs/design` (README con origen, versión y fecha). Ningún cambio visual entra sin pasar por allí.
 

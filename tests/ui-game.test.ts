@@ -127,14 +127,61 @@ describe("Game: deshacer", () => {
   });
 });
 
+describe("Game: rehacer y saltar", () => {
+  function opening(): Game {
+    const game = new Game();
+    for (const [from, to] of [["e2", "e4"], ["e7", "e5"], ["g1", "f3"]] as const) game.play(from, to);
+    return game;
+  }
+
+  it("rehace lo deshecho en orden", () => {
+    const game = opening();
+    game.undo();
+    game.undo();
+    assert.equal(game.canRedo, true);
+    assert.equal(game.redo()?.san, "e5");
+    assert.equal(game.redo()?.san, "Nf3");
+    assert.equal(game.canRedo, false);
+    assert.equal(game.redo(), null);
+    assert.equal(game.turn, "b");
+  });
+
+  it("una jugada nueva tras deshacer borra lo que se podía rehacer", () => {
+    const game = opening();
+    game.undo();
+    game.play("b1", "c3");
+    assert.equal(game.canRedo, false);
+    assert.equal(game.history.length, 3);
+  });
+
+  it("salta a cualquier punto de la partida", () => {
+    const game = opening();
+    game.goTo(0);
+    assert.equal(game.fen, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+    assert.equal(game.ply, 0);
+    game.goTo(2);
+    assert.equal(game.ply, 2);
+    assert.deepEqual(game.lastMove, { from: "e7", to: "e5" });
+    game.goTo(99);
+    assert.equal(game.ply, 3);
+  });
+});
+
 describe("Game: lista de jugadas", () => {
-  it("agrupa por número de jugada con SAN en español", () => {
+  it("agrupa por número de jugada con SAN en español y la media jugada de cada una", () => {
     const game = new Game();
     for (const [from, to] of [["e2", "e4"], ["e7", "e5"], ["g1", "f3"]] as const) game.play(from, to);
     assert.deepEqual(game.moveList(), [
-      { number: 1, white: "e4", black: "e5" },
-      { number: 2, white: "Cf3", black: null },
+      { number: 1, white: { san: "e4", ply: 1 }, black: { san: "e5", ply: 2 } },
+      { number: 2, white: { san: "Cf3", ply: 3 }, black: null },
     ]);
+  });
+
+  it("incluye las jugadas que se pueden rehacer", () => {
+    const game = new Game();
+    for (const [from, to] of [["e2", "e4"], ["e7", "e5"]] as const) game.play(from, to);
+    game.undo();
+    assert.deepEqual(game.moveList(), [{ number: 1, white: { san: "e4", ply: 1 }, black: { san: "e5", ply: 2 } }]);
   });
 
   it("si empiezan las negras, la primera fila no tiene jugada blanca", () => {
@@ -142,8 +189,8 @@ describe("Game: lista de jugadas", () => {
     game.play("e8", "d7");
     game.play("a1", "a7");
     assert.deepEqual(game.moveList(), [
-      { number: 12, white: null, black: "Rd7" },
-      { number: 13, white: "Ta7+", black: null },
+      { number: 12, white: null, black: { san: "Rd7", ply: 1 } },
+      { number: 13, white: { san: "Ta7+", ply: 2 }, black: null },
     ]);
   });
 });

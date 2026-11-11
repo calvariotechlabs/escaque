@@ -1,16 +1,42 @@
-/* Maquetación de la página de demostración (diseño: docs/design, pantalla «Partida · escritorio»). */
+/* Maquetación de la pantalla de partida (diseño: docs/design/lienzo, «Partida · escritorio», «Partida · móvil» y «Coronación · móvil»). */
 body{margin:0;background:var(--surface);color:var(--ink);font:400 16px/24px var(--font-sans)}
-.pagina__cabecera,.pagina__principal{max-width:1120px;margin:0 auto;box-sizing:border-box;padding-left:max(var(--space-4),env(safe-area-inset-left,0px));padding-right:max(var(--space-4),env(safe-area-inset-right,0px))}
-.pagina__cabecera{padding-top:var(--space-6);display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:var(--space-2) var(--space-6)}
-.pagina__cabecera h1{margin:0;font:600 32px/36px var(--font-display)}
+.pagina__cabecera,.partida{max-width:1120px;margin:0 auto;box-sizing:border-box;padding-left:max(var(--space-4),env(safe-area-inset-left,0px));padding-right:max(var(--space-4),env(safe-area-inset-right,0px))}
+.pagina__cabecera{padding-top:var(--space-4);display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:var(--space-2) var(--space-6)}
+.pagina__cabecera h1{margin:0;font:600 24px/28px var(--font-display)}
 .pagina__cabecera p{margin:0;font:400 14px/20px var(--font-sans);color:var(--ink-muted)}
-.pagina__principal{padding-top:var(--space-6);padding-bottom:var(--space-8);display:flex;flex-wrap:wrap;align-items:flex-start;gap:var(--space-8)}
-.pagina__tablero{flex:1 1 320px;min-width:0;max-width:680px}
-.pagina__panel{flex:1 1 280px;min-width:0;max-width:420px;display:flex;flex-direction:column;gap:var(--space-4)}
-.campo{display:flex;flex-direction:column;gap:var(--space-1)}
-.campo label{font:600 12px/16px var(--font-sans);letter-spacing:.04em;text-transform:uppercase;color:var(--ink-muted)}
-.campo select{min-height:44px;padding:0 var(--space-3);border:1.5px solid var(--control-border);border-radius:var(--radius-sm);background:var(--surface-raised);color:var(--ink);font:400 16px/24px var(--font-sans)}
-.campo select:focus-visible,.casilla-check input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
-.casilla-check{display:flex;align-items:center;gap:var(--space-2);min-height:44px;font:400 14px/20px var(--font-sans)}
-.casilla-check input{width:20px;height:20px;accent-color:var(--accent)}
-.pagina__estado{margin:0;padding:var(--space-3) var(--space-4);background:var(--surface-raised);border:1px solid var(--line);border-radius:var(--radius-md);font:600 14px/20px var(--font-sans)}
+
+/* Subtítulo: corto en móvil y largo en escritorio, como en el lienzo. */
+.solo-escritorio{display:none}
+@media (min-width:860px){.solo-escritorio{display:inline}.solo-movil{display:none}}
+
+/* Móvil: estado, tablero, botones y jugadas, en el orden del documento. */
+.partida{padding-top:var(--space-4);padding-bottom:var(--space-8);display:grid;grid-template-columns:minmax(0,1fr);gap:var(--space-4)}
+.partida__estado{margin:0}
+.partida__tablero{min-width:0}
+.partida__controles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-2)}
+.partida__controles .boton--principal{grid-column:1 / -1}
+
+/* Escritorio: tablero a la izquierda; estado, jugadas y botones a la derecha. */
+@media (min-width:860px){
+  .pagina__cabecera{padding-top:var(--space-6)}
+  .pagina__cabecera h1{font-size:32px;line-height:36px}
+  .partida{padding-top:var(--space-6);grid-template-columns:minmax(0,680px) minmax(300px,420px);grid-template-rows:auto auto 1fr;grid-template-areas:"tablero estado" "tablero jugadas" "tablero controles";column-gap:var(--space-8);align-items:start}
+  .partida__estado{grid-area:estado}
+  .partida__tablero{grid-area:tablero}
+  .partida__jugadas{grid-area:jugadas}
+  .partida__controles{grid-area:controles}
+}
+
+/* El tablero recibe el arrastre con dedo sin desplazar la página. */
+.partida .tablero__rejilla{touch-action:none}
+.casilla[data-square]{cursor:pointer}
+
+/* Diálogo modal de coronación: fondo del lienzo «Coronación · móvil». */
+.coronacion-dialogo{padding:0;border:0;background:none;max-width:calc(100vw - 2 * var(--space-4))}
+.coronacion-dialogo::backdrop{background:color-mix(in srgb,var(--ink) 55%,transparent)}
+
+/* Texto solo para lectores de pantalla (anuncios de jugadas). */
+.solo-lector{position:absolute;width:1px;height:1px;margin:-1px;padding:0;border:0;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
+
+/* `hidden` debe ganar al display:grid de la lista del diseño. */
+.jugadas__lista[hidden]{display:none}
