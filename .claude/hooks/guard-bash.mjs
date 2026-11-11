@@ -20,15 +20,34 @@ const DIST_PATH = /^(\.\/)?dist(\/[^\s$`]*)?$/;
  */
 function recursiveRmOutsideDist(command) {
   for (const segment of command.split(/[;&|\n]+/)) {
-    const words = segment.trim().split(/\s+/).map((w) => w.replace(/^['"]|['"]$/g, ""));
-    const at = words.findIndex((w) => w === "rm" || w.endsWith("/rm"));
+    // Sin comillas alrededor ni el cierre de un subshell o bloque: «'src'», «dist)».
+    const words = segment
+      .trim()
+      .split(/\s+/)
+      .map((w) => w.replace(/^['"]|['"]$/g, "").replace(/[)}]+$/, ""));
+    // «rm» también tras «(», «$(», «`», «{» o la «\» que salta un alias.
+    const at = words.findIndex((w) => {
+      const name = w.replace(/^[($`{\\]+/, "");
+      return name === "rm" || name.endsWith("/rm");
+    });
     if (at === -1) continue;
     let recursive = false;
     let endOfOptions = false;
+    let skipNext = false;
     const targets = [];
     for (const word of words.slice(at + 1)) {
+      if (skipNext) {
+        skipNext = false;
+        continue;
+      }
+      // Redirecciones: «2>/dev/null», «> salida.log». No son objetivos del borrado.
+      if (/^\d*[<>]/.test(word)) {
+        skipNext = /^\d*[<>]+$/.test(word);
+        continue;
+      }
       if (!endOfOptions && word === "--") endOfOptions = true;
-      else if (!endOfOptions && word.startsWith("--")) recursive ||= word === "--recursive";
+      // GNU acepta abreviaturas de opciones largas: «--rec» es «--recursive».
+      else if (!endOfOptions && word.startsWith("--")) recursive ||= word.length >= 3 && "--recursive".startsWith(word);
       else if (!endOfOptions && word.startsWith("-") && word.length > 1) recursive ||= /[rR]/.test(word);
       else targets.push(word);
     }

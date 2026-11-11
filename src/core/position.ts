@@ -325,9 +325,9 @@ export class Position implements PerftTarget<Move> {
    * invalida las jugadas de `legalMoves()` de la posición actual.
    */
   moveToSan(move: Move): string {
-    // Reutiliza la lista del ply actual si existe: formatear todas las jugadas no la regenera.
-    const legal = (this.generated[this.history.length] as CoreMove[] | undefined) ?? this.computeLegalMoves();
-    const own = legal.find((m) => m.from === move.from && m.to === move.to && m.promotion === move.promotion);
+    // La lista del ply actual se genera una sola vez: formatear todas las jugadas no la repite.
+    const legal = this.currentMoves();
+    const own = legal.find((m) => sameMove(m, move));
     if (own === undefined) throw new Error(`moveToSan: ${moveToUci(move)} no es legal en esta posición`);
     return this.san(own, legal, true);
   }

@@ -42,6 +42,14 @@ describe("guard-bash: borrados recursivos", () => {
     "sudo rm -rf src",
     "rm -rf 'src'",
     'rm -rf "dist" "src"',
+    "(rm -rf src)",
+    "echo $(rm -rf src)",
+    "echo `rm -rf src`",
+    "\\rm -rf src",
+    "rm --rec src",
+    "rm --r src",
+    "{ rm -rf src; }",
+    "rm -rf dist 2>/dev/null; rm -rf src",
   ];
   for (const command of blocked) {
     it(`bloquea: ${command}`, () => assert.equal(exitCode(command), 2));
@@ -60,6 +68,9 @@ describe("guard-bash: borrados recursivos", () => {
     "git status",
     "echo terminar",
     "npm run build && rm -rf dist",
+    "rm -rf dist 2>/dev/null",
+    "rm -rf dist >/dev/null 2>&1",
+    "rm -rf dist > salida.log",
   ];
   for (const command of allowed) {
     it(`permite: ${command}`, () => assert.equal(exitCode(command), 0));
