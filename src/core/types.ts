@@ -30,7 +30,11 @@ export interface Move {
  * - `checkmate`: el bando que mueve no tiene jugadas y está en jaque; gana `winner`.
  * - `stalemate`: el bando que mueve no tiene jugadas y no está en jaque (tablas).
  * - `insufficient-material`: ningún bando puede dar mate (ver `isInsufficientMaterial`).
- * - `fifty-move` y `threefold-repetition`: los define el bloque 3 del hito 1.
+ * - `fifty-move`: 100 medias jugadas seguidas sin mover un peón ni capturar.
+ * - `threefold-repetition`: la misma posición (mismo bando al mover, enroques y
+ *   capturas al paso posibles) ha aparecido tres veces.
+ *
+ * Las dos tablas son automáticas: no hace falta reclamarlas.
  */
 export type GameStatus =
   | { readonly kind: "ongoing" }
