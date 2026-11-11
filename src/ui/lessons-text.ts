@@ -79,9 +79,4 @@ export const REPEAT_LESSON = "Repetir lección";
 export const RESTART_LESSON = "Reiniciar lección";
 export const LESSONS_TITLE = "Lecciones";
 
-/** Anuncio al abrir una lección. */
-export function openedAnnouncement(number: number, total: number, title: string, goal: string): string {
-  return `${lessonPosition(number, total)}: ${title}. ${goal}`;
-}
-
 export const RESTARTED = "Lección reiniciada.";

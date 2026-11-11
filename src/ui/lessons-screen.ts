@@ -436,7 +436,6 @@ export function createLessonsScreen(deps: LessonsDeps): LessonsScreen {
       persist(openLesson(progress, lesson.id));
       lessonScreen.hidden = false;
       startRun(lesson);
-      announce(text.openedAnnouncement(lesson.number, lessons.length, lesson.title, lesson.goal));
       if (focus) title.focus({ preventScroll: false });
       return lesson.title;
     },
