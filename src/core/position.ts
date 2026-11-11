@@ -12,6 +12,7 @@
 // comprueba si el rey propio queda atacado y se deshace (decisión del proyecto).
 
 import { FenError } from "./errors.js";
+import { createRandom } from "./random.js";
 import type { PerftTarget } from "./perft.js";
 import type { Color, GameStatus, Move, PromotionPiece, Square } from "./types.js";
 
@@ -75,6 +76,32 @@ CASTLING_MASK[E8] = 15 & ~(CASTLE_BK | CASTLE_BQ);
 CASTLING_MASK[H8] = 15 & ~CASTLE_BK;
 CASTLING_MASK[A8] = 15 & ~CASTLE_BQ;
 
+// --- Claves Zobrist ----------------------------------------------------------
+
+// Cada elemento de la posición tiene un número aleatorio de 64 bits, guardado
+// en dos mitades de 32 (sin BigInt). La clave es el XOR de los números de lo
+// que hay en la posición, así que una jugada la actualiza con unos pocos XOR.
+// La semilla es fija: la misma posición tiene la misma clave en cada ejecución.
+const zobristRandom = createRandom(0x2b7e1516);
+const zobristTable = (size: number): [Uint32Array, Uint32Array] => {
+  const hi = new Uint32Array(size);
+  const lo = new Uint32Array(size);
+  for (let i = 0; i < size; i++) {
+    hi[i] = zobristRandom();
+    lo[i] = zobristRandom();
+  }
+  return [hi, lo];
+};
+/** Índice: código de pieza (hasta 15) * 128 + casilla 0x88. */
+const [Z_PIECE_HI, Z_PIECE_LO] = zobristTable(16 * 128);
+/** Índice: los 4 bits de derechos de enroque. */
+const [Z_CASTLE_HI, Z_CASTLE_LO] = zobristTable(16);
+/** Índice: columna de la casilla al paso (solo si la captura al paso es legal). */
+const [Z_EP_HI, Z_EP_LO] = zobristTable(8);
+const [Z_SIDE_HI, Z_SIDE_LO] = zobristTable(1);
+const Z_BLACK_HI = Z_SIDE_HI[0]!;
+const Z_BLACK_LO = Z_SIDE_LO[0]!;
+
 // --- Jugadas -----------------------------------------------------------------
 
 const FLAG_NORMAL = 0;
@@ -95,6 +122,9 @@ interface Undo {
   readonly castling: number;
   readonly epSquare: number;
   readonly halfmove: number;
+  readonly hashHi: number;
+  readonly hashLo: number;
+  readonly epHashed: boolean;
 }
 
 // --- SAN ---------------------------------------------------------------------
@@ -138,6 +168,11 @@ export class Position implements PerftTarget<Move> {
   private epSquare = -1;
   private halfmove = 0;
   private fullmove = 1;
+  /** Clave Zobrist de la posición (dos mitades de 32 bits). */
+  private zHi = 0;
+  private zLo = 0;
+  /** ¿Incluye la clave la columna al paso? Solo cuando la captura al paso es legal. */
+  private epHashed = false;
   private readonly kings: [number, number] = [-1, -1];
   private readonly history: Undo[] = [];
   /**
@@ -264,6 +299,7 @@ export class Position implements PerftTarget<Move> {
     if (p.isAttacked(p.kings[other], p.side)) {
       throw new FenError("El bando que no mueve está en jaque");
     }
+    p.computeHash();
     return p;
   }
 
@@ -304,6 +340,35 @@ export class Position implements PerftTarget<Move> {
       String(this.halfmove),
       String(this.fullmove),
     ].join(" ");
+  }
+
+  /**
+   * Mitad alta de la clave Zobrist (entero sin signo de 32 bits). Junto con
+   * `hashLo` identifica la posición a efectos de repetición: piezas, bando al
+   * mover, derechos de enroque y columna al paso solo si la captura al paso es legal.
+   */
+  get hashHi(): number {
+    return this.zHi;
+  }
+
+  /** Mitad baja de la clave Zobrist (ver `hashHi`). */
+  get hashLo(): number {
+    return this.zLo;
+  }
+
+  /**
+   * Cuántas veces apareció antes la posición actual en las jugadas hechas en
+   * este objeto. Solo mira hasta la última jugada de peón o captura, porque
+   * ninguna posición anterior puede repetirse. 2 significa triple repetición.
+   */
+  repetitions(): number {
+    const plies = Math.min(this.halfmove, this.history.length);
+    let count = 0;
+    for (let back = 2; back <= plies; back += 2) {
+      const undo = this.history[this.history.length - back]!;
+      if (undo.hashHi === this.zHi && undo.hashLo === this.zLo) count++;
+    }
+    return count;
   }
 
   /** Bando al que le toca mover. */
@@ -443,6 +508,9 @@ export class Position implements PerftTarget<Move> {
     this.castling = undo.castling;
     this.epSquare = undo.epSquare;
     this.halfmove = undo.halfmove;
+    this.zHi = undo.hashHi;
+    this.zLo = undo.hashLo;
+    this.epHashed = undo.epHashed;
 
     const moved = move.promotion !== null ? makePiece(us, PAWN) : board[move.to]!;
     board[move.from] = moved;
@@ -532,35 +600,13 @@ export class Position implements PerftTarget<Move> {
 
   /**
    * ¿Ha aparecido la posición actual al menos tres veces en esta partida?
-   *
-   * Dos posiciones son la misma si tienen las mismas piezas en las mismas
-   * casillas, el mismo bando al mover, los mismos derechos de enroque y las
-   * mismas capturas al paso posibles (una casilla al paso sin captura legal no
-   * cuenta). Solo se mira hacia atrás hasta la última jugada de peón o captura,
-   * porque ninguna posición anterior puede repetirse.
-   *
-   * Recorre la historia deshaciendo jugadas y la vuelve a aplicar: la posición
-   * queda igual que estaba. El motor usará más adelante claves Zobrist.
+   * Dos posiciones son la misma si tienen la misma clave Zobrist: mismas
+   * piezas en las mismas casillas, mismo bando al mover, mismos derechos de
+   * enroque y mismas capturas al paso posibles (una casilla al paso sin
+   * captura legal no cuenta).
    */
   private isThreefoldRepetition(): boolean {
-    const plies = Math.min(this.halfmove, this.history.length);
-    // Con menos de 4 medias jugadas reversibles no cabe ninguna repetición.
-    if (plies < 4) return false;
-    const current = this.repetitionKey();
-    // Se rehacen las mismas jugadas con applyMove, que no toca las listas de legalMoves().
-    const undone: CoreMove[] = [];
-    let seen = 1;
-    try {
-      for (let i = 0; i < plies && seen < 3; i++) {
-        undone.push(this.history[this.history.length - 1]!.move);
-        this.unmakeMove();
-        // Solo las posiciones con el mismo bando al mover pueden coincidir.
-        if (i % 2 === 1 && this.repetitionKey() === current) seen++;
-      }
-    } finally {
-      for (let i = undone.length - 1; i >= 0; i--) this.applyMove(undone[i]!);
-    }
-    return seen >= 3;
+    return this.repetitions() >= 2;
   }
 
   /** ¿Tiene el bando que mueve alguna jugada legal? No toca las listas de `legalMoves()`. */
@@ -578,16 +624,6 @@ export class Position implements PerftTarget<Move> {
     const legal = !this.isAttacked(this.kings[us], opposite(us));
     this.unmakeMove();
     return legal;
-  }
-
-  /**
-   * Identidad de la posición para la triple repetición: los cuatro primeros
-   * campos de la FEN, con la casilla al paso solo si hay una captura al paso legal.
-   */
-  private repetitionKey(): string {
-    const fields = this.toFen().split(" ", 4);
-    if (this.epSquare !== -1 && !this.hasLegalEnPassant()) fields[3] = "-";
-    return fields.join(" ");
   }
 
   /** ¿Puede el bando que mueve capturar al paso legalmente? Solo mira los dos peones posibles. */
@@ -842,20 +878,44 @@ export class Position implements PerftTarget<Move> {
       captured = board[to]!;
     }
 
-    this.history.push({ move, captured, castling: this.castling, epSquare: this.epSquare, halfmove: this.halfmove });
+    this.history.push({
+      move,
+      captured,
+      castling: this.castling,
+      epSquare: this.epSquare,
+      halfmove: this.halfmove,
+      hashHi: this.zHi,
+      hashLo: this.zLo,
+      epHashed: this.epHashed,
+    });
 
-    board[to] = move.promotion !== null ? makePiece(us, PROMOTION_TO_TYPE[move.promotion]) : piece;
+    // Clave: se quitan del XOR lo que sale y se añade lo que entra.
+    let zHi = this.zHi ^ Z_BLACK_HI ^ Z_CASTLE_HI[this.castling]!;
+    let zLo = this.zLo ^ Z_BLACK_LO ^ Z_CASTLE_LO[this.castling]!;
+    if (this.epHashed) {
+      zHi ^= Z_EP_HI[fileOf(this.epSquare)]!;
+      zLo ^= Z_EP_LO[fileOf(this.epSquare)]!;
+    }
+    if (captured !== EMPTY) {
+      const capturedSq = flags === FLAG_EN_PASSANT ? to + (us === WHITE ? -16 : 16) : to;
+      zHi ^= Z_PIECE_HI[captured * 128 + capturedSq]!;
+      zLo ^= Z_PIECE_LO[captured * 128 + capturedSq]!;
+    }
+    const placed = move.promotion !== null ? makePiece(us, PROMOTION_TO_TYPE[move.promotion]) : piece;
+    zHi ^= Z_PIECE_HI[piece * 128 + from]! ^ Z_PIECE_HI[placed * 128 + to]!;
+    zLo ^= Z_PIECE_LO[piece * 128 + from]! ^ Z_PIECE_LO[placed * 128 + to]!;
+
+    board[to] = placed;
     board[from] = EMPTY;
     if (typeOf(piece) === KING) this.kings[us] = to;
 
     if (flags === FLAG_CASTLE) {
-      if (to > from) {
-        board[from + 1] = board[from + 3]!;
-        board[from + 3] = EMPTY;
-      } else {
-        board[from - 1] = board[from - 4]!;
-        board[from - 4] = EMPTY;
-      }
+      const [rookFrom, rookTo] = to > from ? [from + 3, from + 1] : [from - 4, from - 1];
+      const rook = board[rookFrom]!;
+      board[rookTo] = rook;
+      board[rookFrom] = EMPTY;
+      zHi ^= Z_PIECE_HI[rook * 128 + rookFrom]! ^ Z_PIECE_HI[rook * 128 + rookTo]!;
+      zLo ^= Z_PIECE_LO[rook * 128 + rookFrom]! ^ Z_PIECE_LO[rook * 128 + rookTo]!;
     }
 
     this.castling &= CASTLING_MASK[from]! & CASTLING_MASK[to]!;
@@ -863,6 +923,35 @@ export class Position implements PerftTarget<Move> {
     this.halfmove = typeOf(piece) === PAWN || captured !== EMPTY ? 0 : this.halfmove + 1;
     if (us === BLACK) this.fullmove++;
     this.side = opposite(us);
+
+    this.zHi = (zHi ^ Z_CASTLE_HI[this.castling]!) >>> 0;
+    this.zLo = (zLo ^ Z_CASTLE_LO[this.castling]!) >>> 0;
+    this.epHashed = false;
+    // Solo tras un avance doble puede haber captura al paso; se mira si es legal.
+    if (this.epSquare !== -1 && this.hasLegalEnPassant()) this.hashEnPassant();
+  }
+
+  /** Añade a la clave la columna al paso. */
+  private hashEnPassant(): void {
+    this.zHi = (this.zHi ^ Z_EP_HI[fileOf(this.epSquare)]!) >>> 0;
+    this.zLo = (this.zLo ^ Z_EP_LO[fileOf(this.epSquare)]!) >>> 0;
+    this.epHashed = true;
+  }
+
+  /** Calcula la clave desde cero (al cargar una FEN). */
+  private computeHash(): void {
+    let zHi = this.side === BLACK ? Z_BLACK_HI : 0;
+    let zLo = this.side === BLACK ? Z_BLACK_LO : 0;
+    for (let sq = 0; sq < 128; sq++) {
+      const piece = this.board[sq]!;
+      if (offBoard(sq) || piece === EMPTY) continue;
+      zHi ^= Z_PIECE_HI[piece * 128 + sq]!;
+      zLo ^= Z_PIECE_LO[piece * 128 + sq]!;
+    }
+    this.zHi = (zHi ^ Z_CASTLE_HI[this.castling]!) >>> 0;
+    this.zLo = (zLo ^ Z_CASTLE_LO[this.castling]!) >>> 0;
+    this.epHashed = false;
+    if (this.epSquare !== -1 && this.hasLegalEnPassant()) this.hashEnPassant();
   }
 }
 
