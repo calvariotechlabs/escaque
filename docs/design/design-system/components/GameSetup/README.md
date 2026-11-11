@@ -1,0 +1,7 @@
+Ajustes de una partida nueva: modo (dos jugadores o contra la máquina), nivel de la máquina y color del jugador.
+
+**Reglas.** Cada grupo es un `fieldset` con su `legend` y botones de radio reales (`.opcion__entrada`); la tarjeta (`.opcion__tarjeta`) es la etiqueta. Nivel y color solo aparecen con «Contra la máquina». La opción elegida se distingue por la forma y no solo por el color: borde de 3 px en `accent` y círculo relleno en lugar de un anillo vacío. Con teclado, las flechas cambian la opción dentro del grupo y Tab salta de un grupo al siguiente. «Empezar partida» es la única acción principal.
+
+**Textos.** Modo: «Dos jugadores» (Se juega en este dispositivo.), «Contra la máquina» (Juegas contra Alfil Beta, el motor de Escaque.). Nivel: «Fácil» (Elige jugadas con algo de azar. Para empezar.), «Medio» (Mira unas jugadas por delante y responde en menos de medio segundo.), «Difícil» (Piensa cerca de un segundo y cuida sus piezas.). Color: «Blancas» (Mueves primero.), «Negras» (Mueve primero la máquina.), «Al azar» (Se decide al empezar.). El círculo de color de cada opción es decorativo (`aria-hidden`).
+
+**Disposición.** Móvil: una columna con los tres grupos apilados. Tablet vertical: modo a todo el ancho y, debajo, nivel y color en dos columnas. Desde 860 px: el formulario a la izquierda (hasta 520 px) y a la derecha un tablero decorativo con la posición inicial, que se gira si eliges negras (`aria-hidden`).

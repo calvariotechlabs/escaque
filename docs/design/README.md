@@ -4,15 +4,15 @@ Copia en el repositorio de lo que se diseña en Claude Design. Regla del proyect
 
 | Qué | Origen en Claude Design | Versión | Exportado |
 | --- | --- | --- | --- |
-| Design System «S-Design - Escaque» | https://claude.ai/artifact/5eMkXXkB3rMzuRwKU5osqC | 1794397996-2af7 | 2026-11-11 |
-| Lienzo «Design - Escaque» (partida en escritorio, móvil, tablet, móvil horizontal, coronación, confirmación, avisos de la app y arranque) | https://claude.ai/artifact/EFBEpxb6n1xjdX35LYqNcG | 1794398998-0eef | 2026-11-11 |
+| Design System «S-Design - Escaque» | https://claude.ai/artifact/5eMkXXkB3rMzuRwKU5osqC | 1794416282-dc95 | 2026-11-11 |
+| Lienzo «Design - Escaque» (tres páginas: Escritorio, Tablet y Móvil, con partida, coronación, confirmación, avisos, arranque y, nuevo, ajustes, «la máquina piensa» y resultado de jugar contra la máquina) | https://claude.ai/artifact/EFBEpxb6n1xjdX35LYqNcG | 1794417405-c7c2 | 2026-11-11 |
 
 Los enlaces son privados de la cuenta de Calvario TechLabs.
 
 ## Contenido
 
-- `design-system/`: `README.md` (el libro de marca), `tokens.json` (fuente de los valores), `tokens.css` (generado a partir de `tokens.json`), `components/` (`bundle.css`, `pieces.js` con las siluetas y, por componente, README y vista previa `preview.html`) `assets/Piezas/` (las doce piezas en SVG) y `assets/Icono/` (icono de la app, versión maskable, símbolo, logos horizontales y favicon; salen del pack de logos). Los componentes `Notice` (avisos de instalar, sin conexión y versión nueva) y `AppIcon` son de la PWA; la vista previa de `AppIcon` apunta a ids de subida del Design System.
-- `lienzo/`: `canvas.json` y las pantallas (`*.dc.html`: escritorio, móvil, tablet vertical y horizontal, móvil horizontal, coronación, confirmación, avisos y arranque). Son fuentes del editor de Claude Design: para verlas en HTML puro, abre el enlace de arriba. Las imágenes de pieza apuntan a ids de subida de ese lienzo, no a ficheros de este repositorio.
+- `design-system/`: `README.md` (el libro de marca), `tokens.json` (fuente de los valores), `tokens.css` (generado a partir de `tokens.json`), `components/` (`bundle.css`, `pieces.js` con las siluetas y, por componente, README y vista previa `preview.html`) `assets/Piezas/` (las doce piezas en SVG) y `assets/Icono/` (icono de la app, versión maskable, símbolo, logos horizontales y favicon; salen del pack de logos). Los componentes `GameSetup` (modo, nivel y color) y `GameResult` (resultado de la partida contra la máquina) y la variante `estado--pensando` de `GameStatus` son de jugar contra la máquina. Los componentes `Notice` (avisos de instalar, sin conexión y versión nueva) y `AppIcon` son de la PWA; la vista previa de `AppIcon` apunta a ids de subida del Design System.
+- `lienzo/`: `canvas.json` y las pantallas (`*.dc.html`: escritorio, móvil, tablet vertical y horizontal, móvil horizontal, coronación, confirmación, avisos, arranque y, de jugar contra la máquina, `Ajustes*`, `Pensando*` y `Resultado*`). `canvas.json` agrupa todo en tres páginas (escritorio, tablet y móvil), en filas por tipo de panel. Son fuentes del editor de Claude Design: para verlas en HTML puro, abre el enlace de arriba. Las imágenes de pieza apuntan a ids de subida de ese lienzo, no a ficheros de este repositorio.
 
 ## Cómo se usa en el código
 

@@ -35,6 +35,14 @@ Escaque no usa iconos en la interfaz: los botones llevan solo texto. Las únicas
 - Los avisos de instalar, sin conexión y versión nueva usan el componente `Notice`. Un aviso a la vez, con texto en español que termina en punto.
 - Puntos de corte: móvil por debajo de 600 px (una columna: estado, tablero, botones y jugadas); tablet vertical de 600 a 859 px (una columna, tablero hasta 700 px, botones en fila y jugadas debajo); desde 860 px, dos columnas con el tablero a la izquierda. En un móvil apaisado (alto menor de 500 px) el tablero se limita por el alto y el panel pasa a la derecha. Los márgenes respetan las áreas seguras del dispositivo.
 
+## Jugar contra la máquina
+
+- La pantalla de inicio y «Nueva partida» llevan a los ajustes (`GameSetup`): modo, nivel (Fácil, Medio, Difícil) y color (blancas, negras o al azar). Contra la máquina, nivel Medio y blancas vienen preseleccionados.
+- Los grupos son `fieldset` con botones de radio reales. La opción elegida se ve por la forma (borde de 3 px y círculo relleno) además del color `accent`.
+- Mientras la máquina piensa, `GameStatus` añade «Alfil Beta está pensando.» y una barra indeterminada. El tablero no admite jugadas y Deshacer y Rehacer se desactivan.
+- Al terminar, `GameResult` sustituye al estado: «Has ganado.», «Has perdido.» o «Tablas.», con la causa y una sola acción principal, «Revancha».
+- Los textos siguen las mismas reglas: español de tú, sin exclamaciones y con punto final.
+
 ## Cómo usar este sistema
 
 Carga `components/bundle.css` tras los tokens y reproduce el marcado de cada componente tal como aparece en su vista previa. Las siluetas de las piezas están en `components/pieces.js` y como SVG sueltos en `assets/Piezas/`.

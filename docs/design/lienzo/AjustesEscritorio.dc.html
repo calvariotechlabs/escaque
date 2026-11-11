@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Ajustes de partida en escritorio</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/escaque/tokens.css">
+<link rel="stylesheet" href="ds/escaque/components/bundle.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;600&family=Space+Grotesk:wght@600&display=swap">
+<style>
+body{margin:0}
+.casilla img{position:relative;z-index:1;display:block;width:100%;height:100%}
+</style>
+</helmet>
+<div style="min-height: 1020px; background: var(--surface); color: var(--ink); font-family: var(--font-sans)">
+<header style="max-width: 1120px; margin: 0 auto; box-sizing: border-box; padding: 24px 32px 0; display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 24px">
+<h1 style="margin: 0; font: 600 32px/36px var(--font-display)">Escaque</h1>
+<p style="margin: 0; font: 400 14px/20px var(--font-sans); color: var(--ink-muted)">Aprende ajedrez jugando</p>
+</header>
+<main style="max-width: 1120px; margin: 0 auto; box-sizing: border-box; padding: 24px 32px 48px; display: flex; flex-wrap: wrap; align-items: flex-start; gap: 48px">
+<section aria-labelledby="th" style="flex: 1 1 420px; min-width: 0; max-width: 520px">
+<h2 id="th" style="margin: 0 0 24px; font: 600 24px/32px var(--font-display)">Nueva partida</h2>
+<form class="ajustes">
+<fieldset class="grupo">
+<legend class="grupo__leyenda">Modo</legend>
+<div class="opciones">
+<div class="opcion"><input class="opcion__entrada" type="radio" name="modo" id="modo-dos" value="dos"><label class="opcion__tarjeta" for="modo-dos"><span class="opcion__nombre">Dos jugadores</span><span class="opcion__texto">Se juega en este dispositivo.</span></label></div>
+<div class="opcion"><input class="opcion__entrada" type="radio" name="modo" id="modo-maquina" value="maquina" checked><label class="opcion__tarjeta" for="modo-maquina"><span class="opcion__nombre">Contra la máquina</span><span class="opcion__texto">Juegas contra Alfil Beta, el motor de Escaque.</span></label></div>
+</div>
+</fieldset>
+<fieldset class="grupo">
+<legend class="grupo__leyenda">Nivel</legend>
+<div class="opciones">
+<div class="opcion"><input class="opcion__entrada" type="radio" name="nivel" id="nivel-facil" value="facil"><label class="opcion__tarjeta" for="nivel-facil"><span class="opcion__nombre">Fácil</span><span class="opcion__texto">Elige jugadas con algo de azar. Para empezar.</span></label></div>
+<div class="opcion"><input class="opcion__entrada" type="radio" name="nivel" id="nivel-medio" value="medio" checked><label class="opcion__tarjeta" for="nivel-medio"><span class="opcion__nombre">Medio</span><span class="opcion__texto">Mira unas jugadas por delante y responde en menos de medio segundo.</span></label></div>
+<div class="opcion"><input class="opcion__entrada" type="radio" name="nivel" id="nivel-dificil" value="dificil"><label class="opcion__tarjeta" for="nivel-dificil"><span class="opcion__nombre">Difícil</span><span class="opcion__texto">Piensa cerca de un segundo y cuida sus piezas.</span></label></div>
+</div>
+</fieldset>
+<fieldset class="grupo">
+<legend class="grupo__leyenda">Tu color</legend>
+<div class="opciones">
+<div class="opcion"><input class="opcion__entrada" type="radio" name="color" id="color-blancas" value="blancas" checked><label class="opcion__tarjeta" for="color-blancas"><span class="opcion__nombre"><span class="estado__turno estado__turno--w" aria-hidden="true"></span>Blancas</span><span class="opcion__texto">Mueves primero.</span></label></div>
+<div class="opcion"><input class="opcion__entrada" type="radio" name="color" id="color-negras" value="negras"><label class="opcion__tarjeta" for="color-negras"><span class="opcion__nombre"><span class="estado__turno estado__turno--b" aria-hidden="true"></span>Negras</span><span class="opcion__texto">Mueve primero la máquina.</span></label></div>
+<div class="opcion"><input class="opcion__entrada" type="radio" name="color" id="color-azar" value="azar"><label class="opcion__tarjeta" for="color-azar"><span class="opcion__nombre"><span class="estado__turno estado__turno--azar" aria-hidden="true"></span>Al azar</span><span class="opcion__texto">Se decide al empezar.</span></label></div>
+</div>
+</fieldset>
+<div class="ajustes__acciones">
+<button class="boton boton--principal" type="submit">Empezar partida</button>
+</div>
+</form>
+</section>
+<aside aria-hidden="true" style="flex: 1 1 400px; min-width: 0; max-width: 560px">
+<div class="tablero">
+<div class="tablero__rejilla" role="grid">
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="8">
+<div class="tablero__fila" role="row">
+<sc-for list="{{r.row}}" as="c" hint-placeholder-count="8">
+<div class="{{c.cls}}" role="gridcell" data-square="{{c.n}}" data-marks=""><sc-if value="{{c.has}}" hint-placeholder-val="{{ true }}"><img src="{{c.img}}" alt=""></sc-if></div>
+</sc-for>
+</div>
+</sc-for>
+</div>
+<div class="tablero__rangos"><span>8</span><span>7</span><span>6</span><span>5</span><span>4</span><span>3</span><span>2</span><span>1</span></div>
+<div class="tablero__columnas"><span>a</span><span>b</span><span>c</span><span>d</span><span>e</span><span>f</span><span>g</span><span>h</span></div>
+</div>
+</aside>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1020}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const IMG = { wk: '/_blob/f755b0e3cde224439141427c2f79dfcc', wq: '/_blob/e6db5db3ffcd79a147b06454e873bbb6', wr: '/_blob/ccca3b7fa33574992239568f87fea94a', wb: '/_blob/77d6825cc2acba00edb2116763773dbd', wn: '/_blob/8c627fe6f9b20e3c70f41a0d92653372', wp: '/_blob/751ba29078e9e60b8b5d0d7948fd281f', bk: '/_blob/77c898d2513e9ba83ab5680730d01bda', bq: '/_blob/5d4b4d17f82632fdf302ea2f666c3b78', br: '/_blob/2958949152b961dd0b29733063618976', bb: '/_blob/582ab6e66656de76eb46628bace09a68', bn: '/_blob/b85f02c56127bec2806870270b615310', bp: '/_blob/e571c7681346433a14159cb146cfb58c' };
+    const FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR'.split('/');
+    const FILES = 'abcdefgh';
+    const rows = FEN.map((text, r) => {
+      const line = [];
+      for (const ch of text) {
+        if (ch >= '1' && ch <= '8') { for (let k = 0; k < Number(ch); k++) line.push(null); } else line.push(ch);
+      }
+      const rank = 8 - r;
+      return { row: line.map((p, c) => {
+        const side = p && p === p.toLowerCase() ? 'b' : 'w';
+        const t = p ? p.toLowerCase() : '';
+        return { n: FILES[c] + rank, cls: 'casilla casilla--' + ((c + rank - 1) % 2 === 1 ? 'clara' : 'oscura'), has: !!p, img: p ? IMG[side + t] : '' };
+      }) };
+    });
+    return { rows };
+  }
+}
+</script>
+</body>
+</html>
