@@ -286,6 +286,7 @@ export class Position implements PerftTarget<Move> {
     const us = this.side;
     const them = opposite(us);
     const legal: Move[] = [];
+    // Misma comprobación que isLegal(), escrita en línea: es el bucle caliente de perft.
     for (const move of this.pseudoLegalMoves()) {
       this.applyMove(move);
       if (!this.isAttacked(this.kings[us], them)) legal.push(move);
@@ -314,8 +315,6 @@ export class Position implements PerftTarget<Move> {
       throw new Error(`makeMove: ${moveToUci(move)} no procede de legalMoves() de esta posición`);
     }
     this.applyMove(move as CoreMove);
-    // Se llega a este ply con otra jugada: la lista generada antes aquí ya no vale.
-    if (this.generated.length > this.history.length) this.generated[this.history.length] = null;
   }
 
   /** Deshace la última jugada aplicada y deja la posición exactamente como estaba. */
@@ -400,6 +399,9 @@ export class Position implements PerftTarget<Move> {
    * La regla de 50 jugadas y la triple repetición se aplican como tablas
    * automáticas, sin que nadie tenga que reclamarlas. La repetición solo mira
    * las jugadas hechas en este objeto: lo anterior a la FEN cargada no se conoce.
+   *
+   * No llama a `legalMoves()`: las jugadas obtenidas antes siguen valiendo
+   * para `makeMove`, y `status()` no prepara ninguna lista nueva.
    */
   status(): GameStatus {
     if (!this.hasLegalMove()) {
@@ -431,15 +433,22 @@ export class Position implements PerftTarget<Move> {
     // Con menos de 4 medias jugadas reversibles no cabe ninguna repetición.
     if (plies < 4) return false;
     const current = this.repetitionKey();
+    // Se rehacen las mismas jugadas, así que las listas de legalMoves() siguen
+    // valiendo; se guardan porque applyMove las descarta al pasar por cada ply.
+    const generated = this.generated.slice();
     const undone: CoreMove[] = [];
     let seen = 1;
-    for (let i = 0; i < plies; i++) {
-      undone.push(this.history[this.history.length - 1]!.move);
-      this.unmakeMove();
-      // Solo las posiciones con el mismo bando al mover pueden coincidir.
-      if (i % 2 === 1 && this.repetitionKey() === current) seen++;
+    try {
+      for (let i = 0; i < plies && seen < 3; i++) {
+        undone.push(this.history[this.history.length - 1]!.move);
+        this.unmakeMove();
+        // Solo las posiciones con el mismo bando al mover pueden coincidir.
+        if (i % 2 === 1 && this.repetitionKey() === current) seen++;
+      }
+    } finally {
+      for (let i = undone.length - 1; i >= 0; i--) this.applyMove(undone[i]!);
+      this.generated.splice(0, this.generated.length, ...generated);
     }
-    for (let i = undone.length - 1; i >= 0; i--) this.applyMove(undone[i]!);
     return seen >= 3;
   }
 
@@ -470,9 +479,15 @@ export class Position implements PerftTarget<Move> {
     return fields.join(" ");
   }
 
+  /** ¿Puede el bando que mueve capturar al paso legalmente? Solo mira los dos peones posibles. */
   private hasLegalEnPassant(): boolean {
-    for (const move of this.pseudoLegalMoves()) {
-      if (move.flags === FLAG_EN_PASSANT && this.isLegal(move)) return true;
+    const to = this.epSquare;
+    if (to === -1) return false;
+    const pawn = makePiece(this.side, PAWN);
+    const behind = this.side === WHITE ? -16 : 16;
+    for (const from of [to + behind - 1, to + behind + 1]) {
+      if (offBoard(from) || this.board[from] !== pawn) continue;
+      if (this.isLegal({ from, to, promotion: null, flags: FLAG_EN_PASSANT })) return true;
     }
     return false;
   }
@@ -674,6 +689,8 @@ export class Position implements PerftTarget<Move> {
     }
 
     this.history.push({ move, captured, castling: this.castling, epSquare: this.epSquare, halfmove: this.halfmove });
+    // Se llega a este ply con otra jugada: la lista generada antes aquí ya no vale.
+    if (this.generated.length > this.history.length) this.generated[this.history.length] = null;
 
     board[to] = move.promotion !== null ? makePiece(us, PROMOTION_TO_TYPE[move.promotion]) : piece;
     board[from] = EMPTY;
