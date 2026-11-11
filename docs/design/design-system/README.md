@@ -43,6 +43,13 @@ Escaque no usa iconos en la interfaz: los botones llevan solo texto. Las únicas
 - Al terminar, `GameResult` sustituye al estado: «Has ganado.», «Has perdido.» o «Tablas.», con la causa y una sola acción principal, «Revancha».
 - Los textos siguen las mismas reglas: español de tú, sin exclamaciones y con punto final.
 
+## Coach
+
+- `Coach` explica la última jugada: «¿por qué fue mala?». Va en la columna derecha entre `GameStatus` y `MoveList` (móvil: justo debajo del tablero; tablet vertical: debajo del tablero, en dos columnas).
+- Lleva veredicto («Error grave.», «Imprecisión.», «Buena jugada.»), mejor jugada, caída de la evaluación en peones (barras de antes y después) y avisos: pieza colgando, mate en 1 que se escapó y captura gratis no vista.
+- La gravedad no depende del color: icono (triángulo, círculo discontinuo, círculo con marca), borde y palabra. Solo el veredicto es `role="status"`; el coach nunca roba el foco. «Ver en el tablero» activa marcas de casilla de siempre y pasa a «Quitar del tablero».
+- Habla de «las blancas» y «las negras», para servir también en dos jugadores.
+
 ## Cómo usar este sistema
 
 Carga `components/bundle.css` tras los tokens y reproduce el marcado de cada componente tal como aparece en su vista previa. Las siluetas de las piezas están en `components/pieces.js` y como SVG sueltos en `assets/Piezas/`.

@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Estados del coach</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/escaque/tokens.css">
+<link rel="stylesheet" href="ds/escaque/components/bundle.css">
+<link rel="stylesheet" href="coach.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;600&family=Space+Grotesk:wght@600&display=swap">
+<style>
+body{margin:0}
+.casilla img{position:relative;z-index:1;display:block;width:100%;height:100%}
+</style>
+</helmet>
+<div style="width: 1280px; box-sizing: border-box; padding: 32px 24px 40px; background: var(--surface); color: var(--ink); font-family: var(--font-sans)">
+<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; align-items: start">
+<div style="display:flex;flex-direction:column;gap:8px;min-width:0"><p style="margin:0;font:600 14px/20px var(--font-sans);color:var(--ink)">Buena jugada</p><section class="coach" aria-labelledby="e1"><header class="coach__cab"><h2 class="coach__titulo" id="e1">Coach</h2><p class="coach__jugada">Jugada revisada: <span class="coach__san">2. Cf3</span></p></header>
+<p class="coach__veredicto" role="status"><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m6 10.3 2.8 2.8L14.2 7.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span><strong>Buena jugada.</strong>Desarrolla una pieza y mantiene la ventaja.</span></p>
+<div><h3 class="coach__sub">Evaluación</h3><dl class="coach__eval"><dt>Antes</dt><dd><span class="coach__valor">+0,3</span> a favor de las blancas<div class="coach__barra" aria-hidden="true"><span style="width: 53%"></span></div></dd><dt>Después</dt><dd><span class="coach__valor">+0,3</span> a favor de las blancas<div class="coach__barra" aria-hidden="true"><span style="width: 53%"></span></div></dd></dl></div>
+<p class="coach__vacio">No hay avisos en esta jugada.</p></section></div>
+<div style="display:flex;flex-direction:column;gap:8px;min-width:0"><p style="margin:0;font:600 14px/20px var(--font-sans);color:var(--ink)">Imprecisión con captura gratis</p><section class="coach" aria-labelledby="e2"><header class="coach__cab"><h2 class="coach__titulo" id="e2">Coach</h2><p class="coach__jugada">Jugada revisada: <span class="coach__san">6. Ae2</span></p></header>
+<p class="coach__veredicto coach__veredicto--dudosa" role="status"><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-dasharray="3 2.4"/><path d="M10 6v4.5M10 13.2v.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span><strong>Imprecisión.</strong>Hay una jugada mejor y pierdes un poco de ventaja.</span></p>
+<p class="coach__mejor">Mejor jugada: <span class="coach__san">Cxd5</span></p>
+<div><h3 class="coach__sub">Evaluación</h3><dl class="coach__eval"><dt>Antes</dt><dd><span class="coach__valor">+1,2</span> a favor de las blancas<div class="coach__barra" aria-hidden="true"><span style="width: 62%"></span></div></dd><dt>Después</dt><dd><span class="coach__valor">+0,2</span> a favor de las blancas<div class="coach__barra" aria-hidden="true"><span style="width: 52%"></span></div></dd></dl></div>
+<ul class="coach__avisos" aria-label="Avisos del coach"><li class="coach__aviso"><h3 class="coach__aviso-titulo"><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-dasharray="3 2.4"/><path d="M10 6v4.5M10 13.2v.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Captura gratis no vista</h3><p>Podías capturar el peón de d5 con el caballo y nadie lo recuperaba. No lo has visto.</p><button class="boton" type="button" aria-label="Ver en el tablero: captura gratis en d5">Ver en el tablero</button></li></ul></section></div>
+<div style="display:flex;flex-direction:column;gap:8px;min-width:0"><p style="margin:0;font:600 14px/20px var(--font-sans);color:var(--ink)">Revisando la jugada</p><section class="coach" aria-labelledby="e3" aria-busy="true"><header class="coach__cab"><h2 class="coach__titulo" id="e3">Coach</h2></header>
+<p class="coach__veredicto" role="status"><span><strong>Revisando tu jugada.</strong>Alfil Beta está comparando la evaluación antes y después.</span></p>
+<div class="coach__barra-pensando" aria-hidden="true"></div>
+<p class="coach__vacio">Puedes seguir jugando mientras tanto.</p></section></div>
+<div style="display:flex;flex-direction:column;gap:8px;min-width:0"><p style="margin:0;font:600 14px/20px var(--font-sans);color:var(--ink)">Antes de la primera jugada</p><section class="coach" aria-labelledby="e4"><header class="coach__cab"><h2 class="coach__titulo" id="e4">Coach</h2></header>
+<p class="coach__vacio" role="status">Todavía no hay jugadas que revisar. Cuando muevas, el coach te dirá cómo ha ido.</p></section></div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":640}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
