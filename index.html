@@ -20,6 +20,7 @@
 <link rel="stylesheet" href="src/ui/board.css">
 <link rel="stylesheet" href="src/ui/page.css">
 <link rel="stylesheet" href="src/ui/ajustes.css">
+<link rel="stylesheet" href="src/ui/coach.css">
 <script type="module" src="dist/src/ui/main.js"></script>
 </head>
 <body>
@@ -73,6 +74,14 @@
   </div>
   <section class="partida__tablero" aria-label="Tablero">
     <div id="tablero"></div>
+  </section>
+  <section id="coach" class="coach partida__coach" aria-labelledby="coach-titulo">
+    <header class="coach__cab"><h2 class="coach__titulo" id="coach-titulo">Coach</h2><p id="coach-jugada" class="coach__jugada" hidden></p></header>
+    <div class="coach__col">
+      <p id="coach-veredicto" class="coach__veredicto coach__veredicto--vacio" role="status"></p>
+      <div id="coach-resumen" class="coach__col"></div>
+    </div>
+    <div id="coach-avisos" class="coach__col" hidden></div>
   </section>
   <div class="partida__controles">
     <button id="nueva" class="boton boton--principal partida__ancho" type="button">Nueva partida</button>
