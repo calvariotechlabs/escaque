@@ -11,12 +11,15 @@ import { buildSite } from "./build-site.mjs";
 const root = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const config = JSON.parse(readFileSync(join(root, "vercel.json"), "utf8"));
 
+const SOURCES = ["/(.*)", "/sw.js", "/manifest.webmanifest"];
+const parseCsp = (csp) => new Map(csp.split(";").map((d) => d.trim().split(/\s+/)).filter((d) => d[0]).map(([name, ...values]) => [name, values]));
+
 /** Cabeceras que Vercel aplicaría a `path`: las reglas que casan, de arriba abajo; las posteriores pisan. */
 function headersFor(path) {
   const out = new Map();
   for (const rule of config.headers) {
-    const pattern = new RegExp(`^${rule.source.replace(/\(\.\*\)/g, ".*").replace(/\./g, "\\.").replace(/\\\.\*/g, ".*")}$`);
-    if (!pattern.test(path)) continue;
+    assert.ok(SOURCES.includes(rule.source), `regla nueva ${rule.source}: amplía SOURCES y headersFor para que el test sepa casarla`);
+    if (rule.source !== "/(.*)" && rule.source !== path) continue;
     for (const { key, value } of rule.headers) out.set(key.toLowerCase(), value);
   }
   return out;
@@ -24,7 +27,7 @@ function headersFor(path) {
 
 const PATHS = ["/", "/index.html", "/sw.js", "/manifest.webmanifest", "/dist/src/ui/main.js", "/src/ui/page.css", "/icons/icono-192.png"];
 
-test("la función se ejecutaría en Frankfurt y no hay funciones que pidan más", () => {
+test("región fra1 fijada (solo afecta a funciones) y sin funciones: es una web estática", () => {
   assert.deepEqual(config.regions, ["fra1"]);
   assert.equal(config.functions, undefined, "es una web estática: sin funciones");
   assert.equal(config.outputDirectory, "site");
@@ -46,7 +49,7 @@ test("todas las respuestas llevan las cabeceras de seguridad", () => {
 test("la CSP es estricta, deja funcionar el worker y el manifiesto y prohíbe incrustar la web", () => {
   const csp = headersFor("/").get("content-security-policy");
   assert.ok(csp, "falta Content-Security-Policy");
-  const directives = new Map(csp.split(";").map((d) => d.trim().split(/\s+/)).map(([name, ...values]) => [name, values]));
+  const directives = parseCsp(csp);
   assert.deepEqual(directives.get("default-src"), ["'none'"]);
   assert.deepEqual(directives.get("frame-ancestors"), ["'none'"]);
   assert.deepEqual(directives.get("script-src"), ["'self'"]);
@@ -64,9 +67,8 @@ test("la etiqueta meta de index.html (la que usa `npm run serve`) no es más lax
   const meta = /http-equiv="Content-Security-Policy" content="([^"]+)"/.exec(html)?.[1];
   assert.ok(meta, "falta la meta CSP");
   const header = headersFor("/").get("content-security-policy");
-  const parse = (csp) => new Map(csp.split(";").map((d) => d.trim().split(/\s+/)).filter((d) => d[0]).map(([n, ...v]) => [n, v.join(" ")]));
-  const m = parse(meta);
-  for (const [name, value] of m) assert.equal(parse(header).get(name), value, `la directiva ${name} difiere entre meta y cabecera`);
+  const headerDirectives = parseCsp(header);
+  for (const [name, values] of parseCsp(meta)) assert.deepEqual(headerDirectives.get(name), values, `la directiva ${name} difiere entre meta y cabecera`);
 });
 
 test("el sitio publicado no tiene código en línea que la CSP bloquearía", () => {
