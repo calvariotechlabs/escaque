@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#0f1218" media="(prefers-color-scheme: dark)">
 <meta name="description" content="Aprende ajedrez con un motor propio. Funciona sin conexión.">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'">
-<title>Escaque · partida a dos jugadores</title>
+<title>Escaque · ajedrez contra la máquina o a dos</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="icon" href="favicon.ico" sizes="48x48">
@@ -19,28 +19,70 @@
 <link rel="stylesheet" href="src/ui/tokens.css">
 <link rel="stylesheet" href="src/ui/board.css">
 <link rel="stylesheet" href="src/ui/page.css">
+<link rel="stylesheet" href="src/ui/ajustes.css">
 <script type="module" src="dist/src/ui/main.js"></script>
 </head>
 <body>
 <header class="pagina__cabecera">
   <h1>Escaque</h1>
-  <p><span class="solo-escritorio">Partida a dos jugadores en este dispositivo</span><span class="solo-movil">Dos jugadores</span></p>
+  <p><span id="cabecera-largo" class="solo-escritorio">Aprende ajedrez jugando</span><span id="cabecera-corto" class="solo-movil">Aprende ajedrez jugando</span></p>
 </header>
-<main class="partida">
+<main id="pantalla-ajustes" class="ajustes-pantalla" aria-labelledby="titulo-ajustes" hidden>
+  <section class="ajustes-pantalla__form">
+    <h2 id="titulo-ajustes" class="ajustes-pantalla__titulo">Nueva partida</h2>
+    <form id="ajustes" class="ajustes">
+      <fieldset class="grupo">
+        <legend class="grupo__leyenda">Modo</legend>
+        <div class="opciones">
+          <div class="opcion"><input class="opcion__entrada" type="radio" name="modo" id="modo-dos" value="dos"><label class="opcion__tarjeta" for="modo-dos"><span class="opcion__nombre">Dos jugadores</span><span class="opcion__texto">Se juega en este dispositivo.</span></label></div>
+          <div class="opcion"><input class="opcion__entrada" type="radio" name="modo" id="modo-maquina" value="maquina" checked><label class="opcion__tarjeta" for="modo-maquina"><span class="opcion__nombre">Contra la máquina</span><span class="opcion__texto">Juegas contra Alfil Beta, el motor de Escaque.</span></label></div>
+        </div>
+      </fieldset>
+      <fieldset id="grupo-nivel" class="grupo">
+        <legend class="grupo__leyenda">Nivel</legend>
+        <div class="opciones">
+          <div class="opcion"><input class="opcion__entrada" type="radio" name="nivel" id="nivel-facil" value="facil"><label class="opcion__tarjeta" for="nivel-facil"><span class="opcion__nombre">Fácil</span><span class="opcion__texto">Elige jugadas con algo de azar. Para empezar.</span></label></div>
+          <div class="opcion"><input class="opcion__entrada" type="radio" name="nivel" id="nivel-medio" value="medio" checked><label class="opcion__tarjeta" for="nivel-medio"><span class="opcion__nombre">Medio</span><span class="opcion__texto">Mira unas jugadas por delante y responde en menos de medio segundo.</span></label></div>
+          <div class="opcion"><input class="opcion__entrada" type="radio" name="nivel" id="nivel-dificil" value="dificil"><label class="opcion__tarjeta" for="nivel-dificil"><span class="opcion__nombre">Difícil</span><span class="opcion__texto">Piensa cerca de un segundo y cuida sus piezas.</span></label></div>
+        </div>
+      </fieldset>
+      <fieldset id="grupo-color" class="grupo">
+        <legend class="grupo__leyenda">Tu color</legend>
+        <div class="opciones">
+          <div class="opcion"><input class="opcion__entrada" type="radio" name="color" id="color-blancas" value="blancas" checked><label class="opcion__tarjeta" for="color-blancas"><span class="opcion__nombre"><span class="estado__turno estado__turno--w" aria-hidden="true"></span>Blancas</span><span class="opcion__texto">Mueves primero.</span></label></div>
+          <div class="opcion"><input class="opcion__entrada" type="radio" name="color" id="color-negras" value="negras"><label class="opcion__tarjeta" for="color-negras"><span class="opcion__nombre"><span class="estado__turno estado__turno--b" aria-hidden="true"></span>Negras</span><span class="opcion__texto">Mueve primero la máquina.</span></label></div>
+          <div class="opcion"><input class="opcion__entrada" type="radio" name="color" id="color-azar" value="azar"><label class="opcion__tarjeta" for="color-azar"><span class="opcion__nombre"><span class="estado__turno estado__turno--azar" aria-hidden="true"></span>Al azar</span><span class="opcion__texto">Se decide al empezar.</span></label></div>
+        </div>
+      </fieldset>
+      <div class="ajustes__acciones">
+        <button class="boton boton--principal" type="submit">Empezar partida</button>
+      </div>
+    </form>
+  </section>
+  <aside class="ajustes-pantalla__vista" aria-hidden="true" inert><div id="vista-previa"></div></aside>
+</main>
+<main id="pantalla-partida" class="partida" hidden>
   <div id="avisos" class="avisos partida__avisos" role="status"></div>
-  <p id="estado" class="estado partida__estado" role="status"><span id="estado-turno" class="estado__turno estado__turno--w" aria-hidden="true"></span><span><strong id="estado-texto">Cargando la partida. Si este mensaje no desaparece, ejecuta «npm run serve».</strong><span id="estado-extra"></span></span></p>
+  <div class="partida__estado">
+    <p id="estado" class="estado" role="status"><span id="estado-turno" class="estado__turno estado__turno--w" aria-hidden="true"></span><span><strong id="estado-texto">Cargando la partida. Si este mensaje no desaparece, ejecuta «npm run serve».</strong><span id="estado-extra"></span></span><span id="pensando" class="pensando__barra" aria-hidden="true" hidden></span></p>
+    <section id="resultado" class="resultado" role="status" aria-labelledby="resultado-titulo" hidden>
+      <h2 id="resultado-titulo" class="resultado__titulo"></h2>
+      <p id="resultado-texto" class="resultado__texto"></p>
+      <button id="revancha" class="boton boton--principal" type="button">Revancha</button>
+    </section>
+  </div>
   <section class="partida__tablero" aria-label="Tablero">
     <div id="tablero"></div>
   </section>
   <div class="partida__controles">
-    <button id="nueva" class="boton boton--principal" type="button">Nueva partida</button>
+    <button id="nueva" class="boton boton--principal partida__ancho" type="button">Nueva partida</button>
     <button id="deshacer" class="boton" type="button" disabled>Deshacer jugada</button>
     <button id="rehacer" class="boton" type="button" disabled>Rehacer jugada</button>
     <button id="girar" class="boton partida__ancho" type="button">Girar tablero</button>
   </div>
   <section class="jugadas partida__jugadas" aria-labelledby="titulo-jugadas">
     <h2 class="jugadas__titulo" id="titulo-jugadas">Jugadas</h2>
-    <p id="sin-jugadas" class="jugadas__vacia">Aún no hay jugadas.</p>
+    <p id="sin-jugadas" class="jugadas__vacia">Todavía no hay jugadas.</p>
     <ol id="lista-jugadas" class="jugadas__lista" aria-label="Lista de jugadas"></ol>
   </section>
   <p id="anuncio" class="solo-lector" aria-live="polite"></p>

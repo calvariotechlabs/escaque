@@ -81,7 +81,7 @@ describe("guardado: entrada no fiable", () => {
   });
 
   it("rechaza versión desconocida o campos ausentes", () => {
-    bad({ ...good(), v: 2 });
+    bad({ ...good(), v: 3 });
     const { fen: _fen, ...sinFen } = good();
     bad(sinFen);
     const { moves: _m, ...sinMoves } = good();
@@ -174,5 +174,54 @@ describe("guardado: escritura automática", () => {
 
   it("sin almacenamiento no hace nada", () => {
     assert.doesNotThrow(() => createAutosave(null)(new Game(), "w"));
+  });
+});
+
+describe("guardado: ajustes de la partida (versión 2)", () => {
+  it("guarda y restaura modo, nivel y color", () => {
+    const game = new Game();
+    playAll(game, ["e2e4", "e7e5"]);
+    const restored = restoreGame(serializeGame(game, "b", { mode: "maquina", level: "dificil", player: "b" }));
+    assert.ok(restored);
+    assert.deepEqual(restored.setup, { mode: "maquina", level: "dificil", player: "b" });
+    assert.equal(restored.orientation, "b");
+    assert.equal(restored.game.ply, 2);
+  });
+
+  it("sin ajustes es una partida a dos jugadores", () => {
+    const restored = restoreGame(serializeGame(new Game(), "w"));
+    assert.deepEqual(restored?.setup, { mode: "dos" });
+  });
+
+  it("una partida guardada con la versión 1 se lee como dos jugadores", () => {
+    const restored = restoreGame('{"v":1,"fen":"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1","moves":["e2e4"],"ply":1,"orientation":"b"}');
+    assert.ok(restored);
+    assert.deepEqual(restored.setup, { mode: "dos" });
+    assert.equal(restored.game.ply, 1);
+  });
+
+  it("rechaza ajustes mal formados", () => {
+    const base = { v: 2, fen: new Game().startFen, moves: [], ply: 0, orientation: "w" };
+    for (const extra of [
+      { mode: "otro" },
+      {},
+      { mode: "maquina" },
+      { mode: "maquina", level: "experto", player: "w" },
+      { mode: "maquina", level: "medio", player: "x" },
+      { mode: "maquina", level: "__proto__", player: "w" },
+    ]) {
+      assert.equal(restoreGame(JSON.stringify({ ...base, ...extra })), null, JSON.stringify(extra));
+    }
+    assert.ok(restoreGame(JSON.stringify({ ...base, mode: "maquina", level: "facil", player: "w" })));
+  });
+
+  it("el guardado automático distingue el cambio de ajustes", () => {
+    const store = memoryStore();
+    const autosave = createAutosave(store);
+    const game = new Game();
+    autosave(game, "w", { mode: "maquina", level: "medio", player: "w" });
+    const first = store.data.get(STORAGE_KEY);
+    autosave(game, "w", { mode: "maquina", level: "facil", player: "w" });
+    assert.notEqual(store.data.get(STORAGE_KEY), first);
   });
 });

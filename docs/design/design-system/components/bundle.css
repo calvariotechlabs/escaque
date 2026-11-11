@@ -82,3 +82,39 @@ body{margin:0;background:var(--surface);color:var(--ink);font:400 16px/24px var(
 .aviso__acciones .boton{flex:1 1 auto}
 .aviso--sin-conexion{border:2px dashed var(--control-border)}
 .aviso--nueva{border:2px solid var(--accent)}
+
+/* Ajustes de la partida: grupos de opciones con botones de radio (modo, nivel, color) */
+.ajustes{display:flex;flex-direction:column;gap:var(--space-6);min-width:0}
+.grupo{margin:0;padding:0;border:0;min-width:0}
+.grupo__leyenda{padding:0;margin:0 0 var(--space-2);font:600 20px/28px var(--font-display)}
+.opciones{display:grid;gap:var(--space-2)}
+.opciones--2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.opcion{position:relative;display:block;min-width:0}
+.opcion__entrada{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer;z-index:1}
+.opcion__tarjeta{position:relative;display:flex;flex-direction:column;gap:2px;box-sizing:border-box;min-height:44px;height:100%;padding:var(--space-3) var(--space-4) var(--space-3) 52px;border:1.5px solid var(--control-border);border-radius:var(--radius-sm);background:var(--surface-raised);color:var(--ink)}
+.opcion__tarjeta::before{content:"";position:absolute;left:var(--space-4);top:50%;width:20px;height:20px;margin-top:-10px;box-sizing:border-box;border:1.5px solid var(--control-border);border-radius:50%;background:var(--surface-raised)}
+.opcion__nombre{display:flex;align-items:center;gap:var(--space-2);font:600 14px/20px var(--font-sans)}
+.opcion__texto{font:400 14px/20px var(--font-sans);color:var(--ink-muted)}
+.opcion__entrada:checked + .opcion__tarjeta{border:3px solid var(--accent);padding:calc(var(--space-3) - 1.5px) calc(var(--space-4) - 1.5px) calc(var(--space-3) - 1.5px) calc(52px - 1.5px)}
+.opcion__entrada:checked + .opcion__tarjeta::before{left:calc(var(--space-4) - 1.5px);border-color:var(--accent);background:var(--accent);box-shadow:inset 0 0 0 4px var(--surface-raised)}
+.opcion__entrada:focus-visible + .opcion__tarjeta{outline:3px solid var(--accent);outline-offset:2px}
+.ajustes__acciones{display:flex;flex-direction:column;gap:var(--space-2)}
+.estado__turno--azar{background:linear-gradient(90deg,var(--piece-white-hi) 50%,var(--piece-black-mid) 50%);border-color:var(--piece-outline-black)}
+
+/* La máquina está pensando: barra indeterminada bajo el texto del estado */
+.estado--pensando{flex-wrap:wrap}
+.pensando__barra{flex:1 0 100%;height:4px;border-radius:2px;background:var(--line);overflow:hidden;position:relative}
+.pensando__barra::after{content:"";position:absolute;inset:0 auto 0 0;width:35%;border-radius:2px;background:var(--accent);animation:pensando 1.2s ease-in-out infinite alternate}
+@keyframes pensando{from{transform:translateX(0)}to{transform:translateX(185%)}}
+@media (prefers-reduced-motion: reduce){
+  .pensando__barra::after{animation:none;width:100%;opacity:.45}
+}
+@media (forced-colors: active){
+  .pensando__barra{border:1px solid CanvasText}
+  .pensando__barra::after{background:Highlight}
+}
+
+/* Resultado de la partida contra la máquina */
+.resultado{display:flex;flex-direction:column;gap:var(--space-3);padding:var(--space-4);background:var(--surface-raised);border:2px solid var(--ink);border-radius:var(--radius-md)}
+.resultado__titulo{margin:0;font:600 20px/28px var(--font-display)}
+.resultado__texto{margin:0;font:400 14px/20px var(--font-sans)}

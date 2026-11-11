@@ -1,0 +1,24 @@
+<!-- @dsCard group="Paneles" height=520 subtitle="Modo, nivel y color de la partida" -->
+<meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;600&family=Space+Grotesk:wght@600&display=swap">
+<style>.col{padding:16px;max-width:420px}</style>
+<div class="col">
+<form class="ajustes">
+<fieldset class="grupo">
+<legend class="grupo__leyenda">Nivel</legend>
+<div class="opciones">
+<div class="opcion"><input class="opcion__entrada" type="radio" name="nivel" id="nivel-facil" value="facil"><label class="opcion__tarjeta" for="nivel-facil"><span class="opcion__nombre">Fácil</span><span class="opcion__texto">Elige jugadas con algo de azar. Para empezar.</span></label></div>
+<div class="opcion"><input class="opcion__entrada" type="radio" name="nivel" id="nivel-medio" value="medio" checked><label class="opcion__tarjeta" for="nivel-medio"><span class="opcion__nombre">Medio</span><span class="opcion__texto">Mira unas jugadas por delante y responde en menos de medio segundo.</span></label></div>
+<div class="opcion"><input class="opcion__entrada" type="radio" name="nivel" id="nivel-dificil" value="dificil"><label class="opcion__tarjeta" for="nivel-dificil"><span class="opcion__nombre">Difícil</span><span class="opcion__texto">Piensa cerca de un segundo y cuida sus piezas.</span></label></div>
+</div>
+</fieldset>
+<fieldset class="grupo">
+<legend class="grupo__leyenda">Tu color</legend>
+<div class="opciones">
+<div class="opcion"><input class="opcion__entrada" type="radio" name="color" id="color-blancas" value="blancas" checked><label class="opcion__tarjeta" for="color-blancas"><span class="opcion__nombre"><span class="estado__turno estado__turno--w" aria-hidden="true"></span>Blancas</span><span class="opcion__texto">Mueves primero.</span></label></div>
+<div class="opcion"><input class="opcion__entrada" type="radio" name="color" id="color-negras" value="negras"><label class="opcion__tarjeta" for="color-negras"><span class="opcion__nombre"><span class="estado__turno estado__turno--b" aria-hidden="true"></span>Negras</span><span class="opcion__texto">Mueve primero la máquina.</span></label></div>
+<div class="opcion"><input class="opcion__entrada" type="radio" name="color" id="color-azar" value="azar"><label class="opcion__tarjeta" for="color-azar"><span class="opcion__nombre"><span class="estado__turno estado__turno--azar" aria-hidden="true"></span>Al azar</span><span class="opcion__texto">Se decide al empezar.</span></label></div>
+</div>
+</fieldset>
+</form>
+</div>

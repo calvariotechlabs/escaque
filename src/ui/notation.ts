@@ -92,3 +92,32 @@ export function statusMessage(status: GameStatus, turn: Color, inCheck: boolean)
 export function newGameWarning(plies: number): string {
   return plies === 1 ? "Se perderá la jugada de esta partida." : `Se perderán las ${plies} jugadas de esta partida.`;
 }
+
+/** Nombre con el que el motor aparece en la interfaz. */
+export const ENGINE_NAME = "Alfil Beta";
+
+/** Estado de la partida contra la máquina: añade quién piensa y a quién le toca. */
+export function machineStatusMessage(status: GameStatus, turn: Color, inCheck: boolean, humanTurn: boolean, thinking: boolean): string {
+  const base = statusMessage(status, turn, inCheck);
+  if (status.kind !== "ongoing") return base;
+  if (thinking) return `${base} ${ENGINE_NAME} está pensando.`;
+  return humanTurn ? `${base} Te toca.` : base;
+}
+
+/** Anuncio de la jugada de la máquina para la región viva: «Alfil Beta juega Cf6. Juegan las blancas.» */
+export function machineMoveAnnouncement(san: string, nextStatus: string): string {
+  return `${ENGINE_NAME} juega ${sanToSpanish(san)}. ${nextStatus}`;
+}
+
+/** Resultado de la partida visto desde la persona: título y causa. `null` si sigue en marcha. */
+export function resultMessage(status: GameStatus, player: Color): { title: string; text: string } | null {
+  if (status.kind === "ongoing") return null;
+  const text = statusMessage(status, player, false);
+  if (status.kind === "checkmate") return { title: status.winner === player ? "Has ganado." : "Has perdido.", text };
+  return { title: "Tablas.", text };
+}
+
+/** Texto de la cabecera de la partida contra la máquina. */
+export function machineHeading(levelName: string, short: boolean): string {
+  return short ? `${ENGINE_NAME} · ${levelName}` : `Contra ${ENGINE_NAME} · nivel ${levelName}`;
+}

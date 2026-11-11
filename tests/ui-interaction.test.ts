@@ -233,3 +233,29 @@ describe("deshacer y reiniciar desde la interacción", () => {
     assert.deepEqual(ui.redo(), { kind: "none" });
   });
 });
+
+describe("jugar contra la máquina", () => {
+  it("solo se pueden seleccionar las piezas de la persona", () => {
+    const { ui } = setup();
+    ui.player = "b";
+    assert.equal(ui.click("e2").kind, "none"); // turno de las blancas, pero la persona juega con negras
+    assert.equal(ui.dragStart("e2"), false);
+    assert.equal(ui.selected, null);
+    ui.player = "w";
+    assert.equal(ui.click("e2").kind, "selected");
+  });
+
+  it("sin bando fijo juegan los dos", () => {
+    const { ui } = setup();
+    assert.equal(ui.player, null);
+    assert.equal(ui.click("e2").kind, "selected");
+  });
+
+  it("el foco del teclado puede ir al rey de un bando", () => {
+    const { ui } = setup();
+    ui.focusKing("b");
+    assert.equal(ui.focus, "e8");
+    ui.focusKing("w");
+    assert.equal(ui.focus, "e1");
+  });
+});

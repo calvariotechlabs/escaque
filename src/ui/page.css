@@ -11,7 +11,7 @@ body{margin:0;background:var(--surface);color:var(--ink);font:400 16px/24px var(
 
 /* Móvil: estado, tablero, botones y jugadas, en el orden del documento. */
 .partida{padding-top:var(--space-4);padding-bottom:max(var(--space-8),env(safe-area-inset-bottom,0px));display:grid;grid-template-columns:minmax(0,1fr);gap:var(--space-4)}
-.partida__estado{margin:0}
+
 .partida__tablero{min-width:0}
 .partida__controles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-2)}
 .partida__controles .boton--principal,.partida__ancho{grid-column:1 / -1}
@@ -56,7 +56,7 @@ body{margin:0;background:var(--surface);color:var(--ink);font:400 16px/24px var(
   .pagina__cabecera h1{font-size:20px;line-height:24px}
   .partida{box-sizing:border-box;height:100dvh;padding:max(var(--space-4),env(safe-area-inset-top,0px)) max(var(--space-6),env(safe-area-inset-right,0px)) max(var(--space-4),env(safe-area-inset-bottom,0px)) max(var(--space-6),env(safe-area-inset-left,0px));grid-template-columns:var(--tablero-ancho) minmax(0,1fr);grid-template-rows:32px auto auto auto minmax(0,1fr);grid-template-areas:"tablero titulo" "tablero avisos" "tablero estado" "tablero controles" "tablero jugadas";gap:var(--space-2) var(--space-6)}
   .partida:has(.avisos:empty){grid-template-rows:32px auto auto minmax(0,1fr);grid-template-areas:"tablero titulo" "tablero estado" "tablero controles" "tablero jugadas"}
-  .pagina__cabecera + .partida::before{content:"";grid-area:titulo}
+  .pagina__cabecera ~ .partida::before{content:"";grid-area:titulo}
   .partida .tablero{width:100%}
   .partida__avisos{grid-area:avisos}
   .partida__estado{grid-area:estado}

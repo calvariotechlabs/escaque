@@ -92,6 +92,11 @@ export class Game {
     return this.initialFen;
   }
 
+  /** Bando al que le tocaba mover en la posición inicial. */
+  get firstMover(): Color {
+    return this.startTurn;
+  }
+
   /** Todas las jugadas de la partida en orden, también las que se pueden rehacer; sirve para guardarla. */
   get allMoves(): readonly MoveRecord[] {
     return [...this.records, ...[...this.future].reverse()];
