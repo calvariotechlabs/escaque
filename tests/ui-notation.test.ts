@@ -1,7 +1,7 @@
 // Textos en español de la interfaz: SAN con C A T D R, anuncios y fin de partida.
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { sanToSpanish, statusMessage, moveAnnouncement, newGameWarning } from "../src/ui/notation.js";
+import { sanToSpanish, statusMessage, moveAnnouncement, newGameWarning, machineStatusMessage, machineMoveAnnouncement, resultMessage, machineHeading } from "../src/ui/notation.js";
 
 describe("SAN en español", () => {
   it("traduce las letras de las piezas", () => {
@@ -83,5 +83,33 @@ describe("aviso de nueva partida", () => {
   it("dice cuántas jugadas se pierden, en singular y en plural", () => {
     assert.equal(newGameWarning(1), "Se perderá la jugada de esta partida.");
     assert.equal(newGameWarning(6), "Se perderán las 6 jugadas de esta partida.");
+  });
+});
+
+describe("jugar contra la máquina: textos", () => {
+  it("estado mientras piensa y cuando te toca", () => {
+    const ongoing = { kind: "ongoing" } as const;
+    assert.equal(machineStatusMessage(ongoing, "b", false, false, true), "Juegan las negras. Alfil Beta está pensando.");
+    assert.equal(machineStatusMessage(ongoing, "b", false, false, false), "Juegan las negras.");
+    assert.equal(machineStatusMessage(ongoing, "w", false, true, false), "Juegan las blancas. Te toca.");
+    assert.equal(machineStatusMessage(ongoing, "w", true, true, false), "Juegan las blancas. Jaque. Te toca.");
+    assert.equal(machineStatusMessage({ kind: "stalemate" }, "w", false, true, false), "Tablas por ahogado.");
+  });
+
+  it("anuncio de la jugada de la máquina", () => {
+    assert.equal(machineMoveAnnouncement("Nf6", "Juegan las blancas."), "Alfil Beta juega Cf6. Juegan las blancas.");
+  });
+
+  it("resultado visto desde la persona", () => {
+    const mate = { kind: "checkmate", winner: "w" } as const;
+    assert.deepEqual(resultMessage(mate, "w"), { title: "Has ganado.", text: "Jaque mate. Ganan las blancas." });
+    assert.deepEqual(resultMessage(mate, "b"), { title: "Has perdido.", text: "Jaque mate. Ganan las blancas." });
+    assert.deepEqual(resultMessage({ kind: "stalemate" }, "b"), { title: "Tablas.", text: "Tablas por ahogado." });
+    assert.equal(resultMessage({ kind: "ongoing" }, "w"), null);
+  });
+
+  it("cabecera", () => {
+    assert.equal(machineHeading("Medio", false), "Contra Alfil Beta · nivel Medio");
+    assert.equal(machineHeading("Medio", true), "Alfil Beta · Medio");
   });
 });

@@ -1,14 +1,37 @@
-// Pantalla de partida a dos jugadores en el mismo dispositivo.
+// Pantallas de Escaque: ajustes de la partida y partida (a dos jugadores en el
+// mismo dispositivo o contra la máquina, Alfil Beta en un Worker).
 // Traduce clics, arrastres y teclas a llamadas de `Interaction` y pinta el
 // resultado con `BoardView`. Todo el texto se escribe con textContent o
 // atributos, nunca como HTML. La carga el navegador como módulo ES nativo.
-import type { PromotionPiece } from "../core/index.js";
+import { START_FEN, type Color, type PromotionPiece } from "../core/index.js";
 import { createBoard } from "./board.js";
 import { Game } from "./game.js";
 import { Interaction, type Outcome } from "./interaction.js";
-import { moveAnnouncement, newGameWarning, sanToSpanish, statusMessage } from "./notation.js";
+import { minPly, normalizePly, redoTarget, requestMachineMove, undoTarget } from "./machine.js";
+import {
+  ENGINE_NAME,
+  machineHeading,
+  machineMoveAnnouncement,
+  machineStatusMessage,
+  moveAnnouncement,
+  newGameWarning,
+  resultMessage,
+  sanToSpanish,
+  statusMessage,
+} from "./notation.js";
 import { pieceSvg } from "./pieces.js";
 import { browserStore, createAutosave, loadFromStorage } from "./save.js";
+import {
+  choiceOf,
+  DEFAULT_CHOICE,
+  LEVEL_NAME,
+  parseChoice,
+  resolveSetup,
+  TWO_PLAYERS,
+  type GameSetup,
+  type SetupChoice,
+} from "./settings.js";
+import { createEngineClient } from "../worker/client.js";
 import { startPwa } from "../pwa/pwa.js";
 
 function byId<T extends HTMLElement>(id: string): T {
@@ -17,6 +40,18 @@ function byId<T extends HTMLElement>(id: string): T {
   return el as T;
 }
 
+const settingsScreen = byId<HTMLElement>("pantalla-ajustes");
+const gameScreen = byId<HTMLElement>("pantalla-partida");
+const settingsForm = byId<HTMLFormElement>("ajustes");
+const levelGroup = byId<HTMLFieldSetElement>("grupo-nivel");
+const colorGroup = byId<HTMLFieldSetElement>("grupo-color");
+const headingLong = byId<HTMLSpanElement>("cabecera-largo");
+const headingShort = byId<HTMLSpanElement>("cabecera-corto");
+const thinkingBar = byId<HTMLSpanElement>("pensando");
+const resultBox = byId<HTMLElement>("resultado");
+const resultTitle = byId<HTMLElement>("resultado-titulo");
+const resultText = byId<HTMLElement>("resultado-texto");
+const rematchButton = byId<HTMLButtonElement>("revancha");
 const statusBox = byId<HTMLParagraphElement>("estado");
 const statusTurn = byId<HTMLSpanElement>("estado-turno");
 const statusText = byId<HTMLElement>("estado-texto");
@@ -35,14 +70,33 @@ const announcer = byId<HTMLParagraphElement>("anuncio");
 const promotionDialog = byId<HTMLDialogElement>("coronacion");
 const promotionOptions = byId<HTMLDivElement>("opciones-coronacion");
 const view = createBoard(byId("tablero"));
+createBoard(byId("vista-previa")).setPosition(START_FEN);
 
 // La partida en curso se guarda en el dispositivo y se recupera al abrir o al actualizar la app.
 const store = browserStore();
 const recovered = loadFromStorage(store);
 const autosave = createAutosave(store);
+let setup: GameSetup = recovered?.setup ?? TWO_PLAYERS;
 let game = recovered?.game ?? new Game();
-let ui = new Interaction(game);
+let ui = newInteraction(game, setup);
 if (recovered !== null) ui.orientation = recovered.orientation;
+
+// La máquina: un Worker propio, creado la primera vez que hace falta.
+let engine: ReturnType<typeof createEngineClient> | null = null;
+/** Cada petición lleva su número; la respuesta de una que ya no vale se ignora. */
+let generation = 0;
+let thinking = false;
+/** «Está pensando» solo se muestra si tarda más de esto, para no parpadear con las jugadas rápidas. */
+const THINKING_DELAY_MS = 300;
+let thinkingVisible = false;
+let thinkingTimer: ReturnType<typeof setTimeout> | null = null;
+let machineFailed = false;
+
+function newInteraction(forGame: Game, forSetup: GameSetup): Interaction {
+  const interaction = new Interaction(forGame);
+  interaction.player = forSetup.mode === "maquina" ? forSetup.player : null;
+  return interaction;
+}
 
 const PROMOTIONS: ReadonlyArray<readonly [PromotionPiece, string]> = [
   ["q", "Dama"],
@@ -60,9 +114,12 @@ function render(): void {
   syncTabIndex();
   renderStatus();
   renderMoveList();
-  undoButton.disabled = game.ply === 0;
-  redoButton.disabled = !game.canRedo;
-  autosave(game, ui.orientation);
+  const undoPossible = setup.mode === "maquina" ? undoTarget(game, setup.player) !== null : game.ply > 0;
+  const redoPossible = setup.mode === "maquina" ? redoTarget(game, setup.player) !== null : game.canRedo;
+  undoButton.disabled = thinking || !undoPossible;
+  redoButton.disabled = thinking || !redoPossible;
+  autosave(game, ui.orientation, setup);
+  maybeThink();
 }
 
 /** Tabindex itinerante: solo la casilla con el foco entra en el orden de tabulación. */
@@ -74,9 +131,41 @@ function syncTabIndex(): void {
 
 function renderStatus(): void {
   statusTurn.className = `estado__turno estado__turno--${game.turn}`;
-  statusText.textContent = statusMessage(game.status, game.turn, game.inCheck);
-  statusExtra.textContent = ui.pendingPromotion !== null ? " Elige la pieza para coronar." : "";
+  const result = setup.mode === "maquina" ? resultMessage(game.status, setup.player) : null;
+  if (setup.mode === "maquina") {
+    statusText.textContent = machineStatusMessage(game.status, game.turn, game.inCheck, game.turn === setup.player, thinkingVisible);
+    // Con la máquina, los anuncios los da la región `#anuncio`: así no se leen dos veces.
+    statusBox.setAttribute("aria-live", "off");
+  } else {
+    statusText.textContent = statusMessage(game.status, game.turn, game.inCheck);
+    statusBox.removeAttribute("aria-live");
+  }
+  if (ui.pendingPromotion !== null) statusExtra.textContent = " Elige la pieza para coronar.";
+  else if (machineFailed) statusExtra.textContent = ` ${ENGINE_NAME} no ha podido elegir jugada. Prueba con «Deshacer jugada» o empieza otra partida.`;
+  else statusExtra.textContent = "";
   statusBox.classList.toggle("estado--fin", game.isOver);
+  statusBox.classList.toggle("estado--pensando", thinkingVisible);
+  thinkingBar.hidden = !thinkingVisible;
+  // Al terminar contra la máquina, el resultado ocupa el lugar del estado.
+  statusBox.hidden = result !== null;
+  resultBox.hidden = result === null;
+  if (result !== null) {
+    resultTitle.textContent = result.title;
+    resultText.textContent = result.text;
+  }
+  newGameButton.classList.toggle("boton--principal", result === null);
+  renderHeading();
+}
+
+function renderHeading(): void {
+  if (setup.mode === "maquina") {
+    const level = LEVEL_NAME[setup.level];
+    headingLong.textContent = machineHeading(level, false);
+    headingShort.textContent = machineHeading(level, true);
+  } else {
+    headingLong.textContent = "Partida a dos jugadores en este dispositivo";
+    headingShort.textContent = "Dos jugadores";
+  }
 }
 
 function moveButton(entry: { readonly san: string; readonly ply: number }, label: string): HTMLButtonElement {
@@ -124,6 +213,64 @@ function announce(text: string): void {
   announcer.textContent = text;
 }
 
+// --- La máquina ----------------------------------------------------------------
+
+/** Añade al anuncio cómo ha acabado la partida, si contra la máquina ya ha acabado. */
+function withResult(text: string): string {
+  const result = setup.mode === "maquina" ? resultMessage(game.status, setup.player) : null;
+  return result === null ? text : `${text} ${result.title} ${result.text}`;
+}
+
+function finishThinking(): void {
+  thinking = false;
+  thinkingVisible = false;
+  if (thinkingTimer !== null) clearTimeout(thinkingTimer);
+  thinkingTimer = null;
+}
+
+/** Descarta lo que la máquina esté pensando: su respuesta, si llega, se ignora. */
+function stopThinking(): void {
+  generation++;
+  finishThinking();
+  engine?.cancel();
+}
+
+/** Si le toca a la máquina y no está ya pensando, le pide su jugada. */
+function maybeThink(): void {
+  if (setup.mode !== "maquina" || thinking || machineFailed || game.isOver || game.canRedo || game.turn === setup.player) return;
+  const token = ++generation;
+  const { level } = setup;
+  thinking = true;
+  engine ??= createEngineClient();
+  thinkingTimer = setTimeout(() => {
+    if (token !== generation) return;
+    thinkingVisible = true;
+    renderStatus();
+    announce(`${ENGINE_NAME} está pensando.`);
+  }, THINKING_DELAY_MS);
+  requestMachineMove(engine, game, level).then(
+    (move) => {
+      if (token !== generation) return;
+      finishThinking();
+      const record = move === null ? null : game.play(move.from, move.to, move.promotion);
+      if (record === null) {
+        machineFailed = !game.isOver;
+        render();
+        return;
+      }
+      announce(withResult(machineMoveAnnouncement(record.san, statusMessage(game.status, game.turn, game.inCheck))));
+      render();
+    },
+    () => {
+      if (token !== generation) return;
+      finishThinking();
+      machineFailed = true;
+      announce(`${ENGINE_NAME} no ha podido elegir jugada.`);
+      render();
+    },
+  );
+}
+
 // --- Resultados --------------------------------------------------------------
 
 function handle(outcome: Outcome): void {
@@ -134,7 +281,7 @@ function handle(outcome: Outcome): void {
       return;
     case "moved":
       ui.focus = outcome.record.to;
-      announce(moveAnnouncement(outcome.record));
+      announce(withResult(moveAnnouncement(outcome.record)));
       break;
     case "undone":
       announce(`Jugada deshecha: ${sanToSpanish(outcome.record.san)}.`);
@@ -327,23 +474,88 @@ view.element.addEventListener("focusin", (event) => {
 moveList.addEventListener("click", (event) => {
   const button = (event.target as Element).closest<HTMLButtonElement>("[data-ply]");
   if (button === null) return;
-  handle(ui.goTo(Number(button.dataset["ply"])));
+  jumpTo(Number(button.dataset["ply"]));
   moveList.querySelector<HTMLButtonElement>(`[data-ply="${game.ply}"]`)?.focus();
 });
 
-function startNewGame(): void {
-  const orientation = ui.orientation;
-  game = new Game();
-  ui = new Interaction(game);
-  ui.orientation = orientation;
-  announce("Nueva partida.");
-  render();
+/** Salta a una jugada de la lista. Contra la máquina no se queda el tablero en un turno suyo ni antes de tu primera jugada. */
+function jumpTo(ply: number): void {
+  if (setup.mode === "maquina") {
+    machineFailed = false;
+    stopThinking();
+    handle(ui.goTo(Math.max(ply, minPly(game, setup.player))));
+    normalizePly(game, setup.player);
+    render();
+    return;
+  }
+  handle(ui.goTo(ply));
 }
 
-// Con jugadas en la partida se pide confirmación; el foco empieza en «Seguir jugando», la opción segura.
+/** Empieza una partida con estos ajustes (el azar ya está decidido). */
+function startGame(next: GameSetup): void {
+  stopThinking();
+  machineFailed = false;
+  setup = next;
+  game = new Game();
+  ui = newInteraction(game, setup);
+  if (setup.mode === "maquina") {
+    ui.orientation = setup.player;
+    ui.focusKing(setup.player);
+  }
+  showScreen("partida");
+  announce(setup.mode === "maquina" && setup.player === "b" ? `Nueva partida. Juegas con las negras.` : "Nueva partida.");
+  render();
+  if (setup.mode === "maquina") focusBoard();
+}
+
+// --- Ajustes -------------------------------------------------------------------
+
+function showScreen(screen: "ajustes" | "partida"): void {
+  settingsScreen.hidden = screen !== "ajustes";
+  gameScreen.hidden = screen !== "partida";
+  if (screen === "ajustes") {
+    headingLong.textContent = "Aprende ajedrez jugando";
+    headingShort.textContent = "Aprende ajedrez jugando";
+  }
+}
+
+function checkedValue(name: string): string | undefined {
+  return settingsForm.querySelector<HTMLInputElement>(`input[name="${name}"]:checked`)?.value;
+}
+
+/** Con «Dos jugadores» desaparecen nivel y color. */
+function syncSettingsGroups(): void {
+  const twoPlayers = checkedValue("modo") === "dos";
+  levelGroup.hidden = twoPlayers;
+  colorGroup.hidden = twoPlayers;
+}
+
+function fillSettings(choice: SetupChoice): void {
+  for (const [name, value] of [["modo", choice.mode], ["nivel", choice.level], ["color", choice.color]] as const) {
+    for (const input of settingsForm.querySelectorAll<HTMLInputElement>(`input[name="${name}"]`)) input.checked = input.value === value;
+  }
+  syncSettingsGroups();
+}
+
+function openSettings(): void {
+  stopThinking();
+  fillSettings(choiceOf(setup));
+  showScreen("ajustes");
+  settingsForm.querySelector<HTMLInputElement>('input[name="modo"]:checked')?.focus();
+}
+
+settingsForm.addEventListener("change", syncSettingsGroups);
+settingsForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const choice = parseChoice({ mode: checkedValue("modo"), level: checkedValue("nivel"), color: checkedValue("color") });
+  startGame(resolveSetup(choice));
+});
+
+// Con una partida a medias se pide confirmación; el foco empieza en «Seguir jugando», la opción segura.
+// Si no hay jugadas, o la partida ya terminó, no hay nada que perder.
 newGameButton.addEventListener("click", () => {
-  if (game.totalPlies === 0) {
-    startNewGame();
+  if (game.totalPlies === 0 || game.isOver) {
+    openSettings();
     return;
   }
   confirmText.textContent = newGameWarning(game.totalPlies);
@@ -351,10 +563,13 @@ newGameButton.addEventListener("click", () => {
   keepPlayingButton.focus();
 });
 
+// La revancha repite modo, nivel y color.
+rematchButton.addEventListener("click", () => startGame(setup.mode === "maquina" ? { ...setup } : setup));
+
 function closeConfirm(start: boolean): void {
   confirmDialog.close();
-  if (start) startNewGame();
-  newGameButton.focus();
+  if (start) openSettings();
+  else newGameButton.focus();
 }
 
 keepPlayingButton.addEventListener("click", () => closeConfirm(false));
@@ -372,17 +587,38 @@ rotateButton.addEventListener("click", () => {
 });
 
 undoButton.addEventListener("click", () => {
-  handle(ui.undo());
+  if (setup.mode === "maquina") {
+    const target = undoTarget(game, setup.player);
+    if (target === null) return;
+    machineFailed = false;
+    const steps = game.ply - target;
+    handle(ui.goTo(target));
+    announce(steps === 1 ? "Jugada deshecha." : "Jugadas deshechas.");
+  } else handle(ui.undo());
   if (undoButton.disabled) redoButton.focus();
 });
 
 redoButton.addEventListener("click", () => {
-  handle(ui.redo());
+  if (setup.mode === "maquina") {
+    const target = redoTarget(game, setup.player);
+    if (target === null) return;
+    const steps = target - game.ply;
+    handle(ui.goTo(target));
+    announce(steps === 1 ? "Jugada rehecha." : "Jugadas rehechas.");
+  } else handle(ui.redo());
   if (redoButton.disabled) undoButton.focus();
 });
 
-render();
-if (recovered !== null && game.totalPlies > 0) announce("Partida recuperada.");
+if (recovered !== null) {
+  // Una partida contra la máquina guardada en pleno turno suyo se retoma: piensa y juega.
+  if (setup.mode === "maquina") normalizePly(game, setup.player);
+  showScreen("partida");
+  render();
+  if (game.totalPlies > 0) announce("Partida recuperada.");
+} else {
+  fillSettings(DEFAULT_CHOICE);
+  showScreen("ajustes");
+}
 
 // App instalable: service worker y avisos de instalar, sin conexión y versión nueva.
 startPwa(byId("avisos"));

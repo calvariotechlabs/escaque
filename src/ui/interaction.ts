@@ -75,6 +75,8 @@ export class Interaction {
   pendingPromotion: { readonly from: string; readonly to: string } | null = null;
   /** Bando que se ve abajo. */
   orientation: Color = "w";
+  /** Bando de la persona cuando juega contra la máquina: solo se pueden mover sus piezas. `null`: juegan los dos bandos. */
+  player: Color | null = null;
 
   constructor(private readonly game: Game) {
     this.focus = this.kingSquare();
@@ -157,6 +159,19 @@ export class Interaction {
     return { kind: "jumped", ply: this.game.ply };
   }
 
+  /** Lleva el foco del teclado al rey de `color` (al empezar una partida en la que se juega con ese bando). */
+  focusKing(color: Color): void {
+    for (const file of FILES) {
+      for (let rank = 1; rank <= 8; rank++) {
+        const piece = this.game.pieceAt(`${file}${rank}`);
+        if (piece?.type === "k" && piece.color === color) {
+          this.focus = `${file}${rank}`;
+          return;
+        }
+      }
+    }
+  }
+
   /** Marcas de todas las casillas que tienen alguna. */
   marks(): Map<string, Mark[]> {
     const marks = new Map<string, Mark[]>();
@@ -188,7 +203,9 @@ export class Interaction {
 
   private canSelect(square: string): boolean {
     const piece = this.game.pieceAt(square);
-    return piece !== null && piece.color === this.game.turn && this.game.targets(square).length > 0;
+    if (piece === null || piece.color !== this.game.turn) return false;
+    if (this.player !== null && piece.color !== this.player) return false;
+    return this.game.targets(square).length > 0;
   }
 
   private select(square: string): Outcome {

@@ -8,7 +8,7 @@ App web para aprender ajedrez con motor propio (**Alfil Beta**), escrita desde c
 
 Velocidad de perft (Node 22, un hilo): unos 9 a 10 millones de nodos por segundo; la inicial a profundidad 6 (119.060.324 nodos) en unos 12 s, y Kiwipete a profundidad 5 (193.690.690) en unos 21 s.
 
-**Hito 3 — Alfil Beta: motor y Worker hechos.** Búsqueda, evaluación, tres niveles y el puente con el Web Worker, con tests y probado en el navegador. Falta la pantalla para jugar contra la máquina, que espera su diseño. Detalles y cifras en [Alfil Beta](#alfil-beta-el-motor).
+**Hito 3 — Alfil Beta: motor y Worker hechos.** Búsqueda, evaluación, tres niveles y el puente con el Web Worker, con tests y probado en el navegador. La pantalla para jugar contra la máquina (ajustes de modo, nivel y color, «Alfil Beta está pensando» y resultado con revancha) está programada y aprobada en diseño. Detalles y cifras en [Alfil Beta](#alfil-beta-el-motor).
 
 | Hito | Descripción | Estado |
 | --- | --- | --- |
@@ -58,7 +58,7 @@ npm run serve    # monta site/ y lo sirve en http://127.0.0.1:8080 (sin dependen
 
 ### Interfaz y diseño
 
-Las piezas (doce SVG dibujados a mano, estilo de volumen con degradado) y el tablero se pintan con DOM y CSS a mano desde la colocación de una FEN: `src/ui/pieces.ts` y `src/ui/board.ts`. Los colores y medidas salen de `src/ui/tokens.css`, con tema claro y oscuro. `index.html` es la partida a dos jugadores, sin bundler (`npm run serve`), con la CSP puesta en una etiqueta `meta`.
+Las piezas (doce SVG dibujados a mano, estilo de volumen con degradado) y el tablero se pintan con DOM y CSS a mano desde la colocación de una FEN: `src/ui/pieces.ts` y `src/ui/board.ts`. Los colores y medidas salen de `src/ui/tokens.css`, con tema claro y oscuro. `index.html` abre los ajustes de la partida (dos jugadores o contra Alfil Beta) y la partida, sin bundler (`npm run serve`), con la CSP puesta en una etiqueta `meta`.
 
 La interacción está separada en dos capas. `src/ui/game.ts` (la partida por casillas, con deshacer, rehacer y lista de jugadas) y `src/ui/interaction.ts` (qué hace cada clic, arrastre o tecla, y qué casillas se marcan) no tocan el DOM y se prueban en Node. `src/ui/main.ts` solo traduce eventos a esas llamadas y pinta el resultado. Se juega con clic, arrastrando (también con el dedo) o con el teclado: flechas, Inicio/Fin, Re Pág/Av Pág, Intro o Espacio para elegir y Escape para cancelar. Cada jugada se anuncia a los lectores de pantalla en notación algebraica con letras españolas (C, A, T, D, R) y con palabras, y la coronación abre un diálogo modal.
 
