@@ -13,7 +13,7 @@ const tmp = mkdtempSync(join(tmpdir(), "escaque-site-"));
 test("el sitio trae lo que index.html necesita y el service worker lo guarda todo", () => {
   const out = join(tmp, "a");
   const { version, precache } = buildSite({ root, out });
-  for (const file of ["index.html", "manifest.webmanifest", "favicon.svg", "favicon.ico", "sw.js", "src/ui/tokens.css", "src/ui/board.css", "src/ui/page.css", "dist/src/ui/main.js", "dist/src/pwa/pwa.js"]) {
+  for (const file of ["index.html", "manifest.webmanifest", "favicon.svg", "favicon.ico", "sw.js", "src/ui/tokens.css", "src/ui/board.css", "src/ui/page.css", "src/ui/lecciones.css", "dist/src/ui/main.js", "dist/src/pwa/pwa.js"]) {
     assert.ok(existsSync(join(out, file)), `falta ${file}`);
   }
   assert.ok(!existsSync(join(out, "dist", "tests")), "los tests no se publican");
@@ -26,6 +26,7 @@ test("el sitio trae lo que index.html necesita y el service worker lo guarda tod
   }
   const html = readFileSync(join(out, "index.html"), "utf8");
   for (const [, href] of html.matchAll(/(?:href|src)="([^":]+)"/g)) {
+    if (href.startsWith("#")) continue; // enlaces de la propia página (rutas #/jugar, #/lecciones)
     assert.ok(existsSync(join(out, href)), `index.html enlaza ${href}, que no existe`);
   }
 });

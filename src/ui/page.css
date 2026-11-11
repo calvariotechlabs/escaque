@@ -1,7 +1,7 @@
 /* Maquetación de la pantalla de partida (diseño: docs/design/lienzo, «Partida · escritorio», «Partida · móvil» y «Coronación · móvil»). */
 body{margin:0;background:var(--surface);color:var(--ink);font:400 16px/24px var(--font-sans)}
 .pagina__cabecera,.partida{max-width:1120px;margin:0 auto;box-sizing:border-box;padding-left:max(var(--space-4),env(safe-area-inset-left,0px));padding-right:max(var(--space-4),env(safe-area-inset-right,0px))}
-.pagina__cabecera{padding-top:max(var(--space-4),env(safe-area-inset-top,0px));display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:var(--space-2) var(--space-6)}
+.pagina__cabecera{padding-top:max(var(--space-4),env(safe-area-inset-top,0px));display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--space-2) var(--space-6)}
 .pagina__cabecera h1{margin:0;font:600 24px/28px var(--font-display)}
 .pagina__cabecera p{margin:0;font:400 14px/20px var(--font-sans);color:var(--ink-muted)}
 
@@ -55,8 +55,8 @@ body{margin:0;background:var(--surface);color:var(--ink);font:400 16px/24px var(
   .pagina__cabecera,.partida{max-width:none;margin:0}
   .pagina__cabecera{position:absolute;top:max(var(--space-4),env(safe-area-inset-top,0px));left:calc(max(var(--space-6),env(safe-area-inset-left,0px)) + var(--tablero-ancho) + var(--space-6));right:max(var(--space-6),env(safe-area-inset-right,0px));padding:0;box-sizing:border-box}
   .pagina__cabecera h1{font-size:20px;line-height:24px}
-  .partida{box-sizing:border-box;height:100dvh;padding:max(var(--space-4),env(safe-area-inset-top,0px)) max(var(--space-6),env(safe-area-inset-right,0px)) max(var(--space-4),env(safe-area-inset-bottom,0px)) max(var(--space-6),env(safe-area-inset-left,0px));grid-template-columns:var(--tablero-ancho) minmax(0,1fr);grid-template-rows:32px auto auto auto minmax(0,1fr);grid-template-areas:"tablero titulo" "tablero avisos" "tablero estado" "tablero controles" "tablero jugadas";gap:var(--space-2) var(--space-6)}
-  .partida:has(.avisos:empty){grid-template-rows:32px auto auto minmax(0,1fr);grid-template-areas:"tablero titulo" "tablero estado" "tablero controles" "tablero jugadas"}
+  .partida{box-sizing:border-box;height:100dvh;padding:max(var(--space-4),env(safe-area-inset-top,0px)) max(var(--space-6),env(safe-area-inset-right,0px)) max(var(--space-4),env(safe-area-inset-bottom,0px)) max(var(--space-6),env(safe-area-inset-left,0px));grid-template-columns:var(--tablero-ancho) minmax(0,1fr);grid-template-rows:44px auto auto auto minmax(0,1fr);grid-template-areas:"tablero titulo" "tablero avisos" "tablero estado" "tablero controles" "tablero jugadas";gap:var(--space-2) var(--space-6)}
+  .partida:has(.avisos:empty){grid-template-rows:44px auto auto minmax(0,1fr);grid-template-areas:"tablero titulo" "tablero estado" "tablero controles" "tablero jugadas"}
   .pagina__cabecera ~ .partida::before{content:"";grid-area:titulo}
   /* Sin diseño del coach en móvil apaisado: no se muestra hasta tenerlo. */
   .partida .partida__coach{display:none}
