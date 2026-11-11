@@ -37,6 +37,7 @@ const TYPE_MASK = 7;
 const makePiece = (side: Side, type: number): number => type | (side === BLACK ? COLOR_BIT : 0);
 const typeOf = (piece: number): number => piece & TYPE_MASK;
 const sideOf = (piece: number): Side => ((piece & COLOR_BIT) === 0 ? WHITE : BLACK);
+const opposite = (side: Side): Side => (side === WHITE ? BLACK : WHITE);
 
 const FEN_TO_TYPE: Readonly<Record<string, number>> = { p: PAWN, n: KNIGHT, b: BISHOP, r: ROOK, q: QUEEN, k: KING };
 const TYPE_TO_FEN = ["", "p", "n", "b", "r", "q", "k"] as const;
@@ -86,8 +87,6 @@ interface CoreMove extends Move {
   readonly flags: number;
 }
 
-const isCoreMove = (move: Move): move is CoreMove =>
-  typeof (move as Partial<CoreMove>).flags === "number";
 
 /** Estado que una jugada destruye y que `unmakeMove` necesita para volver atrás. */
 interface Undo {
@@ -119,6 +118,14 @@ export class Position implements PerftTarget<Move> {
   private fullmove = 1;
   private readonly kings: [number, number] = [-1, -1];
   private readonly history: Undo[] = [];
+  /**
+   * Listas devueltas por `legalMoves()`, indexadas por ply (longitud de `history`).
+   * `makeMove` solo acepta jugadas de la lista del ply actual (por identidad):
+   * así una jugada de otra posición, antigua o construida a mano no puede
+   * corromper el tablero. La lista de un ply sigue valiendo al volver a él con
+   * `unmakeMove`, y se descarta cuando se llega a ese ply con otra jugada.
+   */
+  private readonly generated: Array<Move[] | null> = [];
 
   private constructor() {}
 
@@ -181,6 +188,19 @@ export class Position implements PerftTarget<Move> {
         if ((p.castling & bit) !== 0) throw new FenError(`Derecho de enroque repetido: «${castling}»`);
         p.castling |= bit;
       }
+      // Un derecho solo es posible con el rey y esa torre en sus casillas de salida.
+      const required: Array<[number, number, number, Side]> = [
+        [CASTLE_WK, E1, H1, WHITE],
+        [CASTLE_WQ, E1, A1, WHITE],
+        [CASTLE_BK, E8, H8, BLACK],
+        [CASTLE_BQ, E8, A8, BLACK],
+      ];
+      for (const [bit, king, rook, side] of required) {
+        if ((p.castling & bit) === 0) continue;
+        if (p.board[king] !== makePiece(side, KING) || p.board[rook] !== makePiece(side, ROOK)) {
+          throw new FenError(`Derecho de enroque «${castling}» sin el rey y la torre en su sitio`);
+        }
+      }
     }
 
     // 4. Casilla al paso: fila 6 si mueven blancas, fila 3 si mueven negras.
@@ -192,7 +212,7 @@ export class Position implements PerftTarget<Move> {
       // Tras un avance doble, el peón rival está delante de la casilla al paso
       // y tanto esa casilla como la de salida del peón están vacías. Sin esto,
       // el generador podría «capturar al paso» una casilla vacía.
-      const mover: Side = p.side === WHITE ? BLACK : WHITE;
+      const mover = opposite(p.side);
       const pawnDir = p.side === WHITE ? -16 : 16;
       if (
         p.board[sq] !== EMPTY ||
@@ -209,7 +229,7 @@ export class Position implements PerftTarget<Move> {
     p.fullmove = parseClock(full, "Número de jugada", 1);
 
     // El bando que no mueve no puede estar en jaque: su rey ya habría sido capturado.
-    const other: Side = p.side === WHITE ? BLACK : WHITE;
+    const other = opposite(p.side);
     if (p.isAttacked(p.kings[other], p.side)) {
       throw new FenError("El bando que no mueve está en jaque");
     }
@@ -263,14 +283,15 @@ export class Position implements PerftTarget<Move> {
   /** Todas las jugadas legales del bando que mueve (incluye enroques, al paso y las 4 coronaciones). */
   legalMoves(): Move[] {
     const us = this.side;
-    const them: Side = us === WHITE ? BLACK : WHITE;
+    const them = opposite(us);
     const legal: Move[] = [];
     for (const move of this.pseudoLegalMoves()) {
       this.applyMove(move);
       if (!this.isAttacked(this.kings[us], them)) legal.push(move);
       this.unmakeMove();
     }
-    return legal;
+    this.generated[this.history.length] = legal;
+    return legal.slice();
   }
 
   /**
@@ -286,16 +307,12 @@ export class Position implements PerftTarget<Move> {
 
   /** Aplica una jugada obtenida de `legalMoves()` de esta misma posición. */
   makeMove(move: Move): void {
-    // Comprobación barata de que la jugada viene del generador y es del bando que mueve.
-    // No se verifica la legalidad completa: costaría regenerar todas las jugadas.
-    if (!isCoreMove(move) || offBoard(move.from) || offBoard(move.to)) {
-      throw new Error("makeMove: la jugada no procede de legalMoves()");
+    // Solo jugadas (por identidad) de la última lista de legalMoves() de esta posición.
+    const legal = this.generated[this.history.length];
+    if (legal === undefined || legal === null || !legal.includes(move)) {
+      throw new Error(`makeMove: ${moveToUci(move)} no procede de legalMoves() de esta posición`);
     }
-    const piece = this.board[move.from]!;
-    if (piece === EMPTY || sideOf(piece) !== this.side) {
-      throw new Error(`makeMove: no hay pieza del bando que mueve en ${squareName(move.from)}`);
-    }
-    this.applyMove(move);
+    this.applyMove(move as CoreMove);
   }
 
   /** Deshace la última jugada aplicada y deja la posición exactamente como estaba. */
@@ -305,7 +322,7 @@ export class Position implements PerftTarget<Move> {
     const { move, captured } = undo;
     const board = this.board;
 
-    this.side = this.side === WHITE ? BLACK : WHITE;
+    this.side = opposite(this.side);
     const us = this.side;
     if (us === BLACK) this.fullmove--;
     this.castling = undo.castling;
@@ -335,7 +352,7 @@ export class Position implements PerftTarget<Move> {
 
   /** ¿Está en jaque el rey del bando que mueve? */
   isCheck(): boolean {
-    return this.isAttacked(this.kings[this.side], this.side === WHITE ? BLACK : WHITE);
+    return this.isAttacked(this.kings[this.side], opposite(this.side));
   }
 
   /**
@@ -394,10 +411,10 @@ export class Position implements PerftTarget<Move> {
     // Peones: un peón blanco ataca desde abajo (sq - 15, sq - 17); uno negro, desde arriba.
     const pawn = makePiece(by, PAWN);
     const pawnFrom = by === WHITE ? -16 : 16;
-    for (const side of [-1, 1]) {
-      const from = sq + pawnFrom + side;
-      if (!offBoard(from) && board[from] === pawn) return true;
-    }
+    const left = sq + pawnFrom - 1;
+    const right = sq + pawnFrom + 1;
+    if (!offBoard(left) && board[left] === pawn) return true;
+    if (!offBoard(right) && board[right] === pawn) return true;
 
     const knight = makePiece(by, KNIGHT);
     for (const offset of KNIGHT_OFFSETS) {
@@ -437,7 +454,7 @@ export class Position implements PerftTarget<Move> {
   private pseudoLegalMoves(): CoreMove[] {
     const board = this.board;
     const us = this.side;
-    const them: Side = us === WHITE ? BLACK : WHITE;
+    const them = opposite(us);
     const moves: CoreMove[] = [];
     const add = (from: number, to: number, flags: number): void => {
       moves.push({ from, to, promotion: null, flags });
@@ -469,7 +486,7 @@ export class Position implements PerftTarget<Move> {
             const two = one + forward;
             if (rankOf(from) === startRank && board[two] === EMPTY) add(from, two, FLAG_DOUBLE_PUSH);
           }
-          for (const side of [-1, 1]) {
+          for (let side = -1; side <= 1; side += 2) {
             const to = one + side;
             if (offBoard(to)) continue;
             const target = board[to]!;
@@ -532,7 +549,7 @@ export class Position implements PerftTarget<Move> {
    */
   private addCastling(add: (from: number, to: number, flags: number) => void): void {
     const us = this.side;
-    const them: Side = us === WHITE ? BLACK : WHITE;
+    const them = opposite(us);
     const rights = us === WHITE ? this.castling & (CASTLE_WK | CASTLE_WQ) : this.castling & (CASTLE_BK | CASTLE_BQ);
     if (rights === 0) return;
 
@@ -584,6 +601,8 @@ export class Position implements PerftTarget<Move> {
     }
 
     this.history.push({ move, captured, castling: this.castling, epSquare: this.epSquare, halfmove: this.halfmove });
+    // Se llega a este ply con otra jugada: la lista generada antes aquí ya no vale.
+    if (this.generated.length > this.history.length) this.generated[this.history.length] = null;
 
     board[to] = move.promotion !== null ? makePiece(us, PROMOTION_TO_TYPE[move.promotion]) : piece;
     board[from] = EMPTY;
@@ -603,7 +622,7 @@ export class Position implements PerftTarget<Move> {
     this.epSquare = flags === FLAG_DOUBLE_PUSH ? (from + to) >> 1 : -1;
     this.halfmove = typeOf(piece) === PAWN || captured !== EMPTY ? 0 : this.halfmove + 1;
     if (us === BLACK) this.fullmove++;
-    this.side = us === WHITE ? BLACK : WHITE;
+    this.side = opposite(us);
   }
 }
 
