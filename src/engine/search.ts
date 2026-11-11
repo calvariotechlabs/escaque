@@ -93,10 +93,11 @@ function checkLimits(limits: SearchLimits): { maxDepth: number; timeMs: number }
  */
 export function search(position: Position, limits: SearchLimits, options: SearchOptions = {}): SearchResult {
   const { maxDepth, timeMs } = checkLimits(limits);
-  return new Searcher(position, options.table ?? new TranspositionTable(), options.now ?? (() => performance.now())).run(
-    maxDepth,
-    timeMs,
-  );
+  return makeSearcher(position, options).run(maxDepth, timeMs);
+}
+
+function makeSearcher(position: Position, options: SearchOptions): Searcher {
+  return new Searcher(position, options.table ?? new TranspositionTable(), options.now ?? (() => performance.now()));
 }
 
 /** Puntuación de una jugada de la raíz (ver `scoreMoves`). */
@@ -113,9 +114,7 @@ export interface ScoredMove {
  */
 export function scoreMoves(position: Position, depth: number, options: SearchOptions = {}): ScoredMove[] {
   checkLimits({ maxDepth: depth });
-  return new Searcher(position, options.table ?? new TranspositionTable(), options.now ?? (() => performance.now())).scoreRoot(
-    depth,
-  );
+  return makeSearcher(position, options).scoreRoot(depth);
 }
 
 class Searcher {
@@ -175,7 +174,11 @@ class Searcher {
     if (this.tick()) return 0;
 
     if (ply > 0) {
-      if (position.halfmoveClock >= 100 || position.repetitions() > 0 || position.isInsufficientMaterial()) return 0;
+      if (position.repetitions() > 0 || position.isInsufficientMaterial()) return 0;
+      // 50 jugadas: tablas, salvo que la jugada que llega a 100 dé mate (manda el mate).
+      if (position.halfmoveClock >= 100) {
+        return position.isCheck() && position.legalMoves().length === 0 ? -MATE_SCORE + ply : 0;
+      }
       if (ply >= MAX_PLY) return evaluate(position);
     }
 
@@ -231,17 +234,27 @@ class Searcher {
     return bestScore;
   }
 
-  /** Quietud: solo capturas y coronaciones a dama, con la valoración estática como suelo. */
+  /**
+   * Quietud: solo capturas y coronaciones a dama, con la valoración estática
+   * como suelo. Quien está en jaque no puede quedarse quieto: se miran todas
+   * sus respuestas, y si no tiene ninguna es mate.
+   */
   private quiesce(ply: number, alpha: number, beta: number): number {
     const position = this.position;
     this.pv[ply]!.length = 0;
     if (this.tick()) return 0;
+    if (ply >= MAX_PLY) return evaluate(position);
 
-    const standPat = evaluate(position);
-    if (ply >= MAX_PLY || standPat >= beta) return standPat;
-    if (standPat > alpha) alpha = standPat;
-
-    const moves = position.legalMoves().filter((move) => this.isNoisy(move));
+    const inCheck = position.isCheck();
+    let moves = position.legalMoves();
+    if (inCheck) {
+      if (moves.length === 0) return -MATE_SCORE + ply;
+    } else {
+      const standPat = evaluate(position);
+      if (standPat >= beta) return standPat;
+      if (standPat > alpha) alpha = standPat;
+      moves = moves.filter((move) => this.isNoisy(move));
+    }
     this.order(moves, 0);
     for (const move of moves) {
       position.makeMove(move);

@@ -13,21 +13,13 @@ import { nodeProcess } from "./node.js";
 
 const proc = nodeProcess();
 
-interface Timed {
-  readonly player: Player;
-  readonly times: number[];
-}
-
-function timed(player: Player): Timed {
-  const times: number[] = [];
-  return {
-    times,
-    player: (position) => {
-      const started = performance.now();
-      const move = player(position);
-      times.push(performance.now() - started);
-      return move;
-    },
+/** Envuelve un jugador para apuntar cuánto tarda cada jugada en `times`. */
+function timed(player: Player, times: number[]): Player {
+  return (position) => {
+    const started = performance.now();
+    const move = player(position);
+    times.push(performance.now() - started);
+    return move;
   };
 }
 
@@ -56,14 +48,7 @@ if (games !== null && (!Number.isInteger(games) || games < 1)) {
   proc.exitCode = 2;
 } else {
   const hardTimes: number[] = [];
-  const hard = (): Player => {
-    const t = timed(enginePlayer("dificil"));
-    return (position) => {
-      const move = t.player(position);
-      hardTimes.push(t.times.at(-1)!);
-      return move;
-    };
-  };
+  const hard = (): Player => timed(enginePlayer("dificil"), hardTimes);
   series("Difícil contra azar", games ?? 20, hard, (g) => randomPlayer(createRandom(1000 + g)));
   series("Difícil contra Fácil", games ?? 10, hard, (g) => enginePlayer("facil", createRandom(2000 + g)));
   series("Medio contra Fácil", games ?? 10, () => enginePlayer("medio"), (g) => enginePlayer("facil", createRandom(3000 + g)));

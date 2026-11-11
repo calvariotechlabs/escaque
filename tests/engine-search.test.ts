@@ -3,7 +3,7 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { Position, START_FEN } from "../src/core/index.js";
-import { search, MATE_SCORE } from "../src/engine/index.js";
+import { search, scoreMoves, MATE_SCORE } from "../src/engine/index.js";
 import { after } from "./helpers.js";
 import { canMateIn } from "./mate.js";
 
@@ -108,6 +108,20 @@ describe("search()", () => {
     const result = search(p, { maxDepth: 2 });
     assert.equal(result.best, "g1f3");
     assert.equal(result.score, 0);
+  });
+
+  it("en la quietud, quien está en jaque no puede quedarse quieto: ve el mate", () => {
+    // Tras cualquier jugada que no defienda g2, Dxg2# es una captura con mate.
+    // Con profundidad 1, esa captura solo se ve en la quietud.
+    const scored = scoreMoves(Position.fromFen("6k1/1b6/8/6q1/8/8/5PPP/R5K1 w - - 0 1"), 1);
+    const rookMove = scored.find((m) => m.uci === "a1a2");
+    assert.ok(rookMove !== undefined && rookMove.score < -MATE_SCORE + 100, `Ta2 vale ${rookMove?.score}`);
+  });
+
+  it("un mate en la jugada 100 sin peón ni captura es mate, no tablas por 50 jugadas", () => {
+    const result = search(Position.fromFen("6k1/5ppp/8/8/8/8/8/R5K1 w - - 99 80"), { maxDepth: 2 });
+    assert.equal(result.best, "a1a8");
+    assert.equal(result.score, MATE_SCORE - 1);
   });
 
   it("devuelve null y la puntuación de mate si no hay jugadas", () => {
