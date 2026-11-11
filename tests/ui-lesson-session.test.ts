@@ -17,7 +17,6 @@ const LESSON: Lesson = {
   hints: [{ text: "Mira la última fila negra." }, { text: "Usa la torre.", marks: { from: "e1", to: "e8" } }],
   success: "Te8# es jaque mate.",
   failure: "Esa jugada no da mate.",
-  mistakes: {},
   steps: [{ kind: "mate" }],
 };
 

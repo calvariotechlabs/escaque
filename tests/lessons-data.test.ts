@@ -1,7 +1,7 @@
 // Lecciones: los datos son correctos según el núcleo y Alfil Beta.
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { Position, moveToUci } from "../src/core/index.js";
+import { Position } from "../src/core/index.js";
 import { MATE_SCORE, scoreMoves, search } from "../src/engine/index.js";
 import { LESSONS, checkLessonMove, lessonById } from "../src/lessons/index.js";
 import type { Lesson } from "../src/lessons/index.js";
@@ -74,7 +74,7 @@ for (const lesson of LESSONS) {
 
     it("tiene textos completos con punto final y una explicación de como mucho 2 frases", () => {
       assert.ok(lesson.title.length > 0 && !lesson.title.endsWith("."));
-      for (const text of [lesson.summary, lesson.goal, lesson.success, lesson.failure, ...Object.values(lesson.mistakes)]) {
+      for (const text of [lesson.summary, lesson.goal, lesson.success, lesson.failure, ...lesson.steps.flatMap((step) => Object.values(step.mistakes ?? {}))]) {
         assert.match(text, SENTENCE);
       }
       for (const hint of lesson.hints) assert.match(hint.text, SENTENCE);
@@ -101,30 +101,19 @@ for (const lesson of LESSONS) {
       assert.ok(marks, "la última pista marca casillas");
       assert.match(marks.from, SQUARE);
       assert.match(marks.to, SQUARE);
-      const position = Position.fromFen(lesson.fen);
-      const solutions = position
-        .legalMoves()
-        .map((m) => moveToUci(m))
-        .filter((uci) => uci.startsWith(marks.from + marks.to))
-        .filter((uci) => checkLessonMove(lesson, [], uci).kind !== "fallo");
-      assert.ok(solutions.length > 0, "la jugada marcada resuelve el primer paso");
+      const uci = marks.from + marks.to + (marks.promotion ?? "");
+      assert.ok(Position.fromFen(lesson.fen).moveFromUci(uci), `${uci} es legal`);
+      assert.notEqual(checkLessonMove(lesson, [], uci).kind, "fallo", "la jugada marcada resuelve el primer paso");
     });
 
-    it("las jugadas típicas fallan con su motivo en algún paso", () => {
-      // Una jugada típica puede ser correcta en otro paso (en la escalera, Tb8 es
-      // el mate del segundo): ahí gana la solución.
-      const seen = new Set<string>();
-      walk(lesson, (played) => {
+    it("las jugadas típicas de cada paso son legales ahí y fallan con su motivo", () => {
+      walk(lesson, (played, index) => {
         const position = positionAfter(lesson, played);
-        for (const [uci, reason] of Object.entries(lesson.mistakes)) {
-          if (position.moveFromUci(uci) === null) continue;
-          const result = checkLessonMove(lesson, played, uci);
-          if (result.kind !== "fallo") continue;
-          seen.add(uci);
-          assert.deepEqual(result, { kind: "fallo", reason });
+        for (const [uci, reason] of Object.entries(lesson.steps[index]!.mistakes ?? {})) {
+          assert.ok(position.moveFromUci(uci), `${uci} es legal en el paso ${index + 1}`);
+          assert.deepEqual(checkLessonMove(lesson, played, uci), { kind: "fallo", reason });
         }
       });
-      assert.deepEqual([...seen].sort(), Object.keys(lesson.mistakes).sort());
     });
 
     it("cada respuesta del rival es legal y es su mejor defensa según el motor", () => {
