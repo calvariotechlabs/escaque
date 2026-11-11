@@ -62,6 +62,7 @@ export class Game {
   private readonly position: Position;
   private readonly startFullmove: number;
   private readonly startTurn: Color;
+  private readonly initialFen: string;
   private readonly records: MoveRecord[] = [];
   /** Jugadas deshechas que se pueden rehacer; la siguiente, al final. */
   private readonly future: MoveRecord[] = [];
@@ -75,6 +76,7 @@ export class Game {
     this.position = Position.fromFen(fen);
     this.currentFen = this.position.toFen();
     this.startTurn = this.position.turn;
+    this.initialFen = this.currentFen;
     this.startFullmove = Number(this.currentFen.split(" ")[5]);
     this.pieces = parsePlacement(this.currentFen);
     this.legal = this.position.legalMoves();
@@ -83,6 +85,16 @@ export class Game {
 
   get fen(): string {
     return this.currentFen;
+  }
+
+  /** FEN de la posición con la que empezó la partida. */
+  get startFen(): string {
+    return this.initialFen;
+  }
+
+  /** Todas las jugadas de la partida en orden, también las que se pueden rehacer; sirve para guardarla. */
+  get allMoves(): readonly MoveRecord[] {
+    return [...this.records, ...[...this.future].reverse()];
   }
 
   get turn(): Color {
@@ -233,7 +245,7 @@ export class Game {
 
   /** Lista de jugadas por número, con SAN en español; incluye las que se pueden rehacer. */
   moveList(): MoveListRow[] {
-    const all = [...this.records, ...[...this.future].reverse()];
+    const all = this.allMoves;
     const rows: MoveListRow[] = [];
     // Media jugada 0 es la del bando que empezó; las blancas van en las pares si empezaron ellas.
     const offset = this.startTurn === "w" ? 0 : 1;

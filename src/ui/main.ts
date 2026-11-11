@@ -8,6 +8,7 @@ import { Game } from "./game.js";
 import { Interaction, type Outcome } from "./interaction.js";
 import { moveAnnouncement, newGameWarning, sanToSpanish, statusMessage } from "./notation.js";
 import { pieceSvg } from "./pieces.js";
+import { browserStore, createAutosave, loadFromStorage } from "./save.js";
 import { startPwa } from "../pwa/pwa.js";
 
 function byId<T extends HTMLElement>(id: string): T {
@@ -35,8 +36,13 @@ const promotionDialog = byId<HTMLDialogElement>("coronacion");
 const promotionOptions = byId<HTMLDivElement>("opciones-coronacion");
 const view = createBoard(byId("tablero"));
 
-let game = new Game();
+// La partida en curso se guarda en el dispositivo y se recupera al abrir o al actualizar la app.
+const store = browserStore();
+const recovered = loadFromStorage(store);
+const autosave = createAutosave(store);
+let game = recovered?.game ?? new Game();
 let ui = new Interaction(game);
+if (recovered !== null) ui.orientation = recovered.orientation;
 
 const PROMOTIONS: ReadonlyArray<readonly [PromotionPiece, string]> = [
   ["q", "Dama"],
@@ -56,6 +62,7 @@ function render(): void {
   renderMoveList();
   undoButton.disabled = game.ply === 0;
   redoButton.disabled = !game.canRedo;
+  autosave(game, ui.orientation);
 }
 
 /** Tabindex itinerante: solo la casilla con el foco entra en el orden de tabulación. */
@@ -375,6 +382,7 @@ redoButton.addEventListener("click", () => {
 });
 
 render();
+if (recovered !== null && game.totalPlies > 0) announce("Partida recuperada.");
 
 // App instalable: service worker y avisos de instalar, sin conexión y versión nueva.
 startPwa(byId("avisos"));
