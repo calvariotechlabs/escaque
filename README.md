@@ -12,7 +12,7 @@ Velocidad de perft (Node 22, un hilo): unos 9 a 10 millones de nodos por segundo
 | --- | --- | --- |
 | 0 | Repositorio, estructura y herramientas | Hecho |
 | 1 | Reglas completas + perft | Hecho |
-| 2 | Tablero jugable (dos jugadores) | Pendiente |
+| 2 | Tablero jugable (dos jugadores) | En curso: diseño, piezas SVG y tablero estático hechos; falta la interacción |
 | 3 | Máquina en Web Worker, 3 niveles | Pendiente |
 | 4 | Coach: explicación de errores | Pendiente |
 | 5 | 5–6 lecciones guiadas | Pendiente |
@@ -46,7 +46,14 @@ npm run build    # tsc -> dist/ (módulos ES nativos)
 npm test         # compila y ejecuta node --test (perft a profundidad rápida)
 npm run test:perft   # perft a profundidad completa (unos 43 millones de nodos)
 npm run perft -- <profundidad> ["<fen>"] [jugadas UCI...] [--ref <fichero>]
+npm run serve    # compila y sirve la web en http://127.0.0.1:8080 (sin dependencias)
 ```
+
+### Interfaz y diseño
+
+Las piezas (doce SVG dibujados a mano, estilo de volumen con degradado) y el tablero se pintan con DOM y CSS a mano desde la colocación de una FEN: `src/ui/pieces.ts` y `src/ui/board.ts`. Los colores y medidas salen de `src/ui/tokens.css`, con tema claro y oscuro. `index.html` es una demo sin bundler (`npm run serve`) con la CSP puesta en una etiqueta `meta`.
+
+El diseño se hace antes en Claude Design y se copia en `docs/design` (README con origen, versión y fecha). Ningún cambio visual entra sin pasar por allí.
 
 ### Perft y perft dividido
 

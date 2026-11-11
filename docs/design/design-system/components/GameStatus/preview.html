@@ -1,0 +1,11 @@
+<!-- @dsCard group="Paneles" height=260 subtitle="Turno, jaque y final de partida" -->
+<meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;600&family=Space+Grotesk:wght@600&display=swap">
+<script src="../pieces.js"></script>
+<style>.fila{display:flex;flex-wrap:wrap;gap:16px;padding:16px;align-items:flex-start}.caja{width:72px;display:flex;flex-direction:column;align-items:center;gap:4px;font:400 12px/16px var(--font-sans);color:var(--ink-muted);text-align:center}.sq{width:72px;height:72px}.sq.c{background:var(--square-light)}.sq.o{background:var(--square-dark)}</style>
+<div style="padding:16px;max-width:440px;display:flex;flex-direction:column;gap:12px">
+<p class="estado" role="status"><span class="estado__turno estado__turno--w" aria-hidden="true"></span><span><strong>Juegan las blancas.</strong></span></p>
+<p class="estado" role="status"><span class="estado__turno estado__turno--b" aria-hidden="true"></span><span><strong>Juegan las negras. Jaque.</strong></span></p>
+<p class="estado estado--fin" role="status"><span><strong>Jaque mate.</strong> Ganan las blancas.</span></p>
+<p class="estado estado--fin" role="status"><span><strong>Tablas</strong> por ahogado.</span></p>
+</div>

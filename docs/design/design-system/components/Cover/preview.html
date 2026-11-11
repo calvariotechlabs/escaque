@@ -1,0 +1,84 @@
+<!-- @dsCard height=288 -->
+<meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400&family=Space+Grotesk:wght@600&display=swap">
+<style>
+body{margin:0}
+.cover{position:relative;width:960px;height:288px;background:var(--surface);overflow:hidden}
+.cover svg{position:absolute;left:0;top:0}
+.t0{fill:var(--square-light)}.t1{fill:var(--square-dark)}.b-ink{fill:var(--board-ink)}.b-acc{fill:var(--accent)}.b-sel{fill:var(--mark-selected)}
+.cover__texto{position:absolute;left:32px;bottom:32px;width:400px}
+.cover h1{margin:0;font:600 96px/.92 var(--font-display);color:var(--ink);letter-spacing:-.01em}
+.cover p{margin:12px 0 0;font:400 14px/20px var(--font-sans);color:var(--ink-muted)}
+</style>
+<div class="cover">
+<svg width="960" height="288" viewBox="0 0 960 288" aria-hidden="true" focusable="false">
+<!-- Derivación: bloques = board-ink 120x120 y 80x80, accent 80x160, mark-selected 80x80 (múltiplos de space-2 = 8px), sobre un damero de square-light y square-dark.
+     Disposición = bloques desplazados sobre el damero, anclados al borde derecho y al superior (accent baja desde arriba).
+     Patrón = damero de casillas de 40 px (fila «motivo literal»: el tablero es la marca de un sitio de ajedrez).
+     Pasos y radios = paso de 40 px (5 × space-2), esquinas rectas: radius del tablero = 0. -->
+<rect class="t0" x="480" y="4" width="40" height="40"/>
+<rect class="t1" x="520" y="4" width="40" height="40"/>
+<rect class="t0" x="560" y="4" width="40" height="40"/>
+<rect class="t1" x="600" y="4" width="40" height="40"/>
+<rect class="t0" x="640" y="4" width="40" height="40"/>
+<rect class="t1" x="680" y="4" width="40" height="40"/>
+<rect class="t0" x="800" y="4" width="40" height="40"/>
+<rect class="t1" x="840" y="4" width="40" height="40"/>
+<rect class="t0" x="880" y="4" width="40" height="40"/>
+<rect class="t1" x="920" y="4" width="40" height="40"/>
+<rect class="t1" x="480" y="44" width="40" height="40"/>
+<rect class="t0" x="520" y="44" width="40" height="40"/>
+<rect class="t1" x="560" y="44" width="40" height="40"/>
+<rect class="t0" x="600" y="44" width="40" height="40"/>
+<rect class="t1" x="640" y="44" width="40" height="40"/>
+<rect class="t0" x="680" y="44" width="40" height="40"/>
+<rect class="t1" x="800" y="44" width="40" height="40"/>
+<rect class="t0" x="840" y="44" width="40" height="40"/>
+<rect class="t1" x="880" y="44" width="40" height="40"/>
+<rect class="t0" x="920" y="44" width="40" height="40"/>
+<rect class="t0" x="480" y="84" width="40" height="40"/>
+<rect class="t1" x="520" y="84" width="40" height="40"/>
+<rect class="t0" x="560" y="84" width="40" height="40"/>
+<rect class="t0" x="800" y="84" width="40" height="40"/>
+<rect class="t1" x="840" y="84" width="40" height="40"/>
+<rect class="t0" x="880" y="84" width="40" height="40"/>
+<rect class="t1" x="920" y="84" width="40" height="40"/>
+<rect class="t1" x="480" y="124" width="40" height="40"/>
+<rect class="t0" x="520" y="124" width="40" height="40"/>
+<rect class="t1" x="560" y="124" width="40" height="40"/>
+<rect class="t1" x="800" y="124" width="40" height="40"/>
+<rect class="t0" x="920" y="124" width="40" height="40"/>
+<rect class="t0" x="480" y="164" width="40" height="40"/>
+<rect class="t1" x="520" y="164" width="40" height="40"/>
+<rect class="t0" x="560" y="164" width="40" height="40"/>
+<rect class="t0" x="720" y="164" width="40" height="40"/>
+<rect class="t1" x="760" y="164" width="40" height="40"/>
+<rect class="t0" x="800" y="164" width="40" height="40"/>
+<rect class="t1" x="920" y="164" width="40" height="40"/>
+<rect class="t1" x="480" y="204" width="40" height="40"/>
+<rect class="t0" x="600" y="204" width="40" height="40"/>
+<rect class="t1" x="640" y="204" width="40" height="40"/>
+<rect class="t0" x="680" y="204" width="40" height="40"/>
+<rect class="t1" x="720" y="204" width="40" height="40"/>
+<rect class="t0" x="760" y="204" width="40" height="40"/>
+<rect class="t1" x="800" y="204" width="40" height="40"/>
+<rect class="t0" x="840" y="204" width="40" height="40"/>
+<rect class="t1" x="880" y="204" width="40" height="40"/>
+<rect class="t0" x="920" y="204" width="40" height="40"/>
+<rect class="t0" x="480" y="244" width="40" height="40"/>
+<rect class="t1" x="600" y="244" width="40" height="40"/>
+<rect class="t0" x="640" y="244" width="40" height="40"/>
+<rect class="t1" x="680" y="244" width="40" height="40"/>
+<rect class="t0" x="720" y="244" width="40" height="40"/>
+<rect class="t1" x="760" y="244" width="40" height="40"/>
+<rect class="t0" x="800" y="244" width="40" height="40"/>
+<rect class="t1" x="840" y="244" width="40" height="40"/>
+<rect class="t0" x="880" y="244" width="40" height="40"/>
+<rect class="t1" x="920" y="244" width="40" height="40"/>
+<rect class="b-ink" x="600" y="84" width="120" height="120"/>
+<rect class="b-acc" x="720" y="4" width="80" height="160"/>
+<rect class="b-sel" x="840" y="124" width="80" height="80"/>
+<rect class="b-ink" x="520" y="204" width="80" height="80"/>
+</svg>
+<div class="cover__texto"><h1>Escaque</h1><p>Aprende ajedrez con un motor hecho desde cero.</p></div>
+</div>

@@ -14,7 +14,8 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "npm run clean && npm run build && node --test \"dist/tests/**/*.test.js\"",
     "test:perft": "npm run clean && npm run build && node --test \"dist/tests/perft-full.js\"",
-    "perft": "npm run build && node dist/tools/perft.js"
+    "perft": "npm run build && node dist/tools/perft.js",
+    "serve": "npm run build && node tools/serve.mjs"
   },
   "dependencies": {},
   "devDependencies": {
