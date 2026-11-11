@@ -16,7 +16,8 @@
     "test:perft": "npm run clean && npm run build && node --test \"dist/tests/perft-full.js\"",
     "perft": "npm run build && node dist/tools/perft.js",
     "serve": "npm run build:site && node tools/serve.mjs",
-    "build:site": "npm run clean && npm run build && node tools/build-site.mjs"
+    "build:site": "npm run clean && npm run build && node tools/build-site.mjs",
+    "match": "npm run build && node dist/tools/match.js"
   },
   "dependencies": {},
   "devDependencies": {
