@@ -13,6 +13,7 @@ import { ENGINE_NAME, moveAnnouncement, statusMessage } from "./notation.js";
 import type { PromotionDialog } from "./promotion.js";
 import { lessonHash, LESSONS_HASH, PLAY_HASH } from "./routes.js";
 import type { KeyValueStore } from "./save.js";
+import { COMPACT_LANDSCAPE, onCompactLandscapeChange } from "./scroll-region.js";
 
 export interface LessonsDeps {
   readonly lessons: readonly Lesson[];
@@ -143,6 +144,16 @@ export function createLessonsScreen(deps: LessonsDeps): LessonsScreen {
   const hintButton = byId<HTMLButtonElement>("leccion-pedir-pista");
   const restartButton = byId<HTMLButtonElement>("leccion-reiniciar");
   const announcer = byId<HTMLElement>("leccion-anuncio");
+  const goalSection = byId<HTMLElement>("leccion-objetivo").closest("section")!;
+
+  // En móvil apaisado la columna derecha no cabe entera: «Cómo se mueve» pasa a la región con scroll,
+  // tras la retroalimentación; en el resto, va sobre el objetivo, como en el lienzo.
+  const placeHowItMoves = (compact: boolean): void => {
+    if (compact) feedback.after(howBox);
+    else goalSection.before(howBox);
+  };
+  placeHowItMoves(window.matchMedia(COMPACT_LANDSCAPE).matches);
+  onCompactLandscapeChange(placeHowItMoves);
 
   let view: BoardView | null = null;
   let session: LessonSession | null = null;
