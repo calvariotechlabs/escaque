@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Estados de los primeros pasos movil</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/escaque/tokens.css">
+<link rel="stylesheet" href="ds/escaque/components/bundle.css">
+<link rel="stylesheet" href="lecciones.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;600&family=Space+Grotesk:wght@600&display=swap">
+<style>
+body{margin:0}
+.casilla img{position:relative;z-index:1;display:block;width:100%;height:100%}
+</style>
+</helmet>
+<div style="width: 390px; min-height: 2480px; background: var(--surface); color: var(--ink); font-family: var(--font-sans); box-sizing: border-box">
+<header class="lecc-cab" style="padding: 16px 16px 0">
+<h1 style="font: 600 24px/28px var(--font-display)">Escaque</h1>
+<nav class="lecc-nav" aria-label="Principal"><a class="lecc-enlace" href="#" aria-current="page">Jugar</a><a class="lecc-enlace" href="#">Lecciones</a></nav>
+</header>
+<main class="lecc-pagina" style="padding: 16px 16px 32px; gap: 24px">
+<div style="display: flex; flex-direction: column; gap: 24px">
+<section aria-label="Aviso en la pantalla Jugar"><p class="lecc-etiqueta">Aviso en la pantalla Jugar</p><section class="novato" aria-labelledby="nv"><h3 class="novato__titulo" id="nv">¿Nunca has jugado al ajedrez?</h3><p class="novato__texto">Aprende en nueve lecciones cortas cómo se mueve cada pieza y cómo se gana una partida.</p><div class="novato__acciones"><a class="boton boton--principal boton--enlace" href="#">Empezar por el principio</a><button class="boton" type="button">Ahora no</button></div></section></section>
+<section aria-label="Ejercicio con varias capturas"><p class="lecc-etiqueta">Ejercicio con varias capturas</p><div style="display:flex;flex-direction:column;gap:var(--space-3)"><section class="objetivo" aria-labelledby="ob2"><h3 class="objetivo__etiqueta" id="ob2">Objetivo</h3><p class="objetivo__texto">Captura los tres peones negros con la torre.</p></section><p class="contador"><span class="contador__puntos" aria-hidden="true"><span class="contador__punto contador__punto--hecho"></span><span class="contador__punto"></span><span class="contador__punto"></span></span><span><strong>Capturas: 1 de 3.</strong> Quedan dos peones negros.</span></p><section aria-label="Tablero del ejercicio de capturas" style="width: 100%; max-width: 360px">
+<div class="tablero">
+<div class="tablero__rejilla" role="grid" aria-label="Tablero de ajedrez, visto desde las blancas">
+<sc-for list="{{rows2}}" as="r" hint-placeholder-count="8">
+<div class="tablero__fila" role="row">
+<sc-for list="{{r.row}}" as="c" hint-placeholder-count="8">
+<div class="{{c.cls}}" role="gridcell" data-square="{{c.n}}" data-marks="{{c.marks}}" aria-label="{{c.label}}"><sc-if value="{{c.has}}" hint-placeholder-val="{{ true }}"><img src="{{c.img}}" alt=""></sc-if></div>
+</sc-for>
+</div>
+</sc-for>
+</div>
+<div class="tablero__rangos" aria-hidden="true"><span>8</span><span>7</span><span>6</span><span>5</span><span>4</span><span>3</span><span>2</span><span>1</span></div>
+<div class="tablero__columnas" aria-hidden="true"><span>a</span><span>b</span><span>c</span><span>d</span><span>e</span><span>f</span><span>g</span><span>h</span></div>
+</div>
+</section></div></section>
+<section aria-label="Fallo en una lección de primeros pasos"><p class="lecc-etiqueta">Fallo en una lección de primeros pasos</p><section class="retro retro--fallo" aria-labelledby="rf"><h3 class="retro__titulo" id="rf"><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M7 7l6 6M13 7l-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Esa jugada no es la solución.</h3>
+<p class="retro__texto">El caballo no se mueve en recto: salta dos casillas en línea y una a un lado, como una L.</p>
+<p class="retro__meta">Puedes volver a intentarlo o pedir una pista.</p>
+</section></section>
+<section aria-label="Al terminar los nueve primeros pasos"><p class="lecc-etiqueta">Al terminar los nueve primeros pasos</p><section class="retro" aria-labelledby="rfin"><h3 class="retro__titulo" id="rfin"><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M6 10.5l2.8 2.8L14 7.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Has terminado los primeros pasos.</h3>
+<p class="retro__texto">Ya sabes cómo se mueve cada pieza, qué es el jaque y cómo se gana una partida. Ahora puedes practicar tácticas o jugar una partida.</p>
+<p class="retro__meta">Completadas 9 de 9 lecciones.</p>
+<div class="retro__acciones"><button class="boton boton--principal" type="button">Empezar las lecciones de tácticas</button><a class="boton boton--enlace" href="#">Jugar una partida</a><a class="boton boton--enlace" href="#">Todas las lecciones</a></div></section></section>
+</div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":2480}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const IMG = { wk: '/_blob/f755b0e3cde224439141427c2f79dfcc', wq: '/_blob/e6db5db3ffcd79a147b06454e873bbb6', wr: '/_blob/ccca3b7fa33574992239568f87fea94a', wb: '/_blob/77d6825cc2acba00edb2116763773dbd', wn: '/_blob/8c627fe6f9b20e3c70f41a0d92653372', wp: '/_blob/751ba29078e9e60b8b5d0d7948fd281f', bk: '/_blob/77c898d2513e9ba83ab5680730d01bda', bq: '/_blob/5d4b4d17f82632fdf302ea2f666c3b78', br: '/_blob/2958949152b961dd0b29733063618976', bb: '/_blob/582ab6e66656de76eb46628bace09a68', bn: '/_blob/b85f02c56127bec2806870270b615310', bp: '/_blob/e571c7681346433a14159cb146cfb58c' };
+    const NAME = { p: 'peón', n: 'caballo', b: 'alfil', r: 'torre', q: 'dama', k: 'rey' };
+    const FILES = 'abcdefgh';
+    const build = (fen, MARKS) => fen.split('/').map((text, r) => {
+      const line = [];
+      for (const ch of text) {
+        if (ch >= '1' && ch <= '8') { for (let k = 0; k < Number(ch); k++) line.push(null); } else line.push(ch);
+      }
+      const rank = 8 - r;
+      return { row: line.map((p, c) => {
+        const n = FILES[c] + rank;
+        const side = p && p === p.toLowerCase() ? 'b' : 'w';
+        const t = p ? p.toLowerCase() : '';
+        const m = MARKS[n] || '';
+        let nombre = p ? NAME[t] + ' ' + (side === 'w' ? 'blanc' : 'negr') + (t === 'r' || t === 'q' ? 'a' : 'o') : 'vacía';
+        if (m.indexOf('selected') >= 0) nombre += ', seleccionada';
+        if (m.indexOf('meta') >= 0) nombre += ', casilla objetivo';
+        else if (m.indexOf('target') >= 0) nombre += ', casilla posible';
+        return { n, cls: 'casilla casilla--' + ((c + rank - 1) % 2 === 1 ? 'clara' : 'oscura'), marks: m, has: !!p, img: p ? IMG[side + t] : '', label: n + ', ' + nombre };
+      }) };
+    });
+    return { rows2: build('8/8/8/3R3p/8/8/7p/8', { d1: 'last-move', d5: 'last-move' }) };
+  }
+}
+</script>
+</body>
+</html>
