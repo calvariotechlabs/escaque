@@ -216,8 +216,8 @@
       "x": 0,
       "y": 6140,
       "w": 1280,
-      "h": 720,
-      "title": "Escritorio · elegir una lección",
+      "h": 1500,
+      "title": "Escritorio · elegir una lección (primeros pasos y tácticas)",
       "expand": "fill",
       "page": "escritorio"
     },
@@ -232,7 +232,7 @@
     },
     "LeccionEstados.dc.html": {
       "x": 0,
-      "y": 7220,
+      "y": 7760,
       "w": 1280,
       "h": 700,
       "title": "Escritorio · estados de una lección",
@@ -243,8 +243,8 @@
       "x": 0,
       "y": 8940,
       "w": 820,
-      "h": 920,
-      "title": "Tablet · elegir una lección",
+      "h": 2000,
+      "title": "Tablet · elegir una lección (primeros pasos y tácticas)",
       "page": "tablet"
     },
     "LeccionTablet.dc.html": {
@@ -259,8 +259,8 @@
       "x": 0,
       "y": 10740,
       "w": 390,
-      "h": 1320,
-      "title": "Móvil · elegir una lección",
+      "h": 3300,
+      "title": "Móvil · elegir una lección (primeros pasos y tácticas)",
       "page": "movil"
     },
     "LeccionMovil.dc.html": {
@@ -285,6 +285,48 @@
       "w": 390,
       "h": 1280,
       "title": "Móvil · lección: fallo",
+      "page": "movil"
+    },
+    "LeccionIniciacionEscritorio.dc.html": {
+      "x": 0,
+      "y": 8940,
+      "w": 1280,
+      "h": 1100,
+      "title": "Escritorio · primeros pasos: lección con «Cómo se mueve»",
+      "page": "escritorio",
+      "expand": "fill"
+    },
+    "IniciacionEstadosEscritorio.dc.html": {
+      "x": 1360,
+      "y": 8940,
+      "w": 1280,
+      "h": 1380,
+      "title": "Escritorio · primeros pasos: estados",
+      "page": "escritorio",
+      "expand": "fill"
+    },
+    "LeccionIniciacionTablet.dc.html": {
+      "x": 0,
+      "y": 11420,
+      "w": 820,
+      "h": 1760,
+      "title": "Tablet · primeros pasos: lección con «Cómo se mueve»",
+      "page": "tablet"
+    },
+    "LeccionIniciacionMovil.dc.html": {
+      "x": 0,
+      "y": 15640,
+      "w": 390,
+      "h": 1820,
+      "title": "Móvil · primeros pasos: lección con «Cómo se mueve»",
+      "page": "movil"
+    },
+    "IniciacionEstadosMovil.dc.html": {
+      "x": 470,
+      "y": 15640,
+      "w": 390,
+      "h": 2480,
+      "title": "Móvil · primeros pasos: aviso, varias capturas, fallo y final",
       "page": "movil"
     }
   },
@@ -320,7 +362,12 @@
     "LeccionesMovil.dc.html",
     "LeccionMovil.dc.html",
     "LeccionMovilAcierto.dc.html",
-    "LeccionMovilFallo.dc.html"
+    "LeccionMovilFallo.dc.html",
+    "LeccionIniciacionEscritorio.dc.html",
+    "IniciacionEstadosEscritorio.dc.html",
+    "LeccionIniciacionTablet.dc.html",
+    "LeccionIniciacionMovil.dc.html",
+    "IniciacionEstadosMovil.dc.html"
   ],
   "notes": {
     "t_escritorio_0": {
@@ -645,7 +692,7 @@
     },
     "l3": {
       "x": 1360,
-      "y": 7220,
+      "y": 7760,
       "w": 520,
       "text": "Estados. Acierto: borde continuo de 2 px, icono de marca y «Correcto.»; el tablero queda bloqueado y el foco pasa a «Siguiente lección». Fallo: borde discontinuo, icono de cruz y el motivo; la jugada se deshace y se puede seguir. Paso intermedio (lecciones de dos jugadas): el rival responde con una jugada fija y se avisa; el texto de ejemplo es provisional. Todas completadas: se ofrece jugar contra Alfil Beta. La retroalimentación es la única región role=status.",
       "fill": "gray",
@@ -672,6 +719,70 @@
       "y": 11300,
       "w": 390,
       "text": "Acierto y fallo en móvil. Acierto: «Siguiente lección» es la única acción principal y recibe el foco; las pistas se ocultan. Fallo: la jugada se deshace, la torre vuelve a su casilla y las pistas siguen disponibles; el motivo sale de los datos de la lección.",
+      "fill": "gray",
+      "page": "movil"
+    },
+    "t_escritorio_6": {
+      "x": 0,
+      "y": 8700,
+      "text": "Primeros pasos (para quien nunca ha jugado)",
+      "kind": "title1",
+      "maxW": 2640,
+      "page": "escritorio"
+    },
+    "t_tablet_5": {
+      "x": 0,
+      "y": 11180,
+      "text": "Primeros pasos (para quien nunca ha jugado)",
+      "kind": "title1",
+      "maxW": 1720,
+      "page": "tablet"
+    },
+    "t_movil_7": {
+      "x": 0,
+      "y": 15400,
+      "text": "Primeros pasos (para quien nunca ha jugado)",
+      "kind": "title1",
+      "maxW": 860,
+      "page": "movil"
+    },
+    "i1": {
+      "x": 2720,
+      "y": 8940,
+      "w": 520,
+      "text": "Lección de iniciación (ejemplo: «El caballo», lección 5 de 9). Antes del objetivo hay una tarjeta «Cómo se mueve» con una explicación de dos frases, sin palabras técnicas. El tablero sale casi vacío. «Ver a dónde puede ir» (botón de alternar) marca con un punto las casillas posibles; la casilla objetivo lleva un anillo discontinuo, que también se anuncia en voz alta («casilla objetivo»). Al usar la ayuda, la lección queda «con ayuda» en la lista. Una leyenda explica los dos signos.",
+      "fill": "gray",
+      "page": "escritorio"
+    },
+    "i2": {
+      "x": 2720,
+      "y": 9460,
+      "w": 520,
+      "text": "Estados nuevos. Aviso «¿Nunca has jugado?» en la pantalla Jugar, solo mientras no haya progreso guardado y no se haya pulsado «Ahora no» (se recuerda en el dispositivo). Ejercicios de varias capturas con contador de puntos y texto («Capturas: 1 de 3»). Fallo, acierto y pantalla final del bloque con los mismos paneles de las tácticas.",
+      "fill": "gray",
+      "page": "escritorio"
+    },
+    "i3": {
+      "x": 2720,
+      "y": 9840,
+      "w": 520,
+      "text": "La lista de lecciones pasa a dos grupos, cada uno con su progreso y su numeración: «Primeros pasos» (9) y «Tácticas» (6). El orden sigue siendo libre. Las lecciones guardan su progreso por separado.",
+      "fill": "gray",
+      "page": "escritorio"
+    },
+    "i4": {
+      "x": 900,
+      "y": 11420,
+      "w": 520,
+      "text": "Tablet vertical: la lección va en una columna, con «Cómo se mueve» y el objetivo arriba, el tablero hasta 700 px y la ayuda y las pistas debajo. Los estados son los mismos que en escritorio.",
+      "fill": "gray",
+      "page": "tablet"
+    },
+    "i5": {
+      "x": 940,
+      "y": 15640,
+      "w": 390,
+      "text": "Móvil: igual que en tablet, a todo el ancho. En el estado de la derecha, el aviso de inicio, el contador de capturas, el fallo y el final del bloque.",
       "fill": "gray",
       "page": "movil"
     }
