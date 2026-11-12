@@ -32,7 +32,12 @@
 </header>
 <main id="pantalla-ajustes" class="ajustes-pantalla" aria-labelledby="titulo-ajustes" hidden>
   <section class="ajustes-pantalla__form">
-    <h2 id="titulo-ajustes" class="ajustes-pantalla__titulo">Nueva partida</h2>
+    <section id="aviso-novato" class="novato ajustes-pantalla__novato" aria-labelledby="aviso-novato-titulo" hidden>
+      <h2 class="novato__titulo" id="aviso-novato-titulo">¿Nunca has jugado al ajedrez?</h2>
+      <p class="novato__texto">Aprende en nueve lecciones cortas cómo se mueve cada pieza y cómo se gana una partida.</p>
+      <div class="novato__acciones"><a id="aviso-novato-empezar" class="boton boton--principal boton--enlace" href="#/lecciones/el-tablero">Empezar por el principio</a><button id="aviso-novato-ahora-no" class="boton" type="button">Ahora no</button></div>
+    </section>
+    <h2 id="titulo-ajustes" class="ajustes-pantalla__titulo" tabindex="-1">Nueva partida</h2>
     <form id="ajustes" class="ajustes">
       <fieldset class="grupo">
         <legend class="grupo__leyenda">Modo</legend>
@@ -103,8 +108,7 @@
     <h2 id="titulo-lecciones" class="lecc-titulo" tabindex="-1">Lecciones</h2>
     <p id="lecciones-intro" class="lecc-intro"></p>
   </div>
-  <div id="lecciones-progreso" class="progreso"></div>
-  <ol id="lecciones-lista" class="lecciones" aria-label="Lista de lecciones"></ol>
+  <div id="lecciones-grupos" class="lecc-grupos"></div>
   <p class="lecc-pre">Tu progreso se guarda en este dispositivo.</p>
 </main>
 <main id="pantalla-leccion" class="lecc-pagina" aria-labelledby="leccion-titulo" hidden>
@@ -112,14 +116,28 @@
     <div><p id="leccion-posicion" class="lecc-pre"></p><h2 id="leccion-titulo" class="lecc-titulo" tabindex="-1"></h2></div>
     <div id="leccion-progreso" class="progreso lecc-progreso"></div>
   </div>
+  <section id="leccion-como" class="como" aria-labelledby="leccion-como-etiqueta" hidden>
+    <h3 class="como__etiqueta" id="leccion-como-etiqueta">Cómo se mueve</h3>
+    <p id="leccion-como-texto" class="como__texto"></p>
+  </section>
   <section class="objetivo" aria-labelledby="leccion-objetivo-etiqueta">
     <h3 class="objetivo__etiqueta" id="leccion-objetivo-etiqueta">Objetivo</h3>
     <p id="leccion-objetivo" class="objetivo__texto"></p>
   </section>
+  <p id="leccion-contador" class="contador" hidden></p>
   <div class="lecc-cuerpo">
     <p class="estado lecc-estado"><span id="leccion-turno" class="estado__turno estado__turno--w" aria-hidden="true"></span><span><strong id="leccion-estado-texto"></strong></span></p>
     <section class="lecc-tablero" aria-label="Tablero"><div id="leccion-tablero"></div></section>
     <div id="leccion-retro" class="lecc-retro" role="status"></div>
+    <div id="leccion-ayuda" class="lecc-ayuda" hidden>
+      <p id="leccion-ayuda-estado" class="lecc-pre" role="status"></p>
+      <section class="ayuda" aria-labelledby="leccion-ayuda-titulo">
+        <h3 class="pistas__titulo" id="leccion-ayuda-titulo">Ayuda</h3>
+        <button id="leccion-ver-casillas" class="boton" type="button" aria-pressed="false">Ver a dónde puede ir</button>
+        <ul class="leyenda" aria-label="Qué significan las marcas del tablero"><li><span class="leyenda__muestra leyenda__muestra--punto" aria-hidden="true"></span>Casilla a la que puede ir</li><li id="leccion-leyenda-meta"><span class="leyenda__muestra leyenda__muestra--meta" aria-hidden="true"></span>Casilla objetivo</li></ul>
+        <p class="ayuda__nota">Si usas esta ayuda, la lección queda anotada como «completada con ayuda».</p>
+      </section>
+    </div>
     <section class="pistas lecc-pistas" aria-labelledby="leccion-pistas-titulo">
       <h3 class="pistas__titulo" id="leccion-pistas-titulo">Pistas</h3>
       <div class="pistas__vivo" aria-live="polite">

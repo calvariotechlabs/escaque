@@ -137,13 +137,8 @@ export function helpAnnouncement(targets: readonly string[], goal: string | null
   return goal === null ? list : `${list} La casilla objetivo es ${goal}.`;
 }
 
-export const HOW_IT_MOVES = "Cómo se mueve";
-export const HELP_TITLE = "Ayuda";
-export const HELP_BUTTON = "Ver a dónde puede ir";
-export const HELP_NOTE = "Si usas esta ayuda, la lección queda anotada como «completada con ayuda».";
-export const LEGEND_LABEL = "Qué significan las marcas del tablero";
-export const LEGEND_TARGET = "Casilla a la que puede ir";
-export const LEGEND_GOAL = "Casilla objetivo";
+/** Tras una jugada buena en un ejercicio en que el rival no mueve. */
+export const NO_REPLY = "Las negras no mueven en este ejercicio. Te toca otra vez.";
 
 export const BLOCK_DONE_TITLE = "Has terminado los primeros pasos.";
 export const BLOCK_DONE_TEXT = "Ya sabes cómo se mueve cada pieza, qué es el jaque y cómo se gana una partida. Ahora puedes practicar tácticas o jugar una partida.";
@@ -152,8 +147,3 @@ export function blockDoneMeta(total: number): string {
 }
 export const START_TACTICS = "Empezar las lecciones de tácticas";
 export const PLAY_GAME = "Jugar una partida";
-
-export const BEGINNER_TITLE = "¿Nunca has jugado al ajedrez?";
-export const BEGINNER_TEXT = "Aprende en nueve lecciones cortas cómo se mueve cada pieza y cómo se gana una partida.";
-export const BEGINNER_START = "Empezar por el principio";
-export const BEGINNER_LATER = "Ahora no";

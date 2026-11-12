@@ -40,6 +40,7 @@ import { createCoachClient } from "../worker/coach-client.js";
 import { startPwa } from "../pwa/pwa.js";
 import { checkLessonMove, LESSONS } from "../lessons/index.js";
 import { createLessonsScreen } from "./lessons-screen.js";
+import { dismissBeginner, isBeginnerDismissed, loadProgress, showBeginnerNotice } from "./lessons-progress.js";
 import { LESSONS_TITLE } from "./lessons-text.js";
 import { parseRoute, type Route } from "./routes.js";
 
@@ -95,6 +96,24 @@ createBoard(byId("vista-previa")).setPosition(START_FEN);
 const store = browserStore();
 const recovered = loadFromStorage(store);
 const autosave = createAutosave(store);
+
+// Aviso «¿Nunca has jugado?» en la pantalla de nueva partida: solo sin progreso de lecciones y sin haberlo descartado.
+const beginnerNotice = byId<HTMLElement>("aviso-novato");
+const settingsTitle = byId<HTMLElement>("titulo-ajustes");
+const lessonIds = LESSONS.map((l) => l.id);
+let beginnerDismissed = isBeginnerDismissed(store);
+
+function syncBeginnerNotice(): void {
+  beginnerNotice.hidden = !showBeginnerNotice(loadProgress(store, lessonIds), beginnerDismissed);
+}
+
+byId<HTMLButtonElement>("aviso-novato-ahora-no").addEventListener("click", () => {
+  beginnerDismissed = true;
+  dismissBeginner(store);
+  syncBeginnerNotice();
+  // El botón desaparece con el aviso: el foco pasa al título de la pantalla para no perderse.
+  settingsTitle.focus();
+});
 let setup: GameSetup = recovered?.setup ?? TWO_PLAYERS;
 let game = recovered?.game ?? new Game();
 let ui = newInteraction(game, setup);
@@ -488,6 +507,7 @@ function applyRoute(moveFocus: boolean): void {
   (onPlay ? linkPlay : linkLessons).setAttribute("aria-current", "page");
   if (onPlay) {
     lessonsScreen.hide();
+    syncBeginnerNotice();
     document.title = BASE_TITLE;
     // Al volver de las lecciones se reanuda lo que hubiera: el coach y, si le toca, la máquina.
     if (onLessons && playScreen === "partida") render();
