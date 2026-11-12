@@ -13,6 +13,8 @@ body{margin:0;background:var(--surface);color:var(--ink);font:400 16px/24px var(
 .partida{padding-top:var(--space-4);padding-bottom:max(var(--space-8),env(safe-area-inset-bottom,0px));display:grid;grid-template-columns:minmax(0,1fr);gap:var(--space-4)}
 
 .partida__tablero{min-width:0}
+/* Agrupa coach, botones y jugadas; solo es una caja propia en móvil apaisado. */
+.partida__panel{display:contents}
 .partida__controles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-2)}
 .partida__controles .boton--principal,.partida__ancho{grid-column:1 / -1}
 
@@ -48,26 +50,34 @@ body{margin:0;background:var(--surface);color:var(--ink);font:400 16px/24px var(
   .partida__controles{grid-area:controles}
 }
 
-/* Móvil apaisado (alto menor de 500 px): el tablero se limita por el alto y el panel pasa a la derecha;
-   el título va en la columna del panel y la lista de jugadas se desplaza dentro de su caja. */
+/* Móvil apaisado (alto menor de 500 px): el tablero se limita por el alto y el panel pasa a la derecha
+   (lienzo «Móvil · horizontal · partida con coach»). El título va en la columna del panel, el estado queda fijo
+   y coach, botones y jugadas comparten una región con scroll propio; los botones se quedan arriba de esa región. */
 @media (orientation:landscape) and (max-height:500px){
   :root{--tablero-ancho:calc(100dvh - 2 * var(--space-4))}
   .pagina__cabecera,.partida{max-width:none;margin:0}
   .pagina__cabecera{position:absolute;top:max(var(--space-4),env(safe-area-inset-top,0px));left:calc(max(var(--space-6),env(safe-area-inset-left,0px)) + var(--tablero-ancho) + var(--space-6));right:max(var(--space-6),env(safe-area-inset-right,0px));padding:0;box-sizing:border-box}
   .pagina__cabecera h1{font-size:20px;line-height:24px}
-  .partida{box-sizing:border-box;height:100dvh;padding:max(var(--space-4),env(safe-area-inset-top,0px)) max(var(--space-6),env(safe-area-inset-right,0px)) max(var(--space-4),env(safe-area-inset-bottom,0px)) max(var(--space-6),env(safe-area-inset-left,0px));grid-template-columns:var(--tablero-ancho) minmax(0,1fr);grid-template-rows:44px auto auto auto minmax(0,1fr);grid-template-areas:"tablero titulo" "tablero avisos" "tablero estado" "tablero controles" "tablero jugadas";gap:var(--space-2) var(--space-6)}
-  .partida:has(.avisos:empty){grid-template-rows:44px auto auto minmax(0,1fr);grid-template-areas:"tablero titulo" "tablero estado" "tablero controles" "tablero jugadas"}
+  /* En apaisado va el subtítulo corto aunque el ancho pase de 860 px (un móvil grande). */
+  .solo-escritorio{display:none}
+  .solo-movil{display:inline}
+  .partida{box-sizing:border-box;height:100dvh;padding:max(var(--space-4),env(safe-area-inset-top,0px)) max(var(--space-6),env(safe-area-inset-right,0px)) max(var(--space-4),env(safe-area-inset-bottom,0px)) max(var(--space-6),env(safe-area-inset-left,0px));grid-template-columns:var(--tablero-ancho) minmax(0,1fr);grid-template-rows:44px auto auto minmax(0,1fr);grid-template-areas:"tablero titulo" "tablero avisos" "tablero estado" "tablero panel";gap:var(--space-2) var(--space-6)}
+  .partida:has(.avisos:empty){grid-template-rows:44px auto minmax(0,1fr);grid-template-areas:"tablero titulo" "tablero estado" "tablero panel"}
   .pagina__cabecera ~ .partida::before{content:"";grid-area:titulo}
-  /* Sin diseño del coach en móvil apaisado: no se muestra hasta tenerlo. */
-  .partida .partida__coach{display:none}
   .partida .tablero{width:100%}
   .partida__avisos{grid-area:avisos}
   .partida__estado{grid-area:estado}
   .partida__tablero{grid-area:tablero}
-  .partida__controles{grid-area:controles}
-  .partida__jugadas{grid-area:jugadas;min-height:0;overflow:auto;padding:var(--space-2) var(--space-4)}
+  .partida__panel{display:flex;flex-direction:column;grid-area:panel;min-height:0;overflow:auto;gap:var(--space-2);padding:2px;scroll-padding-top:60px}
+  .partida__panel > *{flex:none}
+  .partida__panel:focus-visible{outline:3px solid var(--accent);outline-offset:-3px}
+  .partida__coach{padding:var(--space-3);gap:var(--space-3)}
+  /* Los cuatro botones en una fila, fijos arriba de la región; el texto pasa a dos líneas. */
+  .partida__controles{order:-1;position:sticky;top:0;z-index:1;grid-template-columns:repeat(4,minmax(0,1fr));padding-bottom:var(--space-2);background:var(--surface)}
+  .partida__controles .boton,.partida__controles .boton--principal,.partida__ancho{grid-column:auto;padding:4px 6px;font-size:13px;line-height:16px}
+  .partida__jugadas{padding:var(--space-2) var(--space-4)}
   .partida__jugadas .jugadas__titulo{font-size:16px;line-height:24px;margin-bottom:var(--space-1)}
-  /* El aviso se compacta: texto a la izquierda y botones a la derecha, para dejar sitio a la lista. */
+  /* El aviso se compacta: texto a la izquierda y botones a la derecha, para dejar sitio al panel. */
   .aviso{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:0 var(--space-3);padding:var(--space-2) var(--space-3)}
   .aviso__titulo,.aviso__texto{grid-column:1}
   .aviso__acciones{grid-column:2;grid-row:1 / span 2;flex-direction:column}

@@ -1,7 +1,7 @@
 // Parte de la app instalable que vive en la página: registra el service worker, escucha
 // instalación, conexión y versiones nuevas, y pinta un único aviso (ver notices.ts).
 // Todo el texto va con textContent: nunca se construye HTML.
-import { INITIAL_STATE, needsIosInstallHint, pickNotice, type NoticeAction, type NoticeKind, type PwaState } from "./notices.js";
+import { INITIAL_STATE, iosInstallDevice, pickNotice, type NoticeAction, type NoticeKind, type PwaState } from "./notices.js";
 
 interface InstallPromptEvent extends Event {
   prompt(): Promise<void>;
@@ -37,7 +37,7 @@ export function startPwa(container: HTMLElement): void {
     ...INITIAL_STATE,
     offline: !navigator.onLine,
     standalone: isStandalone(),
-    iosHint: needsIosInstallHint(navigator.userAgent, navigator.maxTouchPoints, isStandalone()),
+    iosDevice: iosInstallDevice(navigator.userAgent, navigator.maxTouchPoints, isStandalone()),
     installDismissed: readFlag(INSTALL_DISMISSED_KEY),
   };
   let installEvent: InstallPromptEvent | null = null;

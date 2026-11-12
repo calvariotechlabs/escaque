@@ -77,25 +77,27 @@
   <section class="partida__tablero" aria-label="Tablero">
     <div id="tablero"></div>
   </section>
-  <section id="coach" class="coach partida__coach" aria-labelledby="coach-titulo">
-    <header class="coach__cab"><h2 class="coach__titulo" id="coach-titulo">Coach</h2><p id="coach-jugada" class="coach__jugada" hidden></p></header>
-    <div class="coach__col">
-      <p id="coach-veredicto" class="coach__veredicto coach__veredicto--vacio" role="status"></p>
-      <div id="coach-resumen" class="coach__col"></div>
+  <div id="partida-panel" class="partida__panel">
+    <section id="coach" class="coach partida__coach" aria-labelledby="coach-titulo">
+      <header class="coach__cab"><h2 class="coach__titulo" id="coach-titulo">Coach</h2><p id="coach-jugada" class="coach__jugada" hidden></p></header>
+      <div class="coach__col">
+        <p id="coach-veredicto" class="coach__veredicto coach__veredicto--vacio" role="status"></p>
+        <div id="coach-resumen" class="coach__col"></div>
+      </div>
+      <div id="coach-avisos" class="coach__col" hidden></div>
+    </section>
+    <div class="partida__controles">
+      <button id="nueva" class="boton boton--principal partida__ancho" type="button">Nueva partida</button>
+      <button id="deshacer" class="boton" type="button" disabled>Deshacer jugada</button>
+      <button id="rehacer" class="boton" type="button" disabled>Rehacer jugada</button>
+      <button id="girar" class="boton partida__ancho" type="button">Girar tablero</button>
     </div>
-    <div id="coach-avisos" class="coach__col" hidden></div>
-  </section>
-  <div class="partida__controles">
-    <button id="nueva" class="boton boton--principal partida__ancho" type="button">Nueva partida</button>
-    <button id="deshacer" class="boton" type="button" disabled>Deshacer jugada</button>
-    <button id="rehacer" class="boton" type="button" disabled>Rehacer jugada</button>
-    <button id="girar" class="boton partida__ancho" type="button">Girar tablero</button>
+    <section class="jugadas partida__jugadas" aria-labelledby="titulo-jugadas">
+      <h2 class="jugadas__titulo" id="titulo-jugadas">Jugadas</h2>
+      <p id="sin-jugadas" class="jugadas__vacia">Todavía no hay jugadas.</p>
+      <ol id="lista-jugadas" class="jugadas__lista" aria-label="Lista de jugadas"></ol>
+    </section>
   </div>
-  <section class="jugadas partida__jugadas" aria-labelledby="titulo-jugadas">
-    <h2 class="jugadas__titulo" id="titulo-jugadas">Jugadas</h2>
-    <p id="sin-jugadas" class="jugadas__vacia">Todavía no hay jugadas.</p>
-    <ol id="lista-jugadas" class="jugadas__lista" aria-label="Lista de jugadas"></ol>
-  </section>
   <p id="anuncio" class="solo-lector" aria-live="polite"></p>
 </main>
 <main id="pantalla-lecciones" class="lecc-pagina" aria-labelledby="titulo-lecciones" hidden>
@@ -119,16 +121,18 @@
   <div class="lecc-cuerpo">
     <p class="estado lecc-estado"><span id="leccion-turno" class="estado__turno estado__turno--w" aria-hidden="true"></span><span><strong id="leccion-estado-texto"></strong></span></p>
     <section class="lecc-tablero" aria-label="Tablero"><div id="leccion-tablero"></div></section>
-    <div id="leccion-retro" class="lecc-retro" role="status"></div>
-    <section class="pistas lecc-pistas" aria-labelledby="leccion-pistas-titulo">
-      <h3 class="pistas__titulo" id="leccion-pistas-titulo">Pistas</h3>
-      <div class="pistas__vivo" aria-live="polite">
-        <p id="leccion-sin-pistas" class="pistas__vacia">Todavía no has pedido ninguna pista.</p>
-        <ol id="leccion-pistas" class="pistas__lista" hidden></ol>
-      </div>
-      <button id="leccion-pedir-pista" class="boton" type="button"></button>
-    </section>
-    <div class="lecc-acciones lecc-acciones--leccion"><button id="leccion-reiniciar" class="boton" type="button">Reiniciar lección</button><a class="boton boton--enlace" href="#/lecciones">Todas las lecciones</a></div>
+    <div id="leccion-panel" class="lecc-panel">
+      <div id="leccion-retro" class="lecc-retro" role="status"></div>
+      <section class="pistas lecc-pistas" aria-labelledby="leccion-pistas-titulo">
+        <h3 class="pistas__titulo" id="leccion-pistas-titulo">Pistas</h3>
+        <div class="pistas__vivo" aria-live="polite">
+          <p id="leccion-sin-pistas" class="pistas__vacia">Todavía no has pedido ninguna pista.</p>
+          <ol id="leccion-pistas" class="pistas__lista" hidden></ol>
+        </div>
+        <button id="leccion-pedir-pista" class="boton" type="button"></button>
+      </section>
+      <div class="lecc-acciones lecc-acciones--leccion"><button id="leccion-reiniciar" class="boton" type="button">Reiniciar lección</button><a class="boton boton--enlace" href="#/lecciones">Todas las lecciones</a></div>
+    </div>
   </div>
   <p id="leccion-anuncio" class="solo-lector" aria-live="polite"></p>
 </main>

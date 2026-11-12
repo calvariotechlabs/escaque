@@ -84,7 +84,7 @@
       "x": 0,
       "y": 6270,
       "w": 390,
-      "h": 1060,
+      "h": 1260,
       "title": "App instalable · avisos",
       "page": "movil"
     },
@@ -286,6 +286,30 @@
       "h": 1280,
       "title": "Móvil · lección: fallo",
       "page": "movil"
+    },
+    "MovilHorizontalCoach.dc.html": {
+      "x": 0,
+      "y": 12420,
+      "w": 844,
+      "h": 390,
+      "title": "Móvil · horizontal · partida con coach",
+      "page": "movil"
+    },
+    "LeccionMovilHorizontal.dc.html": {
+      "x": 924,
+      "y": 12420,
+      "w": 844,
+      "h": 390,
+      "title": "Móvil · horizontal · lección en curso",
+      "page": "movil"
+    },
+    "LeccionMovilHorizontalAcierto.dc.html": {
+      "x": 1848,
+      "y": 12420,
+      "w": 844,
+      "h": 390,
+      "title": "Móvil · horizontal · lección: acierto",
+      "page": "movil"
     }
   },
   "order": [
@@ -320,7 +344,10 @@
     "LeccionesMovil.dc.html",
     "LeccionMovil.dc.html",
     "LeccionMovilAcierto.dc.html",
-    "LeccionMovilFallo.dc.html"
+    "LeccionMovilFallo.dc.html",
+    "MovilHorizontalCoach.dc.html",
+    "LeccionMovilHorizontal.dc.html",
+    "LeccionMovilHorizontalAcierto.dc.html"
   ],
   "notes": {
     "t_escritorio_0": {
@@ -541,7 +568,7 @@
     },
     "p4": {
       "x": 0,
-      "y": 7370,
+      "y": 7570,
       "w": 390,
       "text": "Un aviso a la vez, encima del estado. Sin conexión lleva borde discontinuo y versión nueva borde sólido en el color de acento, así que no depende solo del color. Al actualizar se reinicia la partida en curso: por eso se avisa antes.",
       "fill": "gray",
@@ -674,6 +701,46 @@
       "text": "Acierto y fallo en móvil. Acierto: «Siguiente lección» es la única acción principal y recibe el foco; las pistas se ocultan. Fallo: la jugada se deshace, la torre vuelve a su casilla y las pistas siguen disponibles; el motivo sale de los datos de la lección.",
       "fill": "gray",
       "page": "movil"
+    },
+    "t_movil_6": {
+      "x": 0,
+      "y": 12140,
+      "text": "Móvil en horizontal",
+      "kind": "title1",
+      "maxW": 2768,
+      "page": "movil"
+    },
+    "h1": {
+      "x": 0,
+      "y": 12850,
+      "w": 520,
+      "fill": "gray",
+      "page": "movil",
+      "text": "Móvil apaisado con el coach visible. El tablero sigue limitado por el alto. En la columna derecha, arriba y fijos: título con navegación, estado y los cuatro botones en una fila (el texto pasa a dos líneas; cada botón mide 44 px de alto como mínimo). Debajo, una sola región con scroll propio que lleva el coach y la lista de jugadas, en ese orden. La región se puede enfocar con Tab (tiene nombre «Coach y jugadas») y se desplaza con las flechas; los botones de dentro la desplazan al recibir el foco. El veredicto sigue siendo la única región que se anuncia."
+    },
+    "h2": {
+      "x": 924,
+      "y": 12850,
+      "w": 520,
+      "fill": "gray",
+      "page": "movil",
+      "text": "Lección en móvil apaisado: tablero a la izquierda y, a la derecha, título, objetivo y turno fijos, una región con scroll propio con la retroalimentación y las pistas, y los botones «Reiniciar lección» y «Todas las lecciones» fijos abajo. Así no hay que desplazar la página para ver el tablero y las pistas a la vez. La lista de lecciones ya cabe en dos columnas con este ancho y no cambia."
+    },
+    "h3": {
+      "x": 1848,
+      "y": 12850,
+      "w": 520,
+      "fill": "gray",
+      "page": "movil",
+      "text": "Acierto en móvil apaisado: desaparecen objetivo, turno y pistas para dar sitio al resultado. «Siguiente lección» ocupa toda la fila y recibe el foco; «Repetir lección» y «Todas las lecciones» van debajo, en dos columnas."
+    },
+    "p6": {
+      "x": 470,
+      "y": 6270,
+      "w": 390,
+      "fill": "gray",
+      "page": "movil",
+      "text": "Instalar en iOS: el aviso dice «iPhone» o «iPad» según el aparato. Solo aparece en Safari, que es donde existe «Añadir a pantalla de inicio» con este gesto; en Chrome, Firefox y otros navegadores de iOS no se muestra aviso."
     }
   },
   "designSystems": [

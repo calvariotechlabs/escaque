@@ -42,6 +42,7 @@ import { checkLessonMove, LESSONS } from "../lessons/index.js";
 import { createLessonsScreen } from "./lessons-screen.js";
 import { LESSONS_TITLE } from "./lessons-text.js";
 import { parseRoute, type Route } from "./routes.js";
+import { bindScrollRegion, onCompactLandscapeChange } from "./scroll-region.js";
 
 function byId<T extends HTMLElement>(id: string): T {
   const el = document.getElementById(id);
@@ -155,6 +156,12 @@ function render(): void {
 }
 
 const coachRoot = byId<HTMLElement>("coach");
+
+// Móvil apaisado: el panel (coach, botones y jugadas) y el de las lecciones tienen scroll propio.
+// Al girar el móvil el coach aparece o desaparece sin que cambie la partida, así que se vuelve a revisar.
+bindScrollRegion(byId<HTMLElement>("partida-panel"), "Coach, botones y jugadas");
+bindScrollRegion(byId<HTMLElement>("leccion-panel"), "Retroalimentación, pistas y acciones");
+onCompactLandscapeChange(() => renderCoach());
 
 function renderCoach(): void {
   if (coachMarks.length > 0 && coachMarksFen !== game.fen) coachPanel.clearMarks();
@@ -489,8 +496,9 @@ function applyRoute(moveFocus: boolean): void {
   if (onPlay) {
     lessonsScreen.hide();
     document.title = BASE_TITLE;
-    // Al volver de las lecciones se reanuda lo que hubiera: el coach y, si le toca, la máquina.
-    if (onLessons && playScreen === "partida") render();
+    // Al enseñar la partida (nueva, recuperada o de vuelta de las lecciones) se pinta y se reanuda lo que hubiera:
+    // el coach y, si le toca, la máquina.
+    if (playScreen === "partida") render();
     onLessons = false;
     return;
   }
