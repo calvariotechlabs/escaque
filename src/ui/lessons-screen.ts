@@ -2,7 +2,7 @@
 // Los datos y la validación son de `src/lessons`; aquí solo se pinta, se lleva el progreso
 // (guardado en el dispositivo) y se conecta el tablero. Todo el texto se escribe con
 // textContent o atributos, nunca como HTML.
-import type { Lesson } from "../lessons/types.js";
+import type { Lesson, LessonGroup } from "../lessons/types.js";
 import { attachBoardInput } from "./board-input.js";
 import { createBoard, type BoardView, type Mark } from "./board.js";
 import { Interaction, type Outcome } from "./interaction.js";
@@ -13,6 +13,7 @@ import { ENGINE_NAME, moveAnnouncement, statusMessage } from "./notation.js";
 import type { PromotionDialog } from "./promotion.js";
 import { lessonHash, LESSONS_HASH, PLAY_HASH } from "./routes.js";
 import type { KeyValueStore } from "./save.js";
+import { COMPACT_LANDSCAPE, onCompactLandscapeChange } from "./scroll-region.js";
 
 export interface LessonsDeps {
   readonly lessons: readonly Lesson[];
@@ -27,6 +28,8 @@ export interface LessonsScreen {
   /** Enseña una lección. Devuelve el título de la pantalla, o `null` si no existe (entonces enseña la lista). */
   showLesson(id: string, focus: boolean): string | null;
   hide(): void;
+  /** El progreso guardado, tal como lo lleva la pantalla (también si no se pudo guardar en el dispositivo). */
+  progress(): LessonProgress;
 }
 
 function byId<T extends HTMLElement>(id: string): T {
@@ -86,6 +89,7 @@ const STATE_ICON: Readonly<Record<LessonState, IconKind>> = { "sin-empezar": "va
 
 // --- Progreso ------------------------------------------------------------------
 
+/** Progreso de un grupo: un segmento por lección. */
 function renderProgress(box: HTMLElement, lessons: readonly Lesson[], progress: LessonProgress, open: string | null, legend: boolean): void {
   const done = completedCount(progress, lessons.map((l) => l.id));
   const sentence = text.progressSentence(done, lessons.length);
@@ -93,6 +97,8 @@ function renderProgress(box: HTMLElement, lessons: readonly Lesson[], progress: 
   label.append(el("strong", undefined, sentence.count), ` ${sentence.rest}`);
   const bar = el("div", "progreso__barra");
   bar.setAttribute("aria-hidden", "true");
+  // CSSOM, no un atributo style: la CSP no deja estilos en línea.
+  bar.style.setProperty("--n", String(lessons.length));
   for (const lesson of lessons) {
     const completed = progress.done.has(lesson.id);
     const seg = el("span", "progreso__seg");
@@ -104,22 +110,31 @@ function renderProgress(box: HTMLElement, lessons: readonly Lesson[], progress: 
   if (legend) box.append(el("p", "progreso__leyenda", text.PROGRESS_LEGEND));
 }
 
+const GROUPS: readonly LessonGroup[] = ["primeros-pasos", "tacticas"];
+
 export function createLessonsScreen(deps: LessonsDeps): LessonsScreen {
   const { lessons, check, store, promotion } = deps;
   const ids = lessons.map((l) => l.id);
   let progress: LessonProgress = loadProgress(store, ids);
+  const groupOf = (group: LessonGroup): readonly Lesson[] => lessons.filter((l) => l.group === group);
 
   const listScreen = byId<HTMLElement>("pantalla-lecciones");
   const listTitle = byId<HTMLElement>("titulo-lecciones");
   const listIntro = byId<HTMLElement>("lecciones-intro");
-  const listProgress = byId<HTMLElement>("lecciones-progreso");
-  const list = byId<HTMLOListElement>("lecciones-lista");
+  const groupsBox = byId<HTMLElement>("lecciones-grupos");
 
   const lessonScreen = byId<HTMLElement>("pantalla-leccion");
   const position = byId<HTMLElement>("leccion-posicion");
   const title = byId<HTMLElement>("leccion-titulo");
   const lessonProgress = byId<HTMLElement>("leccion-progreso");
   const goal = byId<HTMLElement>("leccion-objetivo");
+  const howBox = byId<HTMLElement>("leccion-como");
+  const howText = byId<HTMLElement>("leccion-como-texto");
+  const counter = byId<HTMLElement>("leccion-contador");
+  const helpBox = byId<HTMLElement>("leccion-ayuda");
+  const helpStatus = byId<HTMLElement>("leccion-ayuda-estado");
+  const helpButton = byId<HTMLButtonElement>("leccion-ver-casillas");
+  const legendGoal = byId<HTMLElement>("leccion-leyenda-meta");
   const turnDot = byId<HTMLElement>("leccion-turno");
   const turnText = byId<HTMLElement>("leccion-estado-texto");
   const boardBox = byId<HTMLElement>("leccion-tablero");
@@ -129,6 +144,16 @@ export function createLessonsScreen(deps: LessonsDeps): LessonsScreen {
   const hintButton = byId<HTMLButtonElement>("leccion-pedir-pista");
   const restartButton = byId<HTMLButtonElement>("leccion-reiniciar");
   const announcer = byId<HTMLElement>("leccion-anuncio");
+  const goalSection = byId<HTMLElement>("leccion-objetivo").closest("section")!;
+
+  // En móvil apaisado la columna derecha no cabe entera: «Cómo se mueve» pasa a la región con scroll,
+  // tras la retroalimentación; en el resto, va sobre el objetivo, como en el lienzo.
+  const placeHowItMoves = (compact: boolean): void => {
+    if (compact) feedback.after(howBox);
+    else goalSection.before(howBox);
+  };
+  placeHowItMoves(window.matchMedia(COMPACT_LANDSCAPE).matches);
+  onCompactLandscapeChange(placeHowItMoves);
 
   let view: BoardView | null = null;
   let session: LessonSession | null = null;
@@ -154,9 +179,9 @@ export function createLessonsScreen(deps: LessonsDeps): LessonsScreen {
     const num = el("span", "leccion__num", String(lesson.number));
     num.setAttribute("aria-hidden", "true");
     const heading = el("span", "leccion__titulo");
-    heading.append(el("span", "oculto", `Lección ${lesson.number}: `), lesson.title);
+    heading.append(el("span", "oculto", text.groupLessonLabel(lesson.group, lesson.number)), lesson.title);
     const status = el("span", "leccion__estado");
-    status.append(icon(STATE_ICON[state]), text.stateLabel(state, progress.done.get(lesson.id) ?? 0));
+    status.append(icon(STATE_ICON[state]), text.stateLabel(state, progress.done.get(lesson.id) ?? 0, progress.helped.has(lesson.id)));
     const body = el("span", "leccion__cuerpo");
     body.append(heading, el("span", "leccion__resumen", lesson.summary), el("span", "leccion__meta", text.movesLabel(lesson.steps.length)), status);
     link.append(num, body);
@@ -165,10 +190,33 @@ export function createLessonsScreen(deps: LessonsDeps): LessonsScreen {
     return item;
   }
 
+  /** Un grupo de la lista: título, descripción, su progreso y sus lecciones. La leyenda del progreso va solo en el primero. */
+  function groupSection(group: LessonGroup, first: boolean): HTMLElement {
+    const members = groupOf(group);
+    const section = el("section", "grupo");
+    const headingId = `grupo-${group}`;
+    section.setAttribute("aria-labelledby", headingId);
+    const head = el("div", "grupo__cab");
+    const txt = el("div", "grupo__txt");
+    const h = el("h3", "grupo__titulo", text.GROUP_TITLE[group]);
+    h.id = headingId;
+    txt.append(h, el("p", "grupo__desc", text.groupDescription(group, members.length)));
+    const box = el("div", "grupo__progreso");
+    const progressBox = el("div", "progreso");
+    renderProgress(progressBox, members, progress, progress.current, first);
+    box.append(progressBox);
+    head.append(txt, box);
+    const list = el("ol", "lecciones");
+    list.setAttribute("aria-label", text.groupListLabel(group));
+    list.append(...members.map(card));
+    section.append(head, list);
+    return section;
+  }
+
   function renderList(): void {
-    listIntro.textContent = text.listIntro(lessons.length);
-    renderProgress(listProgress, lessons, progress, progress.current, true);
-    list.replaceChildren(...lessons.map(card));
+    listIntro.textContent = text.LIST_INTRO;
+    const present = GROUPS.filter((g) => groupOf(g).length > 0);
+    groupsBox.replaceChildren(...present.map((g, i) => groupSection(g, i === 0)));
   }
 
   // --- Una lección ----------------------------------------------------------------
@@ -204,15 +252,30 @@ export function createLessonsScreen(deps: LessonsDeps): LessonsScreen {
   }
 
   function marks(): Map<string, Mark[]> {
-    const all = ui!.marks();
-    const hint = session!.hintMarks();
-    if (hint !== null) {
-      for (const [square, mark] of [[hint.from, "selected"], [hint.to, "target"]] as const) {
-        const existing = all.get(square);
-        if (existing === undefined) all.set(square, [mark]);
-        else if (!existing.includes(mark)) existing.push(mark);
-      }
+    const s = session!;
+    const all: Map<string, Mark[]> = ui!.marks();
+    const add = (square: string, mark: Mark): void => {
+      const existing = all.get(square);
+      if (existing === undefined) all.set(square, [mark]);
+      else if (!existing.includes(mark)) existing.push(mark);
+    };
+    // Tras un paso sin respuesta la partida se rehace: la última jugada la guarda la sesión.
+    if (s.game.lastMove === null && s.lastMove !== null) {
+      add(s.lastMove.from, "last-move");
+      add(s.lastMove.to, "last-move");
     }
+    const hint = s.hintMarks();
+    if (hint !== null) {
+      add(hint.from, "selected");
+      add(hint.to, "target");
+    }
+    const targets = s.helpTargets();
+    if (s.helpOn && s.helpSquare !== null) {
+      add(s.helpSquare, "selected");
+      for (const square of targets) add(square, s.game.pieceAt(square) === null ? "target" : "capture");
+    }
+    const goalSquare = s.goalSquare();
+    if (goalSquare !== null) add(goalSquare, "meta");
     return all;
   }
 
@@ -226,6 +289,37 @@ export function createLessonsScreen(deps: LessonsDeps): LessonsScreen {
     turnDot.className = `estado__turno estado__turno--${game.turn}`;
     turnText.textContent = statusMessage(game.status, game.turn, game.inCheck);
     renderHintControls();
+    renderHelp();
+    renderCounter();
+  }
+
+  function renderHelp(): void {
+    const s = session!;
+    helpBox.hidden = s.lesson.helpPiece === undefined;
+    helpButton.setAttribute("aria-pressed", String(s.helpOn));
+    helpButton.disabled = s.solved;
+  }
+
+  function renderCounter(): void {
+    const s = session!;
+    const noun = s.lesson.counter;
+    counter.hidden = noun === undefined;
+    if (noun === undefined) return;
+    const total = s.totalSteps;
+    const dots = el("span", "contador__puntos");
+    dots.setAttribute("aria-hidden", "true");
+    for (let i = 0; i < total; i++) dots.append(el("span", i < s.captures ? "contador__punto contador__punto--hecho" : "contador__punto"));
+    const sentence = text.counterSentence(s.captures, total, noun);
+    const words = el("span");
+    words.append(el("strong", undefined, sentence.count));
+    if (sentence.rest !== "") words.append(` ${sentence.rest}`);
+    counter.replaceChildren(dots, words);
+  }
+
+  /** Texto de la ayuda bajo el tablero (región de estado): las casillas marcadas, o nada si está apagada. */
+  function updateHelpStatus(): void {
+    const s = session!;
+    helpStatus.textContent = s.helpOn ? text.helpAnnouncement(s.helpTargets(), s.goalSquare()) : "";
   }
 
   function renderHintControls(): void {
@@ -237,22 +331,35 @@ export function createLessonsScreen(deps: LessonsDeps): LessonsScreen {
   }
 
   function lessonHeader(lesson: Lesson): void {
-    position.textContent = text.lessonPosition(lesson.number, lessons.length);
+    const members = groupOf(lesson.group);
+    position.textContent = text.groupLessonPosition(lesson.group, lesson.number, members.length);
     title.textContent = lesson.title;
-    renderProgress(lessonProgress, lessons, progress, lesson.id, false);
+    renderProgress(lessonProgress, members, progress, lesson.id, false);
+  }
+
+  /** Interacción nueva sobre la partida de la sesión (al empezar y tras un paso sin respuesta, que rehace la partida). */
+  function bindInteraction(focus: string | null): void {
+    const s = session!;
+    ui = new Interaction(s.game);
+    ui.player = s.lesson.side;
+    ui.orientation = s.lesson.side;
+    if (focus === null) ui.focusKing(s.lesson.side);
+    else ui.focus = focus;
   }
 
   function startRun(lesson: Lesson): void {
     const board = ensureBoard();
     session = new LessonSession(lesson, check);
-    ui = new Interaction(session.game);
-    ui.player = lesson.side;
-    ui.orientation = lesson.side;
-    ui.focusKing(lesson.side);
+    // La pieza de la ayuda es la del ejercicio: el foco del teclado empieza en ella.
+    bindInteraction(lesson.helpPiece ?? null);
     board.setOrientation(lesson.side);
     feedback.replaceChildren();
     hintList.replaceChildren();
     goal.textContent = lesson.goal;
+    howBox.hidden = lesson.howItMoves === undefined;
+    howText.textContent = lesson.howItMoves ?? "";
+    legendGoal.hidden = !lesson.steps.some((step) => step.kind === "reach" && step.marked);
+    helpStatus.textContent = "";
     lessonHeader(lesson);
     render();
   }
@@ -272,10 +379,12 @@ export function createLessonsScreen(deps: LessonsDeps): LessonsScreen {
     return { box, add: (node) => box.append(node) };
   }
 
+  /** La siguiente lección sin completar de su mismo grupo, dando la vuelta; `null` si el grupo está completo. */
   function nextLesson(current: Lesson): Lesson | null {
-    const start = lessons.indexOf(current);
-    for (let step = 1; step < lessons.length; step++) {
-      const candidate = lessons[(start + step) % lessons.length]!;
+    const members = groupOf(current.group);
+    const start = members.indexOf(current);
+    for (let step = 1; step < members.length; step++) {
+      const candidate = members[(start + step) % members.length]!;
       if (!progress.done.has(candidate.id)) return candidate;
     }
     return null;
@@ -294,19 +403,37 @@ export function createLessonsScreen(deps: LessonsDeps): LessonsScreen {
     return b;
   }
 
-  function showSolved(hints: number): void {
+  function showSolved(hints: number, helped: boolean): void {
     const s = session!;
+    helpStatus.textContent = ""; // la ayuda se apaga al resolver: sus casillas ya no están marcadas
     const lesson = s.lesson;
-    persist(completeLesson(progress, lesson.id, hints));
-    renderProgress(lessonProgress, lessons, progress, lesson.id, false);
+    const members = groupOf(lesson.group);
+    persist(completeLesson(progress, lesson.id, hints, helped));
+    renderProgress(lessonProgress, members, progress, lesson.id, false);
     const next = nextLesson(lesson);
-    const allDone = completedCount(progress, ids) === lessons.length;
+    const groupDone = completedCount(progress, members.map((l) => l.id)) === members.length;
+    const usedSentence = lesson.helpPiece === undefined ? text.hintsUsed(hints) : text.helpUsedSentence(hints, helped);
     let focusTarget: HTMLElement;
-    if (allDone) {
-      const { box, add } = retroBox("marca", false, text.ALL_DONE_TITLE(lessons.length));
+    if (groupDone && lesson.group === "primeros-pasos") {
+      // Final del bloque de iniciación: de aquí se pasa a las tácticas o a jugar.
+      const { box, add } = retroBox("marca", false, text.BLOCK_DONE_TITLE);
+      add(el("p", "retro__texto", text.BLOCK_DONE_TEXT));
+      add(el("p", "retro__meta", text.blockDoneMeta(members.length)));
+      const actions = el("div", "retro__acciones");
+      const tactics = groupOf("tacticas");
+      const firstTactic = tactics.find((l) => !progress.done.has(l.id)) ?? tactics[0];
+      const primary = firstTactic === undefined ? actionLink(text.PLAY_GAME, PLAY_HASH, true) : actionLink(text.START_TACTICS, lessonHash(firstTactic.id), true);
+      actions.append(primary);
+      if (firstTactic !== undefined) actions.append(actionLink(text.PLAY_GAME, PLAY_HASH, false));
+      actions.append(actionLink(text.ALL_LESSONS, LESSONS_HASH, false));
+      add(actions);
+      feedback.replaceChildren(box);
+      focusTarget = primary;
+    } else if (groupDone) {
+      const { box, add } = retroBox("marca", false, text.ALL_DONE_TITLE(members.length));
       add(el("p", "retro__texto", `${text.CORRECT} ${lesson.success}`));
       add(el("p", "retro__texto", text.ALL_DONE_TEXT));
-      add(el("p", "retro__meta", text.hintsUsed(hints)));
+      add(el("p", "retro__meta", usedSentence));
       const actions = el("div", "retro__acciones");
       const play = actionLink(text.PLAY_ENGINE, PLAY_HASH, true);
       actions.append(play, actionButton(text.REPEAT_LESSON, false, () => restart(true)), actionLink(text.ALL_LESSONS, LESSONS_HASH, false));
@@ -316,7 +443,7 @@ export function createLessonsScreen(deps: LessonsDeps): LessonsScreen {
     } else {
       const { box, add } = retroBox("marca", false, text.CORRECT);
       add(el("p", "retro__texto", lesson.success));
-      add(el("p", "retro__meta", text.hintsUsed(hints)));
+      add(el("p", "retro__meta", usedSentence));
       const actions = el("div", "retro__acciones");
       const nextAction = next === null ? actionLink(text.ALL_LESSONS, LESSONS_HASH, true) : actionLink(text.nextLessonLabel(next.title), lessonHash(next.id), true);
       actions.append(nextAction, actionButton(text.REPEAT_LESSON, false, () => restart(true)));
@@ -333,8 +460,17 @@ export function createLessonsScreen(deps: LessonsDeps): LessonsScreen {
     const s = session!;
     switch (result.kind) {
       case "correcto":
-        showSolved(result.hints);
+        showSolved(result.hints, result.helped);
         return;
+      case "sigue": {
+        // El rival no mueve: la partida se ha rehecho con el turno del alumno.
+        bindInteraction(ui!.focus);
+        const { box, add } = retroBox("siguiente", false, text.intermediateTitle(result.step, s.totalSteps));
+        add(el("p", "retro__texto", text.NO_REPLY));
+        feedback.replaceChildren(box);
+        if (s.helpOn) updateHelpStatus();
+        break;
+      }
       case "paso": {
         const { box, add } = retroBox("siguiente", false, text.intermediateTitle(result.step, s.totalSteps));
         add(el("p", "retro__texto", text.rivalReply(ENGINE_NAME, result.reply.san)));
@@ -415,6 +551,14 @@ export function createLessonsScreen(deps: LessonsDeps): LessonsScreen {
 
   restartButton.addEventListener("click", () => restart(true));
 
+  helpButton.addEventListener("click", () => {
+    const s = session;
+    if (s === null) return;
+    s.toggleHelp();
+    updateHelpStatus();
+    render();
+  });
+
   // --- Pantallas ---------------------------------------------------------------------
 
   return {
@@ -438,6 +582,9 @@ export function createLessonsScreen(deps: LessonsDeps): LessonsScreen {
       startRun(lesson);
       if (focus) title.focus({ preventScroll: false });
       return lesson.title;
+    },
+    progress() {
+      return progress;
     },
     hide() {
       promotion.close();

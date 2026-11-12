@@ -23,7 +23,8 @@ export interface SquareModel {
   readonly label: string;
 }
 
-export type Mark = "selected" | "target" | "capture" | "last-move" | "check";
+/** `meta`: casilla objetivo de un ejercicio de primeros pasos (anillo discontinuo). */
+export type Mark = "selected" | "target" | "capture" | "last-move" | "check" | "meta";
 
 const MARK_TEXT: Readonly<Record<Mark, string>> = {
   selected: "seleccionada",
@@ -31,6 +32,7 @@ const MARK_TEXT: Readonly<Record<Mark, string>> = {
   capture: "captura posible",
   "last-move": "última jugada",
   check: "rey en jaque",
+  meta: "casilla objetivo",
 };
 
 export interface BoardOptions {
