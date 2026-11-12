@@ -40,7 +40,7 @@ import { createCoachClient } from "../worker/coach-client.js";
 import { startPwa } from "../pwa/pwa.js";
 import { checkLessonMove, LESSONS } from "../lessons/index.js";
 import { createLessonsScreen } from "./lessons-screen.js";
-import { dismissBeginner, isBeginnerDismissed, loadProgress, showBeginnerNotice } from "./lessons-progress.js";
+import { dismissBeginner, isBeginnerDismissed, showBeginnerNotice } from "./lessons-progress.js";
 import { LESSONS_TITLE } from "./lessons-text.js";
 import { parseRoute, type Route } from "./routes.js";
 
@@ -100,11 +100,10 @@ const autosave = createAutosave(store);
 // Aviso «¿Nunca has jugado?» en la pantalla de nueva partida: solo sin progreso de lecciones y sin haberlo descartado.
 const beginnerNotice = byId<HTMLElement>("aviso-novato");
 const settingsTitle = byId<HTMLElement>("titulo-ajustes");
-const lessonIds = LESSONS.map((l) => l.id);
 let beginnerDismissed = isBeginnerDismissed(store);
 
 function syncBeginnerNotice(): void {
-  beginnerNotice.hidden = !showBeginnerNotice(loadProgress(store, lessonIds), beginnerDismissed);
+  beginnerNotice.hidden = !showBeginnerNotice(lessonsScreen.progress(), beginnerDismissed);
 }
 
 byId<HTMLButtonElement>("aviso-novato-ahora-no").addEventListener("click", () => {

@@ -24,17 +24,20 @@ export function passTurn(fen: string, side: Color): string {
 
 const isFree = (step: Step): step is FreeStep => step.kind === "reach" || step.kind === "capture" || step.kind === "check";
 
-/** ¿La jugada `move` (aún sin hacer en `before`) cumple el paso? `after` es la posición tras jugarla. */
-function meetsFree(step: FreeStep, before: Position, move: Move, after: Position): boolean {
+/** ¿La jugada `move` cumple el paso? `captured`: si capturaba algo; `after`: la posición tras jugarla. */
+function meetsFree(step: FreeStep, move: Move, captured: boolean, after: Position): boolean {
   switch (step.kind) {
     case "reach":
       return squareName(move.to) === step.target;
     case "capture":
-      return before.pieceAt(move.to) !== null || isEnPassant(before, move);
+      return captured;
     case "check":
       return after.isCheck();
   }
 }
+
+/** ¿Captura `move` en `position` (antes de jugarla)? */
+const captures = (position: Position, move: Move): boolean => position.pieceAt(move.to) !== null || isEnPassant(position, move);
 
 const FILES = "abcdefgh";
 function squareName(square: number): string {
@@ -104,9 +107,9 @@ export function checkLessonMove(lesson: Lesson, played: readonly string[], uci: 
     const reply = played[2 * i + 1]!;
     if (isFree(previous)) {
       const done = legal(position, mine);
-      const before = Position.fromFen(position.toFen());
+      const captured = captures(position, done);
       position.makeMove(done);
-      if (reply !== PASS || !meetsFree(previous, before, done, position)) throw new LessonError("Las jugadas previas no siguen la lección");
+      if (reply !== PASS || !meetsFree(previous, done, captured, position)) throw new LessonError("Las jugadas previas no siguen la lección");
       position = pass(position, lesson.side, lesson.id);
       continue;
     }
@@ -122,12 +125,12 @@ export function checkLessonMove(lesson: Lesson, played: readonly string[], uci: 
     reason: (step.mistakes && Object.hasOwn(step.mistakes, uci) ? step.mistakes[uci] : undefined) ?? lesson.failure,
   });
   const move = legal(position, uci);
-  const before = Position.fromFen(position.toFen());
+  const captured = captures(position, move);
   position.makeMove(move);
   const last = index === lesson.steps.length - 1;
 
   if (isFree(step)) {
-    if (!meetsFree(step, before, move, position)) return fail();
+    if (!meetsFree(step, move, captured, position)) return fail();
     if (last) return { kind: "correcto" };
     pass(position, lesson.side, lesson.id); // comprueba que el rival puede pasar (no queda en jaque)
     return { kind: "sigue", step: index + 2 };

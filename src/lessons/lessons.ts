@@ -50,7 +50,7 @@ export const LESSONS: readonly Lesson[] = deepFreeze([
     hints: [
       { text: "Para capturar, lleva la torre a la casilla del peón." },
       { text: "Empieza por el peón de la columna d: está en línea recta con la torre." },
-      { text: "Captura el peón de d5.", marks: { from: "d1", to: "d5" } },
+      { text: "Captura primero en d5, después en h5 y por último en h2.", marks: { from: "d1", to: "d5" } },
     ],
     success: "La torre recorre filas y columnas enteras de una vez. Por eso es tan fuerte en un tablero abierto.",
     failure: "Esa jugada no captura ningún peón.",
@@ -76,7 +76,7 @@ export const LESSONS: readonly Lesson[] = deepFreeze([
     hints: [
       { text: "El alfil solo captura en diagonal: busca un peón en la misma diagonal que él." },
       { text: "El peón de f4 está en la diagonal que sube hacia la derecha desde c1." },
-      { text: "Captura el peón de f4.", marks: { from: "c1", to: "f4" } },
+      { text: "Captura primero en f4 y después en c7.", marks: { from: "c1", to: "f4" } },
     ],
     success: "El alfil ha capturado los dos peones sin salir de las casillas oscuras. Cada alfil se queda siempre en su color.",
     failure: "Esa jugada no captura ningún peón.",
@@ -140,7 +140,7 @@ export const LESSONS: readonly Lesson[] = deepFreeze([
     hints: [
       { text: "El peón no captura de frente: captura en diagonal, una casilla hacia delante." },
       { text: "Primero avanza el peón hasta una casilla desde la que toque al caballo en diagonal." },
-      { text: "Avanza el peón de e2 a e3.", marks: { from: "e2", to: "e3" } },
+      { text: "Avanza el peón de e2 a e3 y después captura el caballo en f4.", marks: { from: "e2", to: "e3" } },
     ],
     success: "El peón ha avanzado de frente y ha capturado en diagonal. Si llega a la última fila, corona: se cambia por otra pieza.",
     failure: "Así el peón no puede capturar el caballo.",

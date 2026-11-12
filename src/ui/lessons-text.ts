@@ -31,15 +31,6 @@ export function progressSentence(done: number, total: number): { readonly count:
 export const PROGRESS_LEGEND = "Segmento lleno: completada. Borde grueso: la lección que tienes abierta.";
 const TOTAL_WORD: Readonly<Record<number, string>> = { 3: "Tres", 4: "Cuatro", 5: "Cinco", 6: "Seis", 7: "Siete", 8: "Ocho" };
 
-export function listIntro(total: number): string {
-  return `${TOTAL_WORD[total] ?? total} ejercicios cortos para practicar en el tablero. Elige el que quieras: el orden es libre.`;
-}
-
-/** «Lección 4 de 6» */
-export function lessonPosition(number: number, total: number): string {
-  return `Lección ${number} de ${total}`;
-}
-
 /** Texto del botón de pistas: «Pedir pista 2 de 3», o «No quedan más pistas» cuando se han pedido todas. */
 export function hintButtonLabel(shown: number, total: number): string {
   return shown >= total ? "No quedan más pistas" : `Pedir pista ${shown + 1} de ${total}`;
@@ -73,7 +64,7 @@ export function nextLessonLabel(title: string): string {
   return `Siguiente lección: ${title}`;
 }
 
-export const ALL_DONE_TITLE = (total: number): string => `Has completado las ${total} lecciones.`;
+export const ALL_DONE_TITLE = (total: number): string => `Has completado las ${total} lecciones de tácticas.`;
 export const ALL_DONE_TEXT = "Puedes repetir las que quieras o poner a prueba lo aprendido contra Alfil Beta.";
 export const PLAY_ENGINE = "Jugar contra Alfil Beta";
 export const ALL_LESSONS = "Todas las lecciones";

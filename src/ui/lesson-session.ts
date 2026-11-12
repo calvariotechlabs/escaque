@@ -44,7 +44,7 @@ export class LessonSession {
   private readonly played: string[] = [];
   /** Casilla de origen y destino de la última pista, mientras la posición no cambie. */
   private marksPly = "";
-  /** Cuenta de juicios: con la media jugada, distingue cada posición aunque la partida se rehaga. */
+  /** Cuántas veces se ha rehecho la partida (pasos sin respuesta): con la media jugada, distingue cada posición. */
   private version = 0;
 
   private get positionKey(): string {
@@ -104,7 +104,8 @@ export class LessonSession {
 
   /** Casillas que marca la última pista si es la que marca, y la posición no ha cambiado desde que se pidió. */
   hintMarks(): { readonly from: string; readonly to: string } | null {
-    if (this.hintsShown === 0 || this.marksPly !== this.positionKey) return null;
+    // Las marcas son de la jugada del primer paso (la de la última pista).
+    if (this.hintsShown === 0 || this.step !== 1 || this.marksPly !== this.positionKey) return null;
     return this.lesson.hints[this.hintsShown - 1]?.marks ?? null;
   }
 
@@ -113,7 +114,6 @@ export class LessonSession {
    * deshace; si pide otra, juega la respuesta del rival.
    */
   judge(record: MoveRecord): Feedback {
-    this.version++;
     const uci = uciOf(record);
     let result: LessonCheck;
     try {
@@ -122,22 +122,26 @@ export class LessonSession {
       result = { kind: "fallo", reason: this.lesson.failure };
     }
     if (result.kind === "fallo") return this.fail(result.reason);
-    this.accept(record);
     switch (result.kind) {
       case "correcto":
+        this.accept(record);
         this.solved = true;
         this.helpOn = false;
         return { kind: "correcto", hints: this.hintsShown, helped: this.helpUsed };
       case "paso-intermedio": {
         const reply = result.reply.uci;
         const played = this.game.play(reply.slice(0, 2), reply.slice(2, 4), (reply[4] as PromotionPiece | undefined) ?? undefined);
+        // Respuesta imposible (datos mal hechos): se deshace la jugada del alumno, sin contarla.
         if (played === null) return this.fail(this.lesson.failure);
+        this.accept(record);
         this.played.push(uci, reply);
         this.step = result.step;
         return { kind: "paso", step: result.step, reply: result.reply };
       }
       case "sigue":
         // El rival no mueve: la partida sigue desde la misma posición con el turno del alumno.
+        this.accept(record);
+        this.version++;
         this.played.push(uci, PASS);
         this.passedMove = { from: record.from, to: record.to };
         this.game = new Game(passTurn(this.game.fen, this.lesson.side));
@@ -153,7 +157,6 @@ export class LessonSession {
   }
 
   private fail(reason: string): Feedback {
-    this.version++;
     this.game.undo();
     this.attempts++;
     return { kind: "fallo", reason, attempt: this.attempts };

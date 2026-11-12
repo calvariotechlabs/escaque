@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 import type { Lesson, LessonCheck } from "../src/lessons/types.js";
 import { checkLessonMove } from "../src/lessons/index.js";
 import { LessonSession, type CheckLessonMove } from "../src/ui/lesson-session.js";
-import { lessonPosition, hintButtonLabel, movesLabel, stateLabel, progressSentence, hintsUsed } from "../src/ui/lessons-text.js";
+import { hintButtonLabel, movesLabel, stateLabel, progressSentence, hintsUsed } from "../src/ui/lessons-text.js";
 
 // Mate del pasillo: Te8#.
 const LESSON: Lesson = {
@@ -156,6 +156,33 @@ describe("sesión de lección sin respuesta del rival", () => {
     assert.deepEqual(s.judge(s.game.play("d5", "h5")!), { kind: "correcto", hints: 0, helped: true });
   });
 
+  it("un fallo no quita las marcas de la última pista: la posición vuelve a ser la misma", () => {
+    const s = new LessonSession(ROOK, checkLessonMove);
+    s.askHint();
+    s.askHint();
+    s.judge(s.game.play("d1", "d4")!);
+    assert.deepEqual(s.hintMarks(), { from: "d1", to: "d5" });
+  });
+
+  it("las marcas de la pista son del primer paso: tras un paso sin respuesta ya no salen", () => {
+    const s = new LessonSession(ROOK, checkLessonMove);
+    s.judge(s.game.play("d1", "d5")!);
+    s.askHint();
+    s.askHint();
+    assert.equal(s.hintMarks(), null);
+  });
+
+  it("un paso intermedio cuya respuesta no se puede jugar no cuenta la captura ni mueve la ayuda", () => {
+    const capturing: Lesson = { ...ROOK, steps: [{ kind: "moves", accept: { d1d5: "a8a7" } }, { kind: "capture" }] };
+    // La comprobación de prueba da una respuesta imposible (la torre no está en a8).
+    const check: CheckLessonMove = () => ({ kind: "paso-intermedio", step: 2, reply: { uci: "h8h7", san: "Th7" } });
+    const s = new LessonSession(capturing, check);
+    const result = s.judge(s.game.play("d1", "d5")!);
+    assert.equal(result.kind, "fallo");
+    assert.equal(s.helpSquare, "d1");
+    assert.equal(s.captures, 0);
+  });
+
   it("marca la casilla objetivo de un paso de llegada marcado", () => {
     const s = new LessonSession(KNIGHT, checkLessonMove);
     assert.equal(s.goalSquare(), "f5");
@@ -175,7 +202,6 @@ describe("textos de lecciones", () => {
     assert.equal(stateLabel("en-curso", 0), "En curso.");
     assert.equal(stateLabel("sin-empezar", 0), "Sin empezar.");
     assert.deepEqual(progressSentence(2, 6), { count: "2 de 6", rest: "lecciones completadas." });
-    assert.equal(lessonPosition(4, 6), "Lección 4 de 6");
   });
 
   it("botón de pistas y uso de pistas", () => {
@@ -184,14 +210,6 @@ describe("textos de lecciones", () => {
     assert.equal(hintButtonLabel(3, 3), "No quedan más pistas");
     assert.equal(hintsUsed(0), "Sin pistas.");
     assert.equal(hintsUsed(1), "Has usado 1 pista.");
-  });
-});
-
-describe("introducción de la lista", () => {
-  it("escribe el número de ejercicios con letra", async () => {
-    const { listIntro } = await import("../src/ui/lessons-text.js");
-    assert.equal(listIntro(6), "Seis ejercicios cortos para practicar en el tablero. Elige el que quieras: el orden es libre.");
-    assert.equal(listIntro(12).startsWith("12 ejercicios"), true);
   });
 });
 

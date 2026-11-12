@@ -27,6 +27,8 @@ export interface LessonsScreen {
   /** Enseña una lección. Devuelve el título de la pantalla, o `null` si no existe (entonces enseña la lista). */
   showLesson(id: string, focus: boolean): string | null;
   hide(): void;
+  /** El progreso guardado, tal como lo lleva la pantalla (también si no se pudo guardar en el dispositivo). */
+  progress(): LessonProgress;
 }
 
 function byId<T extends HTMLElement>(id: string): T {
@@ -392,6 +394,7 @@ export function createLessonsScreen(deps: LessonsDeps): LessonsScreen {
 
   function showSolved(hints: number, helped: boolean): void {
     const s = session!;
+    helpStatus.textContent = ""; // la ayuda se apaga al resolver: sus casillas ya no están marcadas
     const lesson = s.lesson;
     const members = groupOf(lesson.group);
     persist(completeLesson(progress, lesson.id, hints, helped));
@@ -568,6 +571,9 @@ export function createLessonsScreen(deps: LessonsDeps): LessonsScreen {
       startRun(lesson);
       if (focus) title.focus({ preventScroll: false });
       return lesson.title;
+    },
+    progress() {
+      return progress;
     },
     hide() {
       promotion.close();
