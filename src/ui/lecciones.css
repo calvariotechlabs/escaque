@@ -106,10 +106,32 @@
   .lecc-acciones--leccion{grid-area:acciones}
 }
 
-/* Móvil apaisado: en la partida la cabecera va sobre la columna derecha (page.css); en las lecciones no hay tablero a la izquierda del título, así que vuelve a su sitio. */
+/* Agrupa retroalimentación, pistas y acciones; solo es una caja propia en móvil apaisado. */
+.lecc-panel{display:contents}
+
+/* Móvil apaisado (alto menor de 500 px, lienzo «Móvil · horizontal · lección»): la lista no cambia (la cabecera vuelve a su sitio).
+   En una lección el tablero va a la izquierda y la cabecera sobre la columna derecha, como en la partida (page.css);
+   título, objetivo y turno quedan fijos, retroalimentación y pistas comparten una región con scroll y las acciones se quedan abajo. */
 @media (orientation:landscape) and (max-height:500px){
-  .pagina__cabecera:has(~ .lecc-pagina:not([hidden])){position:static}
-  .lecc-tablero{max-width:calc(100dvh - var(--space-8));margin:0 auto;width:100%}
-  .lecc-pagina{max-width:none;padding-top:var(--space-2);padding-left:max(var(--space-6),env(safe-area-inset-left,0px));padding-right:max(var(--space-6),env(safe-area-inset-right,0px))}
-  .pagina__cabecera:has(~ .lecc-pagina:not([hidden])){padding:max(var(--space-2),env(safe-area-inset-top,0px)) max(var(--space-6),env(safe-area-inset-right,0px)) 0 max(var(--space-6),env(safe-area-inset-left,0px));max-width:none;margin:0}
+  .pagina__cabecera:has(~ #pantalla-lecciones:not([hidden])){position:static;padding:max(var(--space-2),env(safe-area-inset-top,0px)) max(var(--space-6),env(safe-area-inset-right,0px)) 0 max(var(--space-6),env(safe-area-inset-left,0px));max-width:none;margin:0}
+  #pantalla-lecciones{max-width:none;padding-top:var(--space-2);padding-left:max(var(--space-6),env(safe-area-inset-left,0px));padding-right:max(var(--space-6),env(safe-area-inset-right,0px))}
+  #pantalla-leccion:not([hidden]){display:grid;box-sizing:border-box;max-width:none;margin:0;height:100dvh;padding:max(var(--space-4),env(safe-area-inset-top,0px)) max(var(--space-6),env(safe-area-inset-right,0px)) max(var(--space-4),env(safe-area-inset-bottom,0px)) max(var(--space-6),env(safe-area-inset-left,0px));grid-template-columns:var(--tablero-ancho) minmax(0,1fr);grid-template-rows:44px auto auto auto minmax(0,1fr);grid-template-areas:"tablero nav" "tablero encabezado" "tablero objetivo" "tablero estado" "tablero panel";gap:var(--space-2) var(--space-6);align-items:start}
+  #pantalla-leccion::before{content:"";grid-area:nav}
+  #pantalla-leccion .lecc-cuerpo{display:contents}
+  #pantalla-leccion .lecc-encabezado{grid-area:encabezado;display:block}
+  #pantalla-leccion .lecc-encabezado > div:first-child{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 var(--space-3)}
+  #pantalla-leccion .lecc-progreso{display:none}
+  #pantalla-leccion .lecc-titulo{font-size:20px;line-height:24px}
+  #pantalla-leccion .objetivo{grid-area:objetivo;padding:var(--space-2) var(--space-3)}
+  #pantalla-leccion .objetivo__texto{font-size:16px;line-height:24px}
+  #pantalla-leccion .lecc-estado{grid-area:estado}
+  #pantalla-leccion .lecc-tablero{grid-area:tablero;max-width:none;margin:0;width:100%}
+  #pantalla-leccion .lecc-panel{display:flex;flex-direction:column;grid-area:panel;align-self:stretch;min-height:0;overflow:auto;gap:var(--space-2);padding:2px;scroll-padding-bottom:60px}
+  #pantalla-leccion .lecc-panel > *{flex:none}
+  #pantalla-leccion .lecc-panel:focus-visible{outline:3px solid var(--accent);outline-offset:-3px}
+  #pantalla-leccion .lecc-acciones--leccion{position:sticky;bottom:0;z-index:1;margin-top:auto;padding-top:var(--space-2);background:var(--surface)}
+  /* Acierto: el resultado lleva sus propias acciones; objetivo, turno, pistas y botones fijos sobran. */
+  #pantalla-leccion:has(.retro__acciones) :is(.objetivo,.lecc-estado,.lecc-pistas,.lecc-acciones--leccion){display:none}
+  #pantalla-leccion .retro__acciones{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+  #pantalla-leccion .retro__acciones > :first-child{grid-column:1 / -1}
 }
