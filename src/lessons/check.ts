@@ -4,7 +4,57 @@ import { FenError, Position } from "../core/index.js";
 import type { Move } from "../core/index.js";
 // Directo de text.js, no del índice del coach: así no se carga el motor en el hilo principal.
 import { spanishSan } from "../coach/text.js";
-import type { Lesson, LessonCheck } from "./types.js";
+import type { Color } from "../core/index.js";
+import type { FreeStep, Lesson, LessonCheck, Step } from "./types.js";
+
+/** Jugada nula en `played`: el rival no mueve (como «0000» en UCI). */
+export const PASS = "0000";
+
+/**
+ * FEN con el turno devuelto a `side` (el rival «pasa»). Quita la casilla al
+ * paso, que solo valía para la jugada del rival.
+ */
+export function passTurn(fen: string, side: Color): string {
+  const fields = fen.trim().split(/\s+/);
+  if (fields[1] === side) return fields.join(" ");
+  fields[1] = side;
+  fields[3] = "-";
+  return fields.join(" ");
+}
+
+const isFree = (step: Step): step is FreeStep => step.kind === "reach" || step.kind === "capture" || step.kind === "check";
+
+/** ¿La jugada `move` (aún sin hacer en `before`) cumple el paso? `after` es la posición tras jugarla. */
+function meetsFree(step: FreeStep, before: Position, move: Move, after: Position): boolean {
+  switch (step.kind) {
+    case "reach":
+      return squareName(move.to) === step.target;
+    case "capture":
+      return before.pieceAt(move.to) !== null || isEnPassant(before, move);
+    case "check":
+      return after.isCheck();
+  }
+}
+
+const FILES = "abcdefgh";
+function squareName(square: number): string {
+  return `${FILES[square & 7]!}${(square >> 4) + 1}`;
+}
+
+/** Un peón que cambia de columna hacia una casilla vacía solo puede estar capturando al paso. */
+function isEnPassant(position: Position, move: Move): boolean {
+  return position.pieceAt(move.from)?.type === "p" && (move.from & 7) !== (move.to & 7) && position.pieceAt(move.to) === null;
+}
+
+/** El rival no mueve: misma posición con el turno del alumno. */
+function pass(position: Position, side: Color, id: string): Position {
+  try {
+    return Position.fromFen(passTurn(position.toFen(), side));
+  } catch (error) {
+    if (error instanceof FenError) throw new LessonError(`En «${id}» el rival no puede pasar: ${error.message}`);
+    throw error;
+  }
+}
 
 /** Lección mal formada, jugada ilegal o jugadas previas que no siguen la lección. */
 export class LessonError extends Error {
@@ -41,7 +91,7 @@ function start(lesson: Lesson): Position {
  * lección está mal formada, lanza `LessonError`.
  */
 export function checkLessonMove(lesson: Lesson, played: readonly string[], uci: string): LessonCheck {
-  const position = start(lesson);
+  let position = start(lesson);
   if (played.length % 2 !== 0) throw new LessonError("Falta la respuesta del rival en las jugadas previas");
   const index = played.length / 2;
   const step = lesson.steps[index];
@@ -52,6 +102,14 @@ export function checkLessonMove(lesson: Lesson, played: readonly string[], uci: 
     const previous = lesson.steps[i]!;
     const mine = played[2 * i]!;
     const reply = played[2 * i + 1]!;
+    if (isFree(previous)) {
+      const done = legal(position, mine);
+      const before = Position.fromFen(position.toFen());
+      position.makeMove(done);
+      if (reply !== PASS || !meetsFree(previous, before, done, position)) throw new LessonError("Las jugadas previas no siguen la lección");
+      position = pass(position, lesson.side, lesson.id);
+      continue;
+    }
     if (previous.kind !== "moves" || !Object.hasOwn(previous.accept, mine) || previous.accept[mine] !== reply) {
       throw new LessonError("Las jugadas previas no siguen la lección");
     }
@@ -63,8 +121,17 @@ export function checkLessonMove(lesson: Lesson, played: readonly string[], uci: 
     kind: "fallo",
     reason: (step.mistakes && Object.hasOwn(step.mistakes, uci) ? step.mistakes[uci] : undefined) ?? lesson.failure,
   });
-  play(position, uci);
+  const move = legal(position, uci);
+  const before = Position.fromFen(position.toFen());
+  position.makeMove(move);
   const last = index === lesson.steps.length - 1;
+
+  if (isFree(step)) {
+    if (!meetsFree(step, before, move, position)) return fail();
+    if (last) return { kind: "correcto" };
+    pass(position, lesson.side, lesson.id); // comprueba que el rival puede pasar (no queda en jaque)
+    return { kind: "sigue", step: index + 2 };
+  }
 
   if (step.kind === "mate") {
     if (!last) throw new LessonError(`El paso de mate debe ser el último en «${lesson.id}»`);
@@ -75,7 +142,6 @@ export function checkLessonMove(lesson: Lesson, played: readonly string[], uci: 
   const reply = step.accept[uci]!;
   if (last !== (reply === null)) throw new LessonError(`Respuesta del rival mal puesta en «${lesson.id}»`);
   if (reply === null) return { kind: "correcto" };
-  const move = legal(position, reply);
-  const san = spanishSan(position.moveToSan(move));
+  const san = spanishSan(position.moveToSan(legal(position, reply)));
   return { kind: "paso-intermedio", step: index + 2, reply: { uci: reply, san } };
 }

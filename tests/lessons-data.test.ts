@@ -85,7 +85,7 @@ for (const lesson of LESSONS) {
       assert.ok(lesson.steps.length >= 1 && lesson.steps.length <= 2);
       lesson.steps.forEach((step, i) => {
         if (step.kind === "mate") assert.equal(i, lesson.steps.length - 1);
-        else {
+        else if (step.kind === "moves") {
           const replies = Object.values(step.accept);
           assert.ok(replies.length > 0);
           const last = i === lesson.steps.length - 1;

@@ -2,7 +2,11 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import {
+  BEGINNER_KEY,
   completeLesson,
+  dismissBeginner,
+  isBeginnerDismissed,
+  showBeginnerNotice,
   completedCount,
   EMPTY_PROGRESS,
   loadProgress,
@@ -110,5 +114,63 @@ describe("progreso de lecciones", () => {
 
   it("el formato guardado es estable", () => {
     assert.equal(serializeProgress(completeLesson(EMPTY_PROGRESS, "a", 0)), '{"v":1,"done":{"a":0},"current":null}');
+  });
+
+  it("usar la ayuda deja la lección «con ayuda», y una vez sin ayuda es mejor que cualquiera con ella", () => {
+    const helped = completeLesson(EMPTY_PROGRESS, "a", 0, true);
+    assert.equal(helped.helped.has("a"), true);
+    assert.equal(completeLesson(helped, "a", 0, true).helped.has("a"), true);
+    const clean = completeLesson(helped, "a", 2, false);
+    assert.equal(clean.helped.has("a"), false);
+    assert.equal(clean.done.get("a"), 2);
+    const again = completeLesson(clean, "a", 0, true);
+    assert.equal(again.helped.has("a"), false, "una vez con ayuda no quita una sin ayuda");
+    assert.equal(again.done.get("a"), 2);
+  });
+
+  it("guarda y lee las lecciones completadas con ayuda", () => {
+    const store = memoryStore();
+    saveProgress(store, completeLesson(completeLesson(EMPTY_PROGRESS, "a", 1, true), "b", 0));
+    assert.equal(store.data.get(PROGRESS_KEY), '{"v":1,"done":{"a":1,"b":0},"current":null,"help":["a"]}');
+    const loaded = loadProgress(store, IDS);
+    assert.deepEqual([...loaded.helped], ["a"]);
+  });
+
+  it("de «help» solo acepta lecciones completadas", () => {
+    const raw = JSON.stringify({ v: 1, done: { a: 0, vieja: 1 }, current: null, help: ["a", "b", "vieja", 7, "a"] });
+    const p = parseProgress(raw, IDS);
+    assert.deepEqual([...p.helped].sort(), ["a", "vieja"]);
+    assert.equal(parseProgress(JSON.stringify({ v: 1, done: { a: 0 }, current: null, help: "a" }), IDS).helped.size, 0);
+  });
+});
+
+describe("aviso «¿Nunca has jugado?»", () => {
+  it("sale solo sin ningún progreso y sin haberlo descartado", () => {
+    assert.equal(showBeginnerNotice(EMPTY_PROGRESS, false), true);
+    assert.equal(showBeginnerNotice(EMPTY_PROGRESS, true), false);
+    assert.equal(showBeginnerNotice(openLesson(EMPTY_PROGRESS, "a"), false), false);
+    assert.equal(showBeginnerNotice(completeLesson(EMPTY_PROGRESS, "a", 0), false), false);
+    assert.equal(showBeginnerNotice(parseProgress(JSON.stringify({ v: 1, done: { vieja: 0 }, current: null }), IDS), false), false);
+  });
+
+  it("«Ahora no» se recuerda en el dispositivo", () => {
+    const store = memoryStore();
+    assert.equal(isBeginnerDismissed(store), false);
+    dismissBeginner(store);
+    assert.equal(store.data.get(BEGINNER_KEY), "1");
+    assert.equal(isBeginnerDismissed(store), true);
+    assert.equal(isBeginnerDismissed(null), false);
+    dismissBeginner(null);
+    const broken: KeyValueStore = {
+      getItem: () => {
+        throw new Error("bloqueado");
+      },
+      setItem: () => {
+        throw new Error("cuota");
+      },
+      removeItem: () => {},
+    };
+    assert.equal(isBeginnerDismissed(broken), false);
+    dismissBeginner(broken);
   });
 });

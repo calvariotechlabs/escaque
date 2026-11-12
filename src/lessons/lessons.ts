@@ -6,6 +6,7 @@ import type { Lesson } from "./types.js";
 export const LESSONS: readonly Lesson[] = deepFreeze([
   {
     id: "enroque",
+    group: "tacticas",
     number: 1,
     title: "El enroque",
     summary: "Pon tu rey a salvo y saca la torre en una sola jugada.",
@@ -33,6 +34,7 @@ export const LESSONS: readonly Lesson[] = deepFreeze([
   },
   {
     id: "captura-al-paso",
+    group: "tacticas",
     number: 2,
     title: "La captura al paso",
     summary: "Un peón que avanza dos casillas también se puede capturar.",
@@ -59,6 +61,7 @@ export const LESSONS: readonly Lesson[] = deepFreeze([
   },
   {
     id: "corona-sin-ahogar",
+    group: "tacticas",
     number: 3,
     title: "Corona sin ahogar",
     summary: "Coronar a dama no siempre es lo mejor.",
@@ -88,6 +91,7 @@ export const LESSONS: readonly Lesson[] = deepFreeze([
   },
   {
     id: "mate-del-pasillo",
+    group: "tacticas",
     number: 4,
     title: "Mate del pasillo",
     summary: "Un rey encerrado por sus propios peones es un blanco fácil.",
@@ -113,6 +117,7 @@ export const LESSONS: readonly Lesson[] = deepFreeze([
   },
   {
     id: "horquilla",
+    group: "tacticas",
     number: 5,
     title: "La horquilla de caballo",
     summary: "Un caballo puede atacar dos piezas a la vez.",
@@ -138,6 +143,7 @@ export const LESSONS: readonly Lesson[] = deepFreeze([
   },
   {
     id: "mate-de-la-escalera",
+    group: "tacticas",
     number: 6,
     title: "Mate de la escalera",
     summary: "Dos torres empujan al rey hasta el borde, fila a fila.",
