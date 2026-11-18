@@ -17,9 +17,11 @@ export interface LessonProgress {
   readonly current: string | null;
   /** Lecciones completadas que esta versión no conoce (renombradas o quitadas): se conservan por si vuelven. */
   readonly kept: ReadonlyMap<string, number>;
+  /** Completadas (de `done` o `kept`) cuya mejor vez usó «Ver a dónde puede ir». */
+  readonly helped: ReadonlySet<string>;
 }
 
-export const EMPTY_PROGRESS: LessonProgress = { done: new Map(), current: null, kept: new Map() };
+export const EMPTY_PROGRESS: LessonProgress = { done: new Map(), current: null, kept: new Map(), helped: new Set() };
 const MAX_KEPT = 50;
 const ID_SHAPE = /^[a-z0-9][a-z0-9-]{0,63}$/;
 
@@ -34,12 +36,24 @@ export function openLesson(progress: LessonProgress, id: string): LessonProgress
   return { ...progress, current: id };
 }
 
-/** Marca `id` como completada con `hints` pistas; si ya lo estaba, se queda la mejor vez (las menos pistas). Si era la abierta, deja de serlo. */
-export function completeLesson(progress: LessonProgress, id: string, hints: number): LessonProgress {
-  const done = new Map(progress.done);
+/**
+ * Marca `id` como completada con `hints` pistas y, si `helped`, con la ayuda de
+ * casillas. Si ya lo estaba, se queda la mejor vez: antes sin ayuda que con
+ * ella y, a igualdad, la de menos pistas. Si era la abierta, deja de serlo.
+ */
+export function completeLesson(progress: LessonProgress, id: string, hints: number, helped = false): LessonProgress {
   const used = Math.max(0, Math.min(MAX_HINTS, Math.trunc(hints)));
-  done.set(id, Math.min(used, progress.done.get(id) ?? used));
-  return { ...progress, done, current: progress.current === id ? null : progress.current };
+  const current = progress.current === id ? null : progress.current;
+  const previous = progress.done.get(id);
+  const previousHelped = progress.helped.has(id);
+  const better = previous === undefined || (previousHelped && !helped) || (previousHelped === helped && used < previous);
+  if (!better) return current === progress.current ? progress : { ...progress, current };
+  const done = new Map(progress.done);
+  done.set(id, used);
+  const helpedSet = new Set(progress.helped);
+  if (helped) helpedSet.add(id);
+  else helpedSet.delete(id);
+  return { ...progress, done, current, helped: helpedSet };
 }
 
 export function completedCount(progress: LessonProgress, ids: readonly string[]): number {
@@ -47,7 +61,9 @@ export function completedCount(progress: LessonProgress, ids: readonly string[])
 }
 
 export function serializeProgress(progress: LessonProgress): string {
-  return JSON.stringify({ v: VERSION, done: Object.fromEntries([...progress.kept, ...progress.done]), current: progress.current });
+  const data: Record<string, unknown> = { v: VERSION, done: Object.fromEntries([...progress.kept, ...progress.done]), current: progress.current };
+  if (progress.helped.size > 0) data["help"] = [...progress.helped];
+  return JSON.stringify(data);
 }
 
 /** Reconstruye el progreso, o `EMPTY_PROGRESS` si el texto no vale. Ignora lecciones que ya no existen. */
@@ -60,7 +76,7 @@ export function parseProgress(raw: unknown, knownIds: readonly string[]): Lesson
     return EMPTY_PROGRESS;
   }
   if (typeof data !== "object" || data === null || Array.isArray(data)) return EMPTY_PROGRESS;
-  const { v, done, current } = data as Record<string, unknown>;
+  const { v, done, current, help } = data as Record<string, unknown>;
   if (v !== VERSION || typeof done !== "object" || done === null || Array.isArray(done)) return EMPTY_PROGRESS;
   const known = new Set(knownIds);
   const result = new Map<string, number>();
@@ -75,7 +91,11 @@ export function parseProgress(raw: unknown, knownIds: readonly string[]): Lesson
     if (!known.has(id) && ID_SHAPE.test(id) && typeof hints === "number" && Number.isInteger(hints) && hints >= 0 && hints <= MAX_HINTS) kept.set(id, hints);
   }
   const open = typeof current === "string" && known.has(current) && !result.has(current) ? current : null;
-  return { done: result, current: open, kept };
+  const helped = new Set<string>();
+  if (Array.isArray(help)) {
+    for (const id of help) if (typeof id === "string" && (result.has(id) || kept.has(id))) helped.add(id);
+  }
+  return { done: result, current: open, kept, helped };
 }
 
 /** Lee el progreso. Una entrada corrupta se borra para no tropezar con ella cada vez. */
@@ -99,5 +119,34 @@ export function saveProgress(store: KeyValueStore | null, progress: LessonProgre
     store.setItem(PROGRESS_KEY, serializeProgress(progress));
   } catch {
     // El progreso sigue en memoria; solo se pierde al cerrar la app.
+  }
+}
+
+// --- Aviso «¿Nunca has jugado?» en Jugar ---------------------------------------------
+
+export const BEGINNER_KEY = "escaque:aviso-novato";
+
+/** El aviso sale solo a quien no tiene ningún progreso de lecciones y no lo ha descartado. */
+export function showBeginnerNotice(progress: LessonProgress, dismissed: boolean): boolean {
+  return !dismissed && progress.done.size === 0 && progress.kept.size === 0 && progress.current === null;
+}
+
+/** ¿Se pulsó «Ahora no» en este dispositivo? Sin almacenamiento, no. */
+export function isBeginnerDismissed(store: KeyValueStore | null): boolean {
+  if (store === null) return false;
+  try {
+    return store.getItem(BEGINNER_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+/** Recuerda «Ahora no». Si no se puede guardar, el aviso solo se oculta hasta recargar. */
+export function dismissBeginner(store: KeyValueStore | null): void {
+  if (store === null) return;
+  try {
+    store.setItem(BEGINNER_KEY, "1");
+  } catch {
+    // Sin almacenamiento el aviso volverá a salir la próxima vez.
   }
 }

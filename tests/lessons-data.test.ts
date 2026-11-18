@@ -3,18 +3,22 @@ import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { Position } from "../src/core/index.js";
 import { MATE_SCORE, scoreMoves, search } from "../src/engine/index.js";
-import { LESSONS, checkLessonMove, lessonById } from "../src/lessons/index.js";
-import type { Lesson } from "../src/lessons/index.js";
+import { LESSONS, PASS, checkLessonMove, lessonById, passTurn } from "../src/lessons/index.js";
+import type { Lesson, Step } from "../src/lessons/index.js";
 
 const SQUARE = /^[a-h][1-8]$/;
 /** Frase completa: empieza en mayúscula (o signo de apertura) y acaba en punto. */
 const SENTENCE = /^[¿¡A-ZÁÉÍÓÚÑ].*\.$/s;
 const sentences = (text: string): number => text.split(/\.(?:\s|$)/).filter((s) => s.trim() !== "").length;
 
-/** Posición tras jugar una lista de jugadas UCI. */
+/** Posición tras jugar una lista de jugadas UCI (`PASS`: el rival no mueve). */
 function positionAfter(lesson: Lesson, moves: readonly string[]): Position {
-  const position = Position.fromFen(lesson.fen);
+  let position = Position.fromFen(lesson.fen);
   for (const uci of moves) {
+    if (uci === PASS) {
+      position = Position.fromFen(passTurn(position.toFen(), lesson.side));
+      continue;
+    }
     const move = position.moveFromUci(uci);
     assert.ok(move, `${lesson.id}: ${uci} debe ser legal tras ${moves.join(" ")}`);
     position.makeMove(move);
@@ -33,6 +37,21 @@ function forcedMates(position: Position, n: number): string[] {
 
 const endsInMate = (lesson: Lesson): boolean => lesson.steps[lesson.steps.length - 1]?.kind === "mate";
 
+const isFree = (step: Step): boolean => step.kind === "reach" || step.kind === "capture" || step.kind === "check";
+
+/** Jugadas legales que la lección acepta en el paso al que llevan `played`. */
+function acceptedMoves(lesson: Lesson, played: readonly string[]): string[] {
+  return legalUci(positionAfter(lesson, played))
+    .filter((uci) => checkLessonMove(lesson, played, uci).kind !== "fallo")
+    .sort();
+}
+
+function legalUci(position: Position): string[] {
+  const files = "abcdefgh";
+  const name = (sq: number): string => `${files[sq & 7]!}${(sq >> 4) + 1}`;
+  return position.legalMoves().map((m) => name(m.from) + name(m.to) + (m.promotion ?? ""));
+}
+
 /** Recorre todas las ramas aceptadas: llama a `visit` en cada paso con las jugadas previas. */
 function walk(lesson: Lesson, visit: (played: readonly string[], index: number) => void, played: string[] = []): void {
   const index = played.length / 2;
@@ -44,12 +63,29 @@ function walk(lesson: Lesson, visit: (played: readonly string[], index: number) 
       if (reply !== null) walk(lesson, visit, [...played, uci, reply]);
     }
   }
+  if (isFree(step) && index < lesson.steps.length - 1) {
+    for (const uci of acceptedMoves(lesson, played)) walk(lesson, visit, [...played, uci, PASS]);
+  }
 }
 
+const GROUPS = ["primeros-pasos", "tacticas"] as const;
+
 describe("lista de lecciones", () => {
-  it("tiene entre 5 y 6 lecciones numeradas en orden", () => {
-    assert.ok(LESSONS.length >= 5 && LESSONS.length <= 6);
-    LESSONS.forEach((lesson, i) => assert.equal(lesson.number, i + 1));
+  it("tiene 9 primeros pasos y luego 6 tácticas, numeradas en orden dentro de su grupo", () => {
+    assert.deepEqual(
+      LESSONS.map((l) => l.group),
+      [...Array<string>(9).fill("primeros-pasos"), ...Array<string>(6).fill("tacticas")],
+    );
+    for (const group of GROUPS) {
+      LESSONS.filter((l) => l.group === group).forEach((lesson, i) => assert.equal(lesson.number, i + 1));
+    }
+  });
+
+  it("los primeros pasos van de las piezas al jaque mate", () => {
+    assert.deepEqual(
+      LESSONS.filter((l) => l.group === "primeros-pasos").map((l) => l.title),
+      ["El tablero", "La torre", "El alfil", "La dama", "El caballo", "El peón", "El rey", "El jaque", "El jaque mate"],
+    );
   });
 
   it("usa ids estables, únicos y en minúsculas", () => {
@@ -81,11 +117,11 @@ for (const lesson of LESSONS) {
       assert.ok(sentences(lesson.success) <= 2, `explicación demasiado larga: ${lesson.success}`);
     });
 
-    it("tiene de 1 a 2 pasos y el de mate, si lo hay, es el último", () => {
-      assert.ok(lesson.steps.length >= 1 && lesson.steps.length <= 2);
+    it("tiene de 1 a 3 pasos y el de mate, si lo hay, es el último", () => {
+      assert.ok(lesson.steps.length >= 1 && lesson.steps.length <= 3);
       lesson.steps.forEach((step, i) => {
         if (step.kind === "mate") assert.equal(i, lesson.steps.length - 1);
-        else {
+        else if (step.kind === "moves") {
           const replies = Object.values(step.accept);
           assert.ok(replies.length > 0);
           const last = i === lesson.steps.length - 1;
@@ -115,6 +151,40 @@ for (const lesson of LESSONS) {
         }
       });
     });
+
+    if (lesson.group === "primeros-pasos") {
+      it("tiene «Cómo se mueve» y una pieza del alumno para «Ver a dónde puede ir»", () => {
+        assert.match(lesson.howItMoves ?? "", SENTENCE);
+        assert.match(lesson.helpPiece ?? "", SQUARE);
+        const position = Position.fromFen(lesson.fen);
+        const files = "abcdefgh";
+        const sq = (lesson.helpPiece!.charCodeAt(1) - 49) * 16 + files.indexOf(lesson.helpPiece![0]!);
+        assert.equal(position.pieceAt(sq)?.color, lesson.side);
+      });
+
+      it("en cada paso hay solución, la partida sigue y el rival puede pasar sin quedar en jaque", () => {
+        walk(lesson, (played, index) => {
+          const position = positionAfter(lesson, played);
+          assert.equal(position.status().kind, "ongoing", `partida en marcha en el paso ${index + 1}`);
+          const accepted = acceptedMoves(lesson, played);
+          assert.ok(accepted.length > 0, `hay solución en el paso ${index + 1}`);
+          if (index < lesson.steps.length - 1) {
+            for (const uci of accepted) assert.ok(positionAfter(lesson, [...played, uci, PASS]), `${uci} deja pasar al rival`);
+          }
+        });
+      });
+
+      it("el contador solo va en lecciones de varias capturas", () => {
+        const allCaptures = lesson.steps.length > 1 && lesson.steps.every((s) => s.kind === "capture");
+        assert.equal(lesson.counter !== undefined, allCaptures);
+      });
+    } else {
+      it("las tácticas no usan la ayuda de casillas ni pasos sin respuesta", () => {
+        assert.equal(lesson.helpPiece, undefined);
+        assert.equal(lesson.howItMoves, undefined);
+        assert.ok(lesson.steps.every((s) => !isFree(s)));
+      });
+    }
 
     it("cada respuesta del rival es legal y es su mejor defensa según el motor", () => {
       walk(lesson, (played, index) => {
@@ -161,6 +231,38 @@ describe("comprobaciones propias de cada lección", () => {
     assert.ok(lesson, id);
     return lesson;
   };
+
+  it("el tablero y el caballo: solo una jugada llega a la casilla pedida", () => {
+    assert.deepEqual(acceptedMoves(get("el-tablero"), []), ["e2e6"]);
+    assert.deepEqual(acceptedMoves(get("el-caballo"), []), ["d4f5"]);
+  });
+
+  it("la torre y el alfil: las capturas siguen un único camino", () => {
+    assert.deepEqual(acceptedMoves(get("la-torre"), []), ["d1d5"]);
+    assert.deepEqual(acceptedMoves(get("la-torre"), ["d1d5", PASS]), ["d5h5"]);
+    assert.deepEqual(acceptedMoves(get("la-torre"), ["d1d5", PASS, "d5h5", PASS]), ["h5h2"]);
+    assert.deepEqual(acceptedMoves(get("el-alfil"), []), ["c1f4"]);
+    assert.deepEqual(acceptedMoves(get("el-alfil"), ["c1f4", PASS]), ["f4c7"]);
+  });
+
+  it("el peón: avanza una casilla y captura en diagonal", () => {
+    assert.deepEqual(acceptedMoves(get("el-peon"), []), ["e2e3"]);
+    assert.deepEqual(acceptedMoves(get("el-peon"), ["e2e3", PASS]), ["e3f4"]);
+  });
+
+  it("el rey: no puede capturar la torre protegida y solo puede capturar el caballo", () => {
+    const lesson = get("el-rey");
+    assert.equal(Position.fromFen(lesson.fen).moveFromUci("e4d5"), null, "d5 está protegida por el peón de c6");
+    assert.deepEqual(acceptedMoves(lesson, []), ["e4f3"]);
+  });
+
+  it("el jaque: solo Ta8 da jaque", () => {
+    assert.deepEqual(acceptedMoves(get("el-jaque"), []), ["a1a8"]);
+  });
+
+  it("el jaque mate: Dc7 ahoga al rey negro", () => {
+    assert.equal(positionAfter(get("el-jaque-mate"), ["h2c7"]).status().kind, "stalemate");
+  });
 
   it("enroque: el corto es legal y el largo no, porque el rey pasaría por d1, atacada", () => {
     const position = Position.fromFen(get("enroque").fen);

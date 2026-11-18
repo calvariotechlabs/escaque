@@ -1,10 +1,11 @@
 // Lecciones: comprobación de las jugadas del alumno (con lecciones de prueba).
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { LessonError, checkLessonMove } from "../src/lessons/index.js";
+import { LessonError, PASS, checkLessonMove, passTurn } from "../src/lessons/index.js";
 import type { Lesson } from "../src/lessons/index.js";
 
 const base = {
+  group: "tacticas",
   number: 1,
   title: "Prueba",
   summary: "Lección de prueba.",
@@ -103,5 +104,85 @@ describe("checkLessonMove", () => {
 
   it("lanza LessonError si la lección ya está resuelta", () => {
     assert.throws(() => checkLessonMove(mateIn1, ["d1d8"], "g8h8"), LessonError);
+  });
+});
+
+/** Torre que captura tres peones; el rival no mueve entre capturas. */
+const rookCaptures: Lesson = {
+  ...base,
+  id: "torre",
+  fen: "k7/8/8/3p3p/8/8/7p/K2R4 w - - 0 1",
+  steps: [{ kind: "capture" }, { kind: "capture" }, { kind: "capture", mistakes: { h5h4: "Así no capturas." } }],
+};
+
+/** Caballo que llega a f5, con la casilla marcada. */
+const knightReach: Lesson = {
+  ...base,
+  id: "caballo",
+  fen: "7k/8/8/8/3N4/8/P7/K7 w - - 0 1",
+  steps: [{ kind: "reach", target: "f5", marked: true, mistakes: { d4e6: "Esa no es la casilla objetivo." } }],
+};
+
+/** Peón: avanza a e3 y luego captura en f4. */
+const pawnTwoSteps: Lesson = {
+  ...base,
+  id: "peon",
+  fen: "7k/8/8/8/5n2/8/4P3/K7 w - - 0 1",
+  steps: [{ kind: "reach", target: "e3", marked: false }, { kind: "capture" }],
+};
+
+/** Torre que da jaque. */
+const giveCheck: Lesson = {
+  ...base,
+  id: "jaque",
+  fen: "4k3/8/8/8/8/8/8/R3K3 w - - 0 1",
+  steps: [{ kind: "check" }],
+};
+
+describe("checkLessonMove con objetivos de casilla, capturas y jaque", () => {
+  it("acepta la jugada que llega a la casilla objetivo", () => {
+    assert.deepEqual(checkLessonMove(knightReach, [], "d4f5"), { kind: "correcto" });
+  });
+
+  it("rechaza una jugada que no llega a la casilla objetivo, con su motivo", () => {
+    assert.deepEqual(checkLessonMove(knightReach, [], "d4e6"), { kind: "fallo", reason: "Esa no es la casilla objetivo." });
+    assert.deepEqual(checkLessonMove(knightReach, [], "d4b5"), { kind: "fallo", reason: "Esa no es." });
+  });
+
+  it("tras una captura que no es la última, sigue sin respuesta del rival", () => {
+    assert.deepEqual(checkLessonMove(rookCaptures, [], "d1d5"), { kind: "sigue", step: 2 });
+    assert.deepEqual(checkLessonMove(rookCaptures, ["d1d5", PASS], "d5h5"), { kind: "sigue", step: 3 });
+    assert.deepEqual(checkLessonMove(rookCaptures, ["d1d5", PASS, "d5h5", PASS], "h5h2"), { kind: "correcto" });
+  });
+
+  it("rechaza una jugada que no captura en un paso de captura", () => {
+    assert.deepEqual(checkLessonMove(rookCaptures, [], "d1h1"), { kind: "fallo", reason: "Esa no es." });
+    assert.deepEqual(checkLessonMove(rookCaptures, ["d1d5", PASS, "d5h5", PASS], "h5h4"), { kind: "fallo", reason: "Así no capturas." });
+  });
+
+  it("encadena una llegada y una captura", () => {
+    assert.deepEqual(checkLessonMove(pawnTwoSteps, [], "e2e3"), { kind: "sigue", step: 2 });
+    assert.deepEqual(checkLessonMove(pawnTwoSteps, [], "e2e4"), { kind: "fallo", reason: "Esa no es." });
+    assert.deepEqual(checkLessonMove(pawnTwoSteps, ["e2e3", PASS], "e3f4"), { kind: "correcto" });
+  });
+
+  it("acepta una jugada que da jaque y rechaza la que no", () => {
+    assert.deepEqual(checkLessonMove(giveCheck, [], "a1a8"), { kind: "correcto" });
+    assert.deepEqual(checkLessonMove(giveCheck, [], "a1a7"), { kind: "fallo", reason: "Esa no es." });
+  });
+
+  it("lanza LessonError si las jugadas previas no siguen un paso sin respuesta", () => {
+    assert.throws(() => checkLessonMove(rookCaptures, ["d1h1", PASS], "h1h2"), LessonError);
+    assert.throws(() => checkLessonMove(rookCaptures, ["d1d5", "a8b8"], "d5h5"), LessonError);
+  });
+});
+
+describe("passTurn", () => {
+  it("devuelve el turno al bando que acaba de mover y quita la casilla al paso", () => {
+    assert.equal(passTurn("7k/8/8/8/4P3/8/8/K7 b - e3 0 1", "w"), "7k/8/8/8/4P3/8/8/K7 w - - 0 1");
+  });
+
+  it("no cambia una FEN que ya da el turno a ese bando", () => {
+    assert.equal(passTurn("7k/8/8/8/8/8/P7/K7 w - - 3 9", "w"), "7k/8/8/8/8/8/P7/K7 w - - 3 9");
   });
 });
