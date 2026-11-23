@@ -77,6 +77,8 @@ describe("pantalla de inicio compacta", () => {
       assert.equal(box.scrollY, 0);
       assert.ok(box.top >= 0 && box.bottom <= box.h, `el botón (${Math.round(box.top)}–${Math.round(box.bottom)}) cabe en ${box.h} px de alto`);
       assert.ok(box.w > 0);
+      // Ningún nombre de opción se sale de su tarjeta (con 320 px caben tres columnas justas).
+      assert.equal(await page.eval(`[...document.querySelectorAll('#ajustes .opcion__tarjeta')].every((t) => { const n = t.querySelector('.opcion__nombre'); const a = t.getBoundingClientRect(); const b = n.getBoundingClientRect(); return b.left >= a.left - 0.5 && b.right <= a.right + 0.5 && n.scrollWidth <= n.clientWidth + 1; })`), true, "los nombres caben en sus tarjetas");
       assert.equal(await page.eval(`document.documentElement.scrollWidth <= window.innerWidth`), true, "sin desplazamiento horizontal");
     });
   }
@@ -102,7 +104,10 @@ describe("pantalla de inicio compacta", () => {
   });
 
   test("con el teclado: las flechas cambian de opción dentro del grupo y Tab pasa al siguiente", async () => {
-    await page.eval(`document.getElementById('nivel-medio').focus()`);
+    await page.eval(`document.getElementById('nivel-facil').click(); document.getElementById('nivel-facil').focus()`);
+    assert.equal(await page.eval(`document.getElementById('nivel-facil').checked`), true);
+    await page.press("ArrowRight");
+    assert.equal(await page.eval(`document.activeElement.id`), "nivel-medio");
     await page.press("ArrowRight");
     assert.equal(await page.eval(`document.activeElement.id`), "nivel-dificil");
     assert.equal(await page.eval(`document.getElementById('nivel-dificil').checked`), true);
