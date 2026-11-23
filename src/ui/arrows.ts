@@ -64,7 +64,12 @@ export function arrowsSvg(arrows: readonly Arrow[], orientation: Color): string 
   const shapes = arrowShapes(arrows, orientation);
   if (shapes.length === 0) return "";
   const inner = shapes
-    .map((s) => `<path class="flecha flecha--${s.kind}" d="${s.d}"/><polygon class="flecha-punta--${s.kind}" points="${s.head}"/>`)
+    .map(
+      (s) =>
+        // Primero un borde claro debajo, para que la flecha se distinga también sobre las casillas oscuras (WCAG 1.4.11).
+        `<path class="flecha-borde" d="${s.d}"/><polygon class="flecha-borde" points="${s.head}"/>` +
+        `<path class="flecha flecha--${s.kind}" d="${s.d}"/><polygon class="flecha-punta--${s.kind}" points="${s.head}"/>`,
+    )
     .join("");
   return `<svg class="tablero__flechas" viewBox="0 0 8 8" aria-hidden="true" focusable="false">${inner}</svg>`;
 }

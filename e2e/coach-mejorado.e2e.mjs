@@ -103,7 +103,7 @@ const state = (page) =>
     return {
       banner: !document.getElementById('vista-revision').hidden,
       legend: !document.getElementById('vista-leyenda').hidden,
-      arrows: board.querySelectorAll('.tablero__flechas path').length,
+      arrows: board.querySelectorAll('.tablero__flechas path.flecha').length,
       grid: board.querySelector('.tablero__rejilla').getAttribute('aria-label'),
       h2: piece('h2'),
       h3: piece('h3'),
@@ -169,7 +169,7 @@ describe("coach mejorado de extremo a extremo", () => {
     await page.eval(`${button}.click()`);
     await page.waitFor(`document.querySelectorAll('#coach-pistas-lista li').length === 3`, { what: "pista 3" });
     assert.match(await page.eval(`document.querySelectorAll('#coach-pistas-lista li')[2].textContent`), /^Pista 3 de 3Alfil Beta jugaría .+\. Mira la flecha\.$/);
-    assert.equal(await page.eval(`document.querySelectorAll('#tablero .tablero__flechas path').length`), 1);
+    assert.equal(await page.eval(`document.querySelectorAll('#tablero .tablero__flechas path.flecha').length`), 1);
     assert.equal(await page.eval(`${button}.textContent`), "No quedan más pistas");
     assert.equal(await page.eval(`${button}.getAttribute('aria-disabled')`), "true");
   });
@@ -177,7 +177,7 @@ describe("coach mejorado de extremo a extremo", () => {
   test("al mover, las pistas vuelven a empezar y la flecha desaparece", async () => {
     await moveByKeyboard(page, "a7", "a6");
     assert.equal(await page.eval(`document.querySelectorAll('#coach-pistas-lista li').length`), 0);
-    assert.equal(await page.eval(`document.querySelectorAll('#tablero .tablero__flechas path').length`), 0);
+    assert.equal(await page.eval(`document.querySelectorAll('#tablero .tablero__flechas path.flecha').length`), 0);
     assert.equal(await page.eval(`document.getElementById('coach-pistas-boton').textContent`), "Pedir pista 1 de 3");
   });
 
