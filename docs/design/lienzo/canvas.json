@@ -352,6 +352,35 @@
    "h": 2480,
    "title": "Móvil · primeros pasos: aviso, varias capturas, fallo y final",
    "page": "movil"
+  },
+  "RepasoEscritorio.dc.html": {
+   "x": 0,
+   "y": 10680,
+   "w": 1280,
+   "h": 1840,
+   "page": "escritorio",
+   "expand": "fill"
+  },
+  "RepasoEstados.dc.html": {
+   "x": 1360,
+   "y": 10680,
+   "w": 1280,
+   "h": 900,
+   "page": "escritorio"
+  },
+  "RepasoTablet.dc.html": {
+   "x": 0,
+   "y": 13540,
+   "w": 820,
+   "h": 2870,
+   "page": "tablet"
+  },
+  "RepasoMovil.dc.html": {
+   "x": 0,
+   "y": 18480,
+   "w": 390,
+   "h": 3200,
+   "page": "movil"
   }
  },
  "order": [
@@ -394,7 +423,11 @@
   "IniciacionEstadosEscritorio.dc.html",
   "LeccionIniciacionTablet.dc.html",
   "LeccionIniciacionMovil.dc.html",
-  "IniciacionEstadosMovil.dc.html"
+  "IniciacionEstadosMovil.dc.html",
+  "RepasoEscritorio.dc.html",
+  "RepasoEstados.dc.html",
+  "RepasoTablet.dc.html",
+  "RepasoMovil.dc.html"
  ],
  "notes": {
   "t_escritorio_0": {
@@ -850,6 +883,70 @@
    "y": 15640,
    "w": 390,
    "text": "Móvil: igual que en tablet, a todo el ancho. En el estado de la derecha, el aviso de inicio, el contador de capturas, el fallo y el final del bloque.",
+   "fill": "gray",
+   "page": "movil"
+  },
+  "t_escritorio_7": {
+   "x": 0,
+   "y": 10440,
+   "text": "Repaso de la partida",
+   "kind": "title1",
+   "maxW": 2640,
+   "page": "escritorio"
+  },
+  "t_tablet_6": {
+   "x": 0,
+   "y": 13300,
+   "text": "Repaso de la partida",
+   "kind": "title1",
+   "maxW": 2980,
+   "page": "tablet"
+  },
+  "t_movil_8": {
+   "x": 0,
+   "y": 18240,
+   "text": "Repaso de la partida",
+   "kind": "title1",
+   "maxW": 2692,
+   "page": "movil"
+  },
+  "r1": {
+   "x": 0,
+   "y": 12640,
+   "w": 520,
+   "text": "Repaso de la partida. Se abre con «Repasar la partida», nuevo botón del panel de resultado (sea Has ganado, Has perdido o Tablas). Izquierda: tablero con la jugada seleccionada, botones para moverse, curva de evaluación y resumen por bando. Derecha: la jugada seleccionada (es el panel del coach de siempre), los errores clave, las jugadas y las acciones. Los datos son reales: una partida de 53 jugadas analizada con src/coach (profundidad 4). La curva usa la misma escala que el coach (puntos esperados) y las marcas siguen su lenguaje: triángulo = error o error grave, círculo discontinuo = imprecisión.",
+   "fill": "gray",
+   "page": "escritorio"
+  },
+  "r2": {
+   "x": 1360,
+   "y": 11700,
+   "w": 520,
+   "text": "Estados. 1) Analizando: el análisis tarda, así que la curva se dibuja a medida que llegan jugadas, lo pendiente va rayado y ya se puede recorrer lo revisado; «Parar el análisis» lo corta. 2) Jugada sin revisar: la posición ya está en el tablero y el veredicto llega después. 3) Sin errores clave. 4) Fallo: borde discontinuo, icono y role=\"alert\"; la partida sigue guardada.",
+   "fill": "gray",
+   "page": "escritorio"
+  },
+  "r3": {
+   "x": 1360,
+   "y": 12420,
+   "w": 520,
+   "text": "Accesibilidad. La curva es solo una vista (role=\"img\" con un resumen escrito); todo lo que dice se puede hacer con botones: los seis botones de navegación, la lista de errores clave y la lista de jugadas, que marca los errores con forma y con texto oculto («, error grave»). Con el foco en esos botones: flechas ← y →, Inicio y Fin; no hay atajos globales. Al cambiar de jugada se anuncia, en la región role=\"status\" del veredicto, «14. Th2, blancas. Error. Th2 no aprovecha la captura de la torre de a8.» (jugada en notación algebraica, letras españolas). Ninguna marca depende solo del color y hay estilos para contraste forzado y movimiento reducido.",
+   "fill": "gray",
+   "page": "escritorio"
+  },
+  "r4": {
+   "x": 0,
+   "y": 16530,
+   "w": 520,
+   "text": "Tablet vertical (600–859 px): una columna. La jugada seleccionada se reparte en dos columnas, como el coach; los errores clave y el resumen van lado a lado. Desde 860 px vale el diseño de escritorio.",
+   "fill": "gray",
+   "page": "tablet"
+  },
+  "r5": {
+   "x": 0,
+   "y": 21800,
+   "w": 520,
+   "text": "Móvil: todo en una columna. Los seis botones de navegación ocupan dos filas de 44 px, la curva mide el ancho de la pantalla y la lista de jugadas se desplaza dentro de su panel hasta la jugada seleccionada (aquí se muestran las jugadas 10 a 18). Móvil horizontal: sin diseñar todavía.",
    "fill": "gray",
    "page": "movil"
   }
