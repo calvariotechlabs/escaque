@@ -1,12 +1,18 @@
 # Escaque
 
+**[Jugar ahora: escaque.calvariotechlabs.com](https://escaque.calvariotechlabs.com)** (sin registro, sin instalar nada; se puede instalar como app y juega sin conexión).
+
+![Una partida contra Alfil Beta con el coach avisando de un error, y el repaso de la partida con su curva de evaluación](docs/media/escaque.gif)
+
+*Una partida contra la máquina con el coach explicando un error, y el repaso de una partida cargada por PGN con la curva de evaluación y los errores clave.*
+
 App web para aprender ajedrez con motor propio (**Alfil Beta**), escrita desde cero en TypeScript sin dependencias en ejecución: ni librerías de ajedrez, ni frameworks de interfaz. TypeScript solo se usa para compilar.
+
+**Qué hay dentro:** reglas completas verificadas con perft, un motor con tres niveles que corre en un Web Worker, un coach que explica por qué una jugada fue mala, seis lecciones guiadas, repaso de la partida con curva de evaluación, importación y exportación de PGN, y PWA. Todo accesible con teclado y lector de pantalla. [Cifras](#cifras), [fuerza del motor](#fuerza-del-motor), [decisiones técnicas](#decisiones-técnicas) y [qué aprendí](#qué-aprendí-y-qué-haría-distinto) más abajo.
 
 ## Estado
 
-Los seis hitos están hechos. Alfil Beta juega con tres niveles en un Web Worker, el coach explica los errores y hay seis lecciones guiadas. La web se instala como app (PWA) y se publica como sitio estático en Vercel.
-
-**Demo:** <https://escaque-ochre.vercel.app> (detrás de un desafío anti-bots de Vercel: la primera visita puede tardar un instante).
+Los seis hitos están hechos, más el repaso de la partida y el PGN. Alfil Beta juega con tres niveles en un Web Worker, el coach explica los errores y hay seis lecciones guiadas. La web se instala como app (PWA) y se publica como sitio estático en Vercel. La demo está detrás de un desafío anti-bots de Vercel: la primera visita puede tardar un instante.
 
 | Hito | Descripción | Estado |
 | --- | --- | --- |
@@ -25,16 +31,31 @@ Todas medidas, no estimadas. Las de velocidad salen de un contenedor cloud de 4 
 | Qué | Cifra |
 | --- | --- |
 | Dependencias en ejecución | **0** (`dependencies` vacío; la única `devDependency` es TypeScript, solo para compilar; lo comprueba la CI) |
-| Código | 7.478 líneas de TypeScript en `src` y 4.902 en `tests` |
-| Tests | **829** en 134 suites con `node --test`, unos 5 s (más 109 tests de perft a profundidad completa, unos 10 s) |
+| Código | 9.048 líneas de TypeScript en `src` y 5.521 en `tests` |
+| Tests | **894** en 150 suites con `node --test`, unos 5 s (más 109 tests de perft a profundidad completa, unos 10 s) |
 | Perft | 21 posiciones de referencia, todas exactas: la inicial (20 / 400 / 8.902 / 197.281), Kiwipete (48 / 2.039 / 97.862), las posiciones 3 a 6 de la Chess Programming Wiki y las «trampa» de Sedlak (al paso ilegal, enroques que dan jaque, coronaciones que ahogan). `npm run perft` llega más lejos: 119.060.324 nodos desde la inicial a profundidad 6 y 193.690.690 en Kiwipete a profundidad 5 |
 | Velocidad de perft | Entre 5,9 y 6,5 millones de nodos por segundo en este contenedor: la inicial a profundidad 6 (119.060.324 nodos) en 18,8 s y Kiwipete a profundidad 5 (193.690.690) en 30 s |
-| Alfil Beta, nivel Difícil | Responde en 831 ms de media y 910 ms como máximo (158 jugadas medidas en esta pasada, contenedor de 4 núcleos); la pasada completa del punto de parada (más abajo) dio 818 ms y 909 ms. Gana 4 de 4 a un jugador al azar y 4 de 4 a Fácil; Medio gana 4 de 4 a Fácil |
+| Alfil Beta, nivel Difícil | Responde en 831 ms de media y 910 ms como máximo (158 jugadas medidas en esta pasada, contenedor de 4 núcleos); la pasada completa del punto de parada (más abajo) dio 818 ms y 909 ms. Gana 20 de 20 al azar, a Fácil y a Medio; Medio gana 20 de 20 a Fácil (detalle en [Fuerza del motor](#fuerza-del-motor)) |
 | Tabla de transposición | A la misma profundidad, Alfil Beta visita un **97 % menos de nodos** con la tabla que sin ella en las cinco posiciones de `npm run bench` (1,45 millones frente a 57,5 millones) y tarda 7,9 s en vez de 126 s. Va del −31 % en Kiwipete al −99,9 % en el final de peones Fine 70 (detalle más abajo) |
 | Sitio publicado | 64 ficheros, 516 KB en disco; JS + CSS + HTML suman unos 75 KB comprimidos con gzip |
 | Accesibilidad | **5 pruebas de extremo a extremo** en Chrome real, en la CI: se juega una partida entera solo con teclado, hay rejilla ARIA de 64 casillas etiquetadas y todo control tiene nombre, cada jugada se anuncia en SAN española («Negras: Dh4#. Dama de d8 a h4. Jaque mate.») y el repaso de la partida se maneja con ← → Inicio y Fin |
 | Lighthouse 12.8.2 (sitio servido en local, Chrome 153) | Escritorio: rendimiento **99**, accesibilidad **100**, buenas prácticas **100**, SEO 91 (FCP 0,5 s, LCP 0,8 s, TBT 0 ms, CLS 0). Móvil con la ralentización simulada de Lighthouse: rendimiento **86**, accesibilidad **100**, buenas prácticas **100**, SEO 91 (FCP 2,0 s, LCP 3,9 s, TBT 0 ms, CLS 0). El SEO pierde 9 puntos por no tener `robots.txt`; es a propósito, no busca público. Se mide a mano con `npx lighthouse@12.8.2`, no es una dependencia ni corre en la CI |
 | Cabeceras | CSP sin `unsafe-inline`, `X-Frame-Options: DENY`, `nosniff`, `Referrer-Policy`, `Permissions-Policy` y `COOP`, comprobadas por tests |
+
+## Fuerza del motor
+
+**No hay un Elo medido, y no voy a inventarme uno.** Para ponerle un Elo hace falta jugar contra rivales de fuerza conocida, y Alfil Beta solo se ha enfrentado a sí mismo y a un jugador al azar. Lo que sí hay son partidas medidas, con colores alternos, un hilo y los tiempos de cada nivel (`npm run match -- 20`, unos 40 minutos; 80 partidas, todas terminadas por jaque mate; el registro completo está en [`docs/media/partidas-niveles.txt`](docs/media/partidas-niveles.txt)):
+
+| Enfrentamiento | Resultado (partidas ganadas, tablas, perdidas) | Qué dice |
+| --- | --- | --- |
+| Difícil contra jugador al azar | +20 =0 −0 | Gana siempre, como se espera |
+| Difícil contra Fácil | +20 =0 −0 | |
+| Difícil contra Medio | +20 =0 −0 | |
+| Medio contra Fácil | +20 =0 −0 | |
+
+Con 20 victorias de 20, la estadística solo da una cota: con un 95 % de confianza cada nivel puntúa al menos un 86 % contra el de abajo, lo que equivale a **más de 300 puntos Elo de diferencia entre niveles contiguos** (sin techo, porque no hubo ni una tabla). En esta pasada Difícil pensó 845 ms de media y 909 ms como máximo (1.870 jugadas; la tabla de Cifras usa otra pasada más corta, de ahí la pequeña diferencia), a profundidad 5 en la apertura y más de 10 en finales de peones.
+
+Para situarlo sin números inventados: Alfil Beta no usa poda por jugada nula, reducciones de jugadas tardías ni libro de aperturas; es un motor clásico de búsqueda con evaluación de material y tablas por casilla, pensado para enseñar, no para competir. La escala absoluta queda pendiente de medirla contra un motor externo con fuerza limitada (por ejemplo Stockfish con `UCI_Elo`), fuera del repositorio y solo como medición, para no romper el principio de cero dependencias.
 
 ## Cómo se hizo
 
@@ -56,6 +77,27 @@ El diseño y las decisiones técnicas (arquitectura, tablero 0x88, estrategia de
 - **CI** (`.github/workflows/ci.yml`, GitHub Actions, permisos solo de lectura, sin secretos). En cada pull request y en cada push a `main`: tipos con `tsc` estricto, `npm test`, montaje del sitio (`npm run build:site`), perft a profundidad completa (`npm run test:perft`) pruebas de accesibilidad de extremo a extremo (`npm run test:e2e`) y comprobación de que `dependencies` sigue vacío. Las pruebas de navegador no usan Playwright ni Puppeteer: `tools/cdp.mjs` es un cliente mínimo del protocolo de Chrome (unas 130 líneas, con el `WebSocket` y `fetch` de Node 22) que maneja el Chrome que ya trae el ejecutor de GitHub, con teclado real (`Input.dispatchKeyEvent`).
 - **Despliegue.** Vercel publica `site/` desde el repositorio como web estática (`vercel.json`: región `fra1`, cabeceras de seguridad, sin funciones). Las vistas previas están protegidas con Vercel Authentication, hay Bot Protection en modo desafío con excepción para iconos y manifest, y un tope de gasto en el equipo.
 - **Qué no hace la CI:** no despliega. Cada fusión a `main` la despliega Vercel; la CI solo dice si el código está sano.
+
+## Qué aprendí y qué haría distinto
+
+> Borrador pendiente de mi revisión: lo escribe Claude a partir del historial del repositorio y lo corrijo yo antes de darlo por bueno.
+
+**Lo que aprendí**
+
+- **Medir antes de creerme una mejora.** La tabla de transposición parecía una victoria segura. Al medirla con `npm run bench` salió que ahorra entre un 31 % de nodos (Kiwipete, llena de capturas) y un 99,9 % (un final de peones), y que cada nodo cuesta algo más. Separar «solo ordena jugadas» de «corta con la puntuación guardada» me enseñó de dónde viene cada ganancia: en el medio juego casi todo lo pone el orden de jugadas, y en los finales, no repetir trabajo.
+- **El perft vale más que cualquier test escrito a mano.** Un generador de jugadas que cuadra con cifras publicadas en 21 posiciones, entre ellas las «trampa», me dejó tocar la clave Zobrist, la legalidad o la captura al paso sin miedo a romper algo en silencio.
+- **Decidir qué se mide y cuándo se para.** Fijar un punto de parada antes de afinar el motor (responder en menos de 1 s, no regalar piezas, ganar a un jugador al azar) evitó la tentación de seguir puliendo para siempre.
+- **Diseñar antes de programar.** Pasar cada pantalla por Claude Design y exportarla a `docs/design` costó tiempo, pero casi no hubo rehacer interfaz: el código copiaba un diseño ya aprobado.
+- **Una CSP estricta obliga a ordenar el código.** Sin `unsafe-inline` ni bundler hubo que mantener todo en módulos, hojas de estilo y un Worker con su propia política. A cambio, la superficie de ataque es mínima y un test comprueba que no se cuela código en línea.
+- **Trabajar con IA exige criterio propio.** Las decisiones, los criterios de «terminado» y los límites son míos; la implementación, asistida. Lo que más me ayudó fue pedir una revisión de código antes de cada PR: en el PGN, por ejemplo, salieron siete hallazgos que corregí antes de fusionar.
+
+**Qué haría distinto**
+
+- **Probar con tecnologías de asistencia reales desde el principio.** La accesibilidad está pensada (teclado, ARIA, jugadas en notación algebraica) y probada en el código, pero todavía no con un lector de pantalla real en un móvil Android. Lo haría desde el primer tablero, no al final.
+- **Calibrar el motor contra una referencia externa desde el principio.** Los niveles se miden entre sí y contra un jugador al azar, lo que dice cuál es más fuerte pero no cuánto. Una escala de referencia desde el hito 3 habría orientado mejor el ajuste de los niveles.
+- **Mejorar el motor con ideas que no entraron.** Alfil Beta no usa poda por jugada nula, reducciones de jugadas tardías, jugadas «killer» ni ventanas de aspiración. Me paré en el punto fijado a propósito; con más tiempo, son las siguientes.
+- **Medir el rendimiento en el navegador, no solo en Node.** Las cifras de velocidad salen de un contenedor; el repaso tarda unos 8 s en el navegador y no lo medí en móviles de gama baja.
+- **Llevar la accesibilidad a la CI desde el primer día.** Las pruebas de accesibilidad en Chrome real (`npm run test:e2e`) llegaron al final; si hubieran estado desde el primer tablero, los fallos de etiquetas y foco se habrían visto en cada PR y no al cerrar.
 
 ## Estructura
 
@@ -87,7 +129,7 @@ npm run test:perft   # perft a profundidad completa (unos 43 millones de nodos)
 npm run perft -- <profundidad> ["<fen>"] [jugadas UCI...] [--ref <fichero>]
 npm run build:site   # compila y monta site/ (lo que se publica) con el service worker versionado
 npm run bench    # misma búsqueda con y sin tabla de transposición: nodos, tiempo y nodos/s (unos 3 min)
-npm run match    # partidas automáticas entre niveles (unos 15 min; «-- 4» para 4 por enfrentamiento)
+npm run match    # partidas automáticas entre niveles (unos 40 min con 20 por enfrentamiento; «-- 4» para 4)
 npm run test:e2e # accesibilidad en Chrome real (necesita Chrome; CHROME_PATH si no es `google-chrome`)
 npm run serve    # monta site/ y lo sirve en http://127.0.0.1:8080 (sin dependencias)
 ```

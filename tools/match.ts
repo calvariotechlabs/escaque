@@ -1,11 +1,11 @@
 // Mide los niveles de Alfil Beta con partidas automáticas.
 //
-//   npm run match            (unos 15 minutos: Difícil piensa 0,9 s por jugada)
+//   npm run match            (unos 40 minutos con 20 por enfrentamiento: Difícil piensa 0,9 s por jugada)
 //   npm run match -- 4       (4 partidas por enfrentamiento en vez de las de serie)
 //
-// Enfrentamientos: Difícil contra un jugador al azar, Difícil contra Fácil y
-// Medio contra Fácil, alternando colores. Muestra el marcador y el tiempo por
-// jugada de Difícil (media y máximo).
+// Enfrentamientos: Difícil contra un jugador al azar, Difícil contra Fácil,
+// Difícil contra Medio y Medio contra Fácil, alternando colores. Muestra el
+// marcador y el tiempo por jugada de Difícil (media y máximo). Por defecto: 20, 10, 10 y 10 partidas.
 import { createRandom } from "../src/core/index.js";
 import { enginePlayer, playGame, randomPlayer } from "./match-core.js";
 import type { Player } from "./match-core.js";
@@ -51,6 +51,7 @@ if (games !== null && (!Number.isInteger(games) || games < 1)) {
   const hard = (): Player => timed(enginePlayer("dificil"), hardTimes);
   series("Difícil contra azar", games ?? 20, hard, (g) => randomPlayer(createRandom(1000 + g)));
   series("Difícil contra Fácil", games ?? 10, hard, (g) => enginePlayer("facil", createRandom(2000 + g)));
+  series("Difícil contra Medio", games ?? 10, hard, () => enginePlayer("medio"));
   series("Medio contra Fácil", games ?? 10, () => enginePlayer("medio"), (g) => enginePlayer("facil", createRandom(3000 + g)));
   const average = hardTimes.reduce((sum, t) => sum + t, 0) / hardTimes.length;
   proc.stdout.write(`Difícil: ${hardTimes.length} jugadas, media ${average.toFixed(0)} ms, máximo ${Math.max(...hardTimes).toFixed(0)} ms\n`);
