@@ -3,7 +3,7 @@
 // Traduce clics, arrastres y teclas a llamadas de `Interaction` y pinta el
 // resultado con `BoardView`. Todo el texto se escribe con textContent o
 // atributos, nunca como HTML. La carga el navegador como módulo ES nativo.
-import { START_FEN } from "../core/index.js";
+import { START_FEN, parsePgn } from "../core/index.js";
 import { attachBoardInput } from "./board-input.js";
 import { createBoard } from "./board.js";
 import { Game } from "./game.js";
@@ -36,6 +36,7 @@ import type { CoachReport, SquareMark } from "../coach/index.js";
 import { reportView, reviewJob, reviewKey, withCoachMarks } from "./coach.js";
 import { createCoachPanel } from "./coach-panel.js";
 import { createReviewScreen } from "./review-screen.js";
+import { exportGame, fileTooLarge, gameFromPgn, importIntro, loadError, PGN_TEXT } from "./pgn.js";
 import { createEngineClient, EngineCancelledError } from "../worker/client.js";
 import { createCoachClient } from "../worker/coach-client.js";
 import { startPwa } from "../pwa/pwa.js";
@@ -85,6 +86,25 @@ const moveList = byId<HTMLOListElement>("lista-jugadas");
 const noMoves = byId<HTMLParagraphElement>("sin-jugadas");
 const announcer = byId<HTMLParagraphElement>("anuncio");
 const promotionDialog = byId<HTMLDialogElement>("coronacion");
+const exportPgnButton = byId<HTMLButtonElement>("exportar-pgn");
+const loadPgnButton = byId<HTMLButtonElement>("cargar-pgn");
+const exportNotice = byId<HTMLParagraphElement>("pgn-aviso");
+const exportFile = byId<HTMLElement>("pgn-aviso-archivo");
+const pgnDialog = byId<HTMLDialogElement>("dialogo-pgn");
+const pgnField = byId<HTMLTextAreaElement>("pgn-campo");
+const pgnChoose = byId<HTMLButtonElement>("pgn-elegir");
+const pgnFile = byId<HTMLInputElement>("pgn-archivo");
+const pgnFileName = byId<HTMLParagraphElement>("pgn-archivo-nombre");
+const pgnError = byId<HTMLParagraphElement>("pgn-error");
+const pgnErrorText = byId<HTMLSpanElement>("pgn-error-texto");
+const pgnCancel = byId<HTMLButtonElement>("pgn-cancelar");
+const pgnLoad = byId<HTMLButtonElement>("pgn-cargar");
+/** Partida cargada de un PGN que se está repasando; `null` si se repasa la partida en curso. */
+let imported: { readonly game: Game; readonly intro: string } | null = null;
+/** Posición en la que se exportó la partida: el aviso se quita cuando cambia. */
+let exportedFen: string | null = null;
+/** Cuenta las lecturas de archivo: solo la última escribe en el campo. */
+let pgnFileToken = 0;
 const promotionOptions = byId<HTMLDivElement>("opciones-coronacion");
 const view = createBoard(byId("tablero"));
 const promotion = createPromotionDialog(promotionDialog, promotionOptions);
@@ -152,8 +172,10 @@ const coachPanel = createCoachPanel((marks) => {
 const review = createReviewScreen({
   cache: coachCache,
   onBack: () => {
+    const fromPgn = imported !== null;
+    imported = null;
     showScreen("partida");
-    reviewButton.focus();
+    (fromPgn ? loadPgnButton : reviewButton).focus();
   },
   onRematch: () => startGame(setup.mode === "maquina" ? { ...setup } : setup),
   onNewGame: () => openSettings(),
@@ -191,6 +213,7 @@ function render(): void {
   undoButton.disabled = thinking || !undoPossible;
   redoButton.disabled = thinking || !redoPossible;
   autosave(game, ui.orientation, setup);
+  if (exportedFen !== null && exportedFen !== game.fen) hideExportNotice();
   maybeThink();
 }
 
@@ -495,6 +518,7 @@ function jumpTo(ply: number): void {
 /** Empieza una partida con estos ajustes (el azar ya está decidido). */
 function startGame(next: GameSetup): void {
   stopThinking();
+  hideExportNotice(); // el aviso era de la partida anterior
   machineFailed = false;
   setup = next;
   game = new Game();
@@ -529,7 +553,8 @@ function applyRoute(moveFocus: boolean): void {
   settingsScreen.hidden = !onPlay || playScreen !== "ajustes";
   gameScreen.hidden = !onPlay || playScreen !== "partida";
   reviewScreenRoot.hidden = !onPlay || playScreen !== "repaso";
-  headingSub.hidden = !(onPlay && playScreen !== "ajustes");
+  // El subtítulo describe la partida en curso: no vale para una partida cargada.
+  headingSub.hidden = !(onPlay && playScreen !== "ajustes" && !(playScreen === "repaso" && imported !== null));
   if (!onPlay || playScreen !== "repaso") review.hide();
   linkPlay.removeAttribute("aria-current");
   linkLessons.removeAttribute("aria-current");
@@ -543,7 +568,9 @@ function applyRoute(moveFocus: boolean): void {
     if (playScreen === "partida") render();
     if (playScreen === "repaso") {
       stopCoach();
-      review.open(game, ui.orientation);
+      stopThinking(); // al volver a la partida, render() reanuda a la máquina si le toca
+      if (imported !== null) review.open(imported.game, "w", { kind: "pgn", intro: imported.intro });
+      else review.open(game, ui.orientation);
     }
     onLessons = false;
     return;
@@ -607,6 +634,104 @@ newGameButton.addEventListener("click", () => {
 });
 
 reviewButton.addEventListener("click", () => showScreen("repaso"));
+
+// --- PGN: exportar la partida a la vista y cargar una para repasarla ---------
+
+exportPgnButton.addEventListener("click", () => {
+  const { filename, text } = exportGame(game, setup, new Date());
+  const url = URL.createObjectURL(new Blob([text], { type: "application/x-chess-pgn" }));
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  link.hidden = true;
+  document.body.append(link);
+  link.click();
+  link.remove();
+  // Se libera después: algunos navegadores leen el blob tras el clic.
+  setTimeout(() => URL.revokeObjectURL(url), 10_000);
+  exportedFen = game.fen;
+  exportFile.textContent = filename;
+  exportNotice.hidden = false;
+  announce(`Partida descargada como ${filename}.`);
+});
+
+function hideExportNotice(): void {
+  exportedFen = null;
+  exportNotice.hidden = true;
+}
+
+function showPgnError(message: string): void {
+  pgnErrorText.textContent = message;
+  pgnError.hidden = false;
+  pgnField.setAttribute("aria-invalid", "true");
+  pgnField.setAttribute("aria-describedby", "pgn-ayuda pgn-error");
+}
+
+function clearPgnError(): void {
+  pgnError.hidden = true;
+  pgnErrorText.textContent = "";
+  pgnField.removeAttribute("aria-invalid");
+  pgnField.setAttribute("aria-describedby", "pgn-ayuda");
+}
+
+loadPgnButton.addEventListener("click", () => {
+  clearPgnError();
+  pgnDialog.showModal();
+  pgnField.focus();
+});
+
+function closePgnDialog(): void {
+  pgnFileToken++; // una lectura de archivo a medias ya no escribe en el campo
+  pgnDialog.close();
+  loadPgnButton.focus();
+}
+
+pgnCancel.addEventListener("click", closePgnDialog);
+pgnDialog.addEventListener("cancel", (event) => {
+  event.preventDefault();
+  closePgnDialog();
+});
+
+pgnChoose.addEventListener("click", () => pgnFile.click());
+pgnFile.addEventListener("change", () => {
+  const file = pgnFile.files?.[0];
+  pgnFile.value = ""; // el mismo archivo se puede volver a elegir
+  if (file === undefined) return;
+  clearPgnError();
+  pgnFileName.textContent = file.name;
+  if (fileTooLarge(file.size)) {
+    showPgnError(PGN_TEXT.tooLarge);
+    return;
+  }
+  const token = ++pgnFileToken;
+  file.text().then(
+    (text) => {
+      if (token !== pgnFileToken) return;
+      pgnField.value = text;
+      pgnField.focus();
+    },
+    () => {
+      if (token === pgnFileToken) showPgnError(PGN_TEXT.unreadable);
+    },
+  );
+});
+
+pgnLoad.addEventListener("click", () => {
+  let next: { game: Game; intro: string };
+  try {
+    const pgn = parsePgn(pgnField.value);
+    const { game: loaded, cut } = gameFromPgn(pgn);
+    next = { game: loaded, intro: importIntro(pgn, cut) };
+  } catch (error) {
+    showPgnError(loadError(error));
+    return;
+  }
+  clearPgnError();
+  pgnFileToken++;
+  pgnDialog.close();
+  imported = next;
+  showScreen("repaso");
+});
 
 // La revancha repite modo, nivel y color.
 rematchButton.addEventListener("click", () => startGame(setup.mode === "maquina" ? { ...setup } : setup));

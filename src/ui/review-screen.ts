@@ -28,6 +28,7 @@ import {
   type ReviewMove,
 } from "./review.js";
 import { bindScrollRegion } from "./scroll-region.js";
+import { PGN_TEXT } from "./pgn.js";
 import { createCoachClient } from "../worker/coach-client.js";
 import { EngineCancelledError } from "../worker/client.js";
 
@@ -39,9 +40,15 @@ export interface ReviewScreenOptions {
   readonly onNewGame: () => void;
 }
 
+/**
+ * De dónde viene la partida: la que se acaba de jugar (con revancha y nueva
+ * partida) o una cargada de un PGN, que solo tiene «Volver a la partida».
+ */
+export type ReviewSource = { readonly kind: "partida" } | { readonly kind: "pgn"; readonly intro: string };
+
 export interface ReviewScreen {
   /** Enseña el repaso de `game` y empieza (o sigue) el análisis. */
-  open(game: Game, orientation: Color): void;
+  open(game: Game, orientation: Color, source?: ReviewSource): void;
   /** Deja de analizar; lo revisado se conserva para la próxima vez. */
   hide(): void;
 }
@@ -146,6 +153,7 @@ export function createReviewScreen(options: ReviewScreenOptions): ReviewScreen {
   let client: ReturnType<typeof createCoachClient> | null = null;
   let gameKey = "";
   let game: Game | null = null;
+  let source: ReviewSource = { kind: "partida" };
   let moves: ReviewMove[] = [];
   let reports = new Map<number, CoachReport>();
   let selected = 1;
@@ -437,7 +445,8 @@ export function createReviewScreen(options: ReviewScreenOptions): ReviewScreen {
     const active = document.activeElement;
     const focusedPly = active instanceof HTMLElement && screen.contains(active) ? plyOf(active) : null;
     const focusedList = focusedPly === null ? null : active!.closest("ul, ol");
-    intro.textContent = reviewIntro(game.status, total(), reports.size);
+    const base = reviewIntro(game.status, total(), reports.size);
+    intro.textContent = source.kind === "pgn" ? `${source.intro} ${base}` : base;
     drawKeyMoments(); // antes que los pasos: el salto de error en error usa la lista
     drawBoard();
     drawSteps();
@@ -513,12 +522,26 @@ export function createReviewScreen(options: ReviewScreenOptions): ReviewScreen {
     title.focus(); // el aviso desaparece con el botón: el foco no se pierde
   });
 
-  for (const button of screen.querySelectorAll<HTMLButtonElement>("[data-volver]")) button.addEventListener("click", () => options.onBack());
-  byId<HTMLButtonElement>("repaso-revancha").addEventListener("click", () => options.onRematch());
-  byId<HTMLButtonElement>("repaso-nueva").addEventListener("click", () => options.onNewGame());
+  const backButtons = [...screen.querySelectorAll<HTMLButtonElement>("[data-volver]")];
+  const backLabel = backButtons[0]?.textContent ?? "";
+  const rematchButton = byId<HTMLButtonElement>("repaso-revancha");
+  const newGameButton = byId<HTMLButtonElement>("repaso-nueva");
+  for (const button of backButtons) button.addEventListener("click", () => options.onBack());
+  rematchButton.addEventListener("click", () => options.onRematch());
+  newGameButton.addEventListener("click", () => options.onNewGame());
+
+  /** Botones según el origen: una partida cargada no tiene revancha ni nueva partida. */
+  function applySource(): void {
+    const imported = source.kind === "pgn";
+    for (const button of backButtons) button.textContent = imported ? PGN_TEXT.back : backLabel;
+    rematchButton.hidden = imported;
+    newGameButton.hidden = imported;
+  }
 
   return {
-    open(next, side) {
+    open(next, side, from = { kind: "partida" }) {
+      source = from;
+      applySource();
       const list = reviewMoves(next);
       const nextKey = `${next.startFen}|${list.map((m) => m.job.move).join(" ")}`;
       if (nextKey !== gameKey) {
