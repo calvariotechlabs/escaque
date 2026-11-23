@@ -1,0 +1,105 @@
+/* Escaque · identidad visual (CAL-398). Diseño: «Identidad visual (CAL-398)» del lienzo, estilos en docs/design/lienzo/identidad.css.
+   Se carga la última: tinta de marca en los títulos, el escaque ante los títulos de panel, turno, jaque, fin de partida,
+   estados vacíos, sello y celebración. No toca el tablero. Solo tokens de tokens.css. */
+
+/* Títulos: Space Grotesk en la tinta del logo, con el interletraje algo cerrado */
+.pagina__cabecera h1,.ajustes-pantalla__titulo,.lecc-titulo,.rep-cab__titulo,.resultado__titulo,.retro__titulo,.coach__titulo,.jugadas__titulo,.pistas__titulo,.capturas__titulo,.rep-sec__titulo,
+.grupo__leyenda,.grupo__titulo,.leccion__titulo,.objetivo__texto,.novato__titulo,.confirmacion__titulo,.pgn-dialogo__titulo,.coronacion__titulo,.rep-fallo__titulo{color:var(--marca);letter-spacing:-.01em}
+.pagina__cabecera h1,.ajustes-pantalla__titulo,.lecc-titulo,.rep-cab__titulo{letter-spacing:-.02em}
+
+/* El escaque: cuadrado partido en diagonal (la casilla cruzada por la diagonal del alfil del logo). Firma de los títulos de panel. */
+.coach__titulo,.jugadas__titulo,.pistas__titulo,.capturas__titulo,.rep-sec__titulo{display:flex;align-items:center;gap:10px}
+.coach__titulo::before,.jugadas__titulo::before,.pistas__titulo::before,.capturas__titulo::before,.rep-sec__titulo::before{content:"";flex:none;width:10px;height:10px;box-sizing:border-box;border:1.5px solid var(--marca);background:linear-gradient(135deg,var(--marca) 50%,transparent 50%)}
+
+/* Turno: un escaque del color que juega (también en «Tu color» y en las capturas) */
+.estado__turno{width:18px;height:18px;box-sizing:border-box;border-radius:2px}
+
+/* Estado de la partida */
+.estado__cuerpo{min-width:0}
+.estado__causa:empty{display:none}
+.estado__toca{flex:none;margin-left:auto;padding:2px var(--space-2);border-radius:var(--radius-sm);background:var(--accent);color:var(--on-accent);font:600 12px/16px var(--font-sans);letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
+.estado__toca[hidden],.estado__jaque[hidden]{display:none}
+.estado__jaque{flex:none;display:inline-flex;align-items:center;gap:6px;color:var(--peligro);font:600 12px/16px var(--font-sans);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+.estado__jaque svg{width:16px;height:16px;flex:none}
+.estado--jaque{border:2px solid var(--peligro);background:var(--peligro-suave);padding:calc(var(--space-3) - 1px) calc(var(--space-4) - 1px)}
+.estado--fin{border-color:var(--marca);padding:calc(var(--space-3) - 1px) calc(var(--space-4) - 1px)}
+/* Móvil apaisado: el estado tiene menos relleno (page.css); el borde de 2 px se compensa igual para que no crezca */
+@media (orientation:landscape) and (max-height:500px){
+  .partida__estado .estado--jaque,.partida__estado .estado--fin{padding:calc(var(--space-2) - 1px) calc(var(--space-3) - 1px)}
+}
+/* La lista de jugadas pedía un peso 500 que Plex Sans no trae alojado: el 400, y la jugada actual sigue en 600 */
+.jugadas__lista{font-weight:400}
+/* Dos jugadores: «Jaque mate.» o «Tablas.» en grande y la causa debajo */
+.estado--fin #estado-texto{display:block;font:600 20px/28px var(--font-display);letter-spacing:-.01em;color:var(--marca)}
+.estado--fin .estado__causa{display:block}
+
+/* Estados vacíos: un trozo de tablero de 3x3 casi en blanco y una frase que dice qué va a pasar */
+.vacio{display:flex;align-items:flex-start;gap:var(--space-3);margin:0}
+.vacio[hidden]{display:none}
+.vacio__mini{flex:none;display:grid;grid-template-columns:repeat(3,12px);grid-template-rows:repeat(3,12px);border:1px solid var(--line)}
+.vacio__mini span{background:var(--surface)}
+.vacio__mini span:nth-child(odd){background:color-mix(in srgb,var(--marca) 14%,var(--surface-raised))}
+.vacio--jugadas .vacio__mini span:nth-child(5){background:var(--accent)}
+.vacio__txt{display:flex;flex-direction:column;gap:2px;min-width:0}
+.vacio__titulo{font:600 14px/20px var(--font-sans);color:var(--ink)}
+.vacio__texto{font:400 14px/20px var(--font-sans);color:var(--ink-muted)}
+
+/* Sello: el logo; al ganar o superar una lección, su diagonal pasa a latón. Es decorativo. */
+.sello{position:relative;flex:none;display:block;width:48px;height:48px}
+.sello:empty{display:none}
+.sello svg{display:block;width:100%;height:100%}
+.sello__fondo{fill:#0b2a38}
+.sello__pieza{fill:#f1f3f5}
+.sello__marco{fill:none;stroke:#f1f3f5;stroke-width:4}
+.sello__diagonal{fill:#0b6e8a}
+.sello__diagonal--logro{fill:#c9962f}
+.sello--leccion{width:40px;height:40px}
+
+/* Resultado contra la máquina */
+.resultado{border-color:var(--marca)}
+.resultado[data-resultado="gana"]{border-color:var(--logro);background:linear-gradient(180deg,var(--logro-suave),var(--surface-raised) 72%)}
+.resultado__cab{display:flex;align-items:center;gap:var(--space-3)}
+.resultado__titulos{display:flex;flex-direction:column;gap:2px;min-width:0}
+.resultado__titulo{font-size:28px;line-height:32px;letter-spacing:-.02em}
+.resultado__antetitulo{font:600 12px/16px var(--font-sans);letter-spacing:.06em;text-transform:uppercase;color:var(--ink-muted)}
+.resultado[data-resultado="gana"] .resultado__antetitulo{color:var(--logro)}
+
+/* Lección o bloque superados */
+.retro--logro{border-color:var(--logro);background:linear-gradient(180deg,var(--logro-suave),var(--surface-raised) 72%)}
+.retro__cab{display:flex;align-items:center;gap:var(--space-3)}
+.retro__titulos{display:flex;flex-direction:column;gap:2px;min-width:0}
+.retro__antetitulo{font:600 12px/16px var(--font-sans);letter-spacing:.06em;text-transform:uppercase;color:var(--logro)}
+.retro--logro .retro__titulo{font-size:24px;line-height:28px;letter-spacing:-.02em}
+
+/* Celebración: diez escaques salen del sello una vez, giran y se desvanecen (700 ms, frena al final) */
+.sello__confeti{position:absolute;left:50%;top:50%;width:8px;height:8px;margin:-4px 0 0 -4px;box-sizing:border-box;pointer-events:none;background:var(--logro-vivo);animation:confeti 700ms cubic-bezier(.2,.7,.3,1) both}
+.sello__confeti:nth-of-type(3n+2){background:var(--accent)}
+.sello__confeti:nth-of-type(3n){border:1.5px solid var(--marca);background:linear-gradient(135deg,var(--marca) 50%,transparent 50%)}
+.sello__confeti:nth-of-type(1){--x:-46px;--y:-30px;--r:80deg}
+.sello__confeti:nth-of-type(2){--x:-30px;--y:-52px;--r:140deg}
+.sello__confeti:nth-of-type(3){--x:4px;--y:-60px;--r:60deg}
+.sello__confeti:nth-of-type(4){--x:36px;--y:-48px;--r:120deg}
+.sello__confeti:nth-of-type(5){--x:54px;--y:-18px;--r:90deg}
+.sello__confeti:nth-of-type(6){--x:48px;--y:22px;--r:150deg}
+.sello__confeti:nth-of-type(7){--x:-52px;--y:12px;--r:110deg}
+.sello__confeti:nth-of-type(8){--x:-20px;--y:40px;--r:70deg}
+.sello__confeti:nth-of-type(9){--x:22px;--y:46px;--r:130deg}
+.sello__confeti:nth-of-type(10){--x:-60px;--y:-6px;--r:40deg}
+@keyframes confeti{
+  0%{transform:translate(0,0) rotate(0);opacity:1}
+  60%{opacity:1}
+  100%{transform:translate(var(--x),var(--y)) rotate(var(--r));opacity:0}
+}
+/* Reducir movimiento: sin confeti; el sello aparece con un fundido de 120 ms */
+.sello--aparece svg{animation:sello-aparece 120ms ease-out both}
+@keyframes sello-aparece{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion: reduce){.sello__confeti{display:none}}
+
+@media (forced-colors: active){
+  .coach__titulo::before,.jugadas__titulo::before,.pistas__titulo::before,.capturas__titulo::before,.rep-sec__titulo::before{border-color:CanvasText;background:CanvasText}
+  .estado--jaque,.estado--fin,.resultado,.retro--logro{border-color:CanvasText}
+  .estado__toca{border:1px solid CanvasText}
+  .estado__jaque{color:CanvasText}
+  .vacio__mini{border-color:CanvasText}
+  .sello{forced-color-adjust:none}
+}

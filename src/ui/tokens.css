@@ -26,6 +26,12 @@
   --control-border: #6b7585;
   --accent: #0b6e8a;
   --on-accent: #ffffff;
+  --marca: #0b2a38;
+  --logro: #8a5a0b;
+  --logro-suave: #f8efdc;
+  --logro-vivo: #c9962f;
+  --peligro: #b3261e;
+  --peligro-suave: #fbeceb;
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -49,6 +55,12 @@
     --control-border: #8b95a7;
     --accent: #5cc3df;
     --on-accent: #0f1218;
+    --marca: #d7e7ee;
+    --logro: #e3b55a;
+    --logro-suave: #2a2316;
+    --logro-vivo: #e3b55a;
+    --peligro: #ff8f85;
+    --peligro-suave: #2a1a1b;
     color-scheme: dark;
   }
 }
@@ -61,6 +73,12 @@
   --control-border: #8b95a7;
   --accent: #5cc3df;
   --on-accent: #0f1218;
+  --marca: #d7e7ee;
+  --logro: #e3b55a;
+  --logro-suave: #2a2316;
+  --logro-vivo: #e3b55a;
+  --peligro: #ff8f85;
+  --peligro-suave: #2a1a1b;
   color-scheme: dark;
 }
 /* Tablero Nogal: madera clara y nogal. Solo cambia lo que depende del color de las casillas. */

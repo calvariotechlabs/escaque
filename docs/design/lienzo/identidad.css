@@ -1,0 +1,60 @@
+/* Escaque · identidad visual (CAL-398, propuesta). Tokens nuevos y piezas de marca. Solo para la interfaz: el tablero no cambia aquí. */
+:root,[data-theme="light"]{--marca:#0b2a38;--logro:#8a5a0b;--logro-suave:#f8efdc;--logro-vivo:#c9962f;--peligro:#b3261e;--peligro-suave:#fbeceb}
+[data-theme="dark"]{--marca:#d7e7ee;--logro:#e3b55a;--logro-suave:#2a2316;--logro-vivo:#e3b55a;--peligro:#ff8f85;--peligro-suave:#2a1a1b;background:var(--surface);color:var(--ink)}
+
+/* Tipografía de marca: Space Grotesk en títulos, en tinta de marca y con el interletraje cerrado */
+.id-titulo{margin:0;font:600 40px/44px var(--font-display);letter-spacing:-.02em;color:var(--marca)}
+.id-marca{color:var(--marca);letter-spacing:-.015em}
+.id-h2{margin:0;display:flex;align-items:center;gap:10px;font:600 20px/28px var(--font-display);letter-spacing:-.01em;color:var(--marca)}
+
+/* El escaque: un cuadrado partido en diagonal, como la diagonal del logo. Firma de los títulos de panel. Decorativo. */
+.escaque{flex:none;display:inline-block;width:10px;height:10px;box-sizing:border-box;border:1.5px solid var(--marca);background:linear-gradient(135deg,var(--marca) 50%,transparent 50%)}
+.escaque--logro{border-color:var(--logro);background:linear-gradient(135deg,var(--logro) 50%,transparent 50%)}
+
+/* Estado de la partida: el turno es un escaque del color que juega */
+.id-estado{display:flex;align-items:center;gap:var(--space-3);margin:0;padding:var(--space-3) var(--space-4);background:var(--surface-raised);border:1px solid var(--line);border-radius:var(--radius-md);font:400 14px/20px var(--font-sans);color:var(--ink)}
+.id-turno{flex:none;width:18px;height:18px;box-sizing:border-box;border-radius:2px;border:1.5px solid var(--piece-outline-white);background:var(--piece-white-hi)}
+.id-turno--b{background:var(--piece-black-mid);border-color:var(--piece-outline-black)}
+.id-estado strong{font-weight:600}
+.id-estado__toca{margin-left:auto;padding:2px var(--space-2);border-radius:var(--radius-sm);background:var(--accent);color:var(--on-accent);font:600 12px/16px var(--font-sans);letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
+.id-estado--jaque{border:2px solid var(--peligro);background:var(--peligro-suave);padding:calc(var(--space-3) - 1px) calc(var(--space-4) - 1px)}
+.id-jaque{display:inline-flex;align-items:center;gap:6px;color:var(--peligro);font:600 12px/16px var(--font-sans);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+.id-jaque svg{width:16px;height:16px;flex:none}
+.id-estado--fin{border:2px solid var(--marca);padding:calc(var(--space-3) - 1px) calc(var(--space-4) - 1px)}
+.id-estado__grande{font:600 20px/28px var(--font-display);letter-spacing:-.01em;color:var(--marca)}
+
+/* Estados vacíos: un trozo de tablero de 3x3 casi en blanco y una frase que dice qué va a pasar */
+.id-vacio{display:flex;align-items:flex-start;gap:var(--space-3);margin:0}
+.id-vacio__mini{flex:none;display:grid;grid-template-columns:repeat(3,12px);grid-template-rows:repeat(3,12px);border:1px solid var(--line)}
+.id-vacio__mini span{background:var(--surface)}
+.id-vacio__mini span:nth-child(odd){background:color-mix(in srgb,var(--marca) 14%,var(--surface-raised))}
+.id-vacio__mini span.id-vacio__uno{background:var(--accent)}
+.id-vacio__txt{display:flex;flex-direction:column;gap:2px;min-width:0}
+.id-vacio__titulo{font:600 14px/20px var(--font-sans);color:var(--ink)}
+.id-vacio__texto{font:400 14px/20px var(--font-sans);color:var(--ink-muted)}
+
+/* Resultado y lección superada: el sello es el logo, con la diagonal en latón cuando hay logro */
+.id-resultado{position:relative;display:flex;flex-direction:column;gap:var(--space-3);padding:var(--space-4);background:var(--surface-raised);border:2px solid var(--marca);border-radius:var(--radius-md)}
+.id-resultado--logro{border-color:var(--logro);background:linear-gradient(180deg,var(--logro-suave),var(--surface-raised) 72%)}
+.id-resultado__cab{display:flex;align-items:center;gap:var(--space-3)}
+.id-resultado__titulo{margin:0;font:600 28px/32px var(--font-display);letter-spacing:-.02em;color:var(--marca)}
+.id-resultado__kicker{margin:0;font:600 12px/16px var(--font-sans);letter-spacing:.06em;text-transform:uppercase;color:var(--logro)}
+.id-resultado__kicker--neutro{color:var(--ink-muted)}
+.id-resultado__texto{margin:0;font:400 14px/20px var(--font-sans)}
+.id-sello{position:relative;flex:none;width:48px;height:48px}
+.id-sello svg{display:block;width:100%;height:100%}
+.id-confeti{position:absolute;left:50%;top:50%;width:8px;height:8px;margin:-4px 0 0 -4px;pointer-events:none}
+.id-confeti--a{background:var(--logro-vivo)}
+.id-confeti--b{background:var(--accent)}
+.id-confeti--c{box-sizing:border-box;border:1.5px solid var(--marca);background:linear-gradient(135deg,var(--marca) 50%,transparent 50%)}
+
+/* Lámina (solo lienzo) */
+.id-lamina{display:flex;flex-direction:column;gap:var(--space-3);min-width:0}
+.id-muestra{display:flex;flex-direction:column;gap:6px;padding:var(--space-3);border:1px solid var(--line);border-radius:var(--radius-md);background:var(--surface-raised)}
+.id-muestra__color{height:56px;border-radius:var(--radius-sm);border:1px solid var(--line)}
+.id-nota{margin:0;font:400 12px/16px var(--font-mono);color:var(--ink-muted)}
+
+@media (forced-colors: active){
+  .escaque,.id-turno,.id-confeti--c{border-color:CanvasText;forced-color-adjust:none}
+  .id-estado--jaque,.id-estado--fin,.id-resultado{border-color:CanvasText}
+}

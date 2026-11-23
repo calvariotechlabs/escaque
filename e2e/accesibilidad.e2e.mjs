@@ -161,7 +161,9 @@ describe("accesibilidad de extremo a extremo", () => {
     const moves = await page.eval(`[...document.querySelectorAll('#lista-jugadas button')].map((b) => b.getAttribute('aria-label'))`);
     assert.equal(moves.length, 4);
     assert.match(moves[3], /Dh4#/);
-    assert.match(await page.eval(`document.getElementById('estado-texto').textContent`), /Jaque mate\. Ganan las negras\./);
+    // Dos jugadores (CAL-398): «Jaque mate.» en grande y la causa debajo, en el mismo bloque del estado.
+    assert.equal(await page.eval(`document.getElementById('estado-texto').textContent`), "Jaque mate.");
+    assert.match(await page.eval(`document.getElementById('estado-texto').parentElement.textContent`), /Jaque mate\.\s*Ganan las negras\./);
   });
 
   test("el repaso de la partida se maneja con teclado, tiene nombres ARIA y anuncia el análisis", async () => {
