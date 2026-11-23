@@ -25,4 +25,4 @@ Los enlaces son privados de la cuenta de Calvario TechLabs.
 
 ## Imagen de vista previa (og:image)
 
-`og/og-image.png` (1200x630) y `og/og-image.html` (su fuente, con las piezas y el icono de `design-system/assets`). Aprobada por Sergio el 2026-11-23 (CAL-393) como propuesta en el hilo del proyecto; **todavía no está en el lienzo de Claude Design**. Se publica como `public/og-image.png` y las etiquetas `og:`/`twitter:` están en `index.html`.
+`og/og-image.png` (1200x630) y `og/og-image.html` (su fuente, con las piezas y el icono de `design-system/assets`). Aprobada por Sergio el 2026-11-23 (CAL-393) como propuesta en el hilo del proyecto; está en el lienzo de Claude Design (`lienzo/OgImage.dc.html`, página Escritorio, versión 1795454832-8e29, exportado el 2026-11-23; la imagen del lienzo es una subida, no un fichero de este repositorio). Se publica como `public/og-image.png` y las etiquetas `og:`/`twitter:` están en `index.html`.
