@@ -34,26 +34,53 @@
 .resultado__titulo{margin:0;font:600 20px/28px var(--font-display)}
 .resultado__texto{margin:0;font:400 14px/20px var(--font-sans)}
 
-/* Maquetación de la pantalla de ajustes: formulario y, en escritorio, el tablero de adorno a su lado. */
-.ajustes-pantalla{max-width:1120px;margin:0 auto;box-sizing:border-box;padding:var(--space-4) max(var(--space-4),env(safe-area-inset-right,0px)) max(var(--space-8),env(safe-area-inset-bottom,0px)) max(var(--space-4),env(safe-area-inset-left,0px));display:flex;flex-wrap:wrap;align-items:flex-start;gap:var(--space-6) 48px}
+/* Maquetación de la pantalla de ajustes (diseño: «Inicio compacto» del lienzo, CAL-396): «Empezar partida» a la vista sin desplazar.
+   Una columna en móvil y tablet vertical (formulario, aviso de principiante, aviso de instalar); desde 860 px, formulario a la izquierda
+   y tablero de adorno, aviso de principiante y aviso de instalar a la derecha; en móvil apaisado, formulario en dos columnas sin tablero. */
+.ajustes-pantalla{max-width:1120px;margin:0 auto;box-sizing:border-box;padding:var(--space-4) max(var(--space-4),env(safe-area-inset-right,0px)) max(var(--space-8),env(safe-area-inset-bottom,0px)) max(var(--space-4),env(safe-area-inset-left,0px));display:grid;grid-template-columns:minmax(0,520px);align-items:start;gap:var(--space-6)}
 .ajustes-pantalla[hidden],.partida[hidden]{display:none}
-.ajustes-pantalla__form{flex:1 1 420px;min-width:0;max-width:520px}
+.ajustes-pantalla__form{min-width:0}
 .ajustes-pantalla__titulo{margin:0 0 var(--space-4);font:600 24px/32px var(--font-display)}
 .ajustes-pantalla__vista{display:none}
 /* El aviso de instalar va después del botón de empezar, sin empujarlo; vacío es la región viva de .avisos. */
-.ajustes-pantalla__instalar{flex:1 1 100%;max-width:520px}
-@media (min-width:860px){
-  /* Escritorio y tablet horizontal: el aviso queda en la columna derecha, bajo el tablero de adorno. */
-  .ajustes-pantalla{display:grid;grid-template-columns:minmax(0,520px) minmax(0,560px);grid-template-areas:"form vista" "form instalar";grid-template-rows:auto 1fr;column-gap:48px;row-gap:var(--space-6)}
-  .ajustes-pantalla__form{grid-area:form;max-width:none}
-  .ajustes-pantalla__vista{grid-area:vista;max-width:none}
-  .ajustes-pantalla__instalar{grid-area:instalar;max-width:none}
-  .ajustes-pantalla{padding-top:var(--space-6)}
-  .ajustes-pantalla__titulo{margin-bottom:var(--space-6)}
-  .ajustes-pantalla__vista{display:block;flex:1 1 400px;min-width:0;max-width:560px}
-}
+.ajustes-pantalla__instalar{min-width:0}
 
-@media (min-width:600px) and (max-width:859px){.ajustes-pantalla{max-width:732px}}
+/* Segmentos: cada grupo es una fila con el nombre de cada opción; la descripción de la elegida va debajo.
+   La de las demás sigue en el documento, oculta a la vista, y cada botón de opción la enlaza con aria-describedby. */
+.ajustes{gap:var(--space-4)}
+.grupo__leyenda{margin-bottom:var(--space-2)}
+.grupo--segmentos .opciones{display:grid;grid-template-columns:repeat(var(--segmentos,3),minmax(0,1fr));grid-template-rows:auto minmax(var(--ayuda-min,40px),auto);gap:var(--space-2)}
+.grupo--segmentos .opcion{display:contents}
+.grupo--segmentos .opcion__caja{position:relative;grid-row:1;min-width:0}
+.grupo--segmentos .opcion__tarjeta{flex-direction:row;align-items:center;gap:var(--space-2);min-height:48px;padding:0 var(--space-3)}
+.grupo--segmentos .opcion__tarjeta::before{position:static;flex:none;margin:0}
+.grupo--segmentos .opcion__entrada:checked + .opcion__tarjeta{padding:0 calc(var(--space-3) - 1.5px)}
+.grupo--segmentos .opcion__entrada:checked + .opcion__tarjeta::before{left:auto}
+.grupo--segmentos .opcion__texto{grid-row:2;grid-column:1 / -1;margin:0;padding-top:var(--space-1)}
+.grupo--segmentos .opcion:not(:has(:checked)) .opcion__texto{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.grupo--modo{--segmentos:2}
+/* Tu color: la muestra de color hace de marca de selección y sustituye al círculo, que no cabe junto al nombre en tres columnas. */
+.grupo--color .opcion__tarjeta::before{display:none}
+.grupo--color .estado__turno{flex:none;width:20px;height:20px;margin:2px}
+.grupo--color .opcion__entrada:checked + .opcion__tarjeta .estado__turno{box-shadow:0 0 0 2px var(--surface-raised),0 0 0 4px var(--accent)}
+@media (forced-colors:active){.grupo--color .opcion__entrada:checked + .opcion__tarjeta .estado__turno{outline:2px solid Highlight;outline-offset:2px}}
+
+/* Botón: barra que se queda abajo mientras el formulario es más alto que la pantalla (móvil). */
+.ajustes__acciones{position:sticky;bottom:0;z-index:2;margin:0 calc(-1 * var(--space-4));padding:var(--space-3) var(--space-4) max(var(--space-3),env(safe-area-inset-bottom,0px));background:var(--surface);border-top:1px solid var(--line)}
+
+@media (min-width:600px){
+  .grupo--segmentos{--ayuda-min:20px}
+  .ajustes__acciones{position:static;margin:0;padding:0;border-top:0;background:none}
+}
+@media (min-width:600px) and (max-width:859px){.ajustes-pantalla{max-width:732px;grid-template-columns:minmax(0,1fr)}}
+@media (min-width:860px){
+  .ajustes-pantalla{grid-template-columns:minmax(0,520px) minmax(0,400px);grid-template-areas:"form vista" "form novato" "form instalar";grid-template-rows:auto auto 1fr;column-gap:48px;row-gap:var(--space-4);padding-top:var(--space-6)}
+  .ajustes-pantalla__form{grid-area:form}
+  .ajustes-pantalla__vista{display:block;grid-area:vista;max-width:360px}
+  .ajustes-pantalla__novato{grid-area:novato}
+  .ajustes-pantalla__instalar{grid-area:instalar}
+  .ajustes-pantalla__titulo{margin-bottom:var(--space-6)}
+}
 
 /* Resultado: sustituye al estado y ocupa su sitio en la rejilla. */
 .partida__estado{display:flex;flex-direction:column;gap:var(--space-3);min-width:0}
@@ -63,4 +90,18 @@
 /* Móvil apaisado: la cabecera deja de flotar sobre el tablero cuando se ven los ajustes. */
 @media (orientation:landscape) and (max-height:500px){
   .pagina__cabecera:has(~ .ajustes-pantalla:not([hidden])){position:static}
+}
+/* Móvil apaisado: Modo y Nivel arriba, Tu color y el botón debajo; sin tablero y con los avisos después. */
+@media (orientation:landscape) and (max-height:500px){
+  .ajustes-pantalla{grid-template-columns:minmax(0,1fr);grid-template-areas:none;grid-template-rows:none;padding-top:var(--space-2);row-gap:var(--space-4)}
+  .ajustes-pantalla__form,.ajustes-pantalla__novato,.ajustes-pantalla__instalar{grid-area:auto}
+  .ajustes-pantalla__vista{display:none}
+  .ajustes-pantalla__titulo{margin-bottom:var(--space-2);font-size:20px;line-height:28px}
+  .ajustes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-areas:"modo nivel" "color acciones";gap:var(--space-3) var(--space-6);align-items:start}
+  .grupo--modo{grid-area:modo}
+  #grupo-nivel{grid-area:nivel}
+  #grupo-color{grid-area:color}
+  .ajustes__acciones{grid-area:acciones;position:static;align-self:end;margin:0;padding:0;border:0;background:none}
+  .grupo--segmentos{--ayuda-min:20px}
+  .grupo--segmentos .opcion__tarjeta{min-height:44px}
 }

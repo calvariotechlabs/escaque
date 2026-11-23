@@ -177,7 +177,6 @@ section.grupo{display:flex;flex-direction:column;gap:var(--space-4)}
 .lecc-grupos{display:flex;flex-direction:column;gap:var(--space-8)}
 .lecc-ayuda{display:flex;flex-direction:column;gap:var(--space-3)}
 .lecc-ayuda .lecc-pre:empty{display:none}
-.ajustes-pantalla__novato{margin-bottom:var(--space-6)}
 @media (min-width:860px){
   .lecc-cuerpo{grid-template-areas:"tablero estado" "tablero retro" "tablero ayuda" "tablero pistas" "tablero acciones";grid-template-rows:auto auto auto auto 1fr}
   .lecc-ayuda{grid-area:ayuda}
