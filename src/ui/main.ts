@@ -925,6 +925,9 @@ function clearPgnError(): void {
   pgnField.setAttribute("aria-describedby", "pgn-ayuda");
 }
 
+// Al corregir el texto, el aviso de un intento anterior ya no vale.
+pgnField.addEventListener("input", clearPgnError);
+
 loadPgnButton.addEventListener("click", () => {
   clearPgnError();
   pgnDialog.showModal();
