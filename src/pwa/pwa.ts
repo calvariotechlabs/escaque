@@ -1,5 +1,5 @@
 // Parte de la app instalable que vive en la página: registra el service worker, escucha
-// instalación, conexión y versiones nuevas, y pinta un único aviso (ver notices.ts).
+// instalación, conexión y versiones nuevas, y pinta dos avisos: el de la partida (versión nueva o sin conexión, uno a la vez) y el de instalar de la pantalla de inicio (ver notices.ts).
 // Todo el texto va con textContent: nunca se construye HTML.
 import { INITIAL_STATE, iosInstallDevice, pickInstallNotice, pickNotice, type Notice, type NoticeAction, type NoticeKind, type PwaState } from "./notices.js";
 

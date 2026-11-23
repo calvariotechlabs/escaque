@@ -45,7 +45,6 @@ after(async () => {
   }
 });
 
-
 /** Simula que el navegador ofrece instalar (Chrome lo emite una vez cargada la página). */
 const offerInstall = (page) =>
   page.eval(`(() => { const e = new Event('beforeinstallprompt', { cancelable: true }); e.prompt = () => Promise.resolve(); e.userChoice = Promise.resolve({ outcome: 'dismissed' }); window.dispatchEvent(e); })()`);
@@ -72,6 +71,7 @@ describe("aviso de instalar de extremo a extremo", () => {
     await page.eval(`document.querySelector('#ajustes [type=submit]').click()`);
     await page.waitFor(`!document.getElementById('pantalla-partida').hidden`, { what: "pantalla de partida" });
     assert.equal(await page.eval(`document.getElementById('pantalla-ajustes').hidden`), true);
+    assert.equal(await page.eval(`document.getElementById('aviso-instalar').offsetParent`), null, "el aviso de instalar no se ve en la partida");
     assert.equal(await page.eval(`document.getElementById('avisos').children.length`), 0);
   });
 
