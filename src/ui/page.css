@@ -102,6 +102,17 @@ body{margin:0;background:var(--surface);color:var(--ink);font:400 16px/24px var(
 .tablero--jugable .tablero__rejilla{touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 .casilla[data-square]{cursor:pointer}
 
+/* Arrastre con el dedo (lienzo «Móvil · arrastrar con el dedo»): la pieza sube sobre el dedo con sombra, en su casilla
+   queda una copia tenue, la casilla de debajo lleva un borde grueso y su nombre va en una etiqueta junto a la pieza. */
+.pieza--elevada{filter:drop-shadow(0 6px 5px rgba(0,0,0,.4))}
+.casilla > .pieza.pieza--origen{position:absolute;inset:0;opacity:.3;pointer-events:none}
+.casilla[data-bajo-dedo]::before{inset:0;background:color-mix(in srgb,var(--mark-selected) 60%,transparent);box-shadow:inset 0 0 0 4px var(--board-ink)}
+.arrastre__etiqueta{position:absolute;z-index:5;padding:2px var(--space-2);border-radius:var(--radius-sm);background:var(--accent);color:var(--on-accent);font:500 14px/20px var(--font-mono);pointer-events:none;white-space:nowrap}
+@media (forced-colors: active){
+  .casilla[data-bajo-dedo]{outline:4px solid CanvasText;outline-offset:-4px}
+  .arrastre__etiqueta{border:1px solid CanvasText}
+}
+
 /* Diálogo modal de coronación: fondo del lienzo «Coronación · móvil». */
 .coronacion-dialogo{padding:0;border:0;background:none;max-width:calc(100vw - 2 * var(--space-4))}
 .coronacion-dialogo::backdrop{background:color-mix(in srgb,var(--ink) 55%,transparent)}

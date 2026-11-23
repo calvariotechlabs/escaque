@@ -414,6 +414,14 @@
    "title": "Móvil · cargar una partida en PGN",
    "page": "movil"
   },
+  "ArrastreMovil.dc.html": {
+   "x": 470,
+   "y": 23040,
+   "w": 390,
+   "h": 980,
+   "title": "Móvil · arrastrar con el dedo",
+   "page": "movil"
+  },
   "EnlaceGithub.dc.html": {
    "x": 0,
    "y": 15740,
@@ -480,6 +488,7 @@
   "PgnEstados.dc.html",
   "PgnTablet.dc.html",
   "PgnMovil.dc.html",
+  "ArrastreMovil.dc.html",
   "EnlaceGithub.dc.html",
   "LogoCabecera.dc.html"
  ],
