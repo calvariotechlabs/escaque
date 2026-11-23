@@ -25,12 +25,12 @@ Todas medidas, no estimadas. Las de velocidad salen de un contenedor cloud de 4 
 | Qué | Cifra |
 | --- | --- |
 | Dependencias en ejecución | **0** (`dependencies` vacío; la única `devDependency` es TypeScript, solo para compilar; lo comprueba la CI) |
-| Código | 7.478 líneas de TypeScript en `src` y 4.881 en `tests` |
-| Tests | **827** en 133 suites con `node --test`, unos 5 s (más 109 tests de perft a profundidad completa, unos 10 s) |
+| Código | 7.478 líneas de TypeScript en `src` y 4.902 en `tests` |
+| Tests | **829** en 134 suites con `node --test`, unos 5 s (más 109 tests de perft a profundidad completa, unos 10 s) |
 | Perft | 21 posiciones de referencia, todas exactas: la inicial (20 / 400 / 8.902 / 197.281), Kiwipete (48 / 2.039 / 97.862), las posiciones 3 a 6 de la Chess Programming Wiki y las «trampa» de Sedlak (al paso ilegal, enroques que dan jaque, coronaciones que ahogan). `npm run perft` llega más lejos: 119.060.324 nodos desde la inicial a profundidad 6 y 193.690.690 en Kiwipete a profundidad 5 |
 | Velocidad de perft | Entre 5,9 y 6,5 millones de nodos por segundo en este contenedor: la inicial a profundidad 6 (119.060.324 nodos) en 18,8 s y Kiwipete a profundidad 5 (193.690.690) en 30 s |
 | Alfil Beta, nivel Difícil | Responde en 831 ms de media y 910 ms como máximo (158 jugadas medidas en esta pasada, contenedor de 4 núcleos); la pasada completa del punto de parada (más abajo) dio 818 ms y 909 ms. Gana 4 de 4 a un jugador al azar y 4 de 4 a Fácil; Medio gana 4 de 4 a Fácil |
-| Tabla de transposición | A la misma profundidad, Alfil Beta visita un **97 % menos de nodos** con la tabla que sin ella en las cinco posiciones de `npm run bench` (1,45 millones frente a 57,5 millones) y tarda 7,7 s en vez de 120 s. Va del −31 % en Kiwipete al −100 % en el final de peones Fine 70 (detalle más abajo) |
+| Tabla de transposición | A la misma profundidad, Alfil Beta visita un **97 % menos de nodos** con la tabla que sin ella en las cinco posiciones de `npm run bench` (1,45 millones frente a 57,5 millones) y tarda 7,9 s en vez de 126 s. Va del −31 % en Kiwipete al −99,9 % en el final de peones Fine 70 (detalle más abajo) |
 | Sitio publicado | 64 ficheros, 516 KB en disco; JS + CSS + HTML suman unos 75 KB comprimidos con gzip |
 | Cabeceras | CSP sin `unsafe-inline`, `X-Frame-Options: DENY`, `nosniff`, `Referrer-Policy`, `Permissions-Policy` y `COOP`, comprobadas por tests |
 
@@ -84,7 +84,7 @@ npm test         # compila y ejecuta node --test (perft a profundidad rápida)
 npm run test:perft   # perft a profundidad completa (unos 43 millones de nodos)
 npm run perft -- <profundidad> ["<fen>"] [jugadas UCI...] [--ref <fichero>]
 npm run build:site   # compila y monta site/ (lo que se publica) con el service worker versionado
-npm run bench    # misma búsqueda con y sin tabla de transposición: nodos, tiempo y nodos/s (unos 2 min)
+npm run bench    # misma búsqueda con y sin tabla de transposición: nodos, tiempo y nodos/s (unos 3 min)
 npm run match    # partidas automáticas entre niveles (unos 15 min; «-- 4» para 4 por enfrentamiento)
 npm run serve    # monta site/ y lo sirve en http://127.0.0.1:8080 (sin dependencias)
 ```
@@ -108,18 +108,18 @@ Todo en `src/engine`, sin dependencias ni DOM: funciona igual en Node y en el na
 - **Búsqueda.** Negamax con poda alfa-beta y profundización iterativa con límite de tiempo. Si el tiempo se acaba a media iteración, vale la última completa, y la profundidad 1 siempre se termina. En las hojas, búsqueda de quietud con capturas y coronaciones a dama. Quien está en jaque no puede «quedarse quieto»: se miran todas sus respuestas, y sin ninguna es mate. Estar en jaque alarga la búsqueda una media jugada. Orden de jugadas: primero la de la tabla de transposición, luego capturas por MVV-LVA y luego coronaciones. Los mates se puntúan por distancia, así que busca el más corto y retrasa el suyo. Dentro de la búsqueda, una posición repetida, la regla de 50 jugadas (salvo que la jugada 100 dé mate) y el material insuficiente valen 0.
 - **Clave Zobrist y tabla de transposición.** El núcleo mantiene una clave Zobrist de 64 bits en dos mitades de 32, porque los bitboards o las claves con BigInt serían lentos en JavaScript. Los números salen de un generador propio (mulberry32) con semilla fija. La casilla al paso solo entra en la clave si la captura al paso es legal, así que la misma clave sirve para la triple repetición de las reglas, para las repeticiones dentro de la búsqueda y para la tabla de transposición: 2^18 entradas en arrays tipados, unos 4 MB, sin crear objetos al buscar. Mantener la clave cuesta en torno a un 13 % de velocidad de perft.
 
-  Lo que aporta la tabla, medido con `npm run bench` (búsqueda a profundidad fija, la misma posición con la tabla de 2^18 entradas y con una tabla que no guarda nada; contenedor de 4 núcleos, Node 22, un hilo):
+  Lo que aporta la tabla, medido con `npm run bench`: búsqueda a profundidad fija de la misma posición de tres maneras, con un calentamiento previo para que el compilador JIT no favorezca a ninguna. «Sin tabla» usa una tabla que no guarda nada. «Solo la jugada» usa la tabla únicamente para probar primero la mejor jugada guardada, sin cortar nunca con su puntuación. «Con tabla» es la de Alfil Beta tal cual (2^18 entradas). Contenedor de 4 núcleos, Node 22, un hilo:
 
-  | Posición | Prof. | Nodos sin tabla | Nodos con tabla | Nodos | Tiempo sin tabla | Tiempo con tabla | Nodos/s sin tabla | Nodos/s con tabla |
+  | Posición | Prof. | Nodos sin tabla | Solo la jugada de la tabla | Con tabla | Tiempo sin tabla | Tiempo con tabla | Nodos/s sin tabla | Nodos/s con tabla |
   | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-  | Inicial | 6 | 1.033.163 | 345.576 | -67 % | 4.493 ms | 2.012 ms | 229.928 | 171.735 |
-  | Kiwipete | 5 | 601.441 | 415.722 | -31 % | 5.741 ms | 3.379 ms | 104.769 | 123.020 |
-  | Medio juego (italiana) | 5 | 2.123.497 | 238.832 | -89 % | 15.068 ms | 1.373 ms | 140.929 | 173.893 |
-  | Final de torres | 8 | 16.287.326 | 413.078 | -97 % | 33.383 ms | 891 ms | 487.898 | 463.765 |
-  | Final de peones (Fine 70) | 16 | 37.453.312 | 38.992 | -100 % | 61.454 ms | 64 ms | 609.452 | 608.150 |
-  | Total |  | 57.498.739 | 1.452.200 | -97 % | 120.139 ms | 7.720 ms | — | — |
+  | Inicial | 6 | 1.033.163 | 383.616 (-63 %) | 345.576 (-67 %) | 4.643 ms | 1.744 ms | 222.507 | 198.096 |
+  | Kiwipete | 5 | 601.441 | 499.123 (-17 %) | 415.722 (-31 %) | 4.977 ms | 3.389 ms | 120.849 | 122.653 |
+  | Medio juego (italiana) | 5 | 2.123.497 | 256.427 (-88 %) | 238.832 (-89 %) | 14.512 ms | 1.728 ms | 146.330 | 138.214 |
+  | Final de torres | 8 | 16.287.326 | 2.599.161 (-84 %) | 413.078 (-97 %) | 36.448 ms | 979 ms | 446.870 | 421.987 |
+  | Final de peones (Fine 70) | 16 | 37.453.312 | 6.269.691 (-83 %) | 38.992 (-99,9 %) | 65.903 ms | 105 ms | 568.312 | 372.397 |
+  | Total |  | 57.498.739 | 10.008.018 (-83 %) | 1.452.200 (-97 %) | 126.482 ms | 7.945 ms | — | — |
 
-  Los nodos por segundo apenas cambian: consultar y guardar en la tabla es barato, y lo que se gana es no repetir trabajo. La ganancia crece cuanto más se repiten posiciones por caminos distintos: poca en Kiwipete, con muchas capturas que no se pueden transponer, y enorme en los finales, donde los reyes llegan a la misma casilla por muchos órdenes de jugadas. Con la tabla, la búsqueda a profundidad fija no es idéntica (los cortes de la tabla traen información de búsquedas más profundas), así que la jugada elegida puede variar: en Fine 70 a profundidad 16 elige Rb2 con tabla y Rb1 sin ella.
+  Se ven dos efectos. En el medio juego casi todo lo pone el orden de jugadas: probar primero la mejor jugada de la iteración anterior ya ahorra entre el 17 % (Kiwipete, llena de capturas) y el 88 %. En los finales manda no repetir trabajo: los reyes llegan a la misma casilla por muchos órdenes de jugadas, y los cortes con la puntuación guardada bajan el final de torres del −84 % al −97 % y Fine 70 del −83 % al −99,9 %. Cada nodo cuesta algo más con la tabla (entre un 1 % más rápido y un 11 % más lento por nodo en las cuatro primeras posiciones; Fine 70 con tabla dura solo una décima de segundo y su cifra es poco fiable), pero se visitan tantos menos que la búsqueda total es 16 veces más rápida. Con la tabla, la búsqueda a profundidad fija no es idéntica, porque los cortes traen información de búsquedas más profundas, así que la jugada elegida puede variar: en Fine 70 a profundidad 16 elige Rb2 con tabla y Rb1 sin ella.
 - **Evaluación.** Material (P 100, C 320, A 330, T 500, D 900) más tablas de valor por casilla. El rey tiene una tabla para el medio juego y otra para el final, y se mezclan según el material que queda. Es simétrica: cambiar los colores no cambia la valoración, y hay un test que lo comprueba.
 - **Niveles** (`chooseMove`):
 
