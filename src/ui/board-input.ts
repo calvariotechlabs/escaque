@@ -73,7 +73,7 @@ export function attachBoardInput(host: BoardInputHost): void {
   function draggedPiece(): { cell: HTMLElement; piece: Element | null } | null {
     if (gesture === null) return null;
     const cell = view.squareElement(gesture.square);
-    return { cell, piece: cell.querySelector(".pieza:not(.pieza--origen)") };
+    return { cell, piece: cell.querySelector(".pieza:not(.pieza--origen):not(.pieza--copia)") };
   }
 
   function resetDraggedPiece(): void {

@@ -244,3 +244,24 @@ describe("lo que cambia de golpe", () => {
     assert.equal(await pieceOn(page, "g1"), true);
   });
 });
+
+describe("arrastrar mientras otra pieza se desliza", () => {
+  test("empezar a arrastrar la pieza que acaba de capturar termina la animación y no deja copias", async () => {
+    const page = await deskPage();
+    await startTwoPlayers(page);
+    await play(page, "e2", "e4");
+    await play(page, "d7", "d5");
+    await pause(300);
+    await play(page, "e4", "d5");
+    // Las negras arrastran su dama a d5 justo después, sin esperar a que termine la captura.
+    const a = await center(page, "d8");
+    const b = await center(page, "d5");
+    await page.call("Input.dispatchMouseEvent", { type: "mousePressed", x: a.x, y: a.y, button: "left", clickCount: 1 });
+    for (let i = 1; i <= 6; i++) await page.call("Input.dispatchMouseEvent", { type: "mouseMoved", x: a.x, y: a.y + ((b.y - a.y) * i) / 6, button: "left" });
+    assert.equal(await page.eval(`document.querySelectorAll('.pieza--copia, .casilla--anima').length`), 0);
+    await page.call("Input.dispatchMouseEvent", { type: "mouseReleased", x: b.x, y: b.y, button: "left", clickCount: 1 });
+    await pause(100);
+    const pieces = await page.eval(`[...document.querySelectorAll('[data-square="d5"]')].find((e) => e.offsetParent !== null).querySelectorAll('.pieza').length`);
+    assert.equal(pieces, 1);
+  });
+});

@@ -210,6 +210,9 @@ export function createBoard(container: HTMLElement, options: BoardOptions = {}):
   const settle = (): void => {
     for (const animation of running) animation.finish();
     running = [];
+    // El evento «finish» llega después: lo que limpia se hace ya, para que quien siga (un arrastre) no lo encuentre.
+    for (const copy of element.querySelectorAll(".pieza--copia")) copy.remove();
+    for (const cell of element.querySelectorAll(".casilla--anima")) cell.classList.remove("casilla--anima");
   };
 
   const track = (animation: Animation, done?: () => void): void => {
@@ -296,11 +299,12 @@ export function createBoard(container: HTMLElement, options: BoardOptions = {}):
       if (plan !== null && typeof element.animate === "function") animate(plan);
     },
     withoutAnimation(run: () => void): void {
+      const outer = skipNext; // se puede anidar: soltar arrastrando y, dentro, una partida nueva
       skipNext = true;
       try {
         run();
       } finally {
-        skipNext = false;
+        skipNext = outer;
       }
     },
     settle,
