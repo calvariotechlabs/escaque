@@ -249,22 +249,18 @@ function signed(cp: number): string {
 }
 
 /** Mayor ventaja de cada bando (sin contar los mates) y tras qué jugada. */
-function peaks(moves: readonly ReviewMove[], reports: Reports): { w: { cp: number; label: string } | null; b: { cp: number; label: string } | null; mate: boolean } {
+function peaks(moves: readonly ReviewMove[], reports: Reports): { w: { cp: number; label: string } | null; b: { cp: number; label: string } | null } {
   let w: { cp: number; label: string } | null = null;
   let b: { cp: number; label: string } | null = null;
-  let mate = false;
   for (const move of moves) {
     const after = reports.get(move.ply)?.after;
     if (after === undefined) continue;
-    if (after.mate !== null) {
-      mate = true;
-      continue;
-    }
+    if (after.mate !== null) continue;
     // Con empate gana la más tardía: «tras» la jugada que la deja así por última vez se lee mejor.
     if (after.cp > 0 && (w === null || after.cp >= w.cp)) w = { cp: after.cp, label: move.label };
     if (after.cp < 0 && (b === null || after.cp <= b.cp)) b = { cp: after.cp, label: move.label };
   }
-  return { w, b, mate };
+  return { w, b };
 }
 
 /** Ventaja que no se nombra: por debajo de medio peón se habla de igualdad. */
@@ -294,8 +290,9 @@ export function curveLabel(moves: readonly ReviewMove[], reports: Reports, statu
 }
 
 /** Frase final del pie de la curva: la mayor ventaja de la partida, o `null` si no hubo ninguna notable. */
-export function curveNote(moves: readonly ReviewMove[], reports: Reports): string | null {
-  const { w, b, mate } = peaks(moves, reports);
+export function curveNote(moves: readonly ReviewMove[], reports: Reports, status: GameStatus): string | null {
+  const { w, b } = peaks(moves, reports);
+  const mate = status.kind === "checkmate";
   const best = w !== null && (b === null || w.cp >= -b.cp) ? { ...w, side: "blanca" } : b !== null ? { ...b, side: "negra" } : null;
   if (best === null || Math.abs(best.cp) < NOTABLE) return null;
   return `Máxima ventaja ${best.side}${mate ? " antes del mate" : ""}: ${signed(best.cp)} tras ${best.label}.`;

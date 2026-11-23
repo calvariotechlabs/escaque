@@ -270,10 +270,12 @@ describe("textos", () => {
         "La mayor ventaja de las negras es −0,5 tras 1... e5. " +
         "Acaba con jaque mate de las negras en la jugada 2. Hay 1 jugada con imprecisión o error.",
     );
-    assert.equal(curveNote(moves, reports), "Máxima ventaja negra antes del mate: −0,5 tras 1... e5.");
+    assert.equal(curveNote(moves, reports, { kind: "checkmate", winner: "b" }), "Máxima ventaja negra antes del mate: −0,5 tras 1... e5.");
+    // Un mate que se escapó no cuenta: «antes del mate» solo si la partida acabó en mate.
+    assert.equal(curveNote(moves, reports, { kind: "threefold-repetition" }), "Máxima ventaja negra: −0,5 tras 1... e5.");
   });
 
   it("nota bajo la curva con la mayor ventaja", () => {
-    assert.equal(curveNote(reviewMoves(scholarGame()), scholarReports()), "Máxima ventaja blanca: +15,9 tras 3... Cf6.");
+    assert.equal(curveNote(reviewMoves(scholarGame()), scholarReports(), { kind: "stalemate" }), "Máxima ventaja blanca: +15,9 tras 3... Cf6.");
   });
 });

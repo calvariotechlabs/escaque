@@ -161,6 +161,8 @@ export function createReviewScreen(options: ReviewScreenOptions): ReviewScreen {
   /** Lo que enseña ahora el panel del coach: así no se repinta (ni se vuelve a anunciar) sin cambios. */
   let panelKey = "";
   let key: ReviewItem[] = [];
+  /** La lista de jugadas tiene que llevar la seleccionada a la vista en el próximo repintado. */
+  let scrollPending = true;
 
   const total = (): number => moves.length;
   const complete = (): boolean => reports.size >= moves.length;
@@ -203,7 +205,8 @@ export function createReviewScreen(options: ReviewScreenOptions): ReviewScreen {
       (report) => {
         if (current !== token) return;
         busy = false;
-        if (options.cache.size >= CACHE_LIMIT) options.cache.clear();
+        // Se olvida el informe más antiguo, no todos: los del coach de la partida siguen sirviendo.
+        if (options.cache.size >= CACHE_LIMIT) options.cache.delete(options.cache.keys().next().value!);
         options.cache.set(reviewKey(move.job), report);
         reports.set(ply, report);
         if (complete()) announce(doneAnnouncement());
@@ -265,12 +268,15 @@ export function createReviewScreen(options: ReviewScreenOptions): ReviewScreen {
   }
 
   function drawProgress(): void {
+    // El botón de parar desaparece al terminar o fallar: su foco no se pierde.
+    const hadFocus = document.activeElement === stopButton;
     failure.hidden = !failed;
     curveBox.hidden = failed;
     const done = complete();
     curveTitle.textContent = done ? "Evaluación de la partida" : REVIEW_TEXT.analyzingTitle;
     progress.hidden = done;
     stopButton.hidden = done;
+    if (hadFocus && (done || failed)) (failed ? byId<HTMLButtonElement>("repaso-reintentar") : title).focus();
     if (done) return;
     progressLabel.textContent = progressText(reports.size, total());
     progressBar.setAttribute("aria-valuemax", String(total()));
@@ -319,7 +325,7 @@ export function createReviewScreen(options: ReviewScreenOptions): ReviewScreen {
         return span;
       }),
     );
-    const note = complete() ? curveNote(moves, reports) : null;
+    const note = complete() ? curveNote(moves, reports, game.status) : null;
     caption.textContent = note === null ? REVIEW_TEXT.curveCaption : `${REVIEW_TEXT.curveCaption} ${note}`;
   }
 
@@ -393,7 +399,9 @@ export function createReviewScreen(options: ReviewScreenOptions): ReviewScreen {
       row.append(button);
     }
     moveList.replaceChildren(...rows.values());
-    scrollListToSelected();
+    // Solo al cambiar de jugada: si no, cada informe que llega devolvería la lista a la seleccionada.
+    if (scrollPending) scrollListToSelected();
+    scrollPending = false;
   }
 
   /** Lleva la jugada seleccionada a la vista dentro de la lista, sin mover la página. */
@@ -448,6 +456,7 @@ export function createReviewScreen(options: ReviewScreenOptions): ReviewScreen {
   function select(ply: number | null): void {
     if (ply === null || ply < 1 || ply > total() || ply === selected) return;
     selected = ply;
+    scrollPending = true;
     coachMarks = [];
     render();
     pump(); // si la nueva jugada no está revisada, pasa la primera
@@ -520,15 +529,17 @@ export function createReviewScreen(options: ReviewScreenOptions): ReviewScreen {
         panelKey = "";
         announce("");
       }
+      const wasVisible = visible;
       game = next;
       moves = list;
       orientation = side;
       failed = false;
       visible = true;
       coachMarks = [];
+      scrollPending = true;
       render();
       pump();
-      title.focus();
+      if (!wasVisible) title.focus(); // solo al aparecer: repintar con la pantalla a la vista no mueve el foco
     },
 
     hide() {

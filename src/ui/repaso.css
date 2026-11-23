@@ -101,7 +101,7 @@
 
 /* --- Maquetación de la pantalla (lienzo «Repaso · escritorio / tablet / móvil») --------------------- */
 /* `hidden` debe ganar a los display del diseño. */
-.repaso [hidden]{display:none}
+.repaso[hidden],.repaso [hidden]{display:none}
 /* Botones de paso en el límite de la partida: se ven como desactivados pero conservan el foco. */
 .boton[aria-disabled="true"]{color:var(--ink-muted);border-style:dashed;cursor:not-allowed}
 
