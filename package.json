@@ -17,7 +17,8 @@
     "perft": "npm run build && node dist/tools/perft.js",
     "serve": "npm run build:site && node tools/serve.mjs",
     "build:site": "npm run clean && npm run build && node tools/build-site.mjs",
-    "match": "npm run build && node dist/tools/match.js"
+    "match": "npm run build && node dist/tools/match.js",
+    "bench": "npm run build && node dist/tools/bench.js"
   },
   "dependencies": {},
   "devDependencies": {
