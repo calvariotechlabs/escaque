@@ -381,6 +381,38 @@
    "w": 390,
    "h": 3200,
    "page": "movil"
+  },
+  "PgnEscritorio.dc.html": {
+   "x": 0,
+   "y": 13940,
+   "w": 1280,
+   "h": 860,
+   "title": "Escritorio · cargar una partida en PGN (con error)",
+   "page": "escritorio"
+  },
+  "PgnEstados.dc.html": {
+   "x": 1360,
+   "y": 13940,
+   "w": 1280,
+   "h": 700,
+   "title": "Escritorio · PGN: exportada, repaso de una partida cargada y errores",
+   "page": "escritorio"
+  },
+  "PgnTablet.dc.html": {
+   "x": 0,
+   "y": 17740,
+   "w": 820,
+   "h": 1240,
+   "title": "Tablet · botones de PGN y partida exportada",
+   "page": "tablet"
+  },
+  "PgnMovil.dc.html": {
+   "x": 0,
+   "y": 23040,
+   "w": 390,
+   "h": 1010,
+   "title": "Móvil · cargar una partida en PGN",
+   "page": "movil"
   }
  },
  "order": [
@@ -427,7 +459,11 @@
   "RepasoEscritorio.dc.html",
   "RepasoEstados.dc.html",
   "RepasoTablet.dc.html",
-  "RepasoMovil.dc.html"
+  "RepasoMovil.dc.html",
+  "PgnEscritorio.dc.html",
+  "PgnEstados.dc.html",
+  "PgnTablet.dc.html",
+  "PgnMovil.dc.html"
  ],
  "notes": {
   "t_escritorio_0": {
@@ -949,6 +985,62 @@
    "text": "Móvil: todo en una columna. Los seis botones de navegación ocupan dos filas de 44 px, la curva mide el ancho de la pantalla y la lista de jugadas se desplaza dentro de su panel hasta la jugada seleccionada (aquí se muestran las jugadas 10 a 18). Móvil horizontal: sin diseñar todavía.",
    "fill": "gray",
    "page": "movil"
+  },
+  "t_escritorio_pgn": {
+   "x": 0,
+   "y": 13700,
+   "text": "Partidas en PGN",
+   "kind": "title1",
+   "maxW": 2640,
+   "page": "escritorio"
+  },
+  "t_tablet_pgn": {
+   "x": 0,
+   "y": 17500,
+   "text": "Partidas en PGN",
+   "kind": "title1",
+   "maxW": 1720,
+   "page": "tablet"
+  },
+  "t_movil_pgn": {
+   "x": 0,
+   "y": 22800,
+   "text": "Partidas en PGN",
+   "kind": "title1",
+   "maxW": 860,
+   "page": "movil"
+  },
+  "g1": {
+   "x": 0,
+   "y": 14920,
+   "w": 520,
+   "fill": "gray",
+   "page": "escritorio",
+   "text": "Dos botones nuevos bajo «Girar tablero», en una fila: «Exportar PGN» descarga la partida en curso como escaque-AAAA-MM-DD.pgn (cabeceras Event «Partida en Escaque», Site «Escaque», fecha, jugadores y resultado; contra la máquina, el bando de Alfil Beta lleva el nivel). «Cargar PGN» abre este diálogo modal: pegar el texto o elegir un archivo .pgn (que se vuelca en el campo para verlo). «Cargar y repasar» abre la partida en el repaso. Si falla, el recuadro de error (borde discontinuo, icono y role=alert) dice qué jugada falla; el campo queda marcado (borde discontinuo, aria-invalid) y conserva el texto. Escape o «Cancelar» cierran; el foco vuelve a «Cargar PGN»."
+  },
+  "g2": {
+   "x": 1360,
+   "y": 14760,
+   "w": 520,
+   "fill": "gray",
+   "page": "escritorio",
+   "text": "1) Tras exportar, una línea de estado (role=status) junto a los botones confirma el nombre del archivo; se va al siguiente cambio de la partida. 2) El repaso de una partida cargada es el de siempre, con otra entrada: el texto dice de dónde viene la partida y la única acción es «Volver a la partida», que vuelve a la partida en curso intacta (no hay Revancha ni Nueva partida). 3) Los errores usan el mismo recuadro; el texto sale del lector de PGN. Las jugadas del error van tal como están en el texto (letras inglesas del PGN)."
+  },
+  "g3": {
+   "x": 900,
+   "y": 17740,
+   "w": 520,
+   "fill": "gray",
+   "page": "tablet",
+   "text": "Tablet vertical: los dos botones de PGN forman una segunda fila de la rejilla de cuatro, cada uno a media anchura. El aviso de descarga va debajo, a todo el ancho. El diálogo es el de escritorio, con 560 px de ancho como máximo."
+  },
+  "g4": {
+   "x": 470,
+   "y": 23040,
+   "w": 390,
+   "fill": "gray",
+   "page": "movil",
+   "text": "Móvil: los dos botones van después de «Girar tablero», en la misma rejilla de dos columnas (44 px de alto). El diálogo ocupa el ancho de la pantalla menos 16 px por lado. Sin texto ni archivo, «Cargar y repasar» muestra el error «El texto no contiene ninguna partida en PGN.». En móvil apaisado, «Exportar PGN» y «Cargar PGN» van al final de la región con scroll, después de las jugadas, para no añadir otra fila fija."
   }
  },
  "designSystems": [
