@@ -80,8 +80,6 @@ El diseño y las decisiones técnicas (arquitectura, tablero 0x88, estrategia de
 
 ## Qué aprendí y qué haría distinto
 
-> Borrador pendiente de mi revisión: lo escribe Claude a partir del historial del repositorio y lo corrijo yo antes de darlo por bueno.
-
 **Lo que aprendí**
 
 - **Medir antes de creerme una mejora.** La tabla de transposición parecía una victoria segura. Al medirla con `npm run bench` salió que ahorra entre un 31 % de nodos (Kiwipete, llena de capturas) y un 99,9 % (un final de peones), y que cada nodo cuesta algo más. Separar «solo ordena jugadas» de «corta con la puntuación guardada» me enseñó de dónde viene cada ganancia: en el medio juego casi todo lo pone el orden de jugadas, y en los finales, no repetir trabajo.
