@@ -81,10 +81,10 @@ section.grupo{display:flex;flex-direction:column;gap:var(--space-4)}
 .leyenda{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:var(--space-2);font:400 14px/20px var(--font-sans)}
 .leyenda li{display:flex;align-items:center;gap:var(--space-2)}
 .leyenda__muestra{position:relative;flex:none;width:24px;height:24px;box-sizing:border-box;background:var(--square-light);border:1px solid var(--line)}
-.leyenda__muestra--punto::after{content:"";position:absolute;inset:36%;border-radius:50%;background:var(--board-ink);opacity:.55}
+.leyenda__muestra--punto::after{content:"";position:absolute;inset:36%;border-radius:50%;background:var(--board-ink);box-shadow:0 0 0 2px var(--board-halo)}
 .leyenda__muestra--meta::after{content:"";position:absolute;inset:10%;border-radius:50%;border:3px dashed var(--board-ink)}
 /* Casilla objetivo de un ejercicio: anillo discontinuo (la forma lo dice, no el color) */
-.casilla[data-marks~="meta"]::after,.casilla[data-marks~="meta"][data-marks~="target"]::after{inset:8%;border-radius:50%;border:4px dashed var(--board-ink);background:none;opacity:1;z-index:2}
+.casilla[data-marks~="meta"]::after,.casilla[data-marks~="meta"][data-marks~="target"]::after{inset:8%;border-radius:50%;border:4px dashed var(--board-ink);background:none;opacity:1;box-shadow:0 0 0 2px var(--board-halo);z-index:2}
 .contador{margin:0;display:flex;align-items:center;gap:var(--space-3);padding:var(--space-3) var(--space-4);background:var(--surface-raised);border:1px solid var(--line);border-radius:var(--radius-md);font:400 14px/20px var(--font-sans)}
 .contador strong{font-weight:600}
 .contador__puntos{display:flex;gap:var(--space-1);flex:none}

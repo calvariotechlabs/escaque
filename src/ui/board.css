@@ -31,10 +31,11 @@
 .casilla[data-marks~="last-move-from"]::before{border:2px dashed color-mix(in srgb,var(--board-ink) 62%,transparent)}
 .casilla[data-marks~="last-move-to"]::before{border:2px solid color-mix(in srgb,var(--board-ink) 62%,transparent)}
 .casilla[data-marks~="selected"]::before{inset:0;border:0;background:color-mix(in srgb,var(--mark-selected) 60%,transparent);box-shadow:inset 0 0 0 3px var(--board-ink)}
-.casilla[data-marks~="check"]{background-image:radial-gradient(circle at 50% 50%,var(--mark-check) 0,transparent 72%)}
-.casilla[data-marks~="target"]:not([data-marks~="capture"])::after{inset:36%;border-radius:50%;background:var(--board-ink);opacity:.55;z-index:2}
-.casilla[data-marks~="capture"]::after{inset:4%;border-radius:50%;border:4px solid var(--board-ink);opacity:.75;z-index:2}
-.casilla:focus-visible{outline:3px solid var(--board-ink);outline-offset:-3px;z-index:3}
+.casilla[data-marks~="check"]{background-image:radial-gradient(circle at 50% 50%,var(--mark-check) 0,transparent 72%);box-shadow:inset 0 0 0 3px var(--board-ink),inset 0 0 0 5px var(--board-halo)}
+/* Destino y captura: tinta opaca con un halo claro, para verse sobre casillas claras y oscuras (CAL-397). */
+.casilla[data-marks~="target"]:not([data-marks~="capture"])::after{inset:36%;border-radius:50%;background:var(--board-ink);box-shadow:0 0 0 2px var(--board-halo);z-index:2}
+.casilla[data-marks~="capture"]::after{inset:4%;border-radius:50%;border:4px solid var(--board-ink);box-shadow:0 0 0 2px var(--board-halo),inset 0 0 0 2px var(--board-halo);z-index:2}
+.casilla:focus-visible{outline:3px solid var(--board-ink);outline-offset:-3px;box-shadow:inset 0 0 0 5px var(--board-halo);z-index:3}
 
 
 /* Botones */
@@ -105,10 +106,10 @@
 .tablero__flechas{grid-column:2;grid-row:1;width:100%;height:100%;pointer-events:none;z-index:2;overflow:visible}
 .flecha{fill:none;stroke-linecap:round;stroke-linejoin:round}
 .flecha-borde{fill:none;stroke:#fff;stroke-width:.3;stroke-linecap:round;stroke-linejoin:round;opacity:.85}
-.flecha--mejor{stroke:var(--accent);stroke-width:.2}
-.flecha-punta--mejor{fill:var(--accent)}
-.flecha--tuya{stroke:var(--ink);stroke-width:.13;stroke-dasharray:.24 .18;opacity:.6}
-.flecha-punta--tuya{fill:none;stroke:var(--ink);stroke-width:.09;stroke-linejoin:round;opacity:.6}
+.flecha--mejor{stroke:var(--arrow-best);stroke-width:.2}
+.flecha-punta--mejor{fill:var(--arrow-best)}
+.flecha--tuya{stroke:var(--arrow-yours);stroke-width:.13;stroke-dasharray:.24 .18;opacity:.85}
+.flecha-punta--tuya{fill:none;stroke:var(--arrow-yours);stroke-width:.09;stroke-linejoin:round;opacity:.85}
 /* Vista de la posición de antes de la jugada revisada: aviso encima del tablero y leyenda de flechas debajo. */
 .vista-revision{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--space-2) var(--space-3);margin:0 0 var(--space-2);padding:var(--space-2) var(--space-3);border:2px solid var(--accent);border-radius:var(--radius-sm);background:var(--surface-raised);color:var(--ink);font:400 14px/20px var(--font-sans)}
 .vista-revision p{margin:0;min-width:0;flex:1 1 220px}
@@ -117,9 +118,10 @@
 .leyenda-flechas{display:flex;flex-wrap:wrap;gap:var(--space-1) var(--space-4);margin:var(--space-2) 0 0;padding:0;list-style:none;color:var(--ink-muted);font:400 13px/20px var(--font-sans)}
 .leyenda-flechas li{display:inline-flex;align-items:center;gap:var(--space-2)}
 .leyenda-flechas svg{flex:none;width:28px;height:12px;overflow:visible}
-.leyenda-flechas .flecha--mejor{stroke-width:3}
-.leyenda-flechas .flecha--tuya{stroke-width:2;stroke-dasharray:3 2.5}
-.leyenda-flechas .flecha-punta--tuya{stroke-width:1.4}
+.leyenda-flechas .flecha--mejor{stroke:var(--accent);stroke-width:3}
+.leyenda-flechas .flecha--tuya{stroke:var(--ink);opacity:.6;stroke-width:2;stroke-dasharray:3 2.5}
+.leyenda-flechas .flecha-punta--tuya{stroke:var(--ink);opacity:.6;stroke-width:1.4}
+.leyenda-flechas .flecha-punta--mejor{fill:var(--accent)}
 .vista-revision[hidden],.leyenda-flechas[hidden]{display:none}
 @media (forced-colors: active){
   .flecha--mejor,.flecha--tuya,.flecha-punta--tuya{stroke:CanvasText;opacity:1}

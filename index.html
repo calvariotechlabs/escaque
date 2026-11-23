@@ -41,6 +41,7 @@
 <link rel="stylesheet" href="src/ui/lecciones.css">
 <link rel="stylesheet" href="src/ui/repaso.css">
 <link rel="stylesheet" href="src/ui/pgn.css">
+<link rel="stylesheet" href="src/ui/tema-tablero.css">
 <script type="module" src="dist/src/ui/main.js"></script>
 </head>
 <body>
@@ -99,6 +100,13 @@
       <button id="revancha" class="boton boton--principal" type="button">Revancha</button>
       <button id="repasar" class="boton" type="button">Repasar la partida</button>
     </section>
+    <fieldset id="tema-tablero" class="tema-tablero">
+      <legend class="tema-tablero__leyenda">Tablero</legend>
+      <div class="tema-tablero__opciones">
+        <div class="opcion opcion--bosque"><input class="opcion__entrada" type="radio" name="tablero" id="tablero-bosque" value="bosque" checked><label class="opcion__tarjeta" for="tablero-bosque"><span class="tema-tablero__muestra" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span class="opcion__nombre">Bosque</span></label></div>
+        <div class="opcion opcion--nogal"><input class="opcion__entrada" type="radio" name="tablero" id="tablero-nogal" value="nogal"><label class="opcion__tarjeta" for="tablero-nogal"><span class="tema-tablero__muestra" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span class="opcion__nombre">Nogal</span></label></div>
+      </div>
+    </fieldset>
   </div>
   <div id="partida-izq" class="partida__izq">
     <section class="partida__tablero" aria-label="Tablero">

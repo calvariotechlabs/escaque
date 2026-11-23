@@ -614,6 +614,30 @@
    "h": 1180,
    "title": "Móvil · inicio con aviso de instalar",
    "page": "movil"
+  },
+  "TablerosEscritorio.dc.html": {
+   "x": 0,
+   "y": 30740,
+   "w": 1280,
+   "h": 3300,
+   "title": "Escritorio · tableros Bosque y Nogal",
+   "page": "escritorio"
+  },
+  "TablerosTablet.dc.html": {
+   "x": 0,
+   "y": 31300,
+   "w": 820,
+   "h": 1560,
+   "title": "Tablet · tablero con selector",
+   "page": "tablet"
+  },
+  "TablerosMovil.dc.html": {
+   "x": 0,
+   "y": 36560,
+   "w": 390,
+   "h": 1200,
+   "title": "Móvil · tablero con selector (interfaz oscura)",
+   "page": "movil"
   }
  },
  "order": [
@@ -689,7 +713,10 @@
   "OgImageCentrada.dc.html",
   "InicioInstalarEscritorio.dc.html",
   "InicioInstalarTablet.dc.html",
-  "InicioInstalarMovil.dc.html"
+  "InicioInstalarMovil.dc.html",
+  "TablerosEscritorio.dc.html",
+  "TablerosTablet.dc.html",
+  "TablerosMovil.dc.html"
  ],
  "notes": {
   "t_escritorio_0": {
@@ -1543,6 +1570,30 @@
    "fill": "gray",
    "page": "movil",
    "text": "El aviso «Instala Escaque» (CAL-395) sale solo en la pantalla de inicio, no durante la partida. Va después del botón «Empezar partida». En iPhone/iPad (Safari) el aviso es el de «Añadir a pantalla de inicio» con «Entendido»."
+  },
+  "n_tableros_esc": {
+   "x": 1360,
+   "y": 30740,
+   "w": 520,
+   "text": "Tablero con más contraste y carácter (CAL-397, pendiente de aprobar). Dos tableros, Bosque (el de siempre, con más separación entre casillas) y Nogal (madera). Cada uno se ve en interfaz clara y oscura con las tres situaciones: jugando, jaque y revisión del coach. Abajo, la tabla de contraste medido. Cambios de fondo: punto de destino y captura con halo claro, jaque y foco con anillo doble, flechas con colores fijos.",
+   "fill": "gray",
+   "page": "escritorio"
+  },
+  "n_tableros_tab": {
+   "x": 900,
+   "y": 31300,
+   "w": 480,
+   "text": "El control «Tablero» vive en el panel de la partida, bajo el estado. Aquí, Nogal elegido, con la partida y la revisión del coach.",
+   "fill": "gray",
+   "page": "tablet"
+  },
+  "n_tableros_mov": {
+   "x": 470,
+   "y": 36560,
+   "w": 360,
+   "text": "Móvil con interfaz oscura y Bosque: el tablero conserva sus colores y las marcas se ven igual.",
+   "fill": "gray",
+   "page": "movil"
   }
  },
  "designSystems": [
