@@ -27,6 +27,7 @@ import {
   type ReviewItem,
   type ReviewMove,
 } from "./review.js";
+import { createCapturesView, placeCapturesInLandscape } from "./captures-view.js";
 import { bindScrollRegion } from "./scroll-region.js";
 import { PGN_TEXT } from "./pgn.js";
 import { createCoachClient } from "../worker/coach-client.js";
@@ -110,6 +111,8 @@ export function createReviewScreen(options: ReviewScreenOptions): ReviewScreen {
   const title = byId<HTMLElement>("repaso-titulo");
   const intro = byId<HTMLElement>("repaso-intro");
   const board = createBoard(byId("repaso-tablero"));
+  const captures = createCapturesView(byId<HTMLElement>("repaso-capturas-contenido"));
+  placeCapturesInLandscape(byId<HTMLElement>("repaso-capturas"), byId<HTMLElement>("repaso-tablero").parentElement!, () => byId<HTMLElement>("repaso-paso").after(byId<HTMLElement>("repaso-capturas")));
   const steps = byId<HTMLElement>("repaso-paso");
   const failure = byId<HTMLElement>("repaso-fallo");
   const curveBox = byId<HTMLElement>("repaso-curva");
@@ -256,6 +259,7 @@ export function createReviewScreen(options: ReviewScreenOptions): ReviewScreen {
   function drawBoardNow(): void {
     const move = moveAt(selected);
     board.setOrientation(orientation);
+    captures.render(game === null || move === undefined ? [] : game.allMoves.slice(0, selected), orientation);
     if (move === undefined || game === null) {
       if (game !== null) board.setPosition(game.startFen);
       board.setMarks(new Map());

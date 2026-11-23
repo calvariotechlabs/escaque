@@ -45,6 +45,7 @@ import { createLessonsScreen } from "./lessons-screen.js";
 import { dismissBeginner, isBeginnerDismissed, showBeginnerNotice } from "./lessons-progress.js";
 import { LESSONS_TITLE } from "./lessons-text.js";
 import { parseRoute, type Route } from "./routes.js";
+import { createCapturesView, placeCapturesInLandscape } from "./captures-view.js";
 import { bindScrollRegion, onCompactLandscapeChange } from "./scroll-region.js";
 
 function byId<T extends HTMLElement>(id: string): T {
@@ -211,6 +212,7 @@ function render(): void {
   if (game === drawnGame) view.setPosition(game.fen);
   else view.withoutAnimation(() => view.setPosition(game.fen));
   drawnGame = game;
+  captures.render(game.history, ui.orientation);
   renderCoach();
   applyMarks();
   syncTabIndex();
@@ -227,9 +229,13 @@ function render(): void {
 
 const coachRoot = byId<HTMLElement>("coach");
 
+// Capturas bajo el tablero; en móvil apaisado van al principio del panel con scroll.
+const captures = createCapturesView(byId<HTMLElement>("capturas-contenido"));
+placeCapturesInLandscape(byId<HTMLElement>("capturas"), byId<HTMLElement>("partida-izq"), () => byId<HTMLElement>("partida-panel").prepend(byId<HTMLElement>("capturas")));
+
 // Móvil apaisado: el panel (coach, botones y jugadas) y el de las lecciones tienen scroll propio.
 // Al girar el móvil el coach aparece o desaparece sin que cambie la partida, así que se vuelve a revisar.
-bindScrollRegion(byId<HTMLElement>("partida-panel"), "Coach, botones y jugadas");
+bindScrollRegion(byId<HTMLElement>("partida-panel"), "Capturas, coach, botones y jugadas");
 bindScrollRegion(byId<HTMLElement>("leccion-panel"), "Retroalimentación, pistas y acciones");
 onCompactLandscapeChange(() => renderCoach());
 
