@@ -64,7 +64,7 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - name: Teclado, ARIA y SAN en Chrome real (sin dependencias: tools/cdp.mjs)
+      - name: Teclado, ARIA y SAN en Chrome real (sin dependencias, con tools/cdp.mjs)
         run: npm run test:e2e
 
   dependencias:
