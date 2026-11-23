@@ -25,8 +25,17 @@ export interface BoardInputHost {
 /** Distancia en píxeles a partir de la cual un gesto es un arrastre y no un clic. */
 const DRAG_THRESHOLD = 4;
 
+/**
+ * Milisegundos sin noticias de un gesto a partir de los cuales se da por abandonado. Safari en iOS puede dejar
+ * un toque sin pointerup ni pointercancel; sin este límite el tablero ignoraría todos los toques siguientes.
+ */
+const ABANDONED_MS = 500;
+
 interface Gesture {
   readonly pointerId: number;
+  readonly pointerType: string;
+  /** Momento (`timeStamp` del evento) de la última noticia del puntero: al pulsar o al moverse. */
+  lastSeen: number;
   readonly square: string;
   readonly x: number;
   readonly y: number;
@@ -67,24 +76,35 @@ export function attachBoardInput(host: BoardInputHost): void {
     }
   }
 
+  /** ¿El gesto abierto está abandonado, a la vista de un `pointerdown` nuevo? */
+  function abandonedBy(open: Gesture, event: PointerEvent): boolean {
+    return (
+      event.pointerId === open.pointerId || // el mismo puntero vuelve a pulsar: el gesto anterior ya terminó
+      event.pointerType !== open.pointerType || // nadie arrastra con el dedo y pulsa con el ratón a la vez
+      event.timeStamp - open.lastSeen >= ABANDONED_MS // el dedo lleva rato sin moverse: el navegador lo perdió
+    );
+  }
+
   view.element.addEventListener("pointerdown", (event) => {
-    if (event.button !== 0 || !enabled()) return;
-    // Safari en iOS puede dejar un gesto sin pointerup ni pointercancel. Si llega otro puntero, el gesto
-    // anterior está abandonado: se cancela para que el tablero no se quede bloqueado con la pieza a medio camino.
+    // Se lee todo antes de cancelar nada: cancelar repinta y devuelve el foco al tablero.
+    const square = squareAt(event.target);
+    const hadFocus = view.element.contains(document.activeElement);
     if (gesture !== null) {
-      if (event.pointerId === gesture.pointerId) return;
+      // Otro dedo mientras el primero sigue arrastrando: se ignora, y el arrastre sigue.
+      if (!abandonedBy(gesture, event)) return;
       endGesture(gesture.pointerId, event.clientX, event.clientY, true);
     }
-    const square = squareAt(event.target);
-    if (square === null) return;
+    if (event.button !== 0 || !enabled() || square === null) return;
     gesture = {
       pointerId: event.pointerId,
+      pointerType: event.pointerType,
+      lastSeen: event.timeStamp,
       square,
       x: event.clientX,
       y: event.clientY,
       dragging: false,
       tapOnly: false,
-      hadFocus: view.element.contains(document.activeElement),
+      hadFocus,
     };
     view.element.setPointerCapture(event.pointerId);
     event.preventDefault(); // sin selección de texto ni arrastre nativo de imágenes
@@ -92,6 +112,7 @@ export function attachBoardInput(host: BoardInputHost): void {
 
   view.element.addEventListener("pointermove", (event) => {
     if (gesture === null || event.pointerId !== gesture.pointerId) return;
+    gesture.lastSeen = event.timeStamp;
     const dx = event.clientX - gesture.x;
     const dy = event.clientY - gesture.y;
     if (gesture.tapOnly) return;

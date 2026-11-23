@@ -73,11 +73,11 @@ async function touchDragStart(page, from, to, steps = 10) {
   await page.eval(`(window.__scroll = 0, true)`);
   const a = await center(page, from);
   const b = await center(page, to);
-  await page.call("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x: a.x, y: a.y }] });
+  await page.call("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ id: 0, x: a.x, y: a.y }] });
   for (let i = 1; i <= steps; i++) {
     const x = a.x + ((b.x - a.x) * i) / steps;
     const y = a.y + ((b.y - a.y) * i) / steps;
-    await page.call("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [{ x, y }] });
+    await page.call("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [{ id: 0, x, y }] });
     await pause(16);
   }
 }
@@ -158,6 +158,22 @@ describe("arrastre con el dedo", () => {
     assert.deepEqual(await style("leccion-tablero"), { touch: "none", select: "none" });
   });
 
+  test("un segundo dedo que roza el tablero no corta el arrastre", async () => {
+    const page = await phonePage();
+    await startTwoPlayers(page);
+    await touchDragStart(page, "e2", "e3");
+    const b = await center(page, "e4");
+    const thumb = await center(page, "a7");
+    const e3 = await center(page, "e3");
+    await page.call("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ id: 0, x: e3.x, y: e3.y }, { id: 1, x: thumb.x, y: thumb.y }] });
+    await page.call("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [{ id: 0, x: b.x, y: b.y }, { id: 1, x: thumb.x, y: thumb.y }] });
+    await page.call("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
+    await pause(100);
+    assert.equal(await pieceOn(page, "e4"), true, "el peón llega a e4");
+    assert.equal(await pieceOn(page, "e2"), false);
+    assert.deepEqual(page.errors, []);
+  });
+
   test("si el navegador no cierra un arrastre, el siguiente toque o clic no se pierde", async () => {
     const page = await phonePage();
     await startTwoPlayers(page);
@@ -172,6 +188,27 @@ describe("arrastre con el dedo", () => {
       "",
       "la pieza no se queda desplazada",
     );
+    assert.deepEqual(page.errors, []);
+  });
+
+  test("si el navegador no cierra un toque, otro toque un rato después tampoco se pierde", async () => {
+    const page = await phonePage();
+    await startTwoPlayers(page);
+    await touchDragStart(page, "e2", "e3"); // el primer dedo se queda sin pointerup ni pointercancel
+    await pause(700);
+    // Para el navegador el primer dedo sigue apoyado; el segundo toca d2. (Las herramientas de Chrome solo
+    // saben levantar todos los dedos a la vez, así que al levantar llega también el pointerup del primero.)
+    const e3 = await center(page, "e3");
+    const d2 = await center(page, "d2");
+    await page.call("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ id: 0, x: e3.x, y: e3.y }, { id: 1, x: d2.x, y: d2.y }] });
+    await page.call("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
+    await pause(100);
+    const d4 = await center(page, "d4");
+    await page.call("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ id: 0, x: d4.x, y: d4.y }] });
+    await page.call("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
+    await pause(100);
+    assert.equal(await pieceOn(page, "d4"), true, "los toques siguientes juegan d4");
+    assert.equal(await pieceOn(page, "e2"), true, "el peón arrastrado vuelve a e2");
     assert.deepEqual(page.errors, []);
   });
 });
