@@ -41,6 +41,8 @@ export function attachBoardInput(host: BoardInputHost): void {
   const { view } = host;
   let gesture: Gesture | null = null;
   const enabled = (): boolean => host.enabled === undefined || host.enabled();
+  // Marca el tablero como jugable: la hoja de estilos le quita el desplazamiento y la selección con el dedo.
+  view.element.classList.add("tablero--jugable");
 
   function squareAt(target: EventTarget | null): string | null {
     if (!(target instanceof Element)) return null;
@@ -66,7 +68,13 @@ export function attachBoardInput(host: BoardInputHost): void {
   }
 
   view.element.addEventListener("pointerdown", (event) => {
-    if (event.button !== 0 || gesture !== null || !enabled()) return;
+    if (event.button !== 0 || !enabled()) return;
+    // Safari en iOS puede dejar un gesto sin pointerup ni pointercancel. Si llega otro puntero, el gesto
+    // anterior está abandonado: se cancela para que el tablero no se quede bloqueado con la pieza a medio camino.
+    if (gesture !== null) {
+      if (event.pointerId === gesture.pointerId) return;
+      endGesture(gesture.pointerId, event.clientX, event.clientY, true);
+    }
     const square = squareAt(event.target);
     if (square === null) return;
     gesture = {
@@ -106,14 +114,14 @@ export function attachBoardInput(host: BoardInputHost): void {
     }
   });
 
-  function endGesture(event: PointerEvent, cancelled: boolean): void {
-    if (gesture === null || event.pointerId !== gesture.pointerId) return;
+  function endGesture(pointerId: number, x: number, y: number, cancelled: boolean): void {
+    if (gesture === null || pointerId !== gesture.pointerId) return;
     const { square, dragging, hadFocus } = gesture;
     resetDraggedPiece();
     gesture = null;
-    if (view.element.hasPointerCapture(event.pointerId)) view.element.releasePointerCapture(event.pointerId);
+    if (view.element.hasPointerCapture(pointerId)) view.element.releasePointerCapture(pointerId);
     if (dragging) {
-      const target = cancelled ? null : squareAt(document.elementFromPoint(event.clientX, event.clientY));
+      const target = cancelled ? null : squareAt(document.elementFromPoint(x, y));
       host.handle(host.interaction().drop(target));
     } else if (!cancelled) {
       host.interaction().focus = square;
@@ -123,10 +131,11 @@ export function attachBoardInput(host: BoardInputHost): void {
     if (hadFocus && !host.promotionOpen()) host.focusBoard();
   }
 
-  view.element.addEventListener("pointerup", (event) => endGesture(event, false));
-  view.element.addEventListener("pointercancel", (event) => endGesture(event, true));
+  const end = (event: PointerEvent, cancelled: boolean): void => endGesture(event.pointerId, event.clientX, event.clientY, cancelled);
+  view.element.addEventListener("pointerup", (event) => end(event, false));
+  view.element.addEventListener("pointercancel", (event) => end(event, true));
   // Si el navegador quita la captura sin pointerup ni pointercancel, el gesto se cancela para no bloquear el tablero.
-  view.element.addEventListener("lostpointercapture", (event) => endGesture(event, true));
+  view.element.addEventListener("lostpointercapture", (event) => end(event, true));
 
   view.element.addEventListener("keydown", (event) => {
     if (squareAt(event.target) === null || event.altKey || event.ctrlKey || event.metaKey) return;

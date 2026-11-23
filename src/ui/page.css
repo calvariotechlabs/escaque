@@ -87,8 +87,9 @@ body{margin:0;background:var(--surface);color:var(--ink);font:400 16px/24px var(
 /* Los botones responden al toque sin esperar al doble toque de zoom. */
 .boton,.jugada{touch-action:manipulation}
 
-/* El tablero recibe el arrastre con dedo sin desplazar la página. */
-.partida .tablero__rejilla{touch-action:none}
+/* Los tableros que se juegan (partida y lecciones) reciben el arrastre con el dedo sin desplazar la página,
+   y una pulsación larga no selecciona texto ni abre el menú de Safari en iOS, que cortaría el gesto. */
+.tablero--jugable .tablero__rejilla{touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 .casilla[data-square]{cursor:pointer}
 
 /* Diálogo modal de coronación: fondo del lienzo «Coronación · móvil». */
