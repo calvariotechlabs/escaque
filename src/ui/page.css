@@ -3,6 +3,10 @@ body{margin:0;background:var(--surface);color:var(--ink);font:400 16px/24px var(
 .pagina__cabecera,.partida{max-width:1120px;margin:0 auto;box-sizing:border-box;padding-left:max(var(--space-4),env(safe-area-inset-left,0px));padding-right:max(var(--space-4),env(safe-area-inset-right,0px))}
 .pagina__cabecera{padding-top:max(var(--space-4),env(safe-area-inset-top,0px));display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--space-2) var(--space-6)}
 .pagina__cabecera h1{margin:0;font:600 24px/28px var(--font-display)}
+/* Logo junto al nombre (CAL-387). Diseño: «Logo junto al nombre» del lienzo. Decorativo: lleva aria-hidden. */
+.pagina__cabecera h1.cabecera-marca{display:flex;align-items:center;gap:var(--space-2)}
+.cabecera-marca__logo{flex:none;display:block;width:24px;height:24px}
+@media (max-width:599px){.pagina__cabecera{column-gap:var(--space-2)}} /* con el logo, título y navegación solo caben en una fila de 390 px con el hueco de 8 px */
 .pagina__cabecera p{margin:0;font:400 14px/20px var(--font-sans);color:var(--ink-muted)}
 
 /* Subtítulo: corto en móvil y largo en escritorio, como en el lienzo. */
@@ -28,6 +32,8 @@ body{margin:0;background:var(--surface);color:var(--ink);font:400 16px/24px var(
   .pagina__cabecera,.partida{max-width:732px}
   .pagina__cabecera{padding-top:max(var(--space-6),env(safe-area-inset-top,0px))}
   .pagina__cabecera h1{font-size:32px;line-height:36px}
+  .pagina__cabecera h1.cabecera-marca{gap:var(--space-3)}
+  .cabecera-marca__logo{width:36px;height:36px}
   .partida{padding-top:var(--space-6);gap:var(--space-6)}
   .partida .tablero{width:100%}
   .partida__controles{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr)}
@@ -40,6 +46,8 @@ body{margin:0;background:var(--surface);color:var(--ink);font:400 16px/24px var(
 @media (min-width:860px){
   .pagina__cabecera{padding-top:max(var(--space-6),env(safe-area-inset-top,0px))}
   .pagina__cabecera h1{font-size:32px;line-height:36px}
+  .pagina__cabecera h1.cabecera-marca{gap:var(--space-3)}
+  .cabecera-marca__logo{width:36px;height:36px}
   .partida{padding-top:var(--space-6);grid-template-columns:minmax(0,680px) minmax(300px,420px);grid-template-rows:auto auto auto auto 1fr;grid-template-areas:"tablero avisos" "tablero estado" "tablero coach" "tablero jugadas" "tablero controles";column-gap:var(--space-8);align-items:start}
   .partida:has(.avisos:empty){grid-template-rows:auto auto auto 1fr;grid-template-areas:"tablero estado" "tablero coach" "tablero jugadas" "tablero controles"}
   .partida__avisos{grid-area:avisos}
@@ -58,6 +66,8 @@ body{margin:0;background:var(--surface);color:var(--ink);font:400 16px/24px var(
   .pagina__cabecera,.partida{max-width:none;margin:0}
   .pagina__cabecera{position:absolute;top:max(var(--space-4),env(safe-area-inset-top,0px));left:calc(max(var(--space-6),env(safe-area-inset-left,0px)) + var(--tablero-ancho) + var(--space-6));right:max(var(--space-6),env(safe-area-inset-right,0px));padding:0;box-sizing:border-box}
   .pagina__cabecera h1{font-size:20px;line-height:24px}
+  .pagina__cabecera h1.cabecera-marca{gap:var(--space-2)}
+  .cabecera-marca__logo{width:24px;height:24px}
   .pagina__cabecera{column-gap:var(--space-2)} /* con el logo de GitHub (CAL-385) la fila no cabe en 844 px con el hueco de 24 px */
   /* En apaisado va el subtítulo corto aunque el ancho pase de 860 px (un móvil grande). */
   .solo-escritorio{display:none}

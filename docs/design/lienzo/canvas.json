@@ -421,6 +421,14 @@
    "h": 700,
    "title": "Escritorio · Enlace a GitHub en la cabecera: estados y móvil",
    "page": "escritorio"
+  },
+  "LogoCabecera.dc.html": {
+   "x": 0,
+   "y": 16560,
+   "w": 1280,
+   "h": 760,
+   "title": "Escritorio · Logo junto al nombre en la cabecera",
+   "page": "escritorio"
   }
  },
  "order": [
@@ -472,7 +480,8 @@
   "PgnEstados.dc.html",
   "PgnTablet.dc.html",
   "PgnMovil.dc.html",
-  "EnlaceGithub.dc.html"
+  "EnlaceGithub.dc.html",
+  "LogoCabecera.dc.html"
  ],
  "notes": {
   "t_escritorio_0": {
