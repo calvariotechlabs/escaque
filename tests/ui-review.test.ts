@@ -44,6 +44,8 @@ function report(color: "w" | "b", verdict: Verdict, before: number, after: numbe
     title,
     summary: "Resumen.",
     findings: [],
+    why: "",
+    line: "",
     depth: 4,
   };
 }

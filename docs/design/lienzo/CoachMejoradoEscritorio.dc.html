@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Coach mejorado · escritorio</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/escaque/tokens.css">
+<link rel="stylesheet" href="ds/escaque/components/bundle.css">
+<link rel="stylesheet" href="lecciones.css">
+<link rel="stylesheet" href="coach.css">
+<link rel="stylesheet" href="coach-mejorado.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;600&family=Space+Grotesk:wght@600&display=swap">
+<style>
+body{margin:0}
+.casilla img{position:relative;z-index:1;display:block;width:100%;height:100%}
+/* Propuesta CAL-390 (1): última jugada con origen y destino en la misma tinta, más fuerte; la forma los distingue (origen discontinuo, destino continuo). */
+.casilla[data-marks~="last-move-from"]::before,.casilla[data-marks~="last-move-to"]::before{inset:0;box-sizing:border-box;background:color-mix(in srgb,var(--mark-last-move) 92%,transparent)}
+.casilla[data-marks~="last-move-from"]::before{border:2px dashed color-mix(in srgb,var(--board-ink) 62%,transparent)}
+.casilla[data-marks~="last-move-to"]::before{border:2px solid color-mix(in srgb,var(--board-ink) 62%,transparent)}
+/* Propuesta CAL-390 (2): el coach dice de quién es la jugada que revisa. */
+.coach__etiqueta{display:inline-flex;align-items:center;gap:6px;margin:0;padding:2px 10px 2px 8px;border:1.5px solid var(--control-border);border-radius:999px;font:600 12px/16px var(--font-sans);color:var(--ink)}
+.coach__etiqueta svg{flex:none;width:14px;height:14px}
+.coach__nota{margin:0;color:var(--ink-muted)}
+.coach__san{font:600 15px/24px var(--font-sans);font-variant-numeric:tabular-nums}
+/* Propuesta CAL-390 (3): lista de jugadas con una sola tipografía y columnas compactas. */
+.jugadas__lista{grid-template-columns:2.25em repeat(2,minmax(0,6em));justify-content:start;column-gap:var(--space-1);font:500 15px/24px var(--font-sans);font-variant-numeric:tabular-nums}
+.jugadas__n{font-weight:400}
+.jugada[aria-current="true"]{font-weight:600}
+/* Propuesta CAL-390 (4): en móvil apaisado, el nivel pasa a una segunda línea del estado. */
+.estado__sub{display:block;font:400 13px/16px var(--font-sans);color:var(--ink-muted)}
+.nota-dis{margin:0;font:400 12px/16px var(--font-sans);color:var(--ink-muted)}
+</style>
+</helmet>
+<div style="width: 1280px; min-height: 1440px; background: var(--surface); color: var(--ink); font-family: var(--font-sans); --logo: 36px">
+<header style="max-width: 1160px; margin: 0 auto; box-sizing: border-box; padding: 24px 32px 0; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 24px">
+<h1 style="margin: 0; display: flex; align-items: center; gap: 8px; font: 600 32px/36px var(--font-display)"><svg class="logo" style="flex:none;display:block;width:var(--logo,24px);height:var(--logo,24px)" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><defs><clipPath id="cabecera-marca-recorte"><path d="M32 5 L43 17 C49 24 50 29 47 35 C45 39 41 41 39 42 H25 C20 40 17 37 16 32 C14 25 18 20 22 16 Z"/></clipPath></defs><rect width="64" height="64" rx="12" fill="#0b2a38"/><path d="M32 5 L43 17 C49 24 50 29 47 35 C45 39 41 41 39 42 V45 L47 45 L53 57 H11 L17 45 H25 V42 C20 40 17 37 16 32 C14 25 18 20 22 16 Z" fill="#f1f3f5"/><path d="M17 18 L21 14 L49 41 L44 46 Z" clip-path="url(#cabecera-marca-recorte)" fill="#0b6e8a"/></svg><span>Escaque</span></h1><nav class="lecc-nav" aria-label="Principal"><a class="lecc-enlace" href="#" aria-current="page">Jugar</a><a class="lecc-enlace" href="#">Lecciones</a><a class="enlace-gh" href="https://github.com/calvariotechlabs/escaque" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg><span class="enlace-gh__texto">GitHub</span><span class="oculto"> (se abre en una pestaña nueva)</span></a></nav><p style="margin: 0; font: 400 14px/20px var(--font-sans); color: var(--ink-muted)">Contra Alfil Beta · nivel Medio</p>
+</header>
+<main style="max-width: 1160px; margin: 0 auto; box-sizing: border-box; padding: 24px 32px 48px; display: flex; flex-wrap: wrap; align-items: flex-start; gap: 32px">
+<div style="flex: 1 1 520px; min-width: 0; max-width: 640px"><section aria-label="Tablero"><div class="vista-revision" role="status"><p><strong>Posición antes de tu jugada 5. h3</strong>Mira la flecha: así seguía mejor la partida. No puedes mover hasta volver.</p><button class="boton" type="button">Volver a la partida</button></div><div class="tablero">
+<div class="tablero__rejilla" role="grid" aria-label="Tablero de ajedrez, posición antes de 5. h3, visto desde las blancas">
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="8">
+<div class="tablero__fila" role="row">
+<sc-for list="{{r.row}}" as="c" hint-placeholder-count="8">
+<div class="{{c.cls}}" role="gridcell" data-square="{{c.n}}" data-marks="{{c.marks}}" aria-label="{{c.label}}"><sc-if value="{{c.has}}" hint-placeholder-val="{{ true }}"><img src="{{c.img}}" alt=""></sc-if></div>
+</sc-for>
+</div>
+</sc-for>
+</div>
+<svg class="tablero__flechas" viewBox="0 0 8 8" aria-hidden="true" focusable="false"><path class="flecha flecha--mejor" d="M5.50 5.50 L5.50 3.50 L5.02 3.50"/><polygon class="flecha-punta--mejor" points="4.60,3.50 5.02,3.23 5.02,3.77"/><path class="flecha flecha--tuya" d="M7.50 6.50 L7.50 5.94"/><polygon class="flecha-punta--tuya" points="7.50,5.60 7.71,5.94 7.29,5.94"/></svg>
+<div class="tablero__rangos" aria-hidden="true"><span>8</span><span>7</span><span>6</span><span>5</span><span>4</span><span>3</span><span>2</span><span>1</span></div>
+<div class="tablero__columnas" aria-hidden="true"><span>a</span><span>b</span><span>c</span><span>d</span><span>e</span><span>f</span><span>g</span><span>h</span></div>
+</div><ul class="leyenda-flechas" aria-label="Flechas del tablero"><li><svg viewBox="0 0 28 12" aria-hidden="true" focusable="false"><path d="M2 6H20" stroke="var(--accent)" stroke-width="3" stroke-linecap="round"/><path d="M19 1.5 26 6l-7 4.5Z" fill="var(--accent)"/></svg>Mejor: <span class="coach__san">Cxe5</span></li><li><svg viewBox="0 0 28 12" aria-hidden="true" focusable="false"><path d="M2 6H20" stroke="var(--ink)" stroke-width="2" stroke-dasharray="3 2.5" stroke-linecap="round" opacity=".7"/><path d="M19.5 2.5 25.5 6l-6 3.5Z" fill="none" stroke="var(--ink)" stroke-width="1.4" stroke-linejoin="round" opacity=".7"/></svg>Tu jugada: <span class="coach__san">h3</span></li></ul></section></div>
+<aside aria-label="Partida" style="flex: 1 1 340px; min-width: 0; max-width: 440px; display: flex; flex-direction: column; gap: 16px">
+<p class="estado" role="status" style="margin: 0"><span class="estado__turno estado__turno--w" aria-hidden="true"></span><span><strong>Juegan las blancas. Te toca.</strong></span></p>
+<section class="coach" aria-labelledby="ct"><header class="coach__cab"><h2 class="coach__titulo" id="ct">Coach</h2><p class="coach__etiqueta"><svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2.2a5.8 5.8 0 1 1-5.2 3.2M2.4 2.4v3.3h3.3M8 5v3.2l2 1.3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Jugada anterior</p></header><div class="coach__pistas"><h3 class="coach__sub">Pista para tu jugada</h3><p class="coach__pistas-nota">Una idea para la jugada que te toca, sin decirte cuál es.</p><button class="boton" type="button">Pedir pista 1 de 3</button></div><p class="coach__jugada">Tu jugada: <span class="coach__san">5. h3</span></p><p class="coach__nota">Alfil Beta ya ha respondido. Esta revisión es de tu jugada anterior; ahora te toca mover.</p><p class="coach__veredicto coach__veredicto--dudosa" role="status"><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-dasharray="3 2.4"/><path d="M10 6v4.5M10 13.2v.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span><strong>Imprecisión.</strong>Hay una jugada mejor y pierdes un poco de ventaja.</span></p><div class="coach__alternativa coach__alternativa--activa"><p class="coach__mejor">Mejor jugada: <span class="coach__san">Cxe5</span></p><p class="coach__porque"><strong>Por qué: </strong>Cxe5 gana un peón. Si las negras responden 5… dxe5, 6. Dxg4 se lleva el alfil.</p><p class="coach__linea">Línea de Alfil Beta: <span class="coach__san">5. Cxe5 dxe5 6. Dxg4 Cf6</span></p><button class="boton" type="button" aria-label="Volver a la partida: mejor jugada, Cxe5">Volver a la partida</button></div><div><h3 class="coach__sub">Evaluación</h3><dl class="coach__eval"><dt>Antes</dt><dd><span class="coach__valor">+1,7</span> a favor de las blancas<div class="coach__barra" aria-hidden="true"><span style="width: 66%"></span></div></dd><dt>Después</dt><dd><span class="coach__valor">+0,9</span> a favor de las blancas<div class="coach__barra" aria-hidden="true"><span style="width: 59%"></span></div></dd></dl><p class="coach__leyenda">Valores en peones. La marca central es la igualdad; lo claro es ventaja blanca.</p></div><p class="coach__vacio">No hay avisos en esta jugada.</p></section>
+<section class="jugadas" aria-labelledby="tj"><h2 class="jugadas__titulo" id="tj">Jugadas</h2><ol class="jugadas__lista" aria-label="Lista de jugadas"><li><span class="jugadas__n">1.</span><button class="jugada" type="button">e4</button><button class="jugada" type="button">e5</button></li><li><span class="jugadas__n">2.</span><button class="jugada" type="button">Cf3</button><button class="jugada" type="button">d6</button></li><li><span class="jugadas__n">3.</span><button class="jugada" type="button">Ac4</button><button class="jugada" type="button">Ag4</button></li><li><span class="jugadas__n">4.</span><button class="jugada" type="button">Cc3</button><button class="jugada" type="button">g6</button></li><li><span class="jugadas__n">5.</span><button class="jugada" type="button">h3</button><button class="jugada" type="button" aria-current="true">Axf3</button></li></ol></section>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px"><button class="boton boton--principal" type="button" style="grid-column: 1 / -1">Nueva partida</button><button class="boton" type="button">Deshacer jugada</button><button class="boton" type="button" disabled>Rehacer jugada</button><button class="boton" type="button" style="grid-column: 1 / -1">Girar tablero</button></div>
+</aside>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1440}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const IMG = { wk: '/_blob/f755b0e3cde224439141427c2f79dfcc', wq: '/_blob/e6db5db3ffcd79a147b06454e873bbb6', wr: '/_blob/ccca3b7fa33574992239568f87fea94a', wb: '/_blob/77d6825cc2acba00edb2116763773dbd', wn: '/_blob/8c627fe6f9b20e3c70f41a0d92653372', wp: '/_blob/751ba29078e9e60b8b5d0d7948fd281f', bk: '/_blob/77c898d2513e9ba83ab5680730d01bda', bq: '/_blob/5d4b4d17f82632fdf302ea2f666c3b78', br: '/_blob/2958949152b961dd0b29733063618976', bb: '/_blob/582ab6e66656de76eb46628bace09a68', bn: '/_blob/b85f02c56127bec2806870270b615310', bp: '/_blob/e571c7681346433a14159cb146cfb58c' };
+    const NAME = { p: 'peón', n: 'caballo', b: 'alfil', r: 'torre', q: 'dama', k: 'rey' };
+    const MARKS = { g7: 'last-move-from', g6: 'last-move-to' };
+    const FEN = 'rn1qkbnr/ppp2p1p/3p2p1/4p3/2B1P1b1/2N2N2/PPPP1PPP/R1BQK2R'.split('/');
+    const FILES = 'abcdefgh';
+    const rows = FEN.map((text, r) => {
+      const line = [];
+      for (const ch of text) {
+        if (ch >= '1' && ch <= '8') { for (let k = 0; k < Number(ch); k++) line.push(null); } else line.push(ch);
+      }
+      const rank = 8 - r;
+      return { row: line.map((p, c) => {
+        const n = FILES[c] + rank;
+        const side = p && p === p.toLowerCase() ? 'b' : 'w';
+        const t = p ? p.toLowerCase() : '';
+        const nombre = p ? NAME[t] + ' ' + (side === 'w' ? 'blanc' : 'negr') + (t === 'r' || t === 'q' ? 'a' : 'o') : 'vacía';
+        return { n, cls: 'casilla casilla--' + ((c + rank - 1) % 2 === 1 ? 'clara' : 'oscura'), marks: MARKS[n] || '', has: !!p, img: p ? IMG[side + t] : '', label: n + ', ' + nombre };
+      }) };
+    });
+    return { rows };
+  }
+}
+</script>
+</body>
+</html>

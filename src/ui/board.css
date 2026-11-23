@@ -101,3 +101,29 @@
 .capturas__nada{color:var(--ink-muted)}
 .capturas__ventaja{font:600 14px/20px var(--font-sans);font-variant-numeric:tabular-nums;padding:0 var(--space-2);border:1.5px solid var(--ink);border-radius:999px}
 .capturas__nota{margin:0;color:var(--ink-muted);font-size:13px;line-height:16px}
+/* Flechas sobre el tablero (CAL-394, lienzo «Coach mejorado»): misma celda que la rejilla, encima de las piezas y sin recibir clics. */
+.tablero__flechas{grid-column:2;grid-row:1;width:100%;height:100%;pointer-events:none;z-index:2;overflow:visible}
+.flecha{fill:none;stroke-linecap:round;stroke-linejoin:round}
+.flecha-borde{fill:none;stroke:#fff;stroke-width:.3;stroke-linecap:round;stroke-linejoin:round;opacity:.85}
+.flecha--mejor{stroke:var(--accent);stroke-width:.2}
+.flecha-punta--mejor{fill:var(--accent)}
+.flecha--tuya{stroke:var(--ink);stroke-width:.13;stroke-dasharray:.24 .18;opacity:.6}
+.flecha-punta--tuya{fill:none;stroke:var(--ink);stroke-width:.09;stroke-linejoin:round;opacity:.6}
+/* Vista de la posición de antes de la jugada revisada: aviso encima del tablero y leyenda de flechas debajo. */
+.vista-revision{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--space-2) var(--space-3);margin:0 0 var(--space-2);padding:var(--space-2) var(--space-3);border:2px solid var(--accent);border-radius:var(--radius-sm);background:var(--surface-raised);color:var(--ink);font:400 14px/20px var(--font-sans)}
+.vista-revision p{margin:0;min-width:0;flex:1 1 220px}
+.vista-revision strong{display:block;font-weight:600}
+.vista-revision .boton{min-height:44px}
+.leyenda-flechas{display:flex;flex-wrap:wrap;gap:var(--space-1) var(--space-4);margin:var(--space-2) 0 0;padding:0;list-style:none;color:var(--ink-muted);font:400 13px/20px var(--font-sans)}
+.leyenda-flechas li{display:inline-flex;align-items:center;gap:var(--space-2)}
+.leyenda-flechas svg{flex:none;width:28px;height:12px;overflow:visible}
+.leyenda-flechas .flecha--mejor{stroke-width:3}
+.leyenda-flechas .flecha--tuya{stroke-width:2;stroke-dasharray:3 2.5}
+.leyenda-flechas .flecha-punta--tuya{stroke-width:1.4}
+.vista-revision[hidden],.leyenda-flechas[hidden]{display:none}
+@media (forced-colors: active){
+  .flecha--mejor,.flecha--tuya,.flecha-punta--tuya{stroke:CanvasText;opacity:1}
+  .flecha-punta--mejor{fill:CanvasText;opacity:1}
+  .flecha-borde{stroke:Canvas}
+  .vista-revision{border-color:CanvasText}
+}
