@@ -5,6 +5,8 @@ import type { Color, PieceType } from "../core/index.js";
 import { FADE_MS, MOVE_EASING, MOVE_MS, captureFrames, planMoveAnimation, promotionFrames, revealFrames, slideFrames } from "./move-animation.js";
 import type { MovePlan } from "./move-animation.js";
 import { installPieceDefs, pieceMarkup, pieceName } from "./pieces.js";
+import { arrowsSvg } from "./arrows.js";
+import type { Arrow } from "./arrows.js";
 
 export interface PlacedPiece {
   readonly color: Color;
@@ -69,6 +71,10 @@ export interface BoardView {
    * añade la marca en español («e4, vacía, destino»). Si una casilla tiene captura y destino a la vez, se pinta la captura.
    */
   setMarks(marks: ReadonlyMap<string, readonly Mark[]>): void;
+  /** Sustituye las flechas (CAL-394). Son decorativas: lo que dicen tiene que estar también en texto. */
+  setArrows(arrows: readonly Arrow[]): void;
+  /** Nombre accesible de la rejilla; `null` vuelve al de siempre («Tablero de ajedrez, visto desde las blancas»). */
+  setGridLabel(label: string | null): void;
 }
 
 const FILES = "abcdefgh";
@@ -174,6 +180,8 @@ export function createBoard(container: HTMLElement, options: BoardOptions = {}):
   let baseLabels = new Map<string, string>();
   let skipNext = false; // dentro de `withoutAnimation`
   let running: Animation[] = [];
+  let arrows: readonly Arrow[] = [];
+  let gridLabel: string | null = null;
 
   const element = doc.createElement("div");
   element.className = "tablero";
@@ -193,9 +201,25 @@ export function createBoard(container: HTMLElement, options: BoardOptions = {}):
     }
   };
 
+  /** Flechas encima de la rejilla, en la misma celda del tablero. */
+  const drawArrows = (): void => {
+    element.querySelector(".tablero__flechas")?.remove();
+    const svg = arrowsSvg(arrows, orientation); // solo números y clases fijas
+    if (svg !== "") element.querySelector(".tablero__rejilla")?.insertAdjacentHTML("afterend", svg);
+  };
+
+  const applyGridLabel = (): void => {
+    const grid = element.querySelector(".tablero__rejilla");
+    if (grid === null) return;
+    const side = orientation === "w" ? "blancas" : "negras";
+    grid.setAttribute("aria-label", gridLabel === null ? `Tablero de ajedrez, visto desde las ${side}` : `${gridLabel}, visto desde las ${side}`);
+  };
+
   const draw = (): void => {
     element.dataset["orientation"] = orientation;
     element.innerHTML = boardHtml(fen, orientation);
+    drawArrows();
+    applyGridLabel();
     cells = new Map();
     baseLabels = new Map();
     for (const el of element.querySelectorAll<HTMLElement>("[data-square]")) {
@@ -323,6 +347,16 @@ export function createBoard(container: HTMLElement, options: BoardOptions = {}):
     setMarks(next: ReadonlyMap<string, readonly Mark[]>): void {
       marks = next;
       applyMarks();
+    },
+    setArrows(next: readonly Arrow[]): void {
+      const same = next.length === arrows.length && next.every((a, i) => a.from === arrows[i]!.from && a.to === arrows[i]!.to && a.kind === arrows[i]!.kind);
+      if (same) return;
+      arrows = [...next];
+      drawArrows();
+    },
+    setGridLabel(label: string | null): void {
+      gridLabel = label;
+      applyGridLabel();
     },
   };
 }

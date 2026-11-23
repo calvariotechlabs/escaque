@@ -45,3 +45,23 @@
   .coach{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:var(--space-4) var(--space-6)}
   .coach__cab{grid-column:1 / -1}
 }
+/* Coach mejorado (CAL-394, lienzo «Coach mejorado»): la mejor alternativa con su porqué y las pistas. */
+.coach__alternativa{display:flex;flex-direction:column;align-items:flex-start;gap:var(--space-2);padding:var(--space-3);border:1px solid var(--control-border);border-radius:var(--radius-sm)}
+.coach__alternativa--activa{border:3px solid var(--accent);padding:calc(var(--space-3) - 2px)}
+.coach__alternativa .coach__mejor{color:var(--ink)}
+.coach__porque{margin:0}
+.coach__porque strong{font-weight:600}
+.coach__linea{margin:0;color:var(--ink-muted)}
+.coach__alternativa .boton{min-height:44px}
+.coach__pistas{display:flex;flex-direction:column;align-items:flex-start;gap:var(--space-2);padding-bottom:var(--space-4);border-bottom:1px solid var(--line)}
+.coach__pistas .coach__sub{margin:0}
+.coach__pistas-vivo{align-self:stretch}
+.coach__pistas-lista{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:var(--space-2)}
+.coach__pistas-lista li{padding:var(--space-2) var(--space-3);border:1.5px solid var(--control-border);border-radius:var(--radius-sm)}
+.coach__pistas-lista strong{display:block;font-weight:600}
+.coach__pistas .boton{min-height:44px}
+.coach__pistas .boton[aria-disabled="true"]{color:var(--ink-muted);border-style:dashed;cursor:not-allowed}
+.coach__pistas .coach__barra-pensando{align-self:stretch}
+.coach__pistas-nota{margin:0;color:var(--ink-muted)}
+@media (min-width:600px) and (max-width:859px) and (min-height:501px){.coach__pistas{grid-column:1 / -1}}
+@media (forced-colors: active){.coach__alternativa,.coach__pistas-lista li{border-color:CanvasText}}

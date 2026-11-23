@@ -33,7 +33,23 @@ import {
   type SetupChoice,
 } from "./settings.js";
 import type { CoachReport, SquareMark } from "../coach/index.js";
-import { previousNote, reportView, reviewJob, reviewKey, withCoachMarks } from "./coach.js";
+import type { Arrow } from "./arrows.js";
+import {
+  NO_HINTS,
+  HINTS_TOTAL,
+  hintMarks,
+  hintsView,
+  previousNote,
+  reportView,
+  reviewJob,
+  reviewKey,
+  reviewPosition,
+  reviewViewText,
+  withCoachMarks,
+} from "./coach.js";
+import type { HintsAvailability, HintsState, ReportView, ReviewJob } from "./coach.js";
+import type { Mark } from "./board.js";
+import { historyUci } from "./machine.js";
 import { createCoachPanel } from "./coach-panel.js";
 import { createReviewScreen } from "./review-screen.js";
 import { exportGame, fileTooLarge, gameFromPgn, importIntro, loadError, PGN_TEXT } from "./pgn.js";
@@ -166,11 +182,134 @@ let coachMarks: readonly SquareMark[] = [];
 let coachNote: string | null = null;
 /** Posición en la que se pidieron las marcas de «Ver en el tablero»: si cambia, se quitan. */
 let coachMarksFen = "";
-const coachPanel = createCoachPanel((marks) => {
-  coachMarks = marks;
-  coachMarksFen = game.fen;
-  applyMarks();
+const coachPanel = createCoachPanel(
+  (marks) => {
+    coachMarks = marks;
+    coachMarksFen = game.fen;
+    applyMarks();
+  },
+  { onBest: (active) => (active ? openPeek() : closePeek(false)), onHint: () => requestHint() },
+);
+
+// --- Coach mejorado (CAL-394): la posición de antes con flechas y las pistas ----------------
+
+/** Informe que enseña ahora el panel del coach, con su jugada. */
+let shownReport: { readonly view: ReportView; readonly job: ReviewJob } | null = null;
+
+/** Vista de la posición de antes de la jugada revisada, con la mejor jugada y la tuya en flechas. `null`: la partida. */
+let peek: {
+  readonly fen: string;
+  readonly marks: ReadonlyMap<string, readonly Mark[]>;
+  readonly arrows: readonly Arrow[];
+  readonly grid: string;
+  /** Posición de la partida al abrirla: si cambia, la vista se cierra sola. */
+  readonly gameFen: string;
+} | null = null;
+
+const peekBanner = byId<HTMLElement>("vista-revision");
+const peekLegend = byId<HTMLElement>("vista-leyenda");
+
+function openPeek(): void {
+  if (shownReport === null || shownReport.view.bestArrow === null || shownReport.view.best === null) return;
+  const { view: report, job } = shownReport;
+  const before = reviewPosition(job);
+  const marks = new Map<string, Mark[]>();
+  if (before.lastMove !== null) {
+    marks.set(before.lastMove.from, ["last-move-from"]);
+    marks.set(before.lastMove.to, ["last-move-to"]);
+  }
+  const text = reviewViewText(job.label);
+  peek = {
+    fen: before.fen,
+    marks,
+    arrows: [
+      { ...report.bestArrow!, kind: "mejor" },
+      { ...report.playedArrow, kind: "tuya" },
+    ],
+    grid: text.grid,
+    gameFen: game.fen,
+  };
+  byId("vista-revision-titulo").textContent = text.title;
+  byId("vista-revision-texto").textContent = text.text;
+  byId("vista-leyenda-mejor").textContent = report.best!;
+  byId("vista-leyenda-tuya").textContent = job.label.replace(/^\d+(\.|…) /, "");
+  peekBanner.hidden = false;
+  peekLegend.hidden = false;
+  announce(`${text.title}. Mejor jugada: ${report.best!}.`);
+  paintBoard();
+}
+
+/**
+ * Vuelve a la partida. `fromBanner`: el foco pasa al tablero, porque el botón del aviso desaparece.
+ * `silent`: sin anuncio (la partida ha cambiado y ya se anuncia lo que ha pasado).
+ */
+function closePeek(fromBanner: boolean, silent = false): void {
+  if (peek === null) return;
+  peek = null;
+  peekBanner.hidden = true;
+  peekLegend.hidden = true;
+  coachPanel.setBestActive(false);
+  if (!silent) announce("De vuelta a la partida.");
+  paintBoard();
+  if (fromBanner) focusBoard();
+}
+
+byId("vista-revision-volver").addEventListener("click", () => closePeek(true));
+document.addEventListener("keydown", (event) => {
+  if (peek === null || event.key !== "Escape" || event.defaultPrevented || document.querySelector("dialog[open]") !== null) return;
+  event.preventDefault();
+  closePeek(peekBanner.contains(document.activeElement));
 });
+
+/** Pistas para la posición de la partida en pantalla; se reinician al cambiar la posición. */
+let hints: HintsState = NO_HINTS;
+let hintsFen = "";
+let hintToken = 0;
+let hintClient: ReturnType<typeof createCoachClient> | null = null;
+
+function hintsAvailability(): HintsAvailability {
+  if (game.isOver) return "hidden";
+  if (setup.mode === "maquina" && (game.turn !== setup.player || thinking)) return "waiting";
+  return "available";
+}
+
+function renderHints(): void {
+  if (hintsFen !== game.fen) {
+    hintsFen = game.fen;
+    hints = NO_HINTS;
+    hintToken++;
+    hintClient?.cancel();
+  }
+  coachPanel.setHints(hintsView(hints, hintsAvailability()));
+}
+
+function requestHint(): void {
+  if (hintsAvailability() !== "available" || hints.pending || hints.shown >= HINTS_TOTAL) return;
+  closePeek(false);
+  if (hints.hint !== null) {
+    hints = { ...hints, shown: hints.shown + 1 };
+    renderHints();
+    applyMarks();
+    return;
+  }
+  hints = { ...hints, pending: true, failed: false };
+  renderHints();
+  const token = ++hintToken;
+  hintClient ??= createCoachClient();
+  hintClient.hint({ fen: game.startFen, moves: historyUci(game) }).then(
+    (hint) => {
+      if (token !== hintToken) return;
+      hints = { shown: 1, hint, pending: false, failed: false };
+      renderHints();
+      applyMarks();
+    },
+    (error: unknown) => {
+      if (token !== hintToken || error instanceof EngineCancelledError) return;
+      hints = { ...NO_HINTS, failed: true };
+      renderHints();
+    },
+  );
+}
 
 // Repaso de la partida terminada: su propia pantalla, con los informes del coach compartidos.
 const review = createReviewScreen({
@@ -187,13 +326,37 @@ const review = createReviewScreen({
 
 /** Deja de revisar en el coach de la partida (otra pantalla a la vista). */
 function stopCoach(): void {
+  closePeek(false, true);
   coachToken++;
   coachKey = null;
   coachClient?.cancel();
 }
 
 function applyMarks(): void {
-  view.setMarks(withCoachMarks(ui.marks(), coachMarks));
+  if (peek !== null) {
+    view.setMarks(peek.marks);
+    view.setArrows(peek.arrows);
+    return;
+  }
+  const hint = hintMarks(hints);
+  view.setMarks(withCoachMarks(withCoachMarks(ui.marks(), coachMarks), hint.marks));
+  view.setArrows(hint.arrow === null ? [] : [{ ...hint.arrow, kind: "mejor" }]);
+}
+
+/** Pinta en el tablero la partida o, si está abierta, la vista de la posición de antes. */
+function paintBoard(): void {
+  if (peek !== null) {
+    view.withoutAnimation(() => view.setPosition(peek!.fen));
+    view.setGridLabel(peek.grid);
+  } else {
+    if (game === drawnGame && view.element.dataset["vista"] !== "revision") view.setPosition(game.fen);
+    else view.withoutAnimation(() => view.setPosition(game.fen));
+    view.setGridLabel(null);
+    drawnGame = game;
+  }
+  view.element.dataset["vista"] = peek === null ? "partida" : "revision";
+  applyMarks();
+  syncTabIndex();
 }
 
 function newInteraction(forGame: Game, forSetup: GameSetup): Interaction {
@@ -209,11 +372,12 @@ let drawnGame: Game | null = null;
 
 function render(): void {
   view.setOrientation(ui.orientation);
-  if (game === drawnGame) view.setPosition(game.fen);
-  else view.withoutAnimation(() => view.setPosition(game.fen));
-  drawnGame = game;
+  // La vista de la posición de antes se cierra sola si la partida cambia (jugada de la máquina, deshacer…).
+  if (peek !== null && (peek.gameFen !== game.fen || game !== drawnGame)) closePeek(false, true);
+  else paintBoard();
   captures.render(game.history, ui.orientation);
   renderCoach();
+  renderHints();
   applyMarks();
   syncTabIndex();
   renderStatus();
@@ -261,6 +425,7 @@ function renderCoach(): void {
     return;
   }
   coachKey = key;
+  shownReport = null;
   coachNote = note;
   coachPanel.setPrevious(note);
   const token = ++coachToken;
@@ -277,7 +442,7 @@ function renderCoach(): void {
   try {
     const cached = coachCache.get(key);
     if (cached !== undefined) {
-      coachPanel.showReport(reportView(cached, job.label));
+      showCoachReport(cached, job);
       return;
     }
     coachPanel.showReviewing(job.label);
@@ -288,7 +453,7 @@ function renderCoach(): void {
         try {
           if (coachCache.size >= 300) coachCache.clear();
           coachCache.set(key, report);
-          coachPanel.showReport(reportView(report, job.label));
+          showCoachReport(report, job);
         } catch {
           fail();
         }
@@ -301,6 +466,12 @@ function renderCoach(): void {
   } catch {
     fail();
   }
+}
+
+function showCoachReport(report: CoachReport, job: ReviewJob): void {
+  const shown = reportView(report, job.label);
+  shownReport = { view: shown, job };
+  coachPanel.showReport(shown);
 }
 
 // Al girar el móvil el panel puede pasar de oculto a visible (y al revés).
@@ -518,6 +689,8 @@ attachBoardInput({
   focusBoard,
   syncTabIndex,
   promotionOpen: () => promotion.isOpen,
+  // Viendo la posición de antes de la jugada revisada no se mueve (CAL-394).
+  enabled: () => peek === null,
 });
 
 // --- Lista de jugadas y botones -------------------------------------------------
