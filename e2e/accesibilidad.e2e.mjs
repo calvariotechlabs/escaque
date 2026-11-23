@@ -38,8 +38,11 @@ before(async () => {
 });
 
 after(async () => {
-  await browser?.close();
-  server?.kill();
+  try {
+    await browser?.close();
+  } finally {
+    server?.kill(); // aunque falle el cierre de Chrome: un servidor vivo dejaría colgada la CI
+  }
 });
 
 const FILES = "abcdefgh";
@@ -101,7 +104,7 @@ describe("accesibilidad de extremo a extremo", () => {
     await startTwoPlayers(page);
     const audit = await page.eval(`(() => {
       const name = (el) => (el.getAttribute('aria-label') ?? el.getAttribute('aria-labelledby') ?? (el.labels && el.labels[0]?.textContent) ?? el.textContent ?? '').trim();
-      const visible = (el) => !el.closest('[hidden]') && !el.closest('[inert]');
+      const visible = (el) => !el.closest('[hidden], [inert], [aria-hidden=true]'); // lo oculto al lector (p. ej. el input de archivo que abre un botón) no cuenta
       const nameless = [...document.querySelectorAll('button, a[href], input, select, [role=button]')].filter(visible).filter((el) => name(el) === '').map((el) => el.outerHTML.slice(0, 80));
       const imgs = [...document.querySelectorAll('img')].filter((i) => !i.hasAttribute('alt')).length;
       return {

@@ -134,7 +134,9 @@ export async function launchBrowser({ width = 1280, height = 800 } = {}) {
       } catch {}
       child.kill("SIGKILL");
       child.stderr.destroy(); // los procesos hijos de Chrome heredan la tubería: sin esto un `| grep` no termina
-      rmSync(profile, { recursive: true, force: true });
+      try {
+        rmSync(profile, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 }); // Chrome tarda en soltar el perfil
+      } catch {} // es un directorio temporal: no merece romper la prueba
     },
   };
 }
