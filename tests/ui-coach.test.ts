@@ -3,7 +3,7 @@ import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { analyzeMove } from "../src/coach/index.js";
 import { Game } from "../src/ui/game.js";
-import { barPercent, moveLabel, reportView, reviewJob, reviewKey, withCoachMarks } from "../src/ui/coach.js";
+import { barPercent, moveLabel, previousNote, reportView, reviewJob, reviewKey, withCoachMarks } from "../src/ui/coach.js";
 
 function play(game: Game, moves: string[]): void {
   for (const m of moves) assert.ok(game.play(m.slice(0, 2), m.slice(2, 4)), m);
@@ -11,6 +11,27 @@ function play(game: Game, moves: string[]): void {
 
 // 1.e4 e5 2.Ac4 Cc6 3.Dh5 Cf6 4.Cf3 (la partida del diseño)
 const DESIGN = ["e2e4", "e7e5", "f1c4", "b8c6", "d1h5", "g8f6", "g1f3"];
+
+describe("reviewJob: jugada anterior", () => {
+  it("contra la máquina, la revisión es «anterior» cuando la máquina ya ha respondido", () => {
+    const game = new Game();
+    play(game, ["e2e4"]);
+    assert.equal(reviewJob(game, "w")!.previous, false);
+    play(game, ["e7e5"]);
+    assert.equal(reviewJob(game, "w")!.previous, true);
+  });
+
+  it("a dos jugadores nunca es «anterior»", () => {
+    const game = new Game();
+    play(game, ["e2e4", "e7e5"]);
+    assert.equal(reviewJob(game, null)!.previous, false);
+  });
+
+  it("la nota dice de quién es la revisión y, si sigue la partida, que te toca mover", () => {
+    assert.equal(previousNote(true), "Alfil Beta ya ha respondido. Esta revisión es de tu jugada anterior. Ahora te toca mover.");
+    assert.equal(previousNote(false), "Alfil Beta ya ha respondido. Esta revisión es de tu jugada anterior.");
+  });
+});
 
 describe("reviewJob", () => {
   it("no hay nada que revisar antes de la primera jugada", () => {
@@ -115,14 +136,14 @@ describe("barPercent", () => {
 
 describe("withCoachMarks", () => {
   it("suma las marcas del aviso a las del tablero sin tocarlas ni repetirlas", () => {
-    const base = new Map<string, ("selected" | "target" | "last-move")[]>([["h5", ["last-move"]]]);
+    const base = new Map<string, ("selected" | "target" | "last-move-to")[]>([["h5", ["last-move-to"]]]);
     const merged = withCoachMarks(base, [
       { square: "h5", mark: "selected" },
       { square: "f7", mark: "capture" },
       { square: "f7", mark: "capture" },
     ]);
-    assert.deepEqual(merged.get("h5"), ["last-move", "selected"]);
+    assert.deepEqual(merged.get("h5"), ["last-move-to", "selected"]);
     assert.deepEqual(merged.get("f7"), ["capture"]);
-    assert.deepEqual(base.get("h5"), ["last-move"]);
+    assert.deepEqual(base.get("h5"), ["last-move-to"]);
   });
 });

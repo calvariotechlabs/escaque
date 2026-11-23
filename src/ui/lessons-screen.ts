@@ -261,8 +261,8 @@ export function createLessonsScreen(deps: LessonsDeps): LessonsScreen {
     };
     // Tras un paso sin respuesta la partida se rehace: la última jugada la guarda la sesión.
     if (s.game.lastMove === null && s.lastMove !== null) {
-      add(s.lastMove.from, "last-move");
-      add(s.lastMove.to, "last-move");
+      add(s.lastMove.from, "last-move-from");
+      add(s.lastMove.to, "last-move-to");
     }
     const hint = s.hintMarks();
     if (hint !== null) {

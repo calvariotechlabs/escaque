@@ -437,6 +437,38 @@
    "h": 760,
    "title": "Escritorio · Logo junto al nombre en la cabecera",
    "page": "escritorio"
+  },
+  "PulidoEscritorio.dc.html": {
+   "x": 0,
+   "y": 17680,
+   "w": 1280,
+   "h": 1180,
+   "title": "Escritorio · partida pulida",
+   "page": "escritorio"
+  },
+  "PulidoTablet.dc.html": {
+   "x": 0,
+   "y": 19340,
+   "w": 820,
+   "h": 1560,
+   "title": "Tablet · partida pulida",
+   "page": "tablet"
+  },
+  "PulidoMovil.dc.html": {
+   "x": 0,
+   "y": 24410,
+   "w": 390,
+   "h": 1640,
+   "title": "Móvil · partida pulida",
+   "page": "movil"
+  },
+  "PulidoMovilHorizontal.dc.html": {
+   "x": 470,
+   "y": 24410,
+   "w": 844,
+   "h": 390,
+   "title": "Móvil · horizontal · partida pulida",
+   "page": "movil"
   }
  },
  "order": [
@@ -490,7 +522,11 @@
   "PgnMovil.dc.html",
   "ArrastreMovil.dc.html",
   "EnlaceGithub.dc.html",
-  "LogoCabecera.dc.html"
+  "LogoCabecera.dc.html",
+  "PulidoEscritorio.dc.html",
+  "PulidoTablet.dc.html",
+  "PulidoMovil.dc.html",
+  "PulidoMovilHorizontal.dc.html"
  ],
  "notes": {
   "t_escritorio_0": {
@@ -1076,6 +1112,54 @@
    "text": "Enlace al repositorio (CAL-385, pendiente de aprobar). Va al final de la navegación de la cabecera, así aparece en todas las pantallas. En escritorio y tablet: marca de GitHub y «GitHub»; en móvil, solo el icono con el mismo nombre para el lector de pantalla. Cambiado en las cinco pantallas de partida (escritorio, tablet vertical y horizontal, móvil y móvil horizontal); el resto de pantallas lo tendrá al implementarlo, porque la cabecera es la misma.",
    "fill": "gray",
    "page": "escritorio"
+  },
+  "t_escritorio_9": {
+   "x": 0,
+   "y": 17440,
+   "text": "Pulir la partida (CAL-390)",
+   "kind": "title1",
+   "maxW": 1280,
+   "page": "escritorio"
+  },
+  "t_tablet_8": {
+   "x": 0,
+   "y": 19100,
+   "text": "Pulir la partida (CAL-390)",
+   "kind": "title1",
+   "maxW": 820,
+   "page": "tablet"
+  },
+  "t_movil_10": {
+   "x": 0,
+   "y": 24170,
+   "text": "Pulir la partida (CAL-390)",
+   "kind": "title1",
+   "maxW": 1314,
+   "page": "movil"
+  },
+  "p_escritorio_9": {
+   "x": 1360,
+   "y": 17680,
+   "w": 380,
+   "text": "Propuesta pendiente de aprobar. Posición: 1.e4 e5 2.Cf3 Cc6 3.a3 Cf6, te toca mover contra Alfil Beta. 1) Última jugada: origen y destino con la misma tinta, más fuerte que ahora; la forma los distingue (borde discontinuo en el origen, continuo en el destino), así que no depende del color. Aquí: g8 y f6. 2) Coach: cuando la revisión es de tu jugada anterior y la máquina ya ha respondido, lleva la etiqueta «Jugada anterior», dice «Tu jugada: 3. a3» y una nota: «Alfil Beta ya ha respondido. Esta revisión es de tu jugada anterior; ahora te toca mover.» El veredicto sigue siendo la única región que se anuncia. 3) Jugadas: una sola tipografía (IBM Plex Sans con cifras tabulares), también en el coach, y columnas compactas en vez de dos mitades del panel.",
+   "page": "escritorio",
+   "fill": "gray"
+  },
+  "p_tablet_8": {
+   "x": 900,
+   "y": 19340,
+   "w": 380,
+   "text": "Tablet vertical: mismos cambios en una columna. El coach va debajo de los botones y la etiqueta «Jugada anterior» queda en la cabecera del panel, a la derecha del título. Desde 860 px es la disposición de escritorio.",
+   "page": "tablet",
+   "fill": "gray"
+  },
+  "p_movil_10": {
+   "x": 470,
+   "y": 24850,
+   "w": 440,
+   "text": "Móvil apaisado: la línea «Alfil Beta · Medio» deja de ir en la cabecera, donde se pisaba con el estado, y pasa a una segunda línea dentro del estado: «Juegan las blancas. Te toca.» y debajo «Contra Alfil Beta · Medio». La cabecera queda en una sola fila con logo, navegación y GitHub. A la izquierda, el móvil vertical con los mismos cambios de la partida.",
+   "page": "movil",
+   "fill": "gray"
   }
  },
  "designSystems": [
