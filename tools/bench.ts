@@ -2,12 +2,14 @@
 //
 //   npm run bench
 //
-// Imprime una tabla en Markdown con nodos, tiempo y nodos por segundo.
-import { BENCH_POSITIONS, benchPosition, formatBench } from "./bench-core.js";
+// Imprime una tabla en Markdown con nodos, tiempo y nodos por segundo (unos 3 min).
+import { BENCH_POSITIONS, benchPosition, formatBench, warmUp } from "./bench-core.js";
 import type { BenchRow } from "./bench-core.js";
 import { nodeProcess } from "./node.js";
 
 const proc = nodeProcess();
+proc.stderr.write("Calentando…\n");
+warmUp();
 const rows: BenchRow[] = [];
 for (const p of BENCH_POSITIONS) {
   proc.stderr.write(`${p.name} (profundidad ${p.depth})…\n`);
