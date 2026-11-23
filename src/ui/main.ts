@@ -20,6 +20,7 @@ import {
   sanToSpanish,
   statusMessage,
 } from "./notation.js";
+import { applyBoardTheme, isBoardTheme, loadBoardTheme, saveBoardTheme } from "./board-theme.js";
 import { createPromotionDialog } from "./promotion.js";
 import { browserStore, createAutosave, loadFromStorage } from "./save.js";
 import {
@@ -136,6 +137,20 @@ createBoard(byId("vista-previa")).setPosition(START_FEN);
 
 // La partida en curso se guarda en el dispositivo y se recupera al abrir o al actualizar la app.
 const store = browserStore();
+
+// Tablero elegido (Bosque o Nogal), recordado en el dispositivo (CAL-397). Solo cambia colores, nunca la partida.
+{
+  const picker = byId<HTMLFieldSetElement>("tema-tablero");
+  const theme = loadBoardTheme(store);
+  applyBoardTheme(document.documentElement, theme);
+  for (const input of picker.querySelectorAll<HTMLInputElement>('input[name="tablero"]')) input.checked = input.value === theme;
+  picker.addEventListener("change", (event) => {
+    const value = (event.target as HTMLInputElement).value;
+    if (!isBoardTheme(value)) return;
+    applyBoardTheme(document.documentElement, value);
+    saveBoardTheme(store, value);
+  });
+}
 const recovered = loadFromStorage(store);
 const autosave = createAutosave(store);
 
