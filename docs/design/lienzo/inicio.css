@@ -1,0 +1,39 @@
+/* Inicio compacto (CAL-396): «Empezar partida» a la vista sin desplazar la pantalla.
+   Cada grupo (Modo, Nivel, Tu color) es una fila de segmentos con el nombre; la descripción de la opción elegida va debajo.
+   La de las demás sigue en el documento, oculta a la vista, y cada segmento la enlaza con aria-describedby. */
+.ajustes{gap:var(--space-4)}
+.grupo--segmentos .opciones{display:grid;grid-template-columns:repeat(var(--segmentos,3),minmax(0,1fr));grid-template-rows:auto minmax(var(--ayuda-min,40px),auto);gap:var(--space-2)}
+.grupo--segmentos .opcion{display:contents}
+.grupo--segmentos .opcion__caja{position:relative;grid-row:1;min-width:0}
+.grupo--segmentos .opcion__tarjeta{flex-direction:row;align-items:center;gap:var(--space-2);min-height:48px;padding:0 var(--space-3)}
+.grupo--segmentos .opcion__tarjeta::before{position:static;flex:none;margin:0}
+.grupo--segmentos .opcion__entrada:checked + .opcion__tarjeta{padding:0 calc(var(--space-3) - 1.5px)}
+.grupo--segmentos .opcion__entrada:checked + .opcion__tarjeta::before{left:auto}
+.grupo--segmentos .opcion__texto{grid-row:2;grid-column:1 / -1;margin:0;padding-top:var(--space-1)}
+.grupo--segmentos .opcion:not(:has(:checked)) .opcion__texto{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.grupo--modo{--segmentos:2}
+/* Tu color: la muestra de color hace de marca de selección y sustituye al círculo, que no cabe junto al nombre en 3 columnas. */
+.grupo--color .opcion__tarjeta::before{display:none}
+.grupo--color .estado__turno{flex:none;width:20px;height:20px;margin:2px}
+.grupo--color .opcion__entrada:checked + .opcion__tarjeta .estado__turno{box-shadow:0 0 0 2px var(--surface-raised),0 0 0 4px var(--accent)}
+.grupo__leyenda{margin-bottom:var(--space-2)}
+/* Botón: barra que se queda abajo mientras el formulario es más alto que la pantalla. */
+.ajustes__acciones{position:sticky;bottom:0;z-index:2;margin:0 calc(-1 * var(--space-4));padding:var(--space-3) var(--space-4) max(var(--space-3),env(safe-area-inset-bottom,0px));background:var(--surface);border-top:1px solid var(--line)}
+@media (min-width:600px){
+  .grupo--segmentos{--ayuda-min:20px}
+  .ajustes__acciones{margin:0;padding-left:0;padding-right:0;border-top:0}
+}
+/* Escritorio y tablet horizontal: formulario a la izquierda; tablero, aviso de principiante y aviso de instalar a la derecha. */
+@media (min-width:860px){
+  .ajustes-pantalla__vista .tablero{max-width:360px}
+}
+/* Móvil apaisado: Modo y Nivel arriba, Tu color y el botón debajo; sin título aparte ni tablero. */
+@media (orientation:landscape) and (max-height:500px){
+  .ajustes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-areas:"modo nivel" "color acciones";gap:var(--space-3) var(--space-6);align-items:start}
+  .grupo--modo{grid-area:modo}
+  .grupo--nivel{grid-area:nivel}
+  .grupo--color{grid-area:color}
+  .ajustes__acciones{grid-area:acciones;position:static;align-self:end;margin:0;padding:0;border:0;background:none}
+  .grupo--segmentos{--ayuda-min:20px}
+  .grupo--segmentos .opcion__tarjeta{min-height:44px}
+}
