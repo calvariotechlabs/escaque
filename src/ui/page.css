@@ -58,6 +58,7 @@ body{margin:0;background:var(--surface);color:var(--ink);font:400 16px/24px var(
   .pagina__cabecera,.partida{max-width:none;margin:0}
   .pagina__cabecera{position:absolute;top:max(var(--space-4),env(safe-area-inset-top,0px));left:calc(max(var(--space-6),env(safe-area-inset-left,0px)) + var(--tablero-ancho) + var(--space-6));right:max(var(--space-6),env(safe-area-inset-right,0px));padding:0;box-sizing:border-box}
   .pagina__cabecera h1{font-size:20px;line-height:24px}
+  .pagina__cabecera{column-gap:var(--space-2)} /* con el logo de GitHub (CAL-385) la fila no cabe en 844 px con el hueco de 24 px */
   /* En apaisado va el subtítulo corto aunque el ancho pase de 860 px (un móvil grande). */
   .solo-escritorio{display:none}
   .solo-movil{display:inline}

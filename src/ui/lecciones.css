@@ -190,3 +190,18 @@ section.grupo{display:flex;flex-direction:column;gap:var(--space-4)}
   #pantalla-leccion .contador{grid-area:contador;padding:var(--space-2) var(--space-3)}
   #pantalla-leccion:has(.retro__acciones) :is(.como,.contador,.lecc-ayuda){display:none}
 }
+
+/* Enlace al repositorio de GitHub (CAL-385). Diseño: «Enlace a GitHub» del lienzo. Va al final de la navegación de la cabecera.
+   Móvil (menos de 600 px o apaisado bajo): solo el logo, con el texto solo para el lector de pantalla; tablet y escritorio: logo y «GitHub». */
+.enlace-gh{display:inline-flex;align-items:center;justify-content:center;gap:var(--space-2);min-width:44px;min-height:44px;padding:0;box-sizing:border-box;border-radius:var(--radius-sm);color:var(--ink-muted);font:600 14px/20px var(--font-sans);text-decoration:none}
+.enlace-gh svg{width:20px;height:20px;flex:none}
+.enlace-gh__texto{position:absolute;width:0;height:0;overflow:hidden;white-space:nowrap}
+.enlace-gh:hover{color:var(--ink);text-decoration:underline;text-underline-offset:4px}
+.enlace-gh:focus-visible{color:var(--ink);outline:3px solid var(--accent);outline-offset:2px}
+@media (min-width:600px) and (min-height:501px){
+  .enlace-gh{padding:0 var(--space-3)}
+  .enlace-gh__texto{position:static;width:auto;height:auto;overflow:visible}
+}
+@media (forced-colors: active){
+  .enlace-gh{color:LinkText}
+}
