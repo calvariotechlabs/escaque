@@ -1,7 +1,7 @@
 // Cliente del Worker del coach, para la interfaz. Una petición cada vez: una
 // nueva cancela la anterior. Lo que llega del Worker no es de confianza: se
 // comprueba la forma del informe antes de entregarlo.
-import type { CoachReport, Finding } from "../coach/index.js";
+import type { CoachReport, Finding, Hint } from "../coach/index.js";
 import { EngineCancelledError } from "./client.js";
 import type { WorkerLike } from "./client.js";
 
@@ -12,9 +12,16 @@ export interface AnalyzeJob {
   readonly move: string;
 }
 
+/** Partida hasta la posición en la que se pide la pista (CAL-394). */
+export interface HintJob {
+  readonly fen: string;
+  readonly moves: readonly string[];
+}
+
 interface Pending {
   readonly id: number;
-  readonly resolve: (report: CoachReport) => void;
+  readonly kind: "report" | "hint";
+  readonly resolve: (value: never) => void;
   readonly reject: (error: Error) => void;
 }
 
@@ -57,12 +64,32 @@ export function isReport(v: unknown): v is CoachReport {
     VERDICTS.includes(v["verdict"] as string) &&
     isText(v["title"]) &&
     isText(v["summary"]) &&
+    isText(v["why"]) &&
+    isText(v["line"]) &&
     Array.isArray(v["findings"]) &&
     v["findings"].length <= 3 &&
     v["findings"].every(isFinding)
   );
 }
 
+/** ¿Tiene la pista la forma que la interfaz necesita? */
+export function isHint(v: unknown): v is Hint {
+  return (
+    isObject(v) &&
+    isMove(v["move"]) &&
+    isText(v["idea"]) &&
+    isText(v["piece"]) &&
+    isText(v["play"]) &&
+    SQUARE.test(v["from"] as string) &&
+    SQUARE.test(v["to"] as string)
+  );
+}
+
+/**
+ * Cliente del Worker del coach. Una petición cada vez por cliente: la interfaz
+ * usa uno para revisar jugadas y otro para las pistas, para que pedir una
+ * pista no cancele la revisión en curso.
+ */
 export class CoachClient {
   private worker: WorkerLike | null = null;
   private pending: Pending | null = null;
@@ -76,8 +103,19 @@ export class CoachClient {
     const worker = this.ensureWorker();
     const id = this.nextId++;
     return new Promise<CoachReport>((resolve, reject) => {
-      this.pending = { id, resolve, reject };
+      this.pending = { id, kind: "report", resolve: resolve as (value: never) => void, reject };
       worker.postMessage({ type: "analyze", id, fen: job.fen, moves: [...job.moves], move: job.move });
+    });
+  }
+
+  /** Pide las pistas de la posición en la que toca mover. Cancela la petición anterior si seguía en curso. */
+  hint(job: HintJob): Promise<Hint> {
+    if (this.pending !== null) this.cancel();
+    const worker = this.ensureWorker();
+    const id = this.nextId++;
+    return new Promise<Hint>((resolve, reject) => {
+      this.pending = { id, kind: "hint", resolve: resolve as (value: never) => void, reject };
+      worker.postMessage({ type: "hint", id, fen: job.fen, moves: [...job.moves] });
     });
   }
 
@@ -114,12 +152,13 @@ export class CoachClient {
   private receive(data: unknown): void {
     const pending = this.pending;
     if (pending === null || !isObject(data) || data["id"] !== pending.id) return;
-    if (data["type"] === "report" && isReport(data["report"])) {
+    const value = pending.kind === "report" ? data["report"] : data["hint"];
+    if (data["type"] === pending.kind && (pending.kind === "report" ? isReport(value) : isHint(value))) {
       this.pending = null;
-      pending.resolve(data["report"]);
-    } else if (data["type"] === "error" || data["type"] === "report") {
+      pending.resolve(value as never);
+    } else if (data["type"] === "error" || data["type"] === pending.kind) {
       this.pending = null;
-      pending.reject(new Error("El coach no pudo revisar la jugada"));
+      pending.reject(new Error(pending.kind === "report" ? "El coach no pudo revisar la jugada" : "El coach no pudo dar la pista"));
     }
   }
 }

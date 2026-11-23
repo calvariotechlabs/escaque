@@ -3,7 +3,7 @@ import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { START_FEN } from "../src/core/index.js";
 import { analyzeMove } from "../src/coach/index.js";
-import { CoachClient, EngineCancelledError, handleAnalyze, isReport } from "../src/worker/index.js";
+import { CoachClient, EngineCancelledError, handleAnalyze, isHint, isReport } from "../src/worker/index.js";
 import type { CoachResponse, WorkerLike } from "../src/worker/index.js";
 
 const request = (overrides: Record<string, unknown> = {}): Record<string, unknown> => ({
@@ -155,5 +155,65 @@ describe("CoachClient", () => {
     const crashed = client.analyze(JOB);
     workers[1]!.onerror?.({});
     await assert.rejects(crashed, /ha fallado/);
+  });
+});
+
+describe("pistas por el Worker (CAL-394)", () => {
+  const hintRequest = (overrides: Record<string, unknown> = {}): Record<string, unknown> => ({
+    type: "hint",
+    id: 3,
+    fen: START_FEN,
+    moves: ["e2e4", "e7e5"],
+    ...overrides,
+  });
+
+  it("responde con las pistas y el mismo id", () => {
+    const response = handleAnalyze(hintRequest(), OPTIONS);
+    assert.equal(response.type, "hint");
+    if (response.type !== "hint") return;
+    assert.equal(response.id, 3);
+    assert.ok(isHint(response.hint));
+    assert.match(response.hint.piece, /^Mueve /);
+  });
+
+  it("rechaza peticiones de pista mal formadas y partidas terminadas", () => {
+    assert.match(errorOf(handleAnalyze(hintRequest({ moves: ["<script>"] }))), /jugadas/);
+    assert.match(errorOf(handleAnalyze(hintRequest({ fen: 1 }))), /FEN/);
+    assert.match(errorOf(handleAnalyze(hintRequest({ moves: ["f2f3", "e7e5", "g2g4", "d8h4"] }))), /No se puede/);
+  });
+
+  it("isHint() exige textos y casillas válidas", () => {
+    const hint = { move: { uci: "b1c3", san: "Nc3" }, idea: "i", piece: "p", play: "j", from: "b1", to: "c3" };
+    assert.ok(isHint(hint));
+    assert.equal(isHint({ ...hint, from: "z9" }), false);
+    assert.equal(isHint({ ...hint, idea: 4 }), false);
+    assert.equal(isHint(null), false);
+  });
+
+  it("el cliente pide la pista y la resuelve", async () => {
+    const { client, workers } = clientWithFakes();
+    const pending = client.hint({ fen: START_FEN, moves: ["e2e4"] });
+    const worker = workers[0]!;
+    assert.deepEqual(worker.sent[0], { type: "hint", id: worker.lastId(), fen: START_FEN, moves: ["e2e4"] });
+    const hint = { move: { uci: "e7e5", san: "e5" }, idea: "i", piece: "p", play: "j", from: "e7", to: "e5" };
+    worker.reply({ type: "report", id: worker.lastId(), report });
+    worker.reply({ type: "hint", id: worker.lastId(), hint });
+    assert.deepEqual(await pending, hint);
+  });
+
+  it("el cliente rechaza una pista con mala forma", async () => {
+    const { client, workers } = clientWithFakes();
+    const pending = client.hint({ fen: START_FEN, moves: [] });
+    workers[0]!.reply({ type: "hint", id: workers[0]!.lastId(), hint: { idea: "x" } });
+    await assert.rejects(pending, /no pudo/);
+  });
+});
+
+describe("isReport() con el coach mejorado", () => {
+  it("exige por qué y línea como texto", () => {
+    assert.ok(isReport(report));
+    assert.equal(isReport({ ...report, why: 3 }), false);
+    const { line: _line, ...withoutLine } = report;
+    assert.equal(isReport(withoutLine), false);
   });
 });
