@@ -1,0 +1,18 @@
+/* Selector «Tablero» (CAL-397, lienzo «Tableros · …»): dos opciones en una fila, con una muestra de cuatro casillas.
+   Reutiliza .opcion de ajustes.css. Cada muestra lleva sus propios colores, así que se ve igual con cualquier tablero elegido. */
+.tema-tablero{margin:var(--space-2) 0 0;padding:0;border:0;min-width:0;display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-2) var(--space-4)}
+.tema-tablero__leyenda{float:left;margin:0 var(--space-4) 0 0;padding:0;font:600 16px/24px var(--font-display)}
+.tema-tablero__opciones{display:flex;flex-wrap:wrap;gap:var(--space-2)}
+.tema-tablero .opcion__tarjeta{flex-direction:row;align-items:center;gap:var(--space-2);padding:var(--space-2) var(--space-4) var(--space-2) 46px}
+.tema-tablero .opcion__entrada:checked + .opcion__tarjeta{padding:calc(var(--space-2) - 1.5px) calc(var(--space-4) - 1.5px) calc(var(--space-2) - 1.5px) calc(46px - 1.5px)}
+.tema-tablero .opcion__tarjeta::before,.tema-tablero .opcion__entrada:checked + .opcion__tarjeta::before{display:none} /* la muestra hace de marca de la opción; el marcado lo dice el borde grueso */
+.tema-tablero__muestra{position:absolute;left:12px;top:50%;margin-top:-10px;display:grid;grid-template-columns:repeat(2,10px);grid-template-rows:repeat(2,10px);border:1.5px solid var(--control-border)}
+.tema-tablero .opcion__entrada:checked + .opcion__tarjeta .tema-tablero__muestra{left:calc(12px - 1.5px)}
+.tema-tablero__muestra i{display:block;background:var(--muestra-clara)}
+.tema-tablero__muestra i:nth-child(2),.tema-tablero__muestra i:nth-child(3){background:var(--muestra-oscura)}
+.opcion--bosque{--muestra-clara:#e8efd9;--muestra-oscura:#4a7a58}
+.opcion--nogal{--muestra-clara:#f1dfbf;--muestra-oscura:#a2693d}
+@media (forced-colors: active){
+  .tema-tablero__muestra i{background:Canvas;border:1px solid CanvasText}
+  .tema-tablero__muestra i:nth-child(2),.tema-tablero__muestra i:nth-child(3){background:CanvasText}
+}

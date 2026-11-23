@@ -1,11 +1,14 @@
-/* Tokens de Escaque, generados a partir de docs/design/design-system/tokens.json (tema claro por defecto). */
+/* Tokens de Escaque, generados a partir de docs/design/design-system/tokens.json (tema claro por defecto). El tablero tiene dos juegos de colores a elegir (CAL-397): Bosque, el de siempre, y Nogal con data-tablero="nogal"; no cambian con el tema claro u oscuro. */
 :root {
-  --square-light: #e3e8e6;
-  --square-dark: #7c9a94;
-  --board-ink: #0b2a38;
-  --mark-selected: #f2c94c;
-  --mark-last-move: #9fd3c0;
+  --square-light: #e8efd9;
+  --square-dark: #4a7a58;
+  --board-ink: #0a2418;
+  --board-halo: #ffffff;
+  --mark-selected: #f2b632;
+  --mark-last-move: #e3ec7a;
   --mark-check: #c8382c;
+  --arrow-best: #0a5f78;
+  --arrow-yours: #1d2027;
   --piece-white-hi: #ffffff;
   --piece-white-mid: #eceef2;
   --piece-white-lo: #b7bfcc;
@@ -77,4 +80,12 @@
   --peligro: #ff8f85;
   --peligro-suave: #2a1a1b;
   color-scheme: dark;
+}
+/* Tablero Nogal: madera clara y nogal. Solo cambia lo que depende del color de las casillas. */
+:root[data-tablero="nogal"] {
+  --square-light: #f1dfbf;
+  --square-dark: #a2693d;
+  --board-ink: #2b1608;
+  --mark-selected: #5fb7e5;
+  --mark-last-move: #f6e58a;
 }
