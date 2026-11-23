@@ -16,6 +16,8 @@ body{margin:0;background:var(--surface);color:var(--ink);font:400 16px/24px var(
 /* Móvil: estado, tablero, botones y jugadas, en el orden del documento. */
 .partida{padding-top:var(--space-4);padding-bottom:max(var(--space-8),env(safe-area-inset-bottom,0px));display:grid;grid-template-columns:minmax(0,1fr);gap:var(--space-4)}
 
+/* Tablero y capturas: en una columna son dos elementos de la rejilla; desde 860 px, una columna propia. */
+.partida__izq{display:contents}
 .partida__tablero{min-width:0}
 /* Agrupa coach, botones y jugadas; solo es una caja propia en móvil apaisado. */
 .partida__panel{display:contents}
@@ -53,7 +55,7 @@ body{margin:0;background:var(--surface);color:var(--ink);font:400 16px/24px var(
   .partida__avisos{grid-area:avisos}
   .partida__estado{grid-area:estado}
   .partida__coach{grid-area:coach}
-  .partida__tablero{grid-area:tablero}
+  .partida__izq{display:flex;flex-direction:column;gap:var(--space-4);grid-area:tablero;min-width:0}
   .partida__jugadas{grid-area:jugadas}
   .partida__controles{grid-area:controles}
 }
@@ -84,6 +86,7 @@ body{margin:0;background:var(--surface);color:var(--ink);font:400 16px/24px var(
   .partida .tablero{width:100%}
   .partida__avisos{grid-area:avisos}
   .partida__estado{grid-area:estado}
+  .partida__izq{display:contents}
   .partida__tablero{grid-area:tablero}
   .partida__panel{display:flex;flex-direction:column;grid-area:panel;min-height:0;overflow:auto;gap:var(--space-2);padding:2px;scroll-padding-top:60px}
   .partida__panel > *{flex:none}
@@ -92,6 +95,7 @@ body{margin:0;background:var(--surface);color:var(--ink);font:400 16px/24px var(
   /* Los cuatro botones en una fila, fijos arriba de la región; el texto pasa a dos líneas. */
   .partida__controles{order:-1;position:sticky;top:0;z-index:1;grid-template-columns:repeat(4,minmax(0,1fr));padding-bottom:var(--space-2);background:var(--surface)}
   .partida__controles .boton,.partida__controles .boton--principal,.partida__ancho{grid-column:auto;padding:4px 6px;font-size:13px;line-height:16px}
+  .partida__panel > .capturas{padding:var(--space-2) var(--space-3);gap:var(--space-1)}
   .partida__jugadas{padding:var(--space-2) var(--space-4)}
   .partida__jugadas .jugadas__titulo{font-size:16px;line-height:24px;margin-bottom:var(--space-1)}
   /* El aviso se compacta: texto a la izquierda y botones a la derecha, para dejar sitio al panel. */

@@ -87,3 +87,17 @@
 .aviso__acciones .boton{flex:1 1 auto}
 .aviso--sin-conexion{border:2px dashed var(--control-border)}
 .aviso--nueva{border:2px solid var(--accent)}
+
+/* Panel «Capturas»: piezas capturadas por cada bando y ventaja de material (diseño CAL-392, lienzo «Capturas · …»). */
+.capturas{display:flex;flex-direction:column;gap:var(--space-2);background:var(--surface-raised);border:1px solid var(--line);border-radius:var(--radius-md);padding:var(--space-3) var(--space-4);min-width:0;color:var(--ink);font:400 14px/20px var(--font-sans)}
+.capturas__titulo{margin:0;font:600 16px/24px var(--font-display)}
+.capturas__lista{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:var(--space-1)}
+.capturas__fila{display:grid;grid-template-columns:6.5em minmax(0,1fr) auto;align-items:center;column-gap:var(--space-2);min-height:32px}
+.capturas__quien{display:inline-flex;align-items:center;gap:var(--space-2);font-weight:600}
+.capturas__piezas{display:flex;flex-wrap:wrap;align-items:center;gap:0 var(--space-2);min-width:0}
+.capturas__grupo{display:inline-flex}
+.capturas__grupo .pieza{flex:none;width:28px;height:28px}
+.capturas__grupo .pieza + .pieza{margin-left:-11px}
+.capturas__nada{color:var(--ink-muted)}
+.capturas__ventaja{font:600 14px/20px var(--font-sans);font-variant-numeric:tabular-nums;padding:0 var(--space-2);border:1.5px solid var(--ink);border-radius:999px}
+.capturas__nota{margin:0;color:var(--ink-muted);font-size:13px;line-height:16px}
