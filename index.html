@@ -23,6 +23,7 @@
 <link rel="stylesheet" href="src/ui/coach.css">
 <link rel="stylesheet" href="src/ui/lecciones.css">
 <link rel="stylesheet" href="src/ui/repaso.css">
+<link rel="stylesheet" href="src/ui/pgn.css">
 <script type="module" src="dist/src/ui/main.js"></script>
 </head>
 <body>
@@ -98,6 +99,11 @@
       <button id="deshacer" class="boton" type="button" disabled>Deshacer jugada</button>
       <button id="rehacer" class="boton" type="button" disabled>Rehacer jugada</button>
       <button id="girar" class="boton partida__ancho" type="button">Girar tablero</button>
+    </div>
+    <div class="partida__pgn">
+      <button id="exportar-pgn" class="boton" type="button">Exportar PGN</button>
+      <button id="cargar-pgn" class="boton" type="button" aria-haspopup="dialog">Cargar PGN</button>
+      <p id="pgn-aviso" class="pgn-aviso" hidden><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m6.2 10.2 2.6 2.6 5-5.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Partida descargada como <code id="pgn-aviso-archivo"></code>.</span></p>
     </div>
     <section class="jugadas partida__jugadas" aria-labelledby="titulo-jugadas">
       <h2 class="jugadas__titulo" id="titulo-jugadas">Jugadas</h2>
@@ -230,6 +236,25 @@
   <div class="confirmacion__botones">
     <button id="seguir-jugando" class="boton" type="button">Seguir jugando</button>
     <button id="empezar" class="boton boton--principal" type="button">Empezar</button>
+  </div>
+</dialog>
+<dialog id="dialogo-pgn" class="pgn-dialogo" aria-labelledby="pgn-titulo" aria-describedby="pgn-texto">
+  <h2 class="pgn-dialogo__titulo" id="pgn-titulo">Cargar una partida</h2>
+  <p class="pgn-dialogo__texto" id="pgn-texto">Pega una partida en PGN o elige un archivo .pgn. Se abre en el repaso para analizarla jugada a jugada; la partida en curso no se pierde.</p>
+  <div class="pgn-campo">
+    <label class="pgn-campo__etiqueta" for="pgn-campo">Partida en PGN</label>
+    <textarea class="pgn-campo__texto" id="pgn-campo" rows="8" spellcheck="false" autocomplete="off" autocapitalize="off" aria-describedby="pgn-ayuda" placeholder="[White &quot;Ana&quot;]&#10;[Black &quot;Beto&quot;]&#10;&#10;1. e4 e5 2. Nf3 Nc6 …"></textarea>
+    <p class="pgn-dialogo__texto" id="pgn-ayuda">Solo se lee la primera partida. Los comentarios y las variantes se ignoran.</p>
+  </div>
+  <div class="pgn-archivo">
+    <button id="pgn-elegir" class="boton" type="button">Elegir archivo…</button>
+    <input id="pgn-archivo" class="oculto" type="file" accept=".pgn,application/x-chess-pgn,text/plain" tabindex="-1" aria-hidden="true">
+    <p id="pgn-archivo-nombre" class="pgn-archivo__nombre">Ningún archivo elegido.</p>
+  </div>
+  <p id="pgn-error" class="pgn-error" role="alert" hidden><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M10 2 18.5 17.5H1.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M10 7.5v5M10 14.6v.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span><strong>No se pudo cargar la partida.</strong> <span id="pgn-error-texto"></span></span></p>
+  <div class="pgn-acciones">
+    <button id="pgn-cancelar" class="boton" type="button">Cancelar</button>
+    <button id="pgn-cargar" class="boton boton--principal" type="button">Cargar y repasar</button>
   </div>
 </dialog>
 </body>

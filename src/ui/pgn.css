@@ -1,0 +1,42 @@
+/* Exportar e importar partidas en PGN (lienzo «Partidas en PGN», docs/design/lienzo/pgn.css). */
+.partida__pgn{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-2);min-width:0}
+.pgn-dialogo{box-sizing:border-box;width:calc(100% - 2 * var(--space-4));max-width:560px;max-height:calc(100dvh - 2 * var(--space-4));overflow:auto;padding:var(--space-4);background:var(--surface-raised);color:var(--ink);border:1px solid var(--control-border);border-radius:var(--radius-md)}
+.pgn-dialogo[open]{display:flex;flex-direction:column;gap:var(--space-3)}
+.pgn-dialogo::backdrop{background:color-mix(in srgb,var(--ink) 55%,transparent)}
+.pgn-dialogo__titulo{margin:0;font:600 20px/28px var(--font-display)}
+.pgn-dialogo__texto{margin:0;font:400 14px/20px var(--font-sans);color:var(--ink-muted)}
+.pgn-campo{display:flex;flex-direction:column;gap:var(--space-1)}
+.pgn-campo__etiqueta{font:600 14px/20px var(--font-sans)}
+.pgn-campo__texto{box-sizing:border-box;width:100%;min-height:168px;resize:vertical;margin:0;padding:var(--space-2) var(--space-3);font:500 13px/20px var(--font-mono);color:var(--ink);background:var(--surface);border:1px solid var(--control-border);border-radius:var(--radius-sm)}
+.pgn-campo__texto::placeholder{color:var(--ink-muted);opacity:1}
+.pgn-campo__texto:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.pgn-campo__texto[aria-invalid="true"]{border:2px dashed var(--ink)}
+.pgn-archivo{display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-2) var(--space-3)}
+.pgn-archivo__nombre{margin:0;font:400 14px/20px var(--font-sans);color:var(--ink-muted);overflow-wrap:anywhere}
+.pgn-error{display:flex;gap:var(--space-2);align-items:flex-start;margin:0;padding:var(--space-3);background:var(--surface);border:2px dashed var(--ink);border-radius:var(--radius-md);font:400 14px/20px var(--font-sans);overflow-wrap:anywhere}
+.pgn-error[hidden]{display:none}
+.pgn-error svg{width:20px;height:20px;flex:none}
+.pgn-error strong{font-weight:600}
+.pgn-acciones{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-2);margin-top:var(--space-1)}
+.pgn-aviso{grid-column:1 / -1;display:flex;gap:var(--space-2);align-items:flex-start;margin:0;font:400 14px/20px var(--font-sans);color:var(--ink)}
+.pgn-aviso[hidden]{display:none}
+.pgn-aviso svg{width:20px;height:20px;flex:none}
+.pgn-aviso code{font:500 13px/20px var(--font-mono);overflow-wrap:anywhere}
+
+/* Escritorio: los dos botones van bajo «Girar tablero», en la columna derecha. */
+@media (min-width:860px){
+  .partida{grid-template-rows:auto auto auto auto auto 1fr;grid-template-areas:"tablero avisos" "tablero estado" "tablero coach" "tablero jugadas" "tablero controles" "tablero pgn"}
+  .partida:has(.avisos:empty){grid-template-rows:auto auto auto auto 1fr;grid-template-areas:"tablero estado" "tablero coach" "tablero jugadas" "tablero controles" "tablero pgn"}
+  .partida__pgn{grid-area:pgn}
+}
+
+/* Móvil apaisado: al final de la región con scroll, después de las jugadas. */
+@media (orientation:landscape) and (max-height:500px){
+  /* Repite la rejilla de page.css, que la regla de escritorio de arriba pisaría en un móvil ancho. */
+  .partida{grid-template-rows:44px auto auto minmax(0,1fr);grid-template-areas:"tablero titulo" "tablero avisos" "tablero estado" "tablero panel"}
+  .partida:has(.avisos:empty){grid-template-rows:44px auto minmax(0,1fr);grid-template-areas:"tablero titulo" "tablero estado" "tablero panel"}
+  .partida__pgn{order:1}
+  .partida__pgn .boton{padding:4px 6px;font-size:13px;line-height:16px}
+}
+
+@media (forced-colors:active){.pgn-dialogo,.pgn-error,.pgn-campo__texto{border-color:CanvasText}}
