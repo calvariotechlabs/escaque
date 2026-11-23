@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Piezas que se mueven · tablet</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/escaque/tokens.css">
+<link rel="stylesheet" href="ds/escaque/components/bundle.css">
+<link rel="stylesheet" href="lecciones.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;600&family=Space+Grotesk:wght@600&display=swap">
+<style>
+body{margin:0}
+.casilla img{position:relative;z-index:1;display:block;width:100%;height:100%}
+.tablero__rejilla{position:relative;overflow:visible}
+.anim{--t:2400ms;--ease:cubic-bezier(0.16,1,0.3,1)}
+/* La pieza que viaja: una casilla de tamaño, colocada en su origen; se desplaza en casillas. */
+.anim__pieza{position:absolute;z-index:4;width:12.5%;height:12.5%;pointer-events:none;animation:anim-ida var(--t) var(--ease) infinite}
+.anim__pieza img{display:block;width:100%;height:100%}
+.anim__pieza--vuelta{animation-name:anim-vuelta}
+@keyframes anim-ida{0%,25%{transform:translate(0,0)}33.33%,100%{transform:translate(calc(var(--dx)*100%),calc(var(--dy)*100%))}}
+@keyframes anim-vuelta{0%,25%{transform:translate(calc(var(--dx)*100%),calc(var(--dy)*100%))}33.33%,100%{transform:translate(0,0)}}
+/* La capturada se queda debajo y se desvanece en los últimos 120 ms del recorrido. */
+.anim__sale img{animation:anim-sale var(--t) linear infinite}
+@keyframes anim-sale{0%,28.33%{opacity:1;transform:scale(1)}33.33%{opacity:0;transform:scale(.8);animation-timing-function:steps(1)}100%{opacity:0}}
+/* Deshacer: la capturada vuelve a aparecer mientras la atacante se va. */
+.anim__entra img{animation:anim-entra var(--t) linear infinite}
+@keyframes anim-entra{0%,25%{opacity:0;transform:scale(.8)}33.33%,100%{opacity:1;transform:scale(1)}}
+/* Coronación: el peón llega y se convierte en la pieza elegida con un fundido de 120 ms. */
+.anim__pieza--corona img{animation:anim-peon var(--t) linear infinite}
+@keyframes anim-peon{0%,33.33%{opacity:1}38.33%,100%{opacity:0}}
+.casilla img.anim__nueva{position:absolute;inset:0;z-index:1;opacity:0;animation:anim-nueva var(--t) linear infinite}
+@keyframes anim-nueva{0%,33.33%{opacity:0}38.33%,100%{opacity:1}}
+/* Reducir movimiento: no hay desplazamiento; la pieza aparece en su destino con un fundido de 120 ms. */
+.anim__fundido{position:absolute;z-index:4;width:12.5%;height:12.5%;pointer-events:none;animation:anim-fundido var(--t) linear infinite}
+.anim__fundido img{display:block;width:100%;height:100%}
+@keyframes anim-fundido{0%,25%{opacity:0}30%,100%{opacity:1}}
+.anim__origen-rm img{animation:anim-origen-rm var(--t) steps(1) infinite}
+@keyframes anim-origen-rm{0%,25%{opacity:1}25.01%,100%{opacity:0}}
+.caso{margin:0;display:flex;flex-direction:column;gap:8px;min-width:0}
+.caso figcaption{font:400 14px/20px var(--font-sans);color:var(--ink-muted)}
+.caso figcaption strong{display:block;color:var(--ink);font:600 16px/24px var(--font-display)}
+.reglas{margin:0;padding:0;list-style:none;display:grid;gap:8px}
+.reglas li{background:var(--surface-raised);border:1px solid var(--line);border-radius:var(--radius-md);padding:12px 16px;font:400 14px/20px var(--font-sans)}
+.reglas strong{display:block;font:600 16px/24px var(--font-display);margin-bottom:2px}
+.linea{display:grid;gap:6px;font:500 12px/16px var(--font-mono);color:var(--ink-muted)}
+.linea__pista{position:relative;height:28px;border-radius:var(--radius-sm);background:var(--surface-raised);border:1px solid var(--line)}
+.linea__tramo{position:absolute;top:4px;bottom:4px;border-radius:var(--radius-sm)}
+.linea__tramo--mueve{left:0;width:100%;background:color-mix(in srgb,var(--accent) 35%,transparent);border:2px solid var(--accent)}
+.linea__tramo--sale{left:40%;width:60%;top:14px;background:var(--ink-muted);opacity:.55}
+.linea__marcas{display:flex;justify-content:space-between}
+</style>
+</helmet>
+<div style="width: 820px; min-height: 1500px; box-sizing: border-box; padding: 32px; background: var(--surface); color: var(--ink); font-family: var(--font-sans); display: flex; flex-direction: column; gap: 24px">
+<header>
+<h1 style="margin: 0; font: 600 28px/32px var(--font-display)">Piezas que se mueven</h1>
+<p style="margin: 8px 0 0; font: 400 16px/24px var(--font-sans); color: var(--ink-muted)">Las reglas son las de Escritorio: 200 ms, la misma curva, la capturada se desvanece debajo. Aquí, a tamaño de tablet, la jugada de la máquina y Deshacer.</p>
+</header>
+<figure class="caso" style="max-width: 560px"><div class="tablero anim">
+<div class="tablero__rejilla" role="grid" aria-label="{{maquina.label}}">
+<sc-for list="{{maquina.rows}}" as="r" hint-placeholder-count="8">
+<div class="tablero__fila" role="row">
+<sc-for list="{{r.row}}" as="c" hint-placeholder-count="8">
+<div class="{{c.cls}}" role="gridcell" data-square="{{c.n}}" data-marks="{{c.marks}}" aria-label="{{c.label}}"><sc-if value="{{c.has}}" hint-placeholder-val="{{ true }}"><img src="{{c.img}}" alt=""></sc-if><sc-if value="{{c.over}}" hint-placeholder-val="{{ false }}"><img class="anim__nueva" src="{{c.overImg}}" alt=""></sc-if></div>
+</sc-for>
+</div>
+</sc-for>
+<sc-for list="{{maquina.movers}}" as="m" hint-placeholder-count="1"><div class="{{m.cls}}" style="{{m.style}}" aria-hidden="true"><img src="{{m.img}}" alt=""></div></sc-for>
+<sc-for list="{{maquina.fades}}" as="m" hint-placeholder-count="0"><div class="anim__fundido" style="{{m.style}}" aria-hidden="true"><img src="{{m.img}}" alt=""></div></sc-for>
+</div>
+<div class="tablero__rangos" aria-hidden="true"><span>8</span><span>7</span><span>6</span><span>5</span><span>4</span><span>3</span><span>2</span><span>1</span></div>
+<div class="tablero__columnas" aria-hidden="true"><span>a</span><span>b</span><span>c</span><span>d</span><span>e</span><span>f</span><span>g</span><span>h</span></div>
+</div><figcaption><strong>Jugada de la máquina</strong>Cuando llega la respuesta de Alfil Beta, el estado deja de decir «pensando» y la pieza se desliza. Se anuncia «Alfil Beta juega Cxe4.» a la vez que empieza el recorrido, no al terminar.</figcaption></figure>
+<figure class="caso" style="max-width: 560px"><div class="tablero anim">
+<div class="tablero__rejilla" role="grid" aria-label="{{deshacer.label}}">
+<sc-for list="{{deshacer.rows}}" as="r" hint-placeholder-count="8">
+<div class="tablero__fila" role="row">
+<sc-for list="{{r.row}}" as="c" hint-placeholder-count="8">
+<div class="{{c.cls}}" role="gridcell" data-square="{{c.n}}" data-marks="{{c.marks}}" aria-label="{{c.label}}"><sc-if value="{{c.has}}" hint-placeholder-val="{{ true }}"><img src="{{c.img}}" alt=""></sc-if><sc-if value="{{c.over}}" hint-placeholder-val="{{ false }}"><img class="anim__nueva" src="{{c.overImg}}" alt=""></sc-if></div>
+</sc-for>
+</div>
+</sc-for>
+<sc-for list="{{deshacer.movers}}" as="m" hint-placeholder-count="1"><div class="{{m.cls}}" style="{{m.style}}" aria-hidden="true"><img src="{{m.img}}" alt=""></div></sc-for>
+<sc-for list="{{deshacer.fades}}" as="m" hint-placeholder-count="0"><div class="anim__fundido" style="{{m.style}}" aria-hidden="true"><img src="{{m.img}}" alt=""></div></sc-for>
+</div>
+<div class="tablero__rangos" aria-hidden="true"><span>8</span><span>7</span><span>6</span><span>5</span><span>4</span><span>3</span><span>2</span><span>1</span></div>
+<div class="tablero__columnas" aria-hidden="true"><span>a</span><span>b</span><span>c</span><span>d</span><span>e</span><span>f</span><span>g</span><span>h</span></div>
+</div><figcaption><strong>Deshacer</strong>La jugada se deshace al revés: la pieza vuelve a su casilla y la capturada reaparece en la suya con un fundido mientras la otra se va. Contra la máquina, Deshacer quita dos jugadas a la vez: el tablero cambia de golpe, sin animación.</figcaption></figure>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":820,"height":1500}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const IMG = { wk: '/_blob/f755b0e3cde224439141427c2f79dfcc', wq: '/_blob/e6db5db3ffcd79a147b06454e873bbb6', wr: '/_blob/ccca3b7fa33574992239568f87fea94a', wb: '/_blob/77d6825cc2acba00edb2116763773dbd', wn: '/_blob/8c627fe6f9b20e3c70f41a0d92653372', wp: '/_blob/751ba29078e9e60b8b5d0d7948fd281f', bk: '/_blob/77c898d2513e9ba83ab5680730d01bda', bq: '/_blob/5d4b4d17f82632fdf302ea2f666c3b78', br: '/_blob/2958949152b961dd0b29733063618976', bb: '/_blob/582ab6e66656de76eb46628bace09a68', bn: '/_blob/b85f02c56127bec2806870270b615310', bp: '/_blob/e571c7681346433a14159cb146cfb58c' };
+    const NAME = { p: 'peón', n: 'caballo', b: 'alfil', r: 'torre', q: 'dama', k: 'rey' };
+    const FILES = 'abcdefgh';
+    const at = (sq) => ({ f: FILES.indexOf(sq[0]), r: Number(sq[1]) });
+    // Un tablero: colocación FEN, casillas vacías a la fuerza (las piezas que viajan van aparte),
+    // clases extra por casilla, marcas y las piezas que viajan [{from, to, img, back}].
+    const board = (fen, o) => {
+      const empty = o.empty || [], extra = o.extra || {}, marks = o.marks || {};
+      const rows = fen.split('/').map((text, r) => {
+        const line = [];
+        for (const ch of text) { if (ch >= '1' && ch <= '8') { for (let k = 0; k < Number(ch); k++) line.push(null); } else line.push(ch); }
+        const rank = 8 - r;
+        return { row: line.map((p0, c) => {
+          const n = FILES[c] + rank;
+          const p = empty.includes(n) ? null : p0;
+          const side = p && p === p.toLowerCase() ? 'b' : 'w';
+          const t = p ? p.toLowerCase() : '';
+          const nombre = p ? NAME[t] + ' ' + (side === 'w' ? 'blanc' : 'negr') + (t === 'r' || t === 'q' ? 'a' : 'o') : 'vacía';
+          const ov = o.over && o.over[n];
+          return { n, cls: 'casilla casilla--' + ((c + rank - 1) % 2 === 1 ? 'clara' : 'oscura') + (extra[n] || ''), marks: marks[n] || '', has: !!p, img: p ? IMG[side + t] : '', label: n + ', ' + nombre, over: !!ov, overImg: ov ? IMG[ov] : '' };
+        }) };
+      });
+      const movers = (o.movers || []).map((m) => {
+        const a = at(m.from), b = at(m.to);
+        const left = (a.f * 12.5) + '%', top = ((8 - a.r) * 12.5) + '%';
+        const style = 'left:' + left + ';top:' + top + ';--dx:' + (b.f - a.f) + ';--dy:' + (a.r - b.r);
+        return { style, cls: 'anim__pieza' + (m.back ? ' anim__pieza--vuelta' : '') + (m.corona ? ' anim__pieza--corona' : ''), img: IMG[m.img] };
+      });
+      const fades = (o.fades || []).map((m) => {
+        const b = at(m.to);
+        return { style: 'left:' + (b.f * 12.5) + '%;top:' + ((8 - b.r) * 12.5) + '%', img: IMG[m.img] };
+      });
+      return { rows, movers, fades };
+    };
+
+    return {
+      maquina: Object.assign(board('r1bqk2r/pppp1ppp/2n2n2/2b1p3/2B1P3/2NP1N2/PPP2PPP/R1BQK2R', { empty: ['f6'], extra: { e4: ' anim__sale' }, marks: { f6: 'last-move', e4: 'last-move' }, movers: [{ from: 'f6', to: 'e4', img: 'bn' }] }), { label: 'La máquina responde: caballo negro de f6 toma en e4' }),
+      deshacer: Object.assign(board('r1bqk2r/pppp1ppp/2n2n2/2b1p3/2B1P3/2NP1N2/PPP2PPP/R1BQK2R', { empty: ['f6'], extra: { e4: ' anim__entra' }, movers: [{ from: 'f6', to: 'e4', img: 'bn', back: true }] }), { label: 'Deshacer: el caballo vuelve de e4 a f6 y el peón de e4 reaparece' }),
+    };
+  }
+}
+</script>
+</body>
+</html>

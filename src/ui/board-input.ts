@@ -73,7 +73,7 @@ export function attachBoardInput(host: BoardInputHost): void {
   function draggedPiece(): { cell: HTMLElement; piece: Element | null } | null {
     if (gesture === null) return null;
     const cell = view.squareElement(gesture.square);
-    return { cell, piece: cell.querySelector(".pieza:not(.pieza--origen)") };
+    return { cell, piece: cell.querySelector(".pieza:not(.pieza--origen):not(.pieza--copia)") };
   }
 
   function resetDraggedPiece(): void {
@@ -182,6 +182,7 @@ export function attachBoardInput(host: BoardInputHost): void {
         return;
       }
       gesture.dragging = true;
+      view.settle(); // una pieza que aún se desliza llega ya: la animación no pisa la del arrastre
       host.interaction().focus = gesture.square;
       host.render();
     }
@@ -206,7 +207,8 @@ export function attachBoardInput(host: BoardInputHost): void {
     if (view.element.hasPointerCapture(pointerId)) view.element.releasePointerCapture(pointerId);
     if (dragging) {
       const target = cancelled ? null : squareAt(document.elementFromPoint(x, y));
-      host.handle(host.interaction().drop(target));
+      // Soltar arrastrando no anima: la pieza ya ha hecho el recorrido con el puntero.
+      view.withoutAnimation(() => host.handle(host.interaction().drop(target)));
     } else if (!cancelled) {
       host.interaction().focus = square;
       host.handle(host.interaction().click(square));
