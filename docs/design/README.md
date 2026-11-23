@@ -22,3 +22,7 @@ Los enlaces son privados de la cuenta de Calvario TechLabs.
 - La PWA (`public/manifest.webmanifest`, `public/icons/`, `src/pwa/`) sale de las páginas de tablet, móvil horizontal, avisos y arranque, y del grupo Icono. Puntos de corte y colores de tema: ver el README del Design System.
 - El móvil apaisado (alto menor de 500 px) sale de las páginas «Móvil · horizontal»: el panel de la derecha (coach, botones y jugadas, o retroalimentación y pistas en una lección) es una región con scroll propio con los botones fijos. `src/ui/page.css`, `src/ui/lecciones.css` y `src/ui/scroll-region.ts`.
 - El aviso de instalar en iOS (`src/pwa/notices.ts`) dice «iPhone» o «iPad» según el aparato y solo se muestra en Safari: ver «App instalable · avisos».
+
+## Imagen de vista previa (og:image)
+
+`og/og-image.png` (1200x630) y `og/og-image.html` (su fuente, con las piezas y el icono de `design-system/assets`). Aprobada por Sergio el 2026-11-23 (CAL-393) como propuesta en el hilo del proyecto; está en el lienzo de Claude Design (`lienzo/OgImage.dc.html`, página Escritorio, versión 1795454832-8e29, exportado el 2026-11-23; la imagen del lienzo es una subida, no un fichero de este repositorio). Se publica como `public/og-image.png` y las etiquetas `og:`/`twitter:` están en `index.html`.
