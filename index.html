@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#f1f3f5" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0f1218" media="(prefers-color-scheme: dark)">
 <meta name="description" content="Aprende ajedrez con un motor propio. Funciona sin conexión.">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'">
 <title>Escaque · ajedrez contra la máquina o a dos</title>
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Escaque">
@@ -33,6 +33,9 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Escaque">
+<link rel="preload" href="fonts/ibm-plex-sans-latin-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/space-grotesk-latin-600.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="src/ui/fonts.css">
 <link rel="stylesheet" href="src/ui/tokens.css">
 <link rel="stylesheet" href="src/ui/board.css">
 <link rel="stylesheet" href="src/ui/page.css">
@@ -41,6 +44,7 @@
 <link rel="stylesheet" href="src/ui/lecciones.css">
 <link rel="stylesheet" href="src/ui/repaso.css">
 <link rel="stylesheet" href="src/ui/pgn.css">
+<link rel="stylesheet" href="src/ui/identidad.css">
 <script type="module" src="dist/src/ui/main.js"></script>
 </head>
 <body>
@@ -92,9 +96,9 @@
 <main id="pantalla-partida" class="partida" hidden>
   <div id="avisos" class="avisos partida__avisos" role="status"></div>
   <div class="partida__estado">
-    <p id="estado" class="estado" role="status"><span id="estado-turno" class="estado__turno estado__turno--w" aria-hidden="true"></span><span><strong id="estado-texto">Cargando la partida. Si este mensaje no desaparece, ejecuta «npm run serve».</strong><span id="estado-extra"></span><span id="estado-nivel" class="estado__sub" aria-hidden="true"></span></span><span id="pensando" class="pensando__barra" aria-hidden="true" hidden></span></p>
+    <p id="estado" class="estado" role="status"><span id="estado-turno" class="estado__turno estado__turno--w" aria-hidden="true"></span><span id="estado-jaque" class="estado__jaque" aria-hidden="true" hidden><svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 1.5 14.5 8 8 14.5 1.5 8Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M8 4.8v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="8" cy="11.2" r="1" fill="currentColor"/></svg>Jaque<span class="oculto">.</span></span><span class="estado__cuerpo"><strong id="estado-texto">Cargando la partida. Si este mensaje no desaparece, ejecuta «npm run serve».</strong><span id="estado-causa" class="estado__causa"></span><span id="estado-extra"></span><span id="estado-nivel" class="estado__sub" aria-hidden="true"></span></span><span id="estado-toca" class="estado__toca" hidden>Te toca<span class="oculto">.</span></span><span id="pensando" class="pensando__barra" aria-hidden="true" hidden></span></p>
     <section id="resultado" class="resultado" role="status" aria-labelledby="resultado-titulo" hidden>
-      <h2 id="resultado-titulo" class="resultado__titulo"></h2>
+      <div class="resultado__cab"><span id="resultado-sello" class="sello" aria-hidden="true"></span><span class="resultado__titulos"><span id="resultado-antetitulo" class="resultado__antetitulo"></span><h2 id="resultado-titulo" class="resultado__titulo"></h2></span></div>
       <p id="resultado-texto" class="resultado__texto"></p>
       <button id="revancha" class="boton boton--principal" type="button">Revancha</button>
       <button id="repasar" class="boton" type="button">Repasar la partida</button>
@@ -142,7 +146,7 @@
     </div>
     <section class="jugadas partida__jugadas" aria-labelledby="titulo-jugadas">
       <h2 class="jugadas__titulo" id="titulo-jugadas">Jugadas</h2>
-      <p id="sin-jugadas" class="jugadas__vacia">Todavía no hay jugadas.</p>
+      <p id="sin-jugadas" class="vacio vacio--jugadas jugadas__vacia"><span class="vacio__mini" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="vacio__txt"><span class="vacio__titulo">Todavía no hay jugadas.</span><span class="vacio__texto"> Mueve una pieza: cada jugada se apunta aquí en notación algebraica, como e4 o Cf3.</span></span></p>
       <ol id="lista-jugadas" class="jugadas__lista" aria-label="Lista de jugadas"></ol>
     </section>
   </div>
@@ -254,7 +258,7 @@
       <section class="pistas lecc-pistas" aria-labelledby="leccion-pistas-titulo">
         <h3 class="pistas__titulo" id="leccion-pistas-titulo">Pistas</h3>
         <div class="pistas__vivo" aria-live="polite">
-          <p id="leccion-sin-pistas" class="pistas__vacia">Todavía no has pedido ninguna pista.</p>
+          <p id="leccion-sin-pistas" class="vacio pistas__vacia"><span class="vacio__mini" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="vacio__txt"><span class="vacio__titulo">Todavía no has pedido ninguna pista.</span><span class="vacio__texto"> Cada pista te acerca un poco más: la última marca la jugada en el tablero.</span></span></p>
           <ol id="leccion-pistas" class="pistas__lista" hidden></ol>
         </div>
         <button id="leccion-pedir-pista" class="boton" type="button"></button>

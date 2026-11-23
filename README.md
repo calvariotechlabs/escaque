@@ -69,6 +69,7 @@ El diseño y las decisiones técnicas (arquitectura, tablero 0x88, estrategia de
 - **Una sola clave Zobrist** (64 bits en dos mitades de 32, generador propio) para la triple repetición, las repeticiones dentro de la búsqueda y la tabla de transposición.
 - **Motor en un Worker, coach en otro.** Pensar no congela la interfaz y revisar tu jugada no retrasa la respuesta de la máquina.
 - **Sitio estático sin bundler.** `tsc` emite módulos ES que el navegador carga tal cual. Sin backend, cuentas, analítica ni cookies. Al no haber servidor no hay nonce por petición: la CSP prohíbe `unsafe-inline` y un test comprueba que el sitio no lleva código en línea.
+- **Tipografías alojadas, no de un CDN.** Space Grotesk e IBM Plex (licencia SIL OFL, en `public/fonts/` con su `OFL.txt`) se sirven desde el propio dominio: cuatro woff2 con solo el alfabeto latino, unos 75 KB, precargados y guardados por el service worker para jugar sin conexión. La CSP solo admite `font-src 'self'` y nada se pide a terceros.
 - **Las lecciones son datos.** Cada una es una FEN, unos pasos y sus motivos de fallo (`src/lessons`); los tests comprueban con el motor que lo aceptado es exactamente lo correcto.
 - **Diseño primero.** Ningún cambio visual entra sin pasar por Claude Design y exportarse a `docs/design`.
 

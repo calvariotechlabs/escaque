@@ -56,6 +56,7 @@ test("la CSP es estricta, deja funcionar el worker y el manifiesto y prohíbe in
   assert.deepEqual(directives.get("style-src"), ["'self'"]);
   assert.deepEqual(directives.get("worker-src"), ["'self'"], "el motor y el service worker");
   assert.deepEqual(directives.get("manifest-src"), ["'self'"]);
+  assert.deepEqual(directives.get("font-src"), ["'self'"], "las tipografías de marca, servidas desde el propio dominio (CAL-398)");
   assert.deepEqual(directives.get("connect-src"), ["'self'"], "el service worker descarga los ficheros a guardar");
   assert.deepEqual(directives.get("base-uri"), ["'none'"]);
   assert.ok(!/unsafe-inline|unsafe-eval|\*|https?:|data:/.test(csp), "sin comodines, orígenes externos ni unsafe-*");

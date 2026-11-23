@@ -654,6 +654,86 @@
    "h": 390,
    "title": "Móvil horizontal · inicio compacto",
    "page": "movil"
+  },
+  "TablerosEscritorio.dc.html": {
+   "x": 0,
+   "y": 30740,
+   "w": 1280,
+   "h": 3300,
+   "title": "Escritorio · tableros Bosque y Nogal",
+   "page": "escritorio"
+  },
+  "TablerosTablet.dc.html": {
+   "x": 0,
+   "y": 31300,
+   "w": 820,
+   "h": 1560,
+   "title": "Tablet · tablero con selector",
+   "page": "tablet"
+  },
+  "TablerosMovil.dc.html": {
+   "x": 0,
+   "y": 36560,
+   "w": 390,
+   "h": 1200,
+   "title": "Móvil · tablero con selector (interfaz oscura)",
+   "page": "movil"
+  },
+  "IdentidadMarca.dc.html": {
+   "x": 0,
+   "y": 34760,
+   "w": 1280,
+   "h": 1500,
+   "title": "Escritorio · identidad: tipografía, color, escaque y celebración",
+   "page": "escritorio"
+  },
+  "IdentidadPartidaEscritorio.dc.html": {
+   "x": 1360,
+   "y": 34760,
+   "w": 1280,
+   "h": 880,
+   "title": "Escritorio · partida con la identidad nueva (jaque)",
+   "page": "escritorio"
+  },
+  "IdentidadMomentos.dc.html": {
+   "x": 0,
+   "y": 36380,
+   "w": 1280,
+   "h": 2240,
+   "title": "Escritorio · microdetalles en claro y oscuro",
+   "page": "escritorio"
+  },
+  "IdentidadTablet.dc.html": {
+   "x": 0,
+   "y": 33560,
+   "w": 820,
+   "h": 1180,
+   "title": "Tablet · has ganado (celebración a mitad)",
+   "page": "tablet"
+  },
+  "IdentidadMovil.dc.html": {
+   "x": 0,
+   "y": 38460,
+   "w": 390,
+   "h": 844,
+   "title": "Móvil · jaque",
+   "page": "movil"
+  },
+  "IdentidadMovilFin.dc.html": {
+   "x": 470,
+   "y": 38460,
+   "w": 390,
+   "h": 844,
+   "title": "Móvil · has ganado (tema oscuro)",
+   "page": "movil"
+  },
+  "IdentidadMovilHorizontal.dc.html": {
+   "x": 940,
+   "y": 38460,
+   "w": 844,
+   "h": 390,
+   "title": "Móvil horizontal · lección superada",
+   "page": "movil"
   }
  },
  "order": [
@@ -734,7 +814,17 @@
   "InicioTablet.dc.html",
   "InicioMovil.dc.html",
   "InicioMovilCompleto.dc.html",
-  "InicioMovilHorizontal.dc.html"
+  "InicioMovilHorizontal.dc.html",
+  "TablerosEscritorio.dc.html",
+  "TablerosTablet.dc.html",
+  "TablerosMovil.dc.html",
+  "IdentidadMarca.dc.html",
+  "IdentidadPartidaEscritorio.dc.html",
+  "IdentidadMomentos.dc.html",
+  "IdentidadTablet.dc.html",
+  "IdentidadMovil.dc.html",
+  "IdentidadMovilFin.dc.html",
+  "IdentidadMovilHorizontal.dc.html"
  ],
  "notes": {
   "t_escritorio_0": {
@@ -1635,6 +1725,54 @@
    "w": 520,
    "text": "Móvil: en la pantalla visible de un móvil pequeño (390×664) caben los tres grupos y el botón. La barra del botón se queda pegada abajo (sticky) si el formulario es más alto que la pantalla; los avisos de principiante y de instalar van después del formulario, en la página entera. Tu color usa la muestra de color como marca de selección. Móvil apaisado (844×390): Modo y Nivel arriba, Tu color y el botón debajo, sin tablero.",
    "fill": "gray",
+   "page": "movil"
+  },
+  "n_tableros_esc": {
+   "x": 1360,
+   "y": 30740,
+   "w": 520,
+   "text": "Tablero con más contraste y carácter (CAL-397, pendiente de aprobar). Dos tableros, Bosque (el de siempre, con más separación entre casillas) y Nogal (madera). Cada uno se ve en interfaz clara y oscura con las tres situaciones: jugando, jaque y revisión del coach. Abajo, la tabla de contraste medido. Cambios de fondo: punto de destino y captura con halo claro, jaque y foco con anillo doble, flechas con colores fijos.",
+   "fill": "gray",
+   "page": "escritorio"
+  },
+  "n_tableros_tab": {
+   "x": 900,
+   "y": 31300,
+   "w": 480,
+   "text": "El control «Tablero» vive en el panel de la partida, bajo el estado. Aquí, Nogal elegido, con la partida y la revisión del coach.",
+   "fill": "gray",
+   "page": "tablet"
+  },
+  "n_tableros_mov": {
+   "x": 470,
+   "y": 36560,
+   "w": 360,
+   "text": "Móvil con interfaz oscura y Bosque: el tablero conserva sus colores y las marcas se ven igual.",
+   "fill": "gray",
+   "page": "movil"
+  },
+  "t_ident_e": {
+   "x": 0,
+   "y": 34500,
+   "text": "Identidad visual (CAL-398)",
+   "kind": "title1",
+   "maxW": 2640,
+   "page": "escritorio"
+  },
+  "t_ident_t": {
+   "x": 0,
+   "y": 33300,
+   "text": "Identidad visual (CAL-398)",
+   "kind": "title1",
+   "maxW": 820,
+   "page": "tablet"
+  },
+  "t_ident_m": {
+   "x": 0,
+   "y": 38200,
+   "text": "Identidad visual (CAL-398)",
+   "kind": "title1",
+   "maxW": 1784,
    "page": "movil"
   }
  },

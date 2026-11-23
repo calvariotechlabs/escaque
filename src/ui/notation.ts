@@ -96,14 +96,6 @@ export function newGameWarning(plies: number): string {
 /** Nombre con el que el motor aparece en la interfaz. */
 export const ENGINE_NAME = "Alfil Beta";
 
-/** Estado de la partida contra la máquina: añade quién piensa y a quién le toca. */
-export function machineStatusMessage(status: GameStatus, turn: Color, inCheck: boolean, humanTurn: boolean, thinking: boolean): string {
-  const base = statusMessage(status, turn, inCheck);
-  if (status.kind !== "ongoing") return base;
-  if (thinking) return `${base} ${ENGINE_NAME} está pensando.`;
-  return humanTurn ? `${base} Te toca.` : base;
-}
-
 /** Anuncio de la jugada de la máquina para la región viva: «Alfil Beta juega Cf6. Juegan las blancas.» */
 export function machineMoveAnnouncement(san: string, nextStatus: string): string {
   return `${ENGINE_NAME} juega ${sanToSpanish(san)}. ${nextStatus}`;

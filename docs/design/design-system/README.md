@@ -14,9 +14,9 @@ Escaque es una app web para aprender ajedrez con motor propio (Alfil Beta). Es u
 - **Tablero.** Casillas en `square-light` y `square-dark`, iguales en tema claro y oscuro. No se redondean ni llevan sombra. Las coordenadas van fuera, en la tipografía `coord` y `ink-muted`.
 - **Piezas.** Estilo de volumen con degradado lateral (luz a la izquierda, sombra a la derecha) y contorno oscuro de 1 unidad sobre un viewBox de 45×45. Blancas: `piece-white-hi`, `piece-white-mid`, `piece-white-lo`, contorno `piece-outline-white`. Negras: `piece-black-hi`, `piece-black-mid`, `piece-black-lo`, contorno `piece-outline-black`.
 - **Marcas.** El significado va en la forma y el color solo refuerza: seleccionada = relleno `mark-selected` más anillo `board-ink`; destino = punto `board-ink`; captura = anillo `board-ink` alrededor de la pieza; última jugada = relleno `mark-last-move`; jaque = resplandor `mark-check` bajo el rey. El foco de teclado es un anillo sólido de 3 px en `board-ink`, dentro de la casilla.
-- **Tipografía.** Títulos en `display` (Space Grotesk), texto en `body` y `body-sm` (IBM Plex Sans), jugadas en `notation` (IBM Plex Mono).
+- **Tipografía.** Títulos en `display` (Space Grotesk), texto en `body` y `body-sm` (IBM Plex Sans), jugadas en `notation` (IBM Plex Mono). Las cuatro fuentes (Space Grotesk 600, Plex Sans 400 y 600, Plex Mono 500, subconjunto latino en woff2) están en `fonts/` y la app las sirve desde su propio dominio (`public/fonts/` del repositorio; licencia SIL OFL en `assets/Fuentes/OFL.txt` del Design System y en `public/fonts/OFL.txt`), con `font-display: swap` y sin CDN.
 - **Espaciado y radios.** Escala `space-1` a `space-8`. Paneles y diálogo con `radius-md`; botones con `radius-sm`; el tablero con ángulos rectos.
-- **Movimiento.** Ninguno por defecto. Si se anima una jugada, respeta `prefers-reduced-motion`.
+- **Movimiento.** Ninguno por defecto. Si se anima una jugada, respeta `prefers-reduced-motion`. La única excepción decorativa es la celebración de un logro (ver «Identidad»).
 - **Objetivos táctiles.** Botones de al menos 44 px de alto; las casillas del tablero miden al menos 38 px con una pantalla de 360 px de ancho.
 
 ## Accesibilidad
@@ -27,7 +27,7 @@ Escaque es una app web para aprender ajedrez con motor propio (Alfil Beta). Es u
 
 ## Iconografía
 
-Escaque no usa iconos en la interfaz: los botones llevan solo texto. Las únicas imágenes son las doce piezas del grupo Piezas y el icono de la app del grupo Icono (un alfil blanco con una diagonal `accent` sobre fondo `board-ink`, más el símbolo suelto, el logotipo horizontal y el favicon).
+Escaque no usa iconos en la interfaz: los botones llevan solo texto. Las únicas imágenes son las doce piezas del grupo Piezas y el icono de la app del grupo Icono (un alfil blanco con una diagonal `accent` sobre fondo `board-ink`, más el símbolo suelto, el logotipo horizontal y el favicon). Además, desde la identidad visual (CAL-398), el rombo de la etiqueta «Jaque», el sello (el logo, con la diagonal en latón en los logros) y el escaque de los títulos, todos decorativos.
 
 ## App instalada
 
@@ -56,6 +56,17 @@ Escaque no usa iconos en la interfaz: los botones llevan solo texto. Las únicas
 - El estado de una lección (sin empezar, en curso, completada) y el resultado de una jugada (acierto, fallo) se distinguen por icono, borde y palabra, nunca solo por color. La retroalimentación es la única región `role="status"`; tras acertar, el foco pasa a «Siguiente lección».
 - La cabecera de la web lleva la navegación principal («Jugar» y «Lecciones») con `aria-current="page"` en la actual.
 - Los textos de cada lección (objetivo, pistas, explicación y motivos de fallo) vienen de los datos de la lección: frases completas, de tú y con punto final.
+
+## Identidad
+
+- **Tinta de marca.** Los títulos van en `marca`, el azul petróleo del fondo del logo, con el interletraje algo cerrado. `accent` sigue siendo solo para acciones.
+- **El escaque.** Un cuadrado de 10 px partido en diagonal en `marca` (la casilla que cruza la diagonal del alfil del logo) va delante de los títulos de panel: Coach, Jugadas, Pistas, Capturas y las secciones del repaso. La muestra de turno es un escaque de 18 px del color que juega.
+- **Jaque.** El estado lleva borde de 2 px en `peligro`, fondo `peligro-suave` y la etiqueta «Jaque» con un rombo. Si te toca, el texto dice qué hacer: «Juegan las blancas: sal del jaque.». «Te toca» va en una etiqueta `accent` aparte, solo contra la máquina.
+- **Fin de partida.** En dos jugadores, «Jaque mate.» o «Tablas.» en `title` con la causa debajo. Contra la máquina, `GameResult` lleva un antetítulo (Victoria, Derrota o Empate) y el sello.
+- **Sello y logro.** El sello es el logo; al ganar o superar una lección su diagonal pasa a `logro-vivo` (latón), con borde `logro`, antetítulo en `logro` y fondo con degradado desde `logro-suave`. El latón se reserva para logros.
+- **Celebración.** Una sola vez al ganar o al superar una lección o un bloque: diez escaques salen del sello en 700 ms y se desvanecen. Con «reducir movimiento» no hay confeti, solo un fundido del sello de 120 ms. No se anuncia al lector de pantalla y no se repite al volver a abrir una partida terminada.
+- **Estados vacíos.** Un trozo de tablero de 3×3 casi en blanco y dos frases: qué falta y qué va a pasar («Todavía no hay jugadas.» / «Mueve una pieza: cada jugada se apunta aquí…»).
+- **Colores forzados.** Escaque, bordes y etiquetas pasan a `CanvasText`; el sello conserva sus colores.
 
 ## Cómo usar este sistema
 
