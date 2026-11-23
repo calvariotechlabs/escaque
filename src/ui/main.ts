@@ -264,18 +264,23 @@ document.addEventListener("keydown", (event) => {
 /** Pistas para la posición de la partida en pantalla; se reinician al cambiar la posición. */
 let hints: HintsState = NO_HINTS;
 let hintsFen = "";
+let hintsGame: Game | null = null;
 let hintToken = 0;
 let hintClient: ReturnType<typeof createCoachClient> | null = null;
 
 function hintsAvailability(): HintsAvailability {
   if (game.isOver) return "hidden";
-  if (setup.mode === "maquina" && (game.turn !== setup.player || thinking)) return "waiting";
+  if (setup.mode === "maquina" && (game.turn !== setup.player || thinking)) {
+    // «Está pensando» solo si piensa o va a pensar; si no puede (falló o se mira una jugada pasada), nada.
+    return thinking || (!machineFailed && !game.canRedo) ? "waiting" : "hidden";
+  }
   return "available";
 }
 
 function renderHints(): void {
-  if (hintsFen !== game.fen) {
+  if (hintsFen !== game.fen || hintsGame !== game) {
     hintsFen = game.fen;
+    hintsGame = game;
     hints = NO_HINTS;
     hintToken++;
     hintClient?.cancel();
@@ -784,6 +789,10 @@ function applyRoute(moveFocus: boolean): void {
   coachToken++;
   coachKey = null;
   coachClient?.cancel();
+  closePeek(false, true);
+  hintsGame = null; // al volver, las pistas empiezan de cero
+  hintToken++;
+  hintClient?.cancel();
   const shown = route.kind === "leccion" ? lessonsScreen.showLesson(route.id, moveFocus) : lessonsScreen.showList(moveFocus);
   document.title = shown === null || route.kind !== "leccion" ? `${LESSONS_TITLE} · Escaque` : `${shown} · ${LESSONS_TITLE} · Escaque`;
 }

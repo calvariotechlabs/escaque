@@ -310,7 +310,7 @@ export function analyzeMove(game: CoachGame, move: string, options: AnalyzeOptio
   const before = toEvaluation(beforeScore, color, 0);
   const after = toEvaluation(playedScore, color, 1);
   let why = "";
-  if (!isBest) {
+  if (!isBest && loss > 0) {
     const motive = explainMove(position, bestUci, beforeSearch.pv, beforeScore);
     why = motive.kind === "posicional" ? positionalWhy(before, after) : motive.text;
   }
@@ -383,7 +383,7 @@ function scoreLine(position: Position, uci: string, limits: SearchLimits, option
 /** Sin motivo táctico: «No hay un motivo táctico: Alfil Beta la prefiere por cómo quedan las piezas (+1,7 frente a +0,9).» */
 function positionalWhy(before: Evaluation, after: Evaluation): string {
   const short = (evaluation: Evaluation): string =>
-    evaluation.mate !== null ? `mate en ${evaluation.mate.moves}` : evaluation.text.split(" ")[0]!.replace(/,$/, "");
+    evaluation.mate !== null ? `mate en ${evaluation.mate.moves} de las ${evaluation.mate.winner === "w" ? "blancas" : "negras"}` : evaluation.text.split(" ")[0]!.replace(/,$/, "");
   return `No hay un motivo táctico: Alfil Beta la prefiere por cómo quedan las piezas (${short(before)} frente a ${short(after)}).`;
 }
 

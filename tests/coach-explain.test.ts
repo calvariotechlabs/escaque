@@ -100,6 +100,13 @@ describe("informe con la alternativa", () => {
     assert.match(report.summary, /^Cxe5 gana un peón\./);
   });
 
+  it("sin porqué si la jugada vale lo mismo que la de Alfil Beta", () => {
+    const report = analyzeMove({ fen: START_FEN, moves: [] }, "g1f3", { limits: { maxDepth: 2 } });
+    assert.notEqual(report.best.uci, "g1f3");
+    assert.equal(report.before.cp, report.after.cp);
+    assert.equal(report.why, "");
+  });
+
   it("sin motivo concreto, la frase de siempre", () => {
     const report = analyzeMove({ fen: START_FEN, moves: [] }, "e2e4", LIMITS);
     assert.ok(report.verdict === "mejor" || report.verdict === "buena");

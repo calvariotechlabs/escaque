@@ -284,7 +284,7 @@ export function createCoachPanel(onMarks: (marks: readonly SquareMark[]) => void
         block.append(best);
         if (view.why !== "") {
           const why = el("p", "coach__porque");
-          why.append(el("strong", undefined, COACH_TEXT.whyPrefix), ...textWithSan(view.why, view.best));
+          why.append(el("strong", undefined, COACH_TEXT.whyPrefix), ...textWithSan(view.why, view.best?.replace(/[+#]$/, "") ?? null));
           block.append(why);
         }
         if (view.line !== "") {

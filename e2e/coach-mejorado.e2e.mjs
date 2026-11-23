@@ -181,6 +181,21 @@ describe("coach mejorado de extremo a extremo", () => {
     assert.equal(await page.eval(`document.getElementById('coach-pistas-boton').textContent`), "Pedir pista 1 de 3");
   });
 
+  test("una partida nueva empieza sin pistas aunque la posición sea la misma", async () => {
+    const newGame = async () => {
+      await page.eval(`(document.getElementById('nueva').click(), document.getElementById('empezar').click(), true)`);
+      await page.waitFor(`!document.getElementById('pantalla-ajustes').hidden`, { what: "pantalla de ajustes" });
+      await page.eval(`(() => { document.getElementById('modo-dos').click(); document.querySelector('#pantalla-ajustes [type=submit]').click(); return true; })()`);
+      await page.waitFor(`!document.getElementById('pantalla-partida').hidden`, { what: "pantalla de partida" });
+    };
+    await newGame();
+    await page.eval(`document.getElementById('coach-pistas-boton').click()`);
+    await page.waitFor(`document.querySelectorAll('#coach-pistas-lista li').length === 1`, { what: "pista en la posición inicial" });
+    await newGame();
+    assert.equal(await page.eval(`document.querySelectorAll('#coach-pistas-lista li').length`), 0);
+    assert.equal(await page.eval(`document.getElementById('coach-pistas-boton').textContent`), "Pedir pista 1 de 3");
+  });
+
   test("sin errores en la consola", () => {
     assert.deepEqual(page.errors, []);
   });
