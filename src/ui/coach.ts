@@ -6,7 +6,7 @@ import type { CoachReport, Evaluation, Finding, SquareMark, Verdict } from "../c
 import type { Game } from "./game.js";
 import { historyUci } from "./machine.js";
 import type { Mark } from "./board.js";
-import { sanToSpanish } from "./notation.js";
+import { ENGINE_NAME, sanToSpanish } from "./notation.js";
 
 /** Qué revisa el coach: la última jugada de la persona a la altura de la partida en pantalla. */
 export interface ReviewJob {
@@ -18,6 +18,8 @@ export interface ReviewJob {
   readonly move: string;
   /** «4. Cf3» o «3… Cf6». */
   readonly label: string;
+  /** Contra la máquina, tu jugada ya no es la última de la partida: la máquina ha respondido y la revisión es de la anterior. */
+  readonly previous: boolean;
 }
 
 /**
@@ -31,9 +33,15 @@ export function reviewJob(game: Game, player: Color | null): ReviewJob | null {
   for (let ply = history.length; ply >= 1; ply--) {
     if (player !== null && history[ply - 1]!.color !== player) continue;
     const moves = historyUci(game);
-    return { ply, fen: game.startFen, moves: moves.slice(0, ply - 1), move: moves[ply - 1]!, label: moveLabel(game, ply) };
+    return { ply, fen: game.startFen, moves: moves.slice(0, ply - 1), move: moves[ply - 1]!, label: moveLabel(game, ply), previous: player !== null && ply < history.length };
   }
   return null;
+}
+
+/** Nota del panel cuando la revisión es de tu jugada anterior (CAL-390). `yourTurn`: la partida sigue y te toca mover. */
+export function previousNote(yourTurn: boolean): string {
+  const base = `${ENGINE_NAME} ya ha respondido. Esta revisión es de tu jugada anterior.`;
+  return yourTurn ? `${base} Ahora te toca mover.` : base;
 }
 
 /** Clave para guardar el informe de una jugada: la misma partida y la misma jugada dan el mismo informe. */
@@ -141,6 +149,9 @@ export const COACH_TEXT = {
   legend: "Valores en peones. La marca central es la igualdad; lo claro es ventaja blanca.",
   show: "Ver en el tablero",
   hide: "Quitar del tablero",
+  previousTag: "Jugada anterior",
+  previousMove: "Tu jugada: ",
+  reviewedMove: "Jugada revisada: ",
 } as const;
 
 /** Suma a las marcas del tablero las del aviso activo, sin repetir. */

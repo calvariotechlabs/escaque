@@ -33,7 +33,7 @@ import {
   type SetupChoice,
 } from "./settings.js";
 import type { CoachReport, SquareMark } from "../coach/index.js";
-import { reportView, reviewJob, reviewKey, withCoachMarks } from "./coach.js";
+import { previousNote, reportView, reviewJob, reviewKey, withCoachMarks } from "./coach.js";
 import { createCoachPanel } from "./coach-panel.js";
 import { createReviewScreen } from "./review-screen.js";
 import { exportGame, fileTooLarge, gameFromPgn, importIntro, loadError, PGN_TEXT } from "./pgn.js";
@@ -74,6 +74,7 @@ const statusBox = byId<HTMLParagraphElement>("estado");
 const statusTurn = byId<HTMLSpanElement>("estado-turno");
 const statusText = byId<HTMLElement>("estado-texto");
 const statusExtra = byId<HTMLSpanElement>("estado-extra");
+const statusLevel = byId<HTMLSpanElement>("estado-nivel");
 const newGameButton = byId<HTMLButtonElement>("nueva");
 const rotateButton = byId<HTMLButtonElement>("girar");
 const undoButton = byId<HTMLButtonElement>("deshacer");
@@ -160,6 +161,8 @@ const coachCache = new Map<string, CoachReport>();
 let coachKey: string | null = null;
 let coachToken = 0;
 let coachMarks: readonly SquareMark[] = [];
+/** Nota de «jugada anterior» que enseña ahora el panel del coach (`null`: ninguna). */
+let coachNote: string | null = null;
 /** Posición en la que se pidieron las marcas de «Ver en el tablero»: si cambia, se quitan. */
 let coachMarksFen = "";
 const coachPanel = createCoachPanel((marks) => {
@@ -241,8 +244,19 @@ function renderCoach(): void {
   }
   const job = reviewJob(game, setup.mode === "maquina" ? setup.player : null);
   const key = job === null ? "" : reviewKey(job);
-  if (key === coachKey) return; // el panel ya enseña esta jugada: no se repinta (ni se pierden los avisos abiertos)
+  // «Jugada anterior»: la máquina ya ha respondido a la jugada que se revisa (CAL-390).
+  const note = job !== null && job.previous ? previousNote(!game.isOver && setup.mode === "maquina" && game.turn === setup.player) : null;
+  if (key === coachKey) {
+    // El panel ya enseña esta jugada: no se repinta (ni se pierden los avisos abiertos ni se repite el veredicto).
+    if (note !== coachNote) {
+      coachNote = note;
+      coachPanel.setPrevious(note);
+    }
+    return;
+  }
   coachKey = key;
+  coachNote = note;
+  coachPanel.setPrevious(note);
   const token = ++coachToken;
   coachClient?.cancel();
   if (job === null) {
@@ -326,9 +340,11 @@ function renderHeading(): void {
     const level = LEVEL_NAME[setup.level];
     headingLong.textContent = machineHeading(level, false);
     headingShort.textContent = machineHeading(level, true);
+    statusLevel.textContent = `Contra ${machineHeading(level, true)}`;
   } else {
     headingLong.textContent = "Partida a dos jugadores en este dispositivo";
     headingShort.textContent = "Dos jugadores";
+    statusLevel.textContent = "Dos jugadores";
   }
 }
 

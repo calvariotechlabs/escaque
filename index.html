@@ -74,7 +74,7 @@
 <main id="pantalla-partida" class="partida" hidden>
   <div id="avisos" class="avisos partida__avisos" role="status"></div>
   <div class="partida__estado">
-    <p id="estado" class="estado" role="status"><span id="estado-turno" class="estado__turno estado__turno--w" aria-hidden="true"></span><span><strong id="estado-texto">Cargando la partida. Si este mensaje no desaparece, ejecuta «npm run serve».</strong><span id="estado-extra"></span></span><span id="pensando" class="pensando__barra" aria-hidden="true" hidden></span></p>
+    <p id="estado" class="estado" role="status"><span id="estado-turno" class="estado__turno estado__turno--w" aria-hidden="true"></span><span><strong id="estado-texto">Cargando la partida. Si este mensaje no desaparece, ejecuta «npm run serve».</strong><span id="estado-extra"></span><span id="estado-nivel" class="estado__sub" aria-hidden="true"></span></span><span id="pensando" class="pensando__barra" aria-hidden="true" hidden></span></p>
     <section id="resultado" class="resultado" role="status" aria-labelledby="resultado-titulo" hidden>
       <h2 id="resultado-titulo" class="resultado__titulo"></h2>
       <p id="resultado-texto" class="resultado__texto"></p>
@@ -87,7 +87,9 @@
   </section>
   <div id="partida-panel" class="partida__panel">
     <section id="coach" class="coach partida__coach" aria-labelledby="coach-titulo">
-      <header class="coach__cab"><h2 class="coach__titulo" id="coach-titulo">Coach</h2><p id="coach-jugada" class="coach__jugada" hidden></p></header>
+      <header class="coach__cab"><h2 class="coach__titulo" id="coach-titulo">Coach</h2><p id="coach-etiqueta" class="coach__etiqueta" hidden><svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2.2a5.8 5.8 0 1 1-5.2 3.2M2.4 2.4v3.3h3.3M8 5v3.2l2 1.3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Jugada anterior</p></header>
+      <p id="coach-jugada" class="coach__jugada" hidden></p>
+      <p id="coach-nota" class="coach__nota" hidden></p>
       <div class="coach__col">
         <p id="coach-veredicto" class="coach__veredicto coach__veredicto--vacio" role="status"></p>
         <div id="coach-resumen" class="coach__col"></div>

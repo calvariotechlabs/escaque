@@ -26,13 +26,14 @@ export interface SquareModel {
 }
 
 /** `meta`: casilla objetivo de un ejercicio de primeros pasos (anillo discontinuo). */
-export type Mark = "selected" | "target" | "capture" | "last-move" | "check" | "meta";
+export type Mark = "selected" | "target" | "capture" | "last-move-from" | "last-move-to" | "check" | "meta";
 
 const MARK_TEXT: Readonly<Record<Mark, string>> = {
   selected: "seleccionada",
   target: "destino",
   capture: "captura posible",
-  "last-move": "última jugada",
+  "last-move-from": "origen de la última jugada",
+  "last-move-to": "destino de la última jugada",
   check: "rey en jaque",
   meta: "casilla objetivo",
 };

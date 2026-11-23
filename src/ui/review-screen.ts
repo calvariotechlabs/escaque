@@ -263,8 +263,8 @@ export function createReviewScreen(options: ReviewScreenOptions): ReviewScreen {
     }
     board.setPosition(move.fenAfter);
     const base = new Map<string, Mark[]>([
-      [move.from, ["last-move"]],
-      [move.to, ["last-move"]],
+      [move.from, ["last-move-from"]],
+      [move.to, ["last-move-to"]],
     ]);
     board.setMarks(withCoachMarks(base, coachMarks));
   }

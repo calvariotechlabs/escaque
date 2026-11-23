@@ -5,7 +5,7 @@ import type { Color, PromotionPiece } from "../core/index.js";
 import type { Game, MoveRecord } from "./game.js";
 
 /** Marcas que el tablero sabe pintar en una casilla. */
-export type Mark = "selected" | "target" | "capture" | "last-move" | "check";
+export type Mark = "selected" | "target" | "capture" | "last-move-from" | "last-move-to" | "check";
 
 /** Resultado de una acción, para que la capa DOM sepa qué actualizar o anunciar. */
 export type Outcome =
@@ -182,8 +182,8 @@ export class Interaction {
     };
     const last = this.game.lastMove;
     if (last !== null) {
-      add(last.from, "last-move");
-      add(last.to, "last-move");
+      add(last.from, "last-move-from");
+      add(last.to, "last-move-to");
     }
     const check = this.game.checkSquare;
     if (check !== null) add(check, "check");

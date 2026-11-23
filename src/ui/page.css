@@ -72,6 +72,12 @@ body{margin:0;background:var(--surface);color:var(--ink);font:400 16px/24px var(
   /* En apaisado va el subtítulo corto aunque el ancho pase de 860 px (un móvil grande). */
   .solo-escritorio{display:none}
   .solo-movil{display:inline}
+  /* El subtítulo se pisaba con el estado: la cabecera queda en una sola fila y el nivel va en el estado (CAL-390).
+     El subtítulo sigue en el árbol de accesibilidad, solo sin verse. */
+  .pagina__cabecera{flex-wrap:nowrap}
+  #cabecera-sub{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
+  .estado__sub{display:block}
+  .partida__estado .estado{padding:var(--space-2) var(--space-3)}
   .partida{box-sizing:border-box;height:100dvh;padding:max(var(--space-4),env(safe-area-inset-top,0px)) max(var(--space-6),env(safe-area-inset-right,0px)) max(var(--space-4),env(safe-area-inset-bottom,0px)) max(var(--space-6),env(safe-area-inset-left,0px));grid-template-columns:var(--tablero-ancho) minmax(0,1fr);grid-template-rows:44px auto auto minmax(0,1fr);grid-template-areas:"tablero titulo" "tablero avisos" "tablero estado" "tablero panel";gap:var(--space-2) var(--space-6)}
   .partida:has(.avisos:empty){grid-template-rows:44px auto minmax(0,1fr);grid-template-areas:"tablero titulo" "tablero estado" "tablero panel"}
   .pagina__cabecera ~ .partida::before{content:"";grid-area:titulo}
