@@ -581,6 +581,14 @@
    "h": 630,
    "title": "Imagen de vista previa (og:image)",
    "page": "escritorio"
+  },
+  "OgImageCentrada.dc.html": {
+   "x": 1880,
+   "y": 27240,
+   "w": 1200,
+   "h": 630,
+   "title": "Imagen de vista previa · variante centrada (propuesta)",
+   "page": "escritorio"
   }
  },
  "order": [
@@ -652,7 +660,8 @@
   "CoachMejoradoTablet.dc.html",
   "CoachMejoradoMovil.dc.html",
   "CoachMejoradoMovilHorizontal.dc.html",
-  "OgImage.dc.html"
+  "OgImage.dc.html",
+  "OgImageCentrada.dc.html"
  ],
  "notes": {
   "t_escritorio_0": {
@@ -1450,6 +1459,14 @@
    "fill": "gray",
    "page": "escritorio",
    "text": "Imagen de 1200x630 que muestran WhatsApp, Telegram, Slack, X, LinkedIn y Teams al compartir https://escaque.calvariotechlabs.com. Fondo del tema oscuro, icono y nombre, lema «Aprende ajedrez contra un motor hecho desde cero.», píldora «Sin cuentas · funciona sin conexión» y un tablero de 6x6 con una posición de ejemplo y la última jugada marcada. Aprobada el 23-nov (CAL-393). Texto alternativo: «Escaque: logo y un tablero de ajedrez con una posición de ejemplo»."
+  },
+  "og_n2": {
+   "x": 3160,
+   "y": 27240,
+   "w": 520,
+   "fill": "gray",
+   "page": "escritorio",
+   "text": "Variante centrada, propuesta. Teams recorta la miniatura a un cuadrado central de 630x630 y cortaba el nombre y el lema de la primera versión. Aquí el icono, el nombre, el lema y la píldora caben en esa franja central (marcada por dos líneas finas); los lados llevan un tablero tenue con cuatro piezas, que se pueden perder al recortar. Pendiente del OK de Sergio (CAL-393)."
   }
  },
  "designSystems": [
