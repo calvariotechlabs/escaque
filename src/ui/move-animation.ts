@@ -107,3 +107,40 @@ function isOneMove(plan: MovePlan): boolean {
   }
   return false;
 }
+
+/** Recorrido de una pieza, igual para una casilla que para una diagonal entera. */
+export const MOVE_MS = 200;
+/** Fundidos: la capturada al final del recorrido, la coronación y el movimiento reducido. */
+export const FADE_MS = 120;
+/** Sale rápido y frena al llegar, sin rebote. */
+export const MOVE_EASING = "cubic-bezier(0.16, 1, 0.3, 1)";
+
+/** La pieza empieza desplazada hasta su casilla de origen (`dx`, `dy` en píxeles) y acaba en su sitio. */
+export function slideFrames(dx: number, dy: number): Keyframe[] {
+  return [{ transform: `translate(${dx}px, ${dy}px)` }, { transform: "translate(0px, 0px)" }];
+}
+
+/** La capturada sigue entera hasta los últimos `FADE_MS` del recorrido y entonces se desvanece encogiendo. */
+export function captureFrames(): Keyframe[] {
+  return [
+    { opacity: 1, transform: "scale(1)", offset: 0 },
+    { opacity: 1, transform: "scale(1)", offset: (MOVE_MS - FADE_MS) / MOVE_MS },
+    { opacity: 0, transform: "scale(0.8)", offset: 1 },
+  ];
+}
+
+/** Lo que aparece: la capturada al deshacer, o la pieza en su destino con movimiento reducido. */
+export function revealFrames(): Keyframe[] {
+  return [{ opacity: 0 }, { opacity: 1 }];
+}
+
+/** Coronación: el peón llega en `MOVE_MS` y se cruza con la pieza nueva en `FADE_MS`. */
+export function promotionFrames(): { pawn: Keyframe[]; piece: Keyframe[]; duration: number } {
+  const duration = MOVE_MS + FADE_MS;
+  const arrive = MOVE_MS / duration;
+  return {
+    pawn: [{ opacity: 1, offset: 0 }, { opacity: 1, offset: arrive }, { opacity: 0, offset: 1 }],
+    piece: [{ opacity: 0, offset: 0 }, { opacity: 0, offset: arrive }, { opacity: 1, offset: 1 }],
+    duration,
+  };
+}

@@ -130,3 +130,12 @@ body{margin:0;background:var(--surface);color:var(--ink);font:400 16px/24px var(
 
 /* `hidden` debe ganar al display:grid de la lista del diseño. */
 .jugadas__lista[hidden]{display:none}
+
+/* Piezas que se mueven (lienzo «Piezas que se mueven», CAL-391): la casilla de la pieza que viaja queda por
+   encima de las demás y la pieza no recoge clics mientras pasa por encima de otras casillas. */
+.casilla--anima{z-index:4}
+.casilla--anima > .pieza{pointer-events:none}
+/* Copias que solo existen durante la animación: la capturada, debajo de la que llega, y el peón que corona. */
+.casilla > .pieza.pieza--copia{position:absolute;inset:0;pointer-events:none}
+.casilla > .pieza.pieza--capturada{z-index:0}
+.casilla > .pieza.pieza--corona{z-index:2}

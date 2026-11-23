@@ -157,6 +157,8 @@ export function createLessonsScreen(deps: LessonsDeps): LessonsScreen {
 
   let view: BoardView | null = null;
   let session: LessonSession | null = null;
+  /** Partida de la lección que hay pintada (ver `render`). */
+  let drawnGame: unknown = null;
   let ui: Interaction | null = null;
 
   function persist(next: LessonProgress): void {
@@ -283,7 +285,11 @@ export function createLessonsScreen(deps: LessonsDeps): LessonsScreen {
     if (view === null || session === null || ui === null) return;
     const game = session.game;
     view.setOrientation(ui.orientation);
-    view.setPosition(game.fen);
+    // Al abrir o repetir una lección el tablero cambia de golpe; dentro de ella, cada jugada se anima.
+    const board = view;
+    if (game === drawnGame) board.setPosition(game.fen);
+    else board.withoutAnimation(() => board.setPosition(game.fen));
+    drawnGame = game;
     view.setMarks(marks());
     syncTabIndex();
     turnDot.className = `estado__turno estado__turno--${game.turn}`;

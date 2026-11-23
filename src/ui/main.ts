@@ -200,9 +200,14 @@ function newInteraction(forGame: Game, forSetup: GameSetup): Interaction {
 
 // --- Pintar ------------------------------------------------------------------
 
+/** Partida que hay pintada: con una partida nueva (o recuperada) el tablero cambia de golpe, sin animar. */
+let drawnGame: Game | null = null;
+
 function render(): void {
   view.setOrientation(ui.orientation);
-  view.setPosition(game.fen);
+  if (game === drawnGame) view.setPosition(game.fen);
+  else view.withoutAnimation(() => view.setPosition(game.fen));
+  drawnGame = game;
   renderCoach();
   applyMarks();
   syncTabIndex();

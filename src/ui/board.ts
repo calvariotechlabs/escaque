@@ -2,6 +2,8 @@
 // No gestiona jugadas ni eventos: la interacción se monta encima de `BoardView`.
 import { FenError } from "../core/index.js";
 import type { Color, PieceType } from "../core/index.js";
+import { FADE_MS, MOVE_EASING, MOVE_MS, captureFrames, planMoveAnimation, promotionFrames, revealFrames, slideFrames } from "./move-animation.js";
+import type { MovePlan } from "./move-animation.js";
 import { installPieceDefs, pieceMarkup, pieceName } from "./pieces.js";
 
 export interface PlacedPiece {
@@ -43,8 +45,17 @@ export interface BoardOptions {
 export interface BoardView {
   /** Raíz del tablero (contiene la rejilla y las coordenadas). */
   readonly element: HTMLElement;
-  /** Pinta la colocación de la FEN (solo el primer campo). Lanza `FenError` si está mal formada. */
+  /**
+   * Pinta la colocación de la FEN (solo el primer campo). Lanza `FenError` si está mal formada.
+   * Si el cambio es una sola jugada (o deshacerla), se anima (lienzo «Piezas que se mueven»); si no, cambia de golpe.
+   */
   setPosition(fen: string): void;
+  /**
+   * Ejecuta `run` sin animar los `setPosition` que haga: la pieza se ha soltado arrastrando y ya está donde va.
+   */
+  withoutAnimation(run: () => void): void;
+  /** Termina de golpe la animación en curso (por ejemplo, al empezar a arrastrar una pieza que aún se desliza). */
+  settle(): void;
   setOrientation(color: Color): void;
   /**
    * Casilla por nombre algebraico («e4»). Lanza si el nombre no es válido.
@@ -160,6 +171,8 @@ export function createBoard(container: HTMLElement, options: BoardOptions = {}):
   let marks: ReadonlyMap<string, readonly Mark[]> = new Map();
   let cells = new Map<string, HTMLElement>();
   let baseLabels = new Map<string, string>();
+  let skipNext = false; // dentro de `withoutAnimation`
+  let running: Animation[] = [];
 
   const element = doc.createElement("div");
   element.className = "tablero";
@@ -193,16 +206,107 @@ export function createBoard(container: HTMLElement, options: BoardOptions = {}):
   };
   draw();
 
+  /** Termina de golpe lo que se esté animando y quita las copias de las capturadas. */
+  const settle = (): void => {
+    for (const animation of running) animation.finish();
+    running = [];
+  };
+
+  const track = (animation: Animation, done?: () => void): void => {
+    running.push(animation);
+    animation.addEventListener("finish", () => {
+      running = running.filter((a) => a !== animation);
+      done?.();
+    });
+  };
+
+  /** Pieza (SVG) de una casilla ya dibujada. */
+  const pieceIn = (square: string): SVGElement | null => cells.get(square)?.querySelector<SVGElement>(".pieza:not(.pieza--copia)") ?? null;
+
+  /** Copia de una pieza que ya no está en la posición nueva, encima de su casilla mientras se anima. */
+  const addCopy = (square: string, color: Color, type: PieceType, cls: string): SVGElement | null => {
+    const cell = cells.get(square);
+    if (!cell) return null;
+    cell.insertAdjacentHTML("afterbegin", pieceMarkup(color, type));
+    const copy = cell.firstElementChild as SVGElement;
+    copy.classList.add("pieza--copia", cls);
+    return copy;
+  };
+
+  /** Una casilla con una pieza que viaja queda por encima del resto mientras dura el recorrido. */
+  const lift = (square: string, animation: Animation): void => {
+    const cell = cells.get(square);
+    if (!cell) return;
+    cell.classList.add("casilla--anima");
+    track(animation, () => cell.classList.remove("casilla--anima"));
+  };
+
+  const animate = (plan: MovePlan): void => {
+    const reduced = doc.defaultView?.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
+    if (reduced) {
+      // Sin desplazamiento: la pieza aparece en su destino (y la capturada al deshacer) con un fundido.
+      const shown = [...plan.slides.map((s) => s.to), ...plan.appears.map((a) => a.square)];
+      for (const square of shown) {
+        const piece = pieceIn(square);
+        if (piece) track(piece.animate(revealFrames(), { duration: FADE_MS, easing: "ease-out" }));
+      }
+      return;
+    }
+    for (const slide of plan.slides) {
+      const from = cells.get(slide.from)?.getBoundingClientRect();
+      const to = cells.get(slide.to)?.getBoundingClientRect();
+      if (!from || !to) continue;
+      const frames = slideFrames(from.left - to.left, from.top - to.top);
+      if (plan.promotion !== null && plan.promotion.square === slide.to) {
+        // Coronación: viaja una copia del peón y, al llegar, se cruza con la pieza elegida.
+        const pawn = addCopy(slide.to, slide.piece.color, "p", "pieza--corona");
+        const piece = pieceIn(slide.to);
+        const { pawn: pawnFade, piece: pieceFade, duration } = promotionFrames();
+        if (pawn) {
+          lift(slide.to, pawn.animate(frames, { duration: MOVE_MS, easing: MOVE_EASING }));
+          track(pawn.animate(pawnFade, { duration }), () => pawn.remove());
+        }
+        if (piece) track(piece.animate(pieceFade, { duration }));
+        continue;
+      }
+      const piece = pieceIn(slide.to);
+      if (piece) lift(slide.to, piece.animate(frames, { duration: MOVE_MS, easing: MOVE_EASING }));
+    }
+    // La capturada se queda debajo y se desvanece en los últimos 120 ms del recorrido.
+    for (const gone of plan.fades) {
+      const copy = addCopy(gone.square, gone.piece.color, gone.piece.type, "pieza--capturada");
+      if (copy) track(copy.animate(captureFrames(), { duration: MOVE_MS, fill: "forwards" }), () => copy.remove());
+    }
+    // Al deshacer una captura, la capturada reaparece mientras la otra pieza se va.
+    for (const back of plan.appears) {
+      const piece = pieceIn(back.square);
+      if (piece) track(piece.animate(revealFrames(), { duration: MOVE_MS }));
+    }
+  };
+
   return {
     element,
     setPosition(next: string): void {
       parsePlacement(next); // falla antes de tocar el DOM
       if (next === fen) return;
+      settle();
+      const plan = skipNext ? null : planMoveAnimation(fen, next);
       fen = next;
       draw();
+      if (plan !== null && typeof element.animate === "function") animate(plan);
     },
+    withoutAnimation(run: () => void): void {
+      skipNext = true;
+      try {
+        run();
+      } finally {
+        skipNext = false;
+      }
+    },
+    settle,
     setOrientation(color: Color): void {
       if (color === orientation) return;
+      settle();
       orientation = color;
       draw();
     },

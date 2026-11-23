@@ -153,6 +153,8 @@ export function createReviewScreen(options: ReviewScreenOptions): ReviewScreen {
   let client: ReturnType<typeof createCoachClient> | null = null;
   let gameKey = "";
   let game: Game | null = null;
+  /** Partida que hay pintada en el tablero del repaso (ver `drawBoard`). */
+  let drawnGame: Game | null = null;
   let source: ReviewSource = { kind: "partida" };
   let moves: ReviewMove[] = [];
   let reports = new Map<number, CoachReport>();
@@ -243,6 +245,15 @@ export function createReviewScreen(options: ReviewScreenOptions): ReviewScreen {
   // --- Pintar ----------------------------------------------------------------
 
   function drawBoard(): void {
+    // Con otra partida (al terminar una o cargar un PGN) el tablero cambia de golpe; dentro de la misma,
+    // un paso adelante o atrás se anima y los saltos de varias jugadas no (lo decide el tablero).
+    if (game !== drawnGame) {
+      drawnGame = game;
+      board.withoutAnimation(drawBoardNow);
+    } else drawBoardNow();
+  }
+
+  function drawBoardNow(): void {
     const move = moveAt(selected);
     board.setOrientation(orientation);
     if (move === undefined || game === null) {

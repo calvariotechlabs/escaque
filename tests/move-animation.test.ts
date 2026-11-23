@@ -98,3 +98,36 @@ describe("planMoveAnimation", () => {
     assert.equal(plan?.slides.length, 1);
   });
 });
+
+import { FADE_MS, MOVE_EASING, MOVE_MS, captureFrames, promotionFrames, revealFrames, slideFrames } from "../src/ui/move-animation.js";
+
+describe("tiempos y fotogramas del lienzo", () => {
+  test("200 ms de recorrido con la curva que frena al llegar; fundidos de 120 ms", () => {
+    assert.equal(MOVE_MS, 200);
+    assert.equal(FADE_MS, 120);
+    assert.equal(MOVE_EASING, "cubic-bezier(0.16, 1, 0.3, 1)");
+  });
+
+  test("la pieza sale desplazada hasta su casilla de origen y termina en su sitio", () => {
+    assert.deepEqual(slideFrames(-40, 80), [{ transform: "translate(-40px, 80px)" }, { transform: "translate(0px, 0px)" }]);
+  });
+
+  test("la capturada sigue entera hasta que faltan 120 ms y luego se desvanece encogiendo", () => {
+    const frames = captureFrames();
+    assert.deepEqual(frames[0], { opacity: 1, transform: "scale(1)", offset: 0 });
+    assert.deepEqual(frames[1], { opacity: 1, transform: "scale(1)", offset: (MOVE_MS - FADE_MS) / MOVE_MS });
+    assert.deepEqual(frames[2], { opacity: 0, transform: "scale(0.8)", offset: 1 });
+  });
+
+  test("lo que aparece (deshacer una captura, movimiento reducido) va de transparente a visible", () => {
+    assert.deepEqual(revealFrames(), [{ opacity: 0 }, { opacity: 1 }]);
+  });
+
+  test("coronación: el peón se desvanece y la pieza nueva aparece después del recorrido", () => {
+    const { pawn, piece, duration } = promotionFrames();
+    assert.equal(duration, MOVE_MS + FADE_MS);
+    const arrive = MOVE_MS / (MOVE_MS + FADE_MS);
+    assert.deepEqual(pawn, [{ opacity: 1, offset: 0 }, { opacity: 1, offset: arrive }, { opacity: 0, offset: 1 }]);
+    assert.deepEqual(piece, [{ opacity: 0, offset: 0 }, { opacity: 0, offset: arrive }, { opacity: 1, offset: 1 }]);
+  });
+});
