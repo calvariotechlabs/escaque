@@ -55,7 +55,11 @@ async function startTwoPlayers(page) {
   await page.waitFor(`!document.getElementById('pantalla-partida').hidden`, { what: "pantalla de partida" });
 }
 
-const darkSquare = (page) => page.eval(`getComputedStyle(document.querySelector('#tablero .casilla--oscura')).backgroundColor`);
+// Tras recargar, el tablero se pinta un instante después de que el tema ya esté puesto: se espera a que haya casillas.
+const darkSquare = async (page) => {
+  await page.waitFor(`document.querySelector('#tablero .casilla--oscura')`, { what: "casillas del tablero" });
+  return page.eval(`getComputedStyle(document.querySelector('#tablero .casilla--oscura')).backgroundColor`);
+};
 
 describe("tablero a elegir de extremo a extremo (CAL-397)", () => {
   let page;
