@@ -55,7 +55,11 @@ async function startTwoPlayers(page) {
   await page.waitFor(`!document.getElementById('pantalla-partida').hidden`, { what: "pantalla de partida" });
 }
 
-const darkSquare = (page) => page.eval(`getComputedStyle(document.querySelector('#tablero .casilla--oscura')).backgroundColor`);
+// Tras recargar, el tablero se pinta un instante después de que el tema ya esté puesto: se espera a que haya casillas.
+const darkSquare = async (page) => {
+  await page.waitFor(`document.querySelector('#tablero .casilla--oscura')`, { what: "casillas del tablero" });
+  return page.eval(`getComputedStyle(document.querySelector('#tablero .casilla--oscura')).backgroundColor`);
+};
 
 describe("tablero a elegir de extremo a extremo (CAL-397)", () => {
   let page;
@@ -74,7 +78,7 @@ describe("tablero a elegir de extremo a extremo (CAL-397)", () => {
     await page.eval(`document.getElementById('tablero-nogal').click()`);
     assert.equal(await darkSquare(page), "rgb(162, 105, 61)");
     assert.equal(await page.eval(`document.documentElement.dataset.tablero`), "nogal");
-    await page.eval(`setTimeout(() => location.reload(), 0)`);
+    await page.reload();
     await page.waitFor(`document.documentElement.dataset.tablero === 'nogal' && document.getElementById('tablero-nogal').checked`, { what: "Nogal recordado" });
     assert.equal(await darkSquare(page), "rgb(162, 105, 61)");
   });
@@ -86,7 +90,7 @@ describe("tablero a elegir de extremo a extremo (CAL-397)", () => {
 
   test("un valor guardado que no es válido vuelve a Bosque", async () => {
     await page.eval(`localStorage.setItem('escaque:tablero', 'x<y')`);
-    await page.eval(`setTimeout(() => location.reload(), 0)`);
+    await page.reload();
     await page.waitFor(`document.getElementById('tablero-bosque')?.checked === true`, { what: "Bosque por defecto" });
     assert.equal(await page.eval(`document.documentElement.hasAttribute('data-tablero')`), false);
   });
