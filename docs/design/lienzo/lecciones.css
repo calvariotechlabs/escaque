@@ -106,3 +106,13 @@
   .como,.ayuda,.contador,.novato{border-color:CanvasText}
   .contador__punto--hecho{background:CanvasText}
 }
+
+/* Enlace al repositorio (CAL-385): discreto, en la cabecera tras «Lecciones». Texto atenuado; hover y foco suben a tinta. */
+.enlace-gh{display:inline-flex;align-items:center;gap:var(--space-2);min-height:44px;padding:0 var(--space-3);box-sizing:border-box;border-radius:var(--radius-sm);color:var(--ink-muted);font:600 14px/20px var(--font-sans);text-decoration:none}
+.enlace-gh svg{width:20px;height:20px;flex:none}
+.enlace-gh:hover,.enlace-gh--hover{color:var(--ink);text-decoration:underline;text-underline-offset:4px}
+.enlace-gh:focus-visible,.enlace-gh--foco{color:var(--ink);outline:3px solid var(--accent);outline-offset:2px}
+.enlace-gh--icono{justify-content:center;padding:0;width:44px}
+@media (forced-colors: active){
+  .enlace-gh{color:LinkText}
+}

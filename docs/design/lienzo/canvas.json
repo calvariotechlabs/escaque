@@ -413,6 +413,14 @@
    "h": 1010,
    "title": "Móvil · cargar una partida en PGN",
    "page": "movil"
+  },
+  "EnlaceGithub.dc.html": {
+   "x": 0,
+   "y": 15740,
+   "w": 1280,
+   "h": 700,
+   "title": "Escritorio · Enlace a GitHub en la cabecera: estados y móvil",
+   "page": "escritorio"
   }
  },
  "order": [
@@ -463,7 +471,8 @@
   "PgnEscritorio.dc.html",
   "PgnEstados.dc.html",
   "PgnTablet.dc.html",
-  "PgnMovil.dc.html"
+  "PgnMovil.dc.html",
+  "EnlaceGithub.dc.html"
  ],
  "notes": {
   "t_escritorio_0": {
@@ -1041,6 +1050,14 @@
    "fill": "gray",
    "page": "movil",
    "text": "Móvil: los dos botones van después de «Girar tablero», en la misma rejilla de dos columnas (44 px de alto). El diálogo ocupa el ancho de la pantalla menos 16 px por lado. Sin texto ni archivo, «Cargar y repasar» muestra el error «El texto no contiene ninguna partida en PGN.». En móvil apaisado, «Exportar PGN» y «Cargar PGN» van al final de la región con scroll, después de las jugadas, para no añadir otra fila fija."
+  },
+  "n_gh": {
+   "x": 1360,
+   "y": 15740,
+   "w": 520,
+   "text": "Enlace al repositorio (CAL-385, pendiente de aprobar). Va al final de la navegación de la cabecera, así aparece en todas las pantallas. En escritorio y tablet: marca de GitHub y «GitHub»; en móvil, solo el icono con el mismo nombre para el lector de pantalla. Cambiado en las cinco pantallas de partida (escritorio, tablet vertical y horizontal, móvil y móvil horizontal); el resto de pantallas lo tendrá al implementarlo, porque la cabecera es la misma.",
+   "fill": "gray",
+   "page": "escritorio"
   }
  },
  "designSystems": [
