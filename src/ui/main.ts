@@ -13,7 +13,6 @@ import {
   ENGINE_NAME,
   machineHeading,
   machineMoveAnnouncement,
-  machineStatusMessage,
   moveAnnouncement,
   newGameWarning,
   resultMessage,
@@ -22,6 +21,8 @@ import {
 } from "./notation.js";
 import { applyBoardTheme, isBoardTheme, loadBoardTheme, saveBoardTheme } from "./board-theme.js";
 import { createPromotionDialog } from "./promotion.js";
+import { celebrate, prefersReducedMotion, sealKindFor, setSeal } from "./brand.js";
+import { finishedParts, machineStatusParts, resultView, shouldCelebrate, type ResultKind } from "./identity.js";
 import { browserStore, createAutosave, loadFromStorage } from "./save.js";
 import {
   choiceOf,
@@ -86,12 +87,17 @@ const headingShort = byId<HTMLSpanElement>("cabecera-corto");
 const thinkingBar = byId<HTMLSpanElement>("pensando");
 const resultBox = byId<HTMLElement>("resultado");
 const resultTitle = byId<HTMLElement>("resultado-titulo");
+const resultKicker = byId<HTMLElement>("resultado-antetitulo");
+const resultSeal = byId<HTMLElement>("resultado-sello");
 const resultText = byId<HTMLElement>("resultado-texto");
 const rematchButton = byId<HTMLButtonElement>("revancha");
 const statusBox = byId<HTMLParagraphElement>("estado");
 const statusTurn = byId<HTMLSpanElement>("estado-turno");
 const statusText = byId<HTMLElement>("estado-texto");
 const statusExtra = byId<HTMLSpanElement>("estado-extra");
+const statusCause = byId<HTMLSpanElement>("estado-causa");
+const statusCheck = byId<HTMLSpanElement>("estado-jaque");
+const statusYourTurn = byId<HTMLSpanElement>("estado-toca");
 const statusLevel = byId<HTMLSpanElement>("estado-nivel");
 const newGameButton = byId<HTMLButtonElement>("nueva");
 const rotateButton = byId<HTMLButtonElement>("girar");
@@ -102,7 +108,7 @@ const confirmText = byId<HTMLParagraphElement>("texto-confirmar");
 const keepPlayingButton = byId<HTMLButtonElement>("seguir-jugando");
 const startButton = byId<HTMLButtonElement>("empezar");
 const moveList = byId<HTMLOListElement>("lista-jugadas");
-const noMoves = byId<HTMLParagraphElement>("sin-jugadas");
+const noMoves = byId<HTMLElement>("sin-jugadas");
 const announcer = byId<HTMLParagraphElement>("anuncio");
 const promotionDialog = byId<HTMLDialogElement>("coronacion");
 const exportPgnButton = byId<HTMLButtonElement>("exportar-pgn");
@@ -504,30 +510,51 @@ function syncTabIndex(): void {
   }
 }
 
+/** Resultado a la vista en el último pintado: `undefined` hasta el primero (así no se celebra al abrir una partida terminada). */
+let shownResult: ResultKind | null | undefined;
+/** Partida cuya victoria ya se celebró (o que se abrió ya ganada): no se celebra dos veces. */
+let celebratedGame: Game | null = null;
+
 function renderStatus(): void {
-  statusTurn.className = `estado__turno estado__turno--${game.turn}`;
-  const result = setup.mode === "maquina" ? resultMessage(game.status, setup.player) : null;
-  if (setup.mode === "maquina") {
-    statusText.textContent = machineStatusMessage(game.status, game.turn, game.inCheck, game.turn === setup.player, thinkingVisible);
-    // Con la máquina, los anuncios los da la región `#anuncio`: así no se leen dos veces.
-    statusBox.setAttribute("aria-live", "off");
-  } else {
-    statusText.textContent = statusMessage(game.status, game.turn, game.inCheck);
-    statusBox.removeAttribute("aria-live");
-  }
+  // Al terminar, el escaque es el de quien gana (o partido en dos, en tablas), no el del turno.
+  const status = game.status;
+  const swatch = status.kind === "ongoing" ? game.turn : status.kind === "checkmate" ? status.winner : "azar";
+  statusTurn.className = `estado__turno estado__turno--${swatch}`;
+  const result = setup.mode === "maquina" ? resultView(game.status, setup.player) : null;
+  // Dos jugadores: en el mismo dispositivo siempre «te toca», así que no hay etiqueta.
+  const humanTurn = setup.mode === "dos" || game.turn === setup.player;
+  const parts = machineStatusParts(game.status, game.turn, game.inCheck, humanTurn, thinkingVisible);
+  const finished = setup.mode === "maquina" ? null : finishedParts(game.status);
+  statusText.textContent = finished?.title ?? parts.text;
+  statusCause.textContent = finished === null ? "" : ` ${finished.text}`;
+  statusYourTurn.hidden = !(setup.mode === "maquina" && parts.yourTurn);
+  statusCheck.hidden = !parts.check;
+  // La etiqueta «Jaque» se lee solo cuando el texto no lo dice ya («sal del jaque»).
+  statusCheck.setAttribute("aria-hidden", String(parts.yourTurn));
+  // Con la máquina, los anuncios los da la región `#anuncio`: así no se leen dos veces.
+  if (setup.mode === "maquina") statusBox.setAttribute("aria-live", "off");
+  else statusBox.removeAttribute("aria-live");
   if (ui.pendingPromotion !== null) statusExtra.textContent = " Elige la pieza para coronar.";
   else if (machineFailed) statusExtra.textContent = ` ${ENGINE_NAME} no ha podido elegir jugada. Prueba con «Deshacer jugada» o empieza otra partida.`;
   else statusExtra.textContent = "";
   statusBox.classList.toggle("estado--fin", game.isOver);
+  statusBox.classList.toggle("estado--jaque", parts.check);
   statusBox.classList.toggle("estado--pensando", thinkingVisible);
   thinkingBar.hidden = !thinkingVisible;
   // Al terminar contra la máquina, el resultado ocupa el lugar del estado.
   statusBox.hidden = result !== null;
   resultBox.hidden = result === null;
+  const kind = result?.kind ?? null;
   if (result !== null) {
     resultTitle.textContent = result.title;
     resultText.textContent = result.text;
+    resultKicker.textContent = result.kicker;
+    resultBox.dataset["resultado"] = result.kind;
+    if (kind !== shownResult) setSeal(resultSeal, sealKindFor(result.kind));
   }
+  if (shouldCelebrate(shownResult, kind, celebratedGame === game)) celebrate(resultSeal, prefersReducedMotion());
+  if (kind === "gana") celebratedGame = game;
+  shownResult = kind;
   newGameButton.classList.toggle("boton--principal", result === null);
   renderHeading();
 }

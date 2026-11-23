@@ -2,6 +2,7 @@
 // Los datos y la validación son de `src/lessons`; aquí solo se pinta, se lleva el progreso
 // (guardado en el dispositivo) y se conecta el tablero. Todo el texto se escribe con
 // textContent o atributos, nunca como HTML.
+import { celebrate, prefersReducedMotion, sealSvg } from "./brand.js";
 import type { Lesson, LessonGroup } from "../lessons/types.js";
 import { attachBoardInput } from "./board-input.js";
 import { createBoard, type BoardView, type Mark } from "./board.js";
@@ -294,6 +295,7 @@ export function createLessonsScreen(deps: LessonsDeps): LessonsScreen {
     syncTabIndex();
     turnDot.className = `estado__turno estado__turno--${game.turn}`;
     turnText.textContent = statusMessage(game.status, game.turn, game.inCheck);
+    turnDot.parentElement?.classList.toggle("estado--jaque", game.inCheck && game.status.kind === "ongoing");
     renderHintControls();
     renderHelp();
     renderCounter();
@@ -385,6 +387,20 @@ export function createLessonsScreen(deps: LessonsDeps): LessonsScreen {
     return { box, add: (node) => box.append(node) };
   }
 
+  /** Lección (o bloque) superada: el sello del logro con su antetítulo, y la celebración discreta. */
+  function solvedBox(kicker: string, heading: string): { box: HTMLElement; add(node: HTMLElement): void; seal: HTMLElement } {
+    const box = el("section", "retro retro--logro");
+    const head = el("div", "retro__cab");
+    const seal = el("span", "sello sello--leccion");
+    seal.setAttribute("aria-hidden", "true");
+    seal.append(sealSvg("logro"));
+    const titles = el("span", "retro__titulos");
+    titles.append(el("span", "retro__antetitulo", kicker), el("h3", "retro__titulo", heading));
+    head.append(seal, titles);
+    box.append(head);
+    return { box, add: (node) => box.append(node), seal };
+  }
+
   /** La siguiente lección sin completar de su mismo grupo, dando la vuelta; `null` si el grupo está completo. */
   function nextLesson(current: Lesson): Lesson | null {
     const members = groupOf(current.group);
@@ -420,9 +436,11 @@ export function createLessonsScreen(deps: LessonsDeps): LessonsScreen {
     const groupDone = completedCount(progress, members.map((l) => l.id)) === members.length;
     const usedSentence = lesson.helpPiece === undefined ? text.hintsUsed(hints) : text.helpUsedSentence(hints, helped);
     let focusTarget: HTMLElement;
+    let celebration: HTMLElement;
     if (groupDone && lesson.group === "primeros-pasos") {
       // Final del bloque de iniciación: de aquí se pasa a las tácticas o a jugar.
-      const { box, add } = retroBox("marca", false, text.BLOCK_DONE_TITLE);
+      const { box, add, seal } = solvedBox(text.BLOCK_DONE_KICKER, text.BLOCK_DONE_TITLE);
+      celebration = seal;
       add(el("p", "retro__texto", text.BLOCK_DONE_TEXT));
       add(el("p", "retro__meta", text.blockDoneMeta(members.length)));
       const actions = el("div", "retro__acciones");
@@ -436,7 +454,8 @@ export function createLessonsScreen(deps: LessonsDeps): LessonsScreen {
       feedback.replaceChildren(box);
       focusTarget = primary;
     } else if (groupDone) {
-      const { box, add } = retroBox("marca", false, text.ALL_DONE_TITLE(members.length));
+      const { box, add, seal } = solvedBox(text.BLOCK_DONE_KICKER, text.ALL_DONE_TITLE(members.length));
+      celebration = seal;
       add(el("p", "retro__texto", `${text.CORRECT} ${lesson.success}`));
       add(el("p", "retro__texto", text.ALL_DONE_TEXT));
       add(el("p", "retro__meta", usedSentence));
@@ -447,7 +466,8 @@ export function createLessonsScreen(deps: LessonsDeps): LessonsScreen {
       feedback.replaceChildren(box);
       focusTarget = play;
     } else {
-      const { box, add } = retroBox("marca", false, text.CORRECT);
+      const { box, add, seal } = solvedBox(text.LESSON_DONE_KICKER, text.CORRECT);
+      celebration = seal;
       add(el("p", "retro__texto", lesson.success));
       add(el("p", "retro__meta", usedSentence));
       const actions = el("div", "retro__acciones");
@@ -459,6 +479,7 @@ export function createLessonsScreen(deps: LessonsDeps): LessonsScreen {
       focusTarget = nextAction;
     }
     render();
+    celebrate(celebration, prefersReducedMotion());
     focusTarget.focus();
   }
 

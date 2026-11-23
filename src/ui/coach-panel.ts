@@ -3,6 +3,7 @@
 // entra con textContent; solo los iconos son marcado fijo. El panel nunca toma
 // el foco, y solo el veredicto (`role="status"`) se anuncia: al cambiar de
 // estado se reescribe el contenido de esa misma región, que no se destruye.
+import { emptyState } from "./brand.js";
 import type { SquareMark } from "../coach/index.js";
 import { COACH_TEXT, type EvaluationView, type FindingView, type HintsView, type ReportView } from "./coach.js";
 
@@ -218,7 +219,7 @@ export function createCoachPanel(onMarks: (marks: readonly SquareMark[]) => void
       root.removeAttribute("aria-busy");
       setMove("");
       clearVerdict();
-      summary.replaceChildren(el("p", "coach__vacio", COACH_TEXT.empty));
+      summary.replaceChildren(emptyState(COACH_TEXT.emptyTitle, COACH_TEXT.emptyText, "coach__vacio-marca"));
     },
 
     showReviewing(label) {

@@ -678,6 +678,62 @@
    "h": 1200,
    "title": "Móvil · tablero con selector (interfaz oscura)",
    "page": "movil"
+  },
+  "IdentidadMarca.dc.html": {
+   "x": 0,
+   "y": 34760,
+   "w": 1280,
+   "h": 1500,
+   "title": "Escritorio · identidad: tipografía, color, escaque y celebración",
+   "page": "escritorio"
+  },
+  "IdentidadPartidaEscritorio.dc.html": {
+   "x": 1360,
+   "y": 34760,
+   "w": 1280,
+   "h": 880,
+   "title": "Escritorio · partida con la identidad nueva (jaque)",
+   "page": "escritorio"
+  },
+  "IdentidadMomentos.dc.html": {
+   "x": 0,
+   "y": 36380,
+   "w": 1280,
+   "h": 2240,
+   "title": "Escritorio · microdetalles en claro y oscuro",
+   "page": "escritorio"
+  },
+  "IdentidadTablet.dc.html": {
+   "x": 0,
+   "y": 33560,
+   "w": 820,
+   "h": 1180,
+   "title": "Tablet · has ganado (celebración a mitad)",
+   "page": "tablet"
+  },
+  "IdentidadMovil.dc.html": {
+   "x": 0,
+   "y": 38460,
+   "w": 390,
+   "h": 844,
+   "title": "Móvil · jaque",
+   "page": "movil"
+  },
+  "IdentidadMovilFin.dc.html": {
+   "x": 470,
+   "y": 38460,
+   "w": 390,
+   "h": 844,
+   "title": "Móvil · has ganado (tema oscuro)",
+   "page": "movil"
+  },
+  "IdentidadMovilHorizontal.dc.html": {
+   "x": 940,
+   "y": 38460,
+   "w": 844,
+   "h": 390,
+   "title": "Móvil horizontal · lección superada",
+   "page": "movil"
   }
  },
  "order": [
@@ -761,7 +817,14 @@
   "InicioMovilHorizontal.dc.html",
   "TablerosEscritorio.dc.html",
   "TablerosTablet.dc.html",
-  "TablerosMovil.dc.html"
+  "TablerosMovil.dc.html",
+  "IdentidadMarca.dc.html",
+  "IdentidadPartidaEscritorio.dc.html",
+  "IdentidadMomentos.dc.html",
+  "IdentidadTablet.dc.html",
+  "IdentidadMovil.dc.html",
+  "IdentidadMovilFin.dc.html",
+  "IdentidadMovilHorizontal.dc.html"
  ],
  "notes": {
   "t_escritorio_0": {
@@ -1686,6 +1749,30 @@
    "w": 360,
    "text": "Móvil con interfaz oscura y Bosque: el tablero conserva sus colores y las marcas se ven igual.",
    "fill": "gray",
+   "page": "movil"
+  },
+  "t_ident_e": {
+   "x": 0,
+   "y": 34500,
+   "text": "Identidad visual (CAL-398)",
+   "kind": "title1",
+   "maxW": 2640,
+   "page": "escritorio"
+  },
+  "t_ident_t": {
+   "x": 0,
+   "y": 33300,
+   "text": "Identidad visual (CAL-398)",
+   "kind": "title1",
+   "maxW": 820,
+   "page": "tablet"
+  },
+  "t_ident_m": {
+   "x": 0,
+   "y": 38200,
+   "text": "Identidad visual (CAL-398)",
+   "kind": "title1",
+   "maxW": 1784,
    "page": "movil"
   }
  },

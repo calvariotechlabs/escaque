@@ -1,7 +1,7 @@
 // Textos en español de la interfaz: SAN con C A T D R, anuncios y fin de partida.
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { sanToSpanish, statusMessage, moveAnnouncement, newGameWarning, machineStatusMessage, machineMoveAnnouncement, resultMessage, machineHeading } from "../src/ui/notation.js";
+import { sanToSpanish, statusMessage, moveAnnouncement, newGameWarning, machineMoveAnnouncement, resultMessage, machineHeading } from "../src/ui/notation.js";
 
 describe("SAN en español", () => {
   it("traduce las letras de las piezas", () => {
@@ -87,15 +87,6 @@ describe("aviso de nueva partida", () => {
 });
 
 describe("jugar contra la máquina: textos", () => {
-  it("estado mientras piensa y cuando te toca", () => {
-    const ongoing = { kind: "ongoing" } as const;
-    assert.equal(machineStatusMessage(ongoing, "b", false, false, true), "Juegan las negras. Alfil Beta está pensando.");
-    assert.equal(machineStatusMessage(ongoing, "b", false, false, false), "Juegan las negras.");
-    assert.equal(machineStatusMessage(ongoing, "w", false, true, false), "Juegan las blancas. Te toca.");
-    assert.equal(machineStatusMessage(ongoing, "w", true, true, false), "Juegan las blancas. Jaque. Te toca.");
-    assert.equal(machineStatusMessage({ kind: "stalemate" }, "w", false, true, false), "Tablas por ahogado.");
-  });
-
   it("anuncio de la jugada de la máquina", () => {
     assert.equal(machineMoveAnnouncement("Nf6", "Juegan las blancas."), "Alfil Beta juega Cf6. Juegan las blancas.");
   });

@@ -160,7 +160,8 @@ export function reportView(report: CoachReport, label: string): ReportView {
 /** Textos de los estados sin informe. */
 export const COACH_TEXT = {
   title: "Coach",
-  empty: "Todavía no hay jugadas que revisar. Cuando muevas, el coach te dirá cómo ha ido.",
+  emptyTitle: "El coach espera tu primera jugada.",
+  emptyText: "Cuando muevas, te dirá cómo ha ido y qué había mejor.",
   reviewingTitle: "Revisando tu jugada.",
   reviewingText: "Alfil Beta está comparando la evaluación antes y después.",
   reviewingHint: "Puedes seguir jugando mientras tanto.",

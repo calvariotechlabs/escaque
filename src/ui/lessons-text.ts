@@ -41,6 +41,9 @@ export function hintTitle(number: number, total: number): string {
 }
 
 export const CORRECT = "Correcto.";
+/** Antetítulos del sello de logro (CAL-398). */
+export const LESSON_DONE_KICKER = "Lección superada";
+export const BLOCK_DONE_KICKER = "Bloque completado";
 export const INCORRECT = "Esa jugada no es la solución.";
 
 /** Acierto: cuántas pistas se usaron. */

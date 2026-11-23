@@ -17,6 +17,8 @@ const types = {
   ".png": "image/png",
   ".ico": "image/x-icon",
   ".webmanifest": "application/manifest+json; charset=utf-8",
+  ".woff2": "font/woff2",
+  ".txt": "text/plain; charset=utf-8",
 };
 
 createServer(async (req, res) => {
