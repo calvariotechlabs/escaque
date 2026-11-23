@@ -414,14 +414,6 @@
    "title": "Móvil · cargar una partida en PGN",
    "page": "movil"
   },
-  "ArrastreMovil.dc.html": {
-   "x": 470,
-   "y": 23040,
-   "w": 390,
-   "h": 980,
-   "title": "Móvil · arrastrar con el dedo",
-   "page": "movil"
-  },
   "EnlaceGithub.dc.html": {
    "x": 0,
    "y": 15740,
@@ -437,6 +429,14 @@
    "h": 760,
    "title": "Escritorio · Logo junto al nombre en la cabecera",
    "page": "escritorio"
+  },
+  "ArrastreMovil.dc.html": {
+   "x": 470,
+   "y": 23040,
+   "w": 390,
+   "h": 980,
+   "title": "Móvil · arrastrar con el dedo",
+   "page": "movil"
   },
   "PulidoEscritorio.dc.html": {
    "x": 0,
@@ -468,6 +468,70 @@
    "w": 844,
    "h": 390,
    "title": "Móvil · horizontal · partida pulida",
+   "page": "movil"
+  },
+  "AnimacionEscritorio.dc.html": {
+   "x": 0,
+   "y": 19340,
+   "w": 1280,
+   "h": 1560,
+   "title": "Escritorio · piezas que se mueven: casos, tiempo y reglas",
+   "page": "escritorio"
+  },
+  "AnimacionTablet.dc.html": {
+   "x": 0,
+   "y": 21380,
+   "w": 820,
+   "h": 1500,
+   "title": "Tablet · jugada de la máquina y deshacer",
+   "page": "tablet"
+  },
+  "AnimacionMovil.dc.html": {
+   "x": 0,
+   "y": 26530,
+   "w": 390,
+   "h": 1640,
+   "title": "Móvil · enroque, repaso y arrastre",
+   "page": "movil"
+  },
+  "CapturasEscritorio.dc.html": {
+   "x": 0,
+   "y": 21400,
+   "w": 1280,
+   "h": 1260,
+   "title": "Escritorio · capturas y ventaja",
+   "page": "escritorio"
+  },
+  "CapturasEstados.dc.html": {
+   "x": 1360,
+   "y": 21400,
+   "w": 1280,
+   "h": 980,
+   "title": "Escritorio · capturas · estados",
+   "page": "escritorio"
+  },
+  "CapturasTablet.dc.html": {
+   "x": 0,
+   "y": 23400,
+   "w": 820,
+   "h": 1760,
+   "title": "Tablet · capturas y ventaja",
+   "page": "tablet"
+  },
+  "CapturasMovil.dc.html": {
+   "x": 0,
+   "y": 28700,
+   "w": 390,
+   "h": 1840,
+   "title": "Móvil · capturas y ventaja",
+   "page": "movil"
+  },
+  "CapturasMovilHorizontal.dc.html": {
+   "x": 470,
+   "y": 28700,
+   "w": 844,
+   "h": 390,
+   "title": "Móvil · horizontal · capturas y ventaja",
    "page": "movil"
   }
  },
@@ -520,13 +584,21 @@
   "PgnEstados.dc.html",
   "PgnTablet.dc.html",
   "PgnMovil.dc.html",
-  "ArrastreMovil.dc.html",
   "EnlaceGithub.dc.html",
   "LogoCabecera.dc.html",
+  "ArrastreMovil.dc.html",
   "PulidoEscritorio.dc.html",
   "PulidoTablet.dc.html",
   "PulidoMovil.dc.html",
-  "PulidoMovilHorizontal.dc.html"
+  "PulidoMovilHorizontal.dc.html",
+  "AnimacionEscritorio.dc.html",
+  "AnimacionTablet.dc.html",
+  "AnimacionMovil.dc.html",
+  "CapturasEscritorio.dc.html",
+  "CapturasEstados.dc.html",
+  "CapturasTablet.dc.html",
+  "CapturasMovil.dc.html",
+  "CapturasMovilHorizontal.dc.html"
  ],
  "notes": {
   "t_escritorio_0": {
@@ -1160,6 +1232,102 @@
    "text": "Móvil apaisado: la línea «Alfil Beta · Medio» deja de ir en la cabecera, donde se pisaba con el estado, y pasa a una segunda línea dentro del estado: «Juegan las blancas. Te toca.» y debajo «Contra Alfil Beta · Medio». La cabecera queda en una sola fila con logo, navegación y GitHub. A la izquierda, el móvil vertical con los mismos cambios de la partida.",
    "page": "movil",
    "fill": "gray"
+  },
+  "t_escritorio_anim": {
+   "x": 0,
+   "y": 19100,
+   "text": "Piezas que se mueven (CAL-391)",
+   "kind": "title1",
+   "maxW": 1280,
+   "page": "escritorio"
+  },
+  "t_tablet_anim": {
+   "x": 0,
+   "y": 21140,
+   "text": "Piezas que se mueven (CAL-391)",
+   "kind": "title1",
+   "maxW": 820,
+   "page": "tablet"
+  },
+  "t_movil_anim": {
+   "x": 0,
+   "y": 26290,
+   "text": "Piezas que se mueven (CAL-391)",
+   "kind": "title1",
+   "maxW": 1280,
+   "page": "movil"
+  },
+  "a_escritorio": {
+   "x": 1360,
+   "y": 19340,
+   "w": 420,
+   "text": "Propuesta pendiente de aprobar. Los tableros se mueven en bucle (2,4 s por vuelta) solo para poder mirar la animación; en la app cada jugada se anima una vez. Las marcas de última jugada son las de hoy: si se aprueba el pulido de CAL-390, la animación usa las nuevas sin cambiar nada más.",
+   "fill": "gray",
+   "page": "escritorio"
+  },
+  "t_cap_e": {
+   "x": 0,
+   "y": 21100,
+   "text": "Piezas capturadas y ventaja de material",
+   "kind": "title1",
+   "maxW": 2640,
+   "page": "escritorio"
+  },
+  "t_cap_t": {
+   "x": 0,
+   "y": 23100,
+   "text": "Piezas capturadas y ventaja de material",
+   "kind": "title1",
+   "maxW": 820,
+   "page": "tablet"
+  },
+  "t_cap_m": {
+   "x": 0,
+   "y": 28400,
+   "text": "Piezas capturadas y ventaja de material",
+   "kind": "title1",
+   "maxW": 1314,
+   "page": "movil"
+  },
+  "cap_n1": {
+   "x": 0,
+   "y": 22740,
+   "w": 520,
+   "text": "Propuesta CAL-392. Bajo el tablero va el panel «Capturas»: una fila por bando con su nombre, las piezas del rival que ha capturado (agrupadas por tipo, de más a menos valor) y, en el bando que va por delante, la ventaja de material («+2»). El orden de las filas sigue al tablero: la del bando que está abajo va primero, pegada al tablero. No usa color para nada: la ventaja es un número y «Ninguna» es texto.",
+   "fill": "gray",
+   "page": "escritorio"
+  },
+  "cap_n2": {
+   "x": 1360,
+   "y": 22440,
+   "w": 520,
+   "text": "A lector de pantalla: las piezas son decorativas (aria-hidden) y cada fila lleva un texto oculto («Blancas han capturado un caballo y dos peones. Ventaja de 2.»). El panel no es una región viva: no se anuncia con cada jugada; se lee al navegar hasta «Capturas». Con el tablero girado solo cambia el orden de las filas.",
+   "fill": "gray",
+   "page": "escritorio"
+  },
+  "cap_n3": {
+   "x": 0,
+   "y": 25220,
+   "w": 520,
+   "text": "Tablet vertical: una columna, el panel de capturas justo debajo del tablero y antes del coach. Desde 860 px vuelve a la columna izquierda bajo el tablero, como en escritorio.",
+   "fill": "gray",
+   "page": "tablet"
+  },
+  "cap_n4": {
+   "x": 0,
+   "y": 30620,
+   "w": 390,
+   "text": "Móvil: el panel va entre el tablero y el coach, a todo el ancho. Con muchas capturas las piezas pasan a una segunda línea dentro de su fila (ver «Estados» en escritorio).",
+   "fill": "gray",
+   "page": "movil"
+  },
+  "cap_n5": {
+   "x": 470,
+   "y": 29160,
+   "w": 520,
+   "text": "Móvil apaisado: no hay hueco bajo el tablero, así que el panel va el primero de la región con scroll del panel derecho, más compacto (menos relleno y filas de 28 px).",
+   "fill": "gray",
+   "page": "movil"
   }
  },
  "designSystems": [
