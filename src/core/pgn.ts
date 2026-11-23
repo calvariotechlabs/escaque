@@ -216,12 +216,22 @@ class Reader {
     const tags: PgnTag[] = [];
     for (;;) {
       this.skipSpaceAndEscapes();
+      // Comentarios antes de las cabeceras (o entre ellas), como los que añaden algunos programas.
+      if (this.peek() === "{") {
+        this.skipComment();
+        continue;
+      }
+      if (this.peek() === ";") {
+        this.skipLine();
+        continue;
+      }
       if (this.peek() !== "[") return tags;
       this.i++;
       this.skipInlineSpace();
       const nameStart = this.i;
       while (this.i < this.text.length && /[A-Za-z0-9_]/.test(this.text[this.i]!)) this.i++;
       const name = this.text.slice(nameStart, this.i);
+      if (name.length > TAG_MAX_LENGTH) throw new PgnError("Hay una cabecera demasiado larga.");
       this.skipInlineSpace();
       if (name === "" || this.peek() !== '"') throw new PgnError("Hay una cabecera mal escrita.");
       this.i++;
@@ -230,18 +240,14 @@ class Reader {
         const c = this.text[this.i++];
         if (c === undefined || c === "\n" || c === "\r") throw new PgnError("Hay una cabecera mal escrita.");
         if (c === '"') break;
-        if (c === "\\") {
-          const next = this.text[this.i];
-          if (next === '"' || next === "\\") {
-            value += next;
-            this.i++;
-            continue;
-          }
+        const next = this.text[this.i];
+        if (c === "\\" && (next === '"' || next === "\\")) {
+          value += next;
+          this.i++;
+        } else {
+          value += c;
         }
-        value += c;
-        if (value.length > TAG_MAX_LENGTH || name.length > TAG_MAX_LENGTH) {
-          throw new PgnError("Hay una cabecera demasiado larga.");
-        }
+        if (value.length > TAG_MAX_LENGTH) throw new PgnError("Hay una cabecera demasiado larga.");
       }
       this.skipInlineSpace();
       if (this.peek() !== "]") throw new PgnError("Hay una cabecera mal escrita.");

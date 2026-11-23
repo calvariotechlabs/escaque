@@ -132,6 +132,12 @@ describe("PGN: lectura", () => {
     assert.deepEqual(game.tags, [["Event", "A"]]);
   });
 
+  it("acepta comentarios antes de las cabeceras", () => {
+    const game = parsePgn('{ Exportado por X }\n; otra nota\n[Event "A"]\n1. e4 *');
+    assert.deepEqual(game.tags, [["Event", "A"]]);
+    assert.deepEqual(game.moves, ["e2e4"]);
+  });
+
   it("ignora las líneas de escape que empiezan por %", () => {
     assert.deepEqual(parsePgn("% exportado por algo\n1. e4 *").moves, ["e2e4"]);
   });
@@ -171,6 +177,8 @@ describe("PGN: errores", () => {
     const many = Array.from({ length: 1001 }, () => "Nf3 Nf6 Ng1 Ng8").join(" ");
     assert.equal(errorOf(many), "La partida tiene demasiadas jugadas.");
     assert.equal(errorOf(`[White "${"a".repeat(300)}"]\n*`), "Hay una cabecera demasiado larga.");
+    assert.equal(errorOf(`[White "${"\\\\".repeat(300)}"]\n*`), "Hay una cabecera demasiado larga.");
+    assert.equal(errorOf(`[${"N".repeat(300)} ""]\n*`), "Hay una cabecera demasiado larga.");
   });
 });
 

@@ -3,9 +3,9 @@
 // decide qué cabeceras lleva la partida, cómo se llama el archivo y cómo se
 // convierte una partida leída en un `Game` para el repaso.
 import { PGN_MAX_LENGTH, PgnError, writePgn } from "../core/index.js";
-import type { GameStatus, PgnGame, PgnResult, PgnTag } from "../core/index.js";
+import type { GameStatus, PgnGame, PgnResult, PgnTag, PromotionPiece } from "../core/index.js";
 import { Game } from "./game.js";
-import { ENGINE_NAME } from "./notation.js";
+import { ENGINE_NAME, sanToSpanish } from "./notation.js";
 import { LEVEL_NAME, type GameSetup } from "./settings.js";
 
 /** Textos fijos de exportar y cargar. */
@@ -56,32 +56,38 @@ export function exportGame(game: Game, setup: GameSetup, now: Date): { filename:
 }
 
 /**
- * Partida lista para el repaso, en su última jugada. Lanza `PgnError` si sigue
- * después de terminar (en Escaque las tablas por repetición o por la regla de
- * 50 jugadas son automáticas).
+ * Partida lista para el repaso, en su última jugada. En Escaque las tablas por
+ * repetición, por la regla de 50 jugadas o por material insuficiente son
+ * automáticas, pero en una partida real se puede seguir si nadie las reclama:
+ * entonces el repaso llega hasta ahí y `cut` lo explica. Lanza `PgnError` si
+ * no hay jugadas.
  */
-export function gameFromPgn(pgn: PgnGame): Game {
+export function gameFromPgn(pgn: PgnGame): { game: Game; cut: string | null } {
+  if (pgn.moves.length === 0) throw new PgnError("La partida no tiene jugadas que repasar.");
   const game = new Game(pgn.startFen);
   for (const uci of pgn.moves) {
+    const promotion = (uci[4] as PromotionPiece | undefined) ?? undefined;
     if (game.isOver) {
-      // Número y SAN de la jugada que sobra, como en los errores del lector.
+      // Número y SAN (con letras españolas) de la primera jugada que se queda fuera.
       const number = Number(game.fen.split(" ")[5]);
       const white = game.turn === "w";
-      const probe = new Game(game.fen);
-      const record = probe.play(uci.slice(0, 2), uci.slice(2, 4), (uci[4] as "q" | "r" | "b" | "n" | undefined) ?? undefined);
-      const san = record?.san ?? uci;
-      throw new PgnError(`La partida ya había terminado antes de la jugada ${number}${white ? "." : "..."} ${san}.`);
+      const san = new Game(game.fen).play(uci.slice(0, 2), uci.slice(2, 4), promotion)?.san ?? uci;
+      return {
+        game,
+        cut: `Escaque da la partida por terminada antes de la jugada ${number}${white ? "." : "..."} ${sanToSpanish(san)}; el repaso llega hasta ahí.`,
+      };
     }
-    const record = game.play(uci.slice(0, 2), uci.slice(2, 4), (uci[4] as "q" | "r" | "b" | "n" | undefined) ?? undefined);
-    if (record === null) throw new PgnError(`La jugada ${uci} no es legal en esa posición.`);
+    if (game.play(uci.slice(0, 2), uci.slice(2, 4), promotion) === null) {
+      throw new PgnError(`La jugada ${uci} no es legal en esa posición.`);
+    }
   }
-  return game;
+  return { game, cut: null };
 }
 
 const RESULT_TEXT: Readonly<Record<PgnResult, string>> = { "1-0": "1-0", "0-1": "0-1", "1/2-1/2": "tablas", "*": "sin resultado" };
 
 /** Comienzo de la cabecera del repaso: «Partida cargada: Ana contra Beto, 0-1.». */
-export function importIntro(pgn: PgnGame): string {
+export function importIntro(pgn: PgnGame, cut: string | null = null): string {
   const name = (key: string): string | null => {
     const value = pgn.tags.find(([tag]) => tag === key)?.[1].trim();
     return value === undefined || value === "" || value === "?" ? null : value;
@@ -89,7 +95,8 @@ export function importIntro(pgn: PgnGame): string {
   const white = name("White");
   const black = name("Black");
   const who = white !== null && black !== null ? `: ${white} contra ${black},` : ",";
-  return `Partida cargada${who} ${RESULT_TEXT[pgn.result]}.`;
+  const intro = `Partida cargada${who} ${RESULT_TEXT[pgn.result]}.`;
+  return cut === null ? intro : `${intro} ${cut}`;
 }
 
 /** Texto para el recuadro de error: el del lector o uno genérico. */

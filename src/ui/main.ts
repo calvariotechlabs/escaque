@@ -518,6 +518,7 @@ function jumpTo(ply: number): void {
 /** Empieza una partida con estos ajustes (el azar ya está decidido). */
 function startGame(next: GameSetup): void {
   stopThinking();
+  hideExportNotice(); // el aviso era de la partida anterior
   machineFailed = false;
   setup = next;
   game = new Game();
@@ -552,7 +553,8 @@ function applyRoute(moveFocus: boolean): void {
   settingsScreen.hidden = !onPlay || playScreen !== "ajustes";
   gameScreen.hidden = !onPlay || playScreen !== "partida";
   reviewScreenRoot.hidden = !onPlay || playScreen !== "repaso";
-  headingSub.hidden = !(onPlay && playScreen !== "ajustes");
+  // El subtítulo describe la partida en curso: no vale para una partida cargada.
+  headingSub.hidden = !(onPlay && playScreen !== "ajustes" && !(playScreen === "repaso" && imported !== null));
   if (!onPlay || playScreen !== "repaso") review.hide();
   linkPlay.removeAttribute("aria-current");
   linkLessons.removeAttribute("aria-current");
@@ -566,6 +568,7 @@ function applyRoute(moveFocus: boolean): void {
     if (playScreen === "partida") render();
     if (playScreen === "repaso") {
       stopCoach();
+      stopThinking(); // al volver a la partida, render() reanuda a la máquina si le toca
       if (imported !== null) review.open(imported.game, "w", { kind: "pgn", intro: imported.intro });
       else review.open(game, ui.orientation);
     }
@@ -717,7 +720,8 @@ pgnLoad.addEventListener("click", () => {
   let next: { game: Game; intro: string };
   try {
     const pgn = parsePgn(pgnField.value);
-    next = { game: gameFromPgn(pgn), intro: importIntro(pgn) };
+    const { game: loaded, cut } = gameFromPgn(pgn);
+    next = { game: loaded, intro: importIntro(pgn, cut) };
   } catch (error) {
     showPgnError(loadError(error));
     return;

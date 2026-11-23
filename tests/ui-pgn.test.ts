@@ -59,17 +59,25 @@ describe("Exportar PGN", () => {
 
 describe("Cargar PGN", () => {
   it("la partida cargada termina en su última jugada", () => {
-    const game = gameFromPgn(parsePgn("1. e4 e5 2. Bc4 Nc6 3. Qh5 Nf6 4. Qxf7# 1-0"));
+    const { game, cut } = gameFromPgn(parsePgn("1. e4 e5 2. Bc4 Nc6 3. Qh5 Nf6 4. Qxf7# 1-0"));
+    assert.equal(cut, null);
     assert.equal(game.ply, 7);
     assert.equal(game.status.kind, "checkmate");
   });
 
-  it("si la partida sigue tras terminar, avisa con el número de jugada", () => {
-    // Triple repetición tras 4... Cg8 (tablas automáticas en Escaque): la 5. Cf3 sobra.
-    const pgn = parsePgn("1. Nf3 Nf6 2. Ng1 Ng8 3. Nf3 Nf6 4. Ng1 Ng8 5. Nf3");
-    assert.throws(() => gameFromPgn(pgn), (error: unknown) => {
+  it("si la partida sigue tras unas tablas automáticas, se repasa hasta ahí y se dice", () => {
+    // Triple repetición tras 4... Cg8 (tablas automáticas en Escaque): 5. Cf3 y lo demás no entran.
+    const pgn = parsePgn('[White "Ana"]\n[Black "Beto"]\n1. Nf3 Nf6 2. Ng1 Ng8 3. Nf3 Nf6 4. Ng1 Ng8 5. Nf3 e5 1-0');
+    const { game, cut } = gameFromPgn(pgn);
+    assert.equal(game.ply, 8);
+    assert.equal(cut, "Escaque da la partida por terminada antes de la jugada 5. Cf3; el repaso llega hasta ahí.");
+    assert.equal(importIntro(pgn, cut), `Partida cargada: Ana contra Beto, 1-0. ${cut}`);
+  });
+
+  it("una partida sin jugadas no se puede repasar", () => {
+    assert.throws(() => gameFromPgn(parsePgn('[White "Ana"]\n*')), (error: unknown) => {
       assert.ok(error instanceof PgnError);
-      assert.equal(error.message, "La partida ya había terminado antes de la jugada 5. Nf3.");
+      assert.equal(error.message, "La partida no tiene jugadas que repasar.");
       return true;
     });
   });
