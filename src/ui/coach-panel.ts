@@ -4,7 +4,7 @@
 // el foco, y solo el veredicto (`role="status"`) se anuncia: al cambiar de
 // estado se reescribe el contenido de esa misma región, que no se destruye.
 import type { SquareMark } from "../coach/index.js";
-import { COACH_TEXT, type EvaluationView, type FindingView, type ReportView } from "./coach.js";
+import { COACH_TEXT, type EvaluationView, type FindingView, type HintsView, type ReportView } from "./coach.js";
 
 const SVG = (inner: string): string =>
   `<svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">${inner}</svg>`;
@@ -24,6 +24,13 @@ export interface CoachPanelOptions {
   readonly moveLine?: (label: string, previous: boolean) => Node[];
   /** Nivel de los subtítulos (Evaluación y avisos): un nivel por debajo del título del panel. Por defecto, h3. */
   readonly subheading?: "h3" | "h4";
+  /**
+   * «Ver en el tablero» de la mejor jugada (CAL-394): se llama con `true` al pedir la vista de la
+   * posición de antes y con `false` al volver. Sin esta opción el bloque no lleva botón (repaso).
+   */
+  readonly onBest?: (active: boolean) => void;
+  /** «Pedir pista» (CAL-394). Sin esta opción el panel no tiene pistas. */
+  readonly onHint?: () => void;
 }
 
 export interface CoachPanel {
@@ -48,6 +55,10 @@ export interface CoachPanel {
   setPrevious(note: string | null): void;
   /** Quita las casillas marcadas por «Ver en el tablero». */
   clearMarks(): void;
+  /** El botón de la mejor jugada dice «Volver a la partida» mientras se ve la posición de antes (CAL-394). */
+  setBestActive(active: boolean): void;
+  /** Pinta el bloque de pistas (CAL-394). */
+  setHints(view: HintsView): void;
 }
 
 function el<K extends keyof HTMLElementTagNameMap>(tag: K, className?: string, text?: string): HTMLElementTagNameMap[K] {
@@ -77,6 +88,9 @@ function textWithSan(text: string, san: string | null): Node[] {
   return nodes;
 }
 
+/** Texto de una pista ya pintada («Pista 1 de 3» + el texto), para saber si ha cambiado. */
+const hintItemText = (index: number, text: string | undefined): string => `Pista ${index + 1} de 3${text ?? ""}`;
+
 function evaluationRows(label: string, evaluation: EvaluationView): [HTMLElement, HTMLElement] {
   const term = el("dt", undefined, label);
   const detail = el("dd");
@@ -103,8 +117,29 @@ export function createCoachPanel(onMarks: (marks: readonly SquareMark[]) => void
   const verdict = byId<HTMLElement>(`${prefix}-veredicto`);
   const summary = byId<HTMLElement>(`${prefix}-resumen`);
   const side = byId<HTMLElement>(`${prefix}-avisos`);
+
+  // Pistas para la jugada que toca (CAL-394): solo en el coach de la partida.
+  const hints =
+    options.onHint === undefined
+      ? null
+      : {
+          root: byId<HTMLElement>(`${prefix}-pistas`),
+          note: byId<HTMLElement>(`${prefix}-pistas-nota`),
+          list: byId<HTMLOListElement>(`${prefix}-pistas-lista`),
+          bar: byId<HTMLElement>(`${prefix}-pistas-barra`),
+          button: byId<HTMLButtonElement>(`${prefix}-pistas-boton`),
+        };
+  if (hints !== null) {
+    hints.button.addEventListener("click", () => {
+      if (hints.button.getAttribute("aria-disabled") !== "true") options.onHint?.();
+    });
+  }
   let active: number | null = null;
   let findings: readonly FindingView[] = [];
+  let bestBlock: HTMLElement | null = null;
+  let bestButton: HTMLButtonElement | null = null;
+  let bestSan = "";
+  let bestActive = false;
 
   // Etiqueta y nota de «jugada anterior»: solo existen en el coach de la partida.
   const tag = document.getElementById(`${prefix}-etiqueta`);
@@ -130,9 +165,21 @@ export function createCoachPanel(onMarks: (marks: readonly SquareMark[]) => void
     verdict.className = "coach__veredicto coach__veredicto--vacio";
   };
 
+  const syncBest = (): void => {
+    if (bestBlock === null || bestButton === null) return;
+    bestBlock.classList.toggle("coach__alternativa--activa", bestActive);
+    const text = bestActive ? COACH_TEXT.returnToGame : COACH_TEXT.show;
+    bestButton.textContent = text;
+    bestButton.setAttribute("aria-label", `${text}: mejor jugada, ${bestSan}`);
+  };
+
   const reset = (): void => {
     active = null;
     findings = [];
+    if (bestActive) options.onBest?.(false);
+    bestActive = false;
+    bestBlock = null;
+    bestButton = null;
     onMarks([]);
     side.replaceChildren();
     side.hidden = true;
@@ -231,9 +278,35 @@ export function createCoachPanel(onMarks: (marks: readonly SquareMark[]) => void
 
       const parts: Node[] = [];
       if (view.best !== null) {
+        const block = el("div", "coach__alternativa");
         const best = el("p", "coach__mejor");
-        best.append(document.createTextNode("Mejor jugada: "), el("span", "coach__san", view.best));
-        parts.push(best);
+        best.append(document.createTextNode(COACH_TEXT.bestPrefix), el("span", "coach__san", view.best));
+        block.append(best);
+        if (view.why !== "") {
+          const why = el("p", "coach__porque");
+          why.append(el("strong", undefined, COACH_TEXT.whyPrefix), ...textWithSan(view.why, view.best?.replace(/[+#]$/, "") ?? null));
+          block.append(why);
+        }
+        if (view.line !== "") {
+          const line = el("p", "coach__linea");
+          line.append(document.createTextNode(COACH_TEXT.linePrefix), el("span", "coach__san", view.line));
+          block.append(line);
+        }
+        if (options.onBest !== undefined) {
+          const button = el("button", "boton");
+          button.type = "button";
+          button.addEventListener("click", () => {
+            bestActive = !bestActive;
+            syncBest(); // sin reconstruir: el botón conserva el foco
+            options.onBest?.(bestActive);
+          });
+          block.append(button);
+          bestButton = button;
+        }
+        bestBlock = block;
+        bestSan = view.best;
+        syncBest();
+        parts.push(block);
       }
       const block = el("div");
       const list = el("dl", "coach__eval");
@@ -266,6 +339,37 @@ export function createCoachPanel(onMarks: (marks: readonly SquareMark[]) => void
       });
       side.replaceChildren(ul);
       syncActive();
+    },
+
+    setBestActive(on) {
+      if (bestActive === on) return;
+      bestActive = on;
+      syncBest();
+    },
+
+    setHints(view) {
+      if (hints === null) return;
+      hints.root.hidden = !view.visible;
+      hints.note.hidden = view.note === null;
+      hints.note.textContent = view.note ?? "";
+      hints.bar.hidden = !view.busy;
+      // La lista es una región viva: solo se añade la pista nueva, para que no se relean las anteriores.
+      const current = [...hints.list.children].map((li) => li.textContent ?? "");
+      const same = current.every((text, i) => text === hintItemText(i, view.items[i]));
+      if (!same || view.items.length < current.length) hints.list.replaceChildren();
+      for (let i = hints.list.children.length; i < view.items.length; i++) {
+        const li = el("li");
+        li.append(el("strong", undefined, `Pista ${i + 1} de 3`), document.createTextNode(view.items[i]!));
+        hints.list.append(li);
+      }
+      hints.list.hidden = view.items.length === 0;
+      hints.button.hidden = view.button === null;
+      if (view.button !== null) {
+        hints.button.textContent = view.button.text;
+        // aria-disabled y no `disabled`: un botón desactivado pierde el foco de quien acaba de pulsarlo.
+        if (view.button.disabled) hints.button.setAttribute("aria-disabled", "true");
+        else hints.button.removeAttribute("aria-disabled");
+      }
     },
 
     clearMarks() {

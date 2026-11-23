@@ -1,0 +1,37 @@
+/* Propuesta CAL-394 · coach mejorado: mejor alternativa con flecha, por qué es mejor y pistas. Solo tokens del Design System. */
+/* Flechas sobre el tablero: misma celda de la rejilla, por encima de las piezas y sin recibir clics. */
+.tablero__flechas{grid-column:2;grid-row:1;width:100%;height:100%;pointer-events:none;z-index:2;overflow:visible}
+.flecha{fill:none;stroke-linecap:round;stroke-linejoin:round}
+.flecha--mejor{stroke:var(--accent);stroke-width:.2;opacity:.88}
+.flecha-punta--mejor{fill:var(--accent);opacity:.88}
+.flecha--tuya{stroke:var(--ink);stroke-width:.13;stroke-dasharray:.24 .18;opacity:.6}
+.flecha-punta--tuya{fill:none;stroke:var(--ink);stroke-width:.09;stroke-linejoin:round;opacity:.6}
+/* Vista de la jugada revisada: aviso sobre el tablero con la salida. */
+.vista-revision{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--space-2) var(--space-3);margin:0 0 var(--space-2);padding:var(--space-2) var(--space-3);border:2px solid var(--accent);border-radius:var(--radius-sm);background:var(--surface-raised);color:var(--ink);font:400 14px/20px var(--font-sans)}
+.vista-revision p{margin:0;min-width:0}
+.vista-revision strong{display:block;font-weight:600}
+.vista-revision .boton{min-height:44px}
+.leyenda-flechas{display:flex;flex-wrap:wrap;gap:var(--space-1) var(--space-4);margin:0;padding:0;list-style:none;color:var(--ink-muted);font:400 13px/20px var(--font-sans)}
+.leyenda-flechas li{display:inline-flex;align-items:center;gap:var(--space-2)}
+.leyenda-flechas svg{flex:none;width:28px;height:12px}
+/* Bloque de la mejor alternativa dentro del coach. */
+.coach__alternativa{display:flex;flex-direction:column;align-items:flex-start;gap:var(--space-2);padding:var(--space-3);border:1px solid var(--control-border);border-radius:var(--radius-sm)}
+.coach__alternativa--activa{border:3px solid var(--accent);padding:calc(var(--space-3) - 2px)}
+.coach__alternativa .coach__mejor{color:var(--ink)}
+.coach__porque{margin:0}
+.coach__porque strong{font-weight:600}
+.coach__linea{margin:0;color:var(--ink-muted)}
+.coach__alternativa .boton{min-height:44px}
+/* Pistas para la jugada que toca ahora (mismo aspecto que las pistas de las lecciones). */
+.coach__pistas{display:flex;flex-direction:column;align-items:flex-start;gap:var(--space-2);padding-bottom:var(--space-4);border-bottom:1px solid var(--line)}
+.coach__pistas .coach__sub{margin:0}
+.coach__pistas-lista{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:var(--space-2);align-self:stretch}
+.coach__pistas-lista li{padding:var(--space-2) var(--space-3);border:1.5px solid var(--control-border);border-radius:var(--radius-sm)}
+.coach__pistas-lista strong{display:block;font-weight:600}
+.coach__pistas .boton{min-height:44px}
+.coach__pistas-nota{margin:0;color:var(--ink-muted)}
+@media (forced-colors: active){
+  .flecha--mejor,.flecha--tuya,.flecha-punta--tuya{stroke:CanvasText;opacity:1}
+  .flecha-punta--mejor{fill:CanvasText;opacity:1}
+  .vista-revision,.coach__alternativa,.coach__pistas-lista li{border-color:CanvasText}
+}

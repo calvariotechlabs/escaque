@@ -23,6 +23,8 @@ import type { Color, Move, PieceType, Square } from "../core/index.js";
 import { MATE_SCORE, PIECE_VALUES, TranspositionTable, search } from "../engine/index.js";
 import type { SearchLimits, SearchOptions } from "../engine/index.js";
 import { capturedValue, cheapestCapture, exchangeGain, moveBalance } from "./exchange.js";
+import { explainMove, hintForPosition, lineText } from "./explain.js";
+import type { Hint } from "./explain.js";
 import {
   agree,
   joinPhrases,
@@ -132,6 +134,13 @@ export interface CoachReport {
   readonly summary: string;
   /** Avisos, del más importante al menos. Vacío si no hay ninguno. */
   readonly findings: readonly Finding[];
+  /**
+   * Por qué es mejor `best` (CAL-394): «Cxe5 gana un peón. Si las negras…». Vacío si `best`
+   * es la jugada hecha.
+   */
+  readonly why: string;
+  /** Línea de Alfil Beta desde la posición de antes, en SAN española: «5. Cxe5 dxe5 6. Dxg4 Cf6». */
+  readonly line: string;
   /** Profundidad de la búsqueda usada. */
   readonly depth: number;
 }
@@ -269,7 +278,8 @@ export function analyzeMove(game: CoachGame, move: string, options: AnalyzeOptio
 
   // Después: la puntuación de la jugada hecha.
   const isBest = bestUci === moveInfo.uci;
-  const playedScore = isBest ? beforeScore : scoreMove(position, moveInfo.uci, replyLimits, searchOptions);
+  const playedLine = isBest ? { score: beforeScore, line: beforeSearch.pv } : scoreLine(position, moveInfo.uci, replyLimits, searchOptions);
+  const playedScore = playedLine.score;
   const loss = Math.max(0, toCp(beforeScore) - toCp(playedScore));
   const drop = isBest ? 0 : expected(toCp(beforeScore)) - expected(toCp(playedScore));
   let verdict: Verdict = isBest || loss === 0 ? "mejor" : (THRESHOLDS.find(([limit]) => drop >= limit)?.[1] ?? "buena");
@@ -297,17 +307,33 @@ export function analyzeMove(game: CoachGame, move: string, options: AnalyzeOptio
     }
   }
 
+  const before = toEvaluation(beforeScore, color, 0);
+  const after = toEvaluation(playedScore, color, 1);
+  let why = "";
+  if (!isBest && loss > 0) {
+    const motive = explainMove(position, bestUci, beforeSearch.pv, beforeScore);
+    why = motive.kind === "posicional" ? positionalWhy(before, after) : motive.text;
+  }
+  // Elogio: una jugada buena con un motivo concreto lo dice en lugar de la frase general.
+  let praise: string | null = null;
+  if ((verdict === "mejor" || verdict === "buena") && findings.length === 0 && !playedMates) {
+    const motive = explainMove(position, moveInfo.uci, playedLine.line, playedScore);
+    if (motive.kind !== "posicional") praise = motive.text;
+  }
+
   return {
     color,
     move: moveInfo,
     best: info(position, bestUci),
-    before: toEvaluation(beforeScore, color, 0),
-    after: toEvaluation(playedScore, color, 1),
+    before,
+    after,
     loss,
     verdict,
     title: TITLES[verdict],
-    summary: summarize(verdict, moveInfo, playedMates, findings),
+    summary: praise ?? summarize(verdict, moveInfo, playedMates, findings),
     findings,
+    why,
+    line: lineText(position, beforeSearch.pv),
     depth: beforeSearch.depth,
   };
 }
@@ -337,15 +363,39 @@ function info(position: Position, move: Move | string): MoveInfo {
 
 /** Puntuación (para quien mueve en `position`) de hacer `uci`. Deja `position` como estaba. */
 function scoreMove(position: Position, uci: string, limits: SearchLimits, options: SearchOptions): number {
+  return scoreLine(position, uci, limits, options).score;
+}
+
+/** Puntuación de hacer `uci` y la línea que sigue (empezando por `uci`). Deja `position` como estaba. */
+function scoreLine(position: Position, uci: string, limits: SearchLimits, options: SearchOptions): { score: number; line: readonly string[] } {
   position.makeMove(position.moveFromUci(uci)!);
   try {
     const status = position.status();
-    if (status.kind === "checkmate") return MATE_SCORE - 1;
-    if (status.kind !== "ongoing") return 0; // tablas
-    return fromReply(search(position, limits, options).score);
+    if (status.kind === "checkmate") return { score: MATE_SCORE - 1, line: [uci] };
+    if (status.kind !== "ongoing") return { score: 0, line: [uci] }; // tablas
+    const reply = search(position, limits, options);
+    return { score: fromReply(reply.score), line: [uci, ...reply.pv] };
   } finally {
     position.unmakeMove();
   }
+}
+
+/** Sin motivo táctico: «No hay un motivo táctico: Alfil Beta la prefiere por cómo quedan las piezas (+1,7 frente a +0,9).» */
+function positionalWhy(before: Evaluation, after: Evaluation): string {
+  const short = (evaluation: Evaluation): string =>
+    evaluation.mate !== null ? `mate en ${evaluation.mate.moves} de las ${evaluation.mate.winner === "w" ? "blancas" : "negras"}` : evaluation.text.split(" ")[0]!.replace(/,$/, "");
+  return `No hay un motivo táctico: Alfil Beta la prefiere por cómo quedan las piezas (${short(before)} frente a ${short(after)}).`;
+}
+
+/**
+ * Pistas para la jugada que toca en la partida `game` (CAL-394). Lanza
+ * `FenError` si la FEN no es válida y `CoachError` si alguna jugada no es
+ * legal o la partida ya ha terminado.
+ */
+export function hintFor(game: CoachGame, options: AnalyzeOptions = {}): Hint {
+  const position = replay(game);
+  if (position.status().kind !== "ongoing") throw new CoachError("La partida ya ha terminado");
+  return hintForPosition(position, options.limits ?? COACH_LIMITS, options.now ? { now: options.now } : {});
 }
 
 /** Jugadas (UCI) que dan mate ya. */

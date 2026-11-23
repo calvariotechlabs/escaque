@@ -5,11 +5,14 @@
 //     move: la jugada que se revisa, en UCI.
 // Respuesta: { type: "report", id, report } o { type: "error", id, message }
 //
+// Pistas (CAL-394): { type: "hint", id, fen, moves } → { type: "hint", id, hint }
+//   - fen y moves: la partida hasta la posición en la que toca mover.
+//
 // Igual que el del motor, el Worker valida cada mensaje y nunca lanza: un
 // mensaje mal formado recibe un error corto que no repite lo recibido.
 import { FenError } from "../core/index.js";
-import { analyzeMove, CoachError } from "../coach/index.js";
-import type { AnalyzeOptions, CoachReport } from "../coach/index.js";
+import { analyzeMove, CoachError, hintFor } from "../coach/index.js";
+import type { AnalyzeOptions, CoachReport, Hint } from "../coach/index.js";
 import { MAX_MOVES } from "./protocol.js";
 
 const MAX_FEN_LENGTH = 100;
@@ -23,18 +26,26 @@ export interface AnalyzeRequest {
   readonly move: string;
 }
 
+export interface HintRequest {
+  readonly type: "hint";
+  readonly id: number;
+  readonly fen: string;
+  readonly moves: readonly string[];
+}
+
 export type CoachResponse =
   | { readonly type: "report"; readonly id: number; readonly report: CoachReport }
+  | { readonly type: "hint"; readonly id: number; readonly hint: Hint }
   | { readonly type: "error"; readonly id: number | null; readonly message: string };
 
 class ProtocolError extends Error {}
 
 const isId = (value: unknown): value is number => Number.isSafeInteger(value) && (value as number) >= 0;
 
-function parseRequest(data: unknown): AnalyzeRequest {
+function parseRequest(data: unknown): AnalyzeRequest | HintRequest {
   if (typeof data !== "object" || data === null || Array.isArray(data)) throw new ProtocolError("La petición debe ser un objeto");
   const { type, id, fen, moves, move } = data as Record<string, unknown>;
-  if (type !== "analyze") throw new ProtocolError("Se desconoce el tipo de petición");
+  if (type !== "analyze" && type !== "hint") throw new ProtocolError("Se desconoce el tipo de petición");
   if (!isId(id)) throw new ProtocolError("El id debe ser un entero no negativo");
   if (typeof fen !== "string" || fen.length > MAX_FEN_LENGTH) throw new ProtocolError("FEN no válida");
   if (
@@ -44,6 +55,7 @@ function parseRequest(data: unknown): AnalyzeRequest {
   ) {
     throw new ProtocolError("Lista de jugadas no válida");
   }
+  if (type === "hint") return { type, id, fen, moves };
   if (typeof move !== "string" || !UCI.test(move)) throw new ProtocolError("Jugada no válida");
   return { type, id, fen, moves, move };
 }
@@ -54,6 +66,9 @@ export function handleAnalyze(data: unknown, options: AnalyzeOptions = {}): Coac
   const id = isId(rawId) ? rawId : null;
   try {
     const request = parseRequest(data);
+    if (request.type === "hint") {
+      return { type: "hint", id: request.id, hint: hintFor({ fen: request.fen, moves: request.moves }, options) };
+    }
     const report = analyzeMove({ fen: request.fen, moves: request.moves }, request.move, options);
     return { type: "report", id: request.id, report };
   } catch (error) {
