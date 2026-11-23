@@ -135,6 +135,60 @@ describe("arrastre con el dedo", () => {
     assert.deepEqual(page.errors, []);
   });
 
+  test("con el dedo, la pieza sube sobre el contacto, deja una copia tenue y la etiqueta nombra la casilla de debajo", async () => {
+    const page = await phonePage();
+    await startTwoPlayers(page);
+    await touchDragStart(page, "e2", "e4");
+    const state = await page.eval(`(() => {
+      const cell = document.querySelector('#tablero [data-square="e2"]');
+      const piece = cell.querySelector('.pieza:not(.pieza--origen)');
+      return {
+        transform: piece.style.transform,
+        elevated: piece.classList.contains('pieza--elevada'),
+        ghost: cell.querySelectorAll('.pieza--origen').length,
+        chip: cell.querySelector('.arrastre__etiqueta')?.textContent,
+        over: [...document.querySelectorAll('#tablero [data-bajo-dedo]')].map((e) => e.dataset.square),
+      };
+    })()`);
+    assert.match(state.transform, /scale\(1\.5\)/);
+    assert.equal(state.elevated, true);
+    assert.equal(state.ghost, 1);
+    assert.equal(state.chip, "e4");
+    assert.deepEqual(state.over, ["e4"]);
+    await page.call("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
+    await pause(100);
+    assert.equal(await pieceOn(page, "e4"), true, "el peón llega a e4");
+    const rest = await page.eval(`document.querySelectorAll('#tablero .pieza--origen, #tablero .pieza--elevada, #tablero .arrastre__etiqueta, #tablero [data-bajo-dedo]').length`);
+    assert.equal(rest, 0, "al soltar no queda nada del arrastre");
+    assert.deepEqual(page.errors, []);
+  });
+
+  test("con el ratón, la pieza no se levanta ni se agranda", async () => {
+    const page = await phonePage();
+    await startTwoPlayers(page);
+    await page.eval(`([...document.querySelectorAll('.tablero')].find((e) => e.offsetParent !== null).scrollIntoView({ block: "center" }), true)`);
+    await pause(100);
+    const a = await center(page, "e2");
+    const b = await center(page, "e4");
+    await page.call("Input.dispatchMouseEvent", { type: "mousePressed", x: a.x, y: a.y, button: "left", clickCount: 1 });
+    for (let i = 1; i <= 6; i++) {
+      await page.call("Input.dispatchMouseEvent", { type: "mouseMoved", x: a.x + ((b.x - a.x) * i) / 6, y: a.y + ((b.y - a.y) * i) / 6, button: "left", buttons: 1 });
+      await pause(16);
+    }
+    const state = await page.eval(`(() => {
+      const cell = document.querySelector('#tablero [data-square="e2"]');
+      const piece = cell.querySelector('.pieza');
+      return { transform: piece.style.transform, extra: cell.querySelectorAll('.pieza--origen, .arrastre__etiqueta').length, elevated: piece.classList.contains('pieza--elevada') };
+    })()`);
+    assert.doesNotMatch(state.transform, /scale/);
+    assert.equal(state.extra, 0);
+    assert.equal(state.elevated, false);
+    await page.call("Input.dispatchMouseEvent", { type: "mouseReleased", x: b.x, y: b.y, button: "left", clickCount: 1 });
+    await pause(100);
+    assert.equal(await pieceOn(page, "e4"), true);
+    assert.deepEqual(page.errors, []);
+  });
+
   test("en una lección, arrastrar la torre la mueve sin desplazar la página", async () => {
     const page = await phonePage();
     await page.goto(base + "/#/lecciones/el-tablero");

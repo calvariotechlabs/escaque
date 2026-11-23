@@ -3,6 +3,7 @@
 // (su interacción, cómo pintar y cómo seguir tras una jugada) en un `BoardInputHost`.
 import type { BoardView } from "./board.js";
 import type { Interaction, Outcome } from "./interaction.js";
+import { chipPlacement, liftedTransform, liftsPiece } from "./drag-lift.js";
 
 export interface BoardInputHost {
   readonly view: BoardView;
@@ -44,6 +45,15 @@ interface Gesture {
   tapOnly: boolean;
   /** ¿Estaba el foco en el tablero al empezar? Entonces sigue a la casilla. */
   hadFocus: boolean;
+  /** Con el dedo la pieza se levanta sobre el contacto (y solo entonces hay lado de casilla, copia y etiqueta). */
+  lifted: boolean;
+  cell: number;
+  /** Copia tenue que se queda en la casilla de origen. */
+  ghost: Element | null;
+  /** Etiqueta con el nombre de la casilla que hay bajo el dedo. */
+  chip: HTMLElement | null;
+  /** Casilla que hay bajo el puntero, con su marca de «bajo el dedo». */
+  over: HTMLElement | null;
 }
 
 export function attachBoardInput(host: BoardInputHost): void {
@@ -63,7 +73,7 @@ export function attachBoardInput(host: BoardInputHost): void {
   function draggedPiece(): { cell: HTMLElement; piece: Element | null } | null {
     if (gesture === null) return null;
     const cell = view.squareElement(gesture.square);
-    return { cell, piece: cell.querySelector(".pieza") };
+    return { cell, piece: cell.querySelector(".pieza:not(.pieza--origen)") };
   }
 
   function resetDraggedPiece(): void {
@@ -73,7 +83,51 @@ export function attachBoardInput(host: BoardInputHost): void {
     if (dragged.piece instanceof SVGElement) {
       dragged.piece.style.removeProperty("transform");
       dragged.piece.style.removeProperty("pointer-events");
+      dragged.piece.classList.remove("pieza--elevada");
     }
+    if (gesture !== null) {
+      gesture.ghost?.remove();
+      gesture.chip?.remove();
+      gesture.over?.removeAttribute("data-bajo-dedo");
+    }
+  }
+
+  /** Levanta la pieza: queda una copia tenue en su casilla y aparece la etiqueta de la casilla de debajo. */
+  function lift(g: Gesture, cell: HTMLElement, piece: SVGElement): void {
+    g.lifted = true;
+    g.cell = cell.getBoundingClientRect().width;
+    piece.classList.add("pieza--elevada");
+    const ghost = piece.cloneNode(true) as SVGElement;
+    ghost.classList.add("pieza--origen");
+    ghost.setAttribute("aria-hidden", "true");
+    piece.before(ghost);
+    g.ghost = ghost;
+    const chip = document.createElement("span");
+    chip.className = "arrastre__etiqueta";
+    chip.setAttribute("aria-hidden", "true");
+    cell.append(chip);
+    g.chip = chip;
+  }
+
+  /** Marca la casilla bajo el dedo y escribe su nombre en la etiqueta, que va junto a la pieza elevada. */
+  function showOver(g: Gesture, event: PointerEvent, dx: number, dy: number): void {
+    const square = squareAt(document.elementFromPoint(event.clientX, event.clientY));
+    const over = square === null ? null : view.squareElement(square);
+    if (over !== g.over) {
+      g.over?.removeAttribute("data-bajo-dedo");
+      over?.setAttribute("data-bajo-dedo", "");
+      g.over = over;
+    }
+    const chip = g.chip;
+    if (chip === null) return;
+    chip.hidden = square === null;
+    chip.textContent = square;
+    const bounds = view.element.getBoundingClientRect();
+    const flip = event.clientX > bounds.left + 0.65 * bounds.width;
+    const place = chipPlacement(dx, dy, g.cell, flip);
+    chip.style.left = `${place.x}px`;
+    chip.style.top = `${place.y}px`;
+    chip.style.transform = flip ? "translateX(-100%)" : "";
   }
 
   /** ¿El gesto abierto está abandonado, a la vista de un `pointerdown` nuevo? */
@@ -105,6 +159,11 @@ export function attachBoardInput(host: BoardInputHost): void {
       dragging: false,
       tapOnly: false,
       hadFocus,
+      lifted: false,
+      cell: 0,
+      ghost: null,
+      chip: null,
+      over: null,
     };
     view.element.setPointerCapture(event.pointerId);
     event.preventDefault(); // sin selección de texto ni arrastre nativo de imágenes
@@ -130,8 +189,12 @@ export function attachBoardInput(host: BoardInputHost): void {
     if (dragged === null) return;
     dragged.cell.style.zIndex = "4";
     if (dragged.piece instanceof SVGElement) {
-      dragged.piece.style.transform = `translate(${dx}px, ${dy}px)`;
+      // Si el tablero se repinta a mitad de un arrastre, la casilla y la pieza son otras: se vuelve a levantar.
+      if (gesture.lifted && gesture.ghost?.isConnected !== true) gesture.lifted = false;
+      if (!gesture.lifted && liftsPiece(gesture.pointerType)) lift(gesture, dragged.cell, dragged.piece);
+      dragged.piece.style.transform = liftedTransform(dx, dy, gesture.cell, gesture.lifted);
       dragged.piece.style.pointerEvents = "none";
+      if (gesture.lifted) showOver(gesture, event, dx, dy);
     }
   });
 

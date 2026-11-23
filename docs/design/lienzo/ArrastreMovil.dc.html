@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Arrastrar con el dedo</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/escaque/tokens.css">
+<link rel="stylesheet" href="ds/escaque/components/bundle.css">
+<link rel="stylesheet" href="lecciones.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;600&family=Space+Grotesk:wght@600&display=swap">
+<style>
+body{margin:0}
+.casilla img{position:relative;z-index:1;display:block;width:100%;height:100%}
+.tablero__rejilla{position:relative}
+/* Con el dedo: la pieza que se arrastra queda en su casilla de origen más tenue, y la casilla bajo el dedo se marca con un borde grueso. */
+.casilla--origen img{opacity:.3}
+.casilla--bajo-dedo::before{inset:0;background:color-mix(in srgb,var(--mark-selected) 60%,transparent);box-shadow:inset 0 0 0 4px var(--board-ink)}
+.arrastre__pieza{position:absolute;z-index:5;left:34.375%;top:29.375%;width:18.75%;height:18.75%;pointer-events:none;filter:drop-shadow(0 6px 5px rgba(0,0,0,.4))}
+.arrastre__pieza img{display:block;width:100%;height:100%}
+.arrastre__chip{position:absolute;z-index:5;left:54%;top:29%;padding:2px 8px;border-radius:var(--radius-sm);background:var(--accent);color:var(--on-accent);font:500 14px/20px var(--font-mono);pointer-events:none}
+.arrastre__dedo{position:absolute;z-index:4;left:34.75%;top:47.25%;width:18%;height:18%;border-radius:50%;border:2px dashed var(--ink-muted);background:color-mix(in srgb,var(--ink) 12%,transparent);pointer-events:none}
+.arrastre__lista{margin:0;padding:0;list-style:none;display:grid;gap:8px}
+.arrastre__lista li{background:var(--surface-raised);border:1px solid var(--line);border-radius:var(--radius-md);padding:12px 16px;font:400 14px/20px var(--font-sans)}
+.arrastre__lista strong{display:block;font:600 16px/24px var(--font-display);margin-bottom:2px}
+</style>
+</helmet>
+<div style="width: 390px; min-height: 980px; box-sizing: border-box; padding: 16px; background: var(--surface); color: var(--ink); font-family: var(--font-sans); display: flex; flex-direction: column; gap: 16px">
+<header>
+<h1 style="margin: 0; font: 600 24px/28px var(--font-display)">Arrastrar con el dedo</h1>
+<p style="margin: 4px 0 0; font: 400 14px/20px var(--font-sans); color: var(--ink-muted)">Un caballo blanco de f3 a d4, a mitad del gesto.</p>
+</header>
+<p class="estado" role="status" style="margin: 0"><span class="estado__turno estado__turno--w" aria-hidden="true"></span><span><strong>Juegan las blancas.</strong></span></p>
+<section aria-label="Tablero">
+<div class="tablero">
+<div class="tablero__rejilla" role="grid" aria-label="Tablero de ajedrez, visto desde las blancas">
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="8">
+<div class="tablero__fila" role="row">
+<sc-for list="{{r.row}}" as="c" hint-placeholder-count="8">
+<div class="{{c.cls}}" role="gridcell" data-square="{{c.n}}" data-marks="{{c.marks}}" aria-label="{{c.label}}"><sc-if value="{{c.has}}" hint-placeholder-val="{{ true }}"><img src="{{c.img}}" alt=""></sc-if></div>
+</sc-for>
+</div>
+</sc-for>
+<div class="arrastre__dedo" aria-hidden="true"></div>
+<div class="arrastre__pieza" aria-hidden="true"><img src="/_blob/8c627fe6f9b20e3c70f41a0d92653372" alt=""></div>
+<div class="arrastre__chip" aria-hidden="true">d4</div>
+</div>
+<div class="tablero__rangos" aria-hidden="true"><span>8</span><span>7</span><span>6</span><span>5</span><span>4</span><span>3</span><span>2</span><span>1</span></div>
+<div class="tablero__columnas" aria-hidden="true"><span>a</span><span>b</span><span>c</span><span>d</span><span>e</span><span>f</span><span>g</span><span>h</span></div>
+</div>
+</section>
+<p style="margin: 0; font: 400 12px/16px var(--font-sans); color: var(--ink-muted)">El círculo discontinuo es el dedo: solo es ilustración, no se dibuja en la app.</p>
+<ul class="arrastre__lista">
+<li><strong>Con el dedo</strong>La pieza sube sobre el dedo: 1,5 veces su tamaño y una casilla y media por encima del punto de contacto, con sombra. En su casilla queda tenue. La casilla de debajo del dedo lleva un borde grueso y su nombre aparece junto a la pieza, donde el dedo no tapa.</li>
+<li><strong>Con ratón o lápiz</strong>Sin cambios: la pieza va pegada al puntero, del mismo tamaño.</li>
+<li><strong>Reducir movimiento</strong>La pieza aparece ya elevada, sin animación de subida ni de bajada.</li>
+<li><strong>Al soltar</strong>La pieza vuelve a su tamaño. Clic con clic y teclado no cambian.</li>
+</ul>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":980}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const IMG = { wk: '/_blob/f755b0e3cde224439141427c2f79dfcc', wq: '/_blob/e6db5db3ffcd79a147b06454e873bbb6', wr: '/_blob/ccca3b7fa33574992239568f87fea94a', wb: '/_blob/77d6825cc2acba00edb2116763773dbd', wn: '/_blob/8c627fe6f9b20e3c70f41a0d92653372', wp: '/_blob/751ba29078e9e60b8b5d0d7948fd281f', bk: '/_blob/77c898d2513e9ba83ab5680730d01bda', bq: '/_blob/5d4b4d17f82632fdf302ea2f666c3b78', br: '/_blob/2958949152b961dd0b29733063618976', bb: '/_blob/582ab6e66656de76eb46628bace09a68', bn: '/_blob/b85f02c56127bec2806870270b615310', bp: '/_blob/e571c7681346433a14159cb146cfb58c' };
+    const NAME = { p: 'peón', n: 'caballo', b: 'alfil', r: 'torre', q: 'dama', k: 'rey' };
+    const MARKS = { f3: 'selected', d4: 'target', g5: 'target', h4: 'target', g1: 'target', e5: 'capture', f8: 'last-move', c5: 'last-move' };
+    const EXTRA = { f3: ' casilla--origen', d4: ' casilla--bajo-dedo' };
+    const FEN = 'r1bqk1nr/pppp1ppp/2n5/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQK2R'.split('/');
+    const FILES = 'abcdefgh';
+    const rows = FEN.map((text, r) => {
+      const line = [];
+      for (const ch of text) {
+        if (ch >= '1' && ch <= '8') { for (let k = 0; k < Number(ch); k++) line.push(null); } else line.push(ch);
+      }
+      const rank = 8 - r;
+      return { row: line.map((p, c) => {
+        const n = FILES[c] + rank;
+        const side = p && p === p.toLowerCase() ? 'b' : 'w';
+        const t = p ? p.toLowerCase() : '';
+        const nombre = p ? NAME[t] + ' ' + (side === 'w' ? 'blanc' : 'negr') + (t === 'r' || t === 'q' ? 'a' : 'o') : 'vacía';
+        return { n, cls: 'casilla casilla--' + ((c + rank - 1) % 2 === 1 ? 'clara' : 'oscura') + (EXTRA[n] || ''), marks: MARKS[n] || '', has: !!p, img: p ? IMG[side + t] : '', label: n + ', ' + nombre };
+      }) };
+    });
+    return { rows };
+  }
+}
+</script>
+</body>
+</html>
