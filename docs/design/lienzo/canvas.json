@@ -581,6 +581,31 @@
    "h": 630,
    "title": "Imagen de vista previa (og:image)",
    "page": "escritorio"
+  },
+  "InicioInstalarEscritorio.dc.html": {
+   "x": 0,
+   "y": 28240,
+   "w": 1280,
+   "h": 1020,
+   "title": "Escritorio · inicio con aviso de instalar",
+   "expand": "fill",
+   "page": "escritorio"
+  },
+  "InicioInstalarTablet.dc.html": {
+   "x": 0,
+   "y": 28300,
+   "w": 820,
+   "h": 1020,
+   "title": "Tablet · inicio con aviso de instalar",
+   "page": "tablet"
+  },
+  "InicioInstalarMovil.dc.html": {
+   "x": 0,
+   "y": 33860,
+   "w": 390,
+   "h": 1180,
+   "title": "Móvil · inicio con aviso de instalar",
+   "page": "movil"
   }
  },
  "order": [
@@ -652,7 +677,10 @@
   "CoachMejoradoTablet.dc.html",
   "CoachMejoradoMovil.dc.html",
   "CoachMejoradoMovilHorizontal.dc.html",
-  "OgImage.dc.html"
+  "OgImage.dc.html",
+  "InicioInstalarEscritorio.dc.html",
+  "InicioInstalarTablet.dc.html",
+  "InicioInstalarMovil.dc.html"
  ],
  "notes": {
   "t_escritorio_0": {
@@ -1450,6 +1478,54 @@
    "fill": "gray",
    "page": "escritorio",
    "text": "Imagen de 1200x630 que muestran WhatsApp, Telegram, Slack, X, LinkedIn y Teams al compartir https://escaque.calvariotechlabs.com. Fondo del tema oscuro, icono y nombre, lema «Aprende ajedrez contra un motor hecho desde cero.», píldora «Sin cuentas · funciona sin conexión» y un tablero de 6x6 con una posición de ejemplo y la última jugada marcada. Aprobada el 23-nov (CAL-393). Texto alternativo: «Escaque: logo y un tablero de ajedrez con una posición de ejemplo»."
+  },
+  "t_inst_escritorio": {
+   "x": 0,
+   "y": 28000,
+   "text": "Instalar la app",
+   "kind": "title1",
+   "maxW": 1280,
+   "page": "escritorio"
+  },
+  "t_inst_tablet": {
+   "x": 0,
+   "y": 28060,
+   "text": "Instalar la app",
+   "kind": "title1",
+   "maxW": 820,
+   "page": "tablet"
+  },
+  "t_inst_movil": {
+   "x": 0,
+   "y": 33620,
+   "text": "Instalar la app",
+   "kind": "title1",
+   "maxW": 390,
+   "page": "movil"
+  },
+  "n_inst_escritorio": {
+   "x": 1360,
+   "y": 28240,
+   "w": 520,
+   "fill": "gray",
+   "page": "escritorio",
+   "text": "El aviso «Instala Escaque» (CAL-395) sale solo en la pantalla de inicio, no durante la partida. Desde 860 px va en la columna derecha, debajo del tablero de adorno: no empuja «Empezar partida». Mismos textos y botones que en «App instalable · avisos». Los avisos de versión nueva y sin conexión siguen en la pantalla de partida."
+  },
+  "n_inst_tablet": {
+   "x": 900,
+   "y": 28300,
+   "w": 520,
+   "fill": "gray",
+   "page": "tablet",
+   "text": "El aviso «Instala Escaque» (CAL-395) sale solo en la pantalla de inicio, no durante la partida. Por debajo de 860 px va después del botón «Empezar partida», al final del formulario, para no empujarlo. En el orden de tabulación queda tras el botón."
+  },
+  "n_inst_movil": {
+   "x": 470,
+   "y": 33860,
+   "w": 390,
+   "fill": "gray",
+   "page": "movil",
+   "text": "El aviso «Instala Escaque» (CAL-395) sale solo en la pantalla de inicio, no durante la partida. Va después del botón «Empezar partida». En iPhone/iPad (Safari) el aviso es el de «Añadir a pantalla de inicio» con «Entendido»."
   }
  },
  "designSystems": [

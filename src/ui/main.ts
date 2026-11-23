@@ -819,4 +819,5 @@ if (recovered !== null) {
 }
 
 // App instalable: service worker y avisos de instalar, sin conexión y versión nueva.
-startPwa(byId("avisos"));
+// El aviso de instalar vive en la pantalla de inicio; si desaparece al pulsarlo, el foco pasa al título de la pantalla.
+startPwa(byId("avisos"), byId("aviso-instalar"), () => settingsTitle.focus());
