@@ -1,0 +1,158 @@
+/* Escaque · repaso de la partida. Copia de docs/design/lienzo/repaso.css (diseño aprobado, CAL-304) sin la lámina de estados, más la maquetación de la pantalla al final. Solo usa tokens del Design System. */
+.rep-cab{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:var(--space-3) var(--space-6);flex:1 1 100%;min-width:0}
+.rep-cab__txt{display:flex;flex-direction:column;gap:var(--space-1);min-width:0;flex:1 1 360px}
+.rep-cab__titulo{margin:0;font:600 24px/28px var(--font-display)}
+.rep-cab__texto{margin:0;color:var(--ink-muted);font:400 14px/20px var(--font-sans)}
+.rep-col{display:flex;flex-direction:column;gap:var(--space-4);min-width:0}
+.rep-sec{display:flex;flex-direction:column;gap:var(--space-3);background:var(--surface-raised);border:1px solid var(--line);border-radius:var(--radius-md);padding:var(--space-4);min-width:0;color:var(--ink);font:400 14px/20px var(--font-sans)}
+.rep-sec__titulo{margin:0;font:600 20px/28px var(--font-display)}
+.rep-sec__nota{margin:0;color:var(--ink-muted);font:400 12px/16px var(--font-sans)}
+
+/* Botones para moverse por la partida: dos filas, siempre de texto */
+.paso{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--space-2)}
+.paso .boton{padding:0 var(--space-1);display:inline-flex;align-items:center;justify-content:center;gap:var(--space-1)}
+.paso .boton svg{flex:none;width:16px;height:16px}
+.paso__doble{grid-column:span 2}
+
+/* Curva de evaluación: lo claro es ventaja blanca; la línea discontinua, la igualdad. */
+.curva{margin:0;display:flex;flex-direction:column;gap:var(--space-2);min-width:0}
+.curva__lienzo{position:relative;border:1.5px solid var(--ink);border-radius:2px;background:var(--piece-black-mid);min-width:0}
+.curva__svg{display:block;width:100%;height:auto}
+.curva__area{fill:var(--piece-white-hi)}
+.curva__igualdad{fill:none;stroke-width:2;stroke-dasharray:6 6}
+.curva__igualdad--a{stroke:var(--piece-white-lo)}
+.curva__igualdad--b{stroke:var(--piece-black-mid);stroke-dashoffset:6}
+.curva__pendiente{fill:none;stroke:var(--piece-white-lo);stroke-width:2;stroke-dasharray:2 5;stroke-linecap:round}
+.curva__velo{position:absolute;top:0;bottom:0;right:0;background:repeating-linear-gradient(135deg,transparent 0 6px,color-mix(in srgb,var(--piece-white-lo) 35%,transparent) 6px 8px);border-left:2px dashed var(--piece-white-lo)}
+.curva__cursor{position:absolute;top:0;bottom:0;width:3px;margin-left:-1.5px;background:var(--accent);box-shadow:0 0 0 1.5px var(--surface-raised);pointer-events:none}
+.marca{position:absolute;width:20px;height:20px;margin:-10px 0 0 -10px;pointer-events:none;border-radius:50%}
+.marca svg{display:block;width:100%;height:100%;overflow:visible}
+.marca--sel{box-shadow:0 0 0 3px var(--surface-raised),0 0 0 6px var(--accent)}
+.forma{stroke-width:2.2;stroke-linejoin:round}
+.forma--b{fill:var(--piece-white-hi);stroke:var(--piece-outline-white)}
+.forma--n{fill:var(--piece-black-mid);stroke:var(--piece-white-hi)}
+.forma--lista{fill:currentColor;stroke:currentColor}
+.forma--dudosa{stroke-dasharray:3 2.4}
+.curva__ejex{position:relative;height:20px;color:var(--ink-muted);font:500 12px/16px var(--font-mono)}
+.curva__ejex span{position:absolute;top:2px;transform:translateX(-50%)}
+.curva__pie{margin:0;color:var(--ink-muted);font:400 12px/16px var(--font-sans)}
+.curva__leyenda{margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:var(--space-1) var(--space-4);font:400 14px/20px var(--font-sans)}
+.curva__leyenda li{display:inline-flex;align-items:center;gap:var(--space-2)}
+.curva__leyenda svg{width:16px;height:16px;flex:none;color:var(--ink)}
+
+/* Errores clave: cada fila es un botón que lleva a esa jugada */
+.clave__lista{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:var(--space-2)}
+.clave__item{display:grid;grid-template-columns:20px minmax(0,1fr);gap:var(--space-1) var(--space-3);align-items:start;width:100%;box-sizing:border-box;min-height:44px;padding:var(--space-2) var(--space-3);border:1.5px solid var(--control-border);border-radius:var(--radius-sm);background:var(--surface-raised);color:var(--ink);font:400 14px/20px var(--font-sans);text-align:left;cursor:pointer}
+.clave__item svg{width:20px;height:20px;margin-top:2px}
+.clave__item:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.clave__item[aria-current="true"]{border:3px solid var(--accent);padding:calc(var(--space-2) - 1.5px) calc(var(--space-3) - 1.5px)}
+.clave__san{font:500 15px/24px var(--font-mono)}
+.clave__tit{font-weight:600}
+.clave__eval{grid-column:2;color:var(--ink-muted)}
+.clave__mas{border:1px solid var(--line);border-radius:var(--radius-sm)}
+.clave__mas > summary{display:flex;align-items:center;min-height:44px;padding:0 var(--space-3);font:600 14px/20px var(--font-sans);cursor:pointer}
+.clave__mas > summary:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.clave__mas[open] > summary{border-bottom:1px solid var(--line)}
+.clave__mas .clave__lista{padding:var(--space-2)}
+.clave__vacio{margin:0;color:var(--ink-muted)}
+
+/* Resumen por bando */
+.resumen{width:100%;border-collapse:collapse;font:400 14px/20px var(--font-sans)}
+.resumen caption{text-align:left;padding:0 0 var(--space-2);font:600 20px/28px var(--font-display)}
+.resumen th,.resumen td{padding:var(--space-2) var(--space-2);border-top:1px solid var(--line);text-align:left}
+.resumen thead th{border-top:0;border-bottom:2px solid var(--ink);font-weight:600}
+.resumen tbody th{font-weight:400}
+.resumen td,.resumen thead th:not(:first-child){text-align:right;font-family:var(--font-mono);font-weight:500;font-size:15px}
+.resumen__cero{color:var(--ink-muted)}
+
+/* Marcas en la lista de jugadas */
+.jugadas__lista--repaso{max-height:320px;overflow:auto;padding-right:var(--space-1)}
+.jugada{display:flex;align-items:center;gap:var(--space-1)}
+.jugada svg{flex:none;width:12px;height:12px}
+.jugada[aria-current="true"] svg{color:var(--on-accent)}
+.jugada__sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+
+/* Progreso del análisis */
+.avance{display:flex;flex-direction:column;gap:var(--space-2)}
+.avance__barra{height:12px;box-sizing:border-box;border:1.5px solid var(--ink);border-radius:2px;background:var(--surface-raised);position:relative;overflow:hidden}
+.avance__barra > span{position:absolute;inset:0 auto 0 0;background:var(--accent)}
+.avance__texto{margin:0;font:600 14px/20px var(--font-sans)}
+.avance__nota{margin:0;color:var(--ink-muted)}
+
+/* Aviso de que no se pudo revisar: borde discontinuo e icono, como el fallo de las lecciones */
+.rep-fallo{display:flex;flex-direction:column;gap:var(--space-2);padding:var(--space-4);background:var(--surface-raised);border:2px dashed var(--ink);border-radius:var(--radius-md)}
+.rep-fallo__titulo{margin:0;display:flex;align-items:center;gap:var(--space-2);font:600 20px/28px var(--font-display)}
+.rep-fallo__titulo svg{width:24px;height:24px;flex:none}
+.rep-fallo p{margin:0}
+.rep-fallo__acciones{display:flex;flex-wrap:wrap;gap:var(--space-2);margin-top:var(--space-1)}
+
+@media (forced-colors: active){
+  .curva__lienzo,.clave__item,.rep-sec,.rep-fallo,.avance__barra{border-color:CanvasText}
+  .curva__area{fill:CanvasText}
+  .curva__lienzo{background:Canvas}
+  .avance__barra > span{background:Highlight}
+  .curva__cursor{background:Highlight}
+  .clave__item[aria-current="true"]{border-color:Highlight}
+  .forma--b,.forma--n{fill:Canvas;stroke:CanvasText}
+}
+@media (prefers-reduced-motion: reduce){
+  .clave__item{transition:none}
+}
+
+/* --- Maquetación de la pantalla (lienzo «Repaso · escritorio / tablet / móvil») --------------------- */
+/* `hidden` debe ganar a los display del diseño. */
+.repaso[hidden],.repaso [hidden]{display:none}
+/* Botones de paso en el límite de la partida: se ven como desactivados pero conservan el foco. */
+.boton[aria-disabled="true"]{color:var(--ink-muted);border-style:dashed;cursor:not-allowed}
+
+/* Móvil: una columna. El tablero va después de la cabecera y el resumen después de los errores clave. */
+.repaso{max-width:1160px;margin:0 auto;box-sizing:border-box;padding:var(--space-4) max(var(--space-4),env(safe-area-inset-right,0px)) max(var(--space-8),env(safe-area-inset-bottom,0px)) max(var(--space-4),env(safe-area-inset-left,0px));display:grid;grid-template-columns:minmax(0,1fr);gap:var(--space-4);align-items:start}
+.repaso__panel,.repaso__der{display:contents}
+.repaso__cab{order:-1}
+.repaso__resumen{order:1}
+.repaso__jugadas,.repaso__acciones{order:2}
+.repaso__tablero{min-width:0}
+.repaso .tablero{width:100%}
+.repaso__parar{justify-self:start;align-self:flex-start}
+.repaso__nota-lista{margin:0 0 var(--space-2)}
+.repaso__acciones{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-2)}
+.repaso__acciones .boton--principal{grid-column:1 / -1}
+
+/* Tablet vertical: una columna de hasta 700 px; errores clave y resumen lado a lado; tres botones en fila. */
+@media (min-width:600px) and (max-width:859px) and (min-height:501px){
+  .repaso{max-width:732px;padding-top:var(--space-6);gap:var(--space-6) var(--space-4);grid-template-columns:minmax(0,1.25fr) minmax(0,1fr)}
+  .repaso > *,.repaso__panel > *,.repaso__der > *{grid-column:1 / -1}
+  .repaso__panel > .repaso__resumen{grid-column:2}
+  .repaso__der > .repaso__clave{grid-column:1}
+  .repaso__acciones{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .repaso__acciones .boton--principal{grid-column:auto}
+}
+
+/* Escritorio y tablet horizontal: cabecera arriba; tablero, pasos, curva y resumen a la izquierda; el resto a la derecha. */
+@media (min-width:860px){
+  .repaso{padding-top:var(--space-6);padding-bottom:calc(var(--space-8) + var(--space-4));grid-template-columns:minmax(0,640px) minmax(340px,440px);grid-template-rows:auto auto auto auto auto 1fr;grid-template-areas:"cab cab" "tablero der" "paso der" "curva der" "resumen der" ". der";gap:var(--space-4) var(--space-8);justify-content:center}
+  .repaso__cab{grid-area:cab;margin-bottom:var(--space-2)}
+  .repaso__tablero{grid-area:tablero}
+  .repaso__paso{grid-area:paso}
+  .repaso__curva{grid-area:curva}
+  .repaso__resumen{grid-area:resumen}
+  .repaso__der{grid-area:der;display:flex;flex-direction:column;gap:var(--space-4);min-width:0}
+}
+
+/* Móvil apaisado (alto menor de 500 px): el patrón del coach. El tablero a la izquierda, limitado por el alto;
+   a la derecha, una región con scroll propio con los botones de paso fijos arriba. */
+@media (orientation:landscape) and (max-height:500px){
+  .repaso{max-width:none;margin:0;height:100dvh;padding:max(var(--space-4),env(safe-area-inset-top,0px)) max(var(--space-6),env(safe-area-inset-right,0px)) max(var(--space-4),env(safe-area-inset-bottom,0px)) max(var(--space-6),env(safe-area-inset-left,0px));grid-template-columns:var(--tablero-ancho) minmax(0,1fr);grid-template-rows:44px minmax(0,1fr);grid-template-areas:"tablero titulo" "tablero panel";gap:var(--space-2) var(--space-6)}
+  .pagina__cabecera ~ .repaso::before{content:"";grid-area:titulo}
+  .repaso__tablero{grid-area:tablero}
+  .repaso__panel{grid-area:panel;display:flex;flex-direction:column;gap:var(--space-3);min-height:0;overflow:auto;padding:2px;scroll-padding-top:100px}
+  .repaso__panel > *{flex:none}
+  .repaso__panel:focus-visible{outline:3px solid var(--accent);outline-offset:-3px}
+  .repaso__der{display:contents}
+  .repaso__cab{order:-2}
+  .repaso__cab .rep-cab__titulo{font-size:20px;line-height:24px}
+  .repaso__paso{order:-1;position:sticky;top:0;z-index:2;padding-bottom:var(--space-2);background:var(--surface)}
+  .repaso__paso .boton{padding:4px 6px;font-size:13px;line-height:16px}
+  .repaso__coach{padding:var(--space-3);gap:var(--space-3)}
+  .curva__lienzo .marca{width:16px;height:16px;margin:-8px 0 0 -8px}
+}

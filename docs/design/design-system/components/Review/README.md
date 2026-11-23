@@ -1,6 +1,6 @@
 Repaso de la partida: pantalla que se abre desde «Repasar la partida» en el panel de resultado y deja recorrer la partida terminada con el coach.
 
-**Estado:** propuesta de diseño pendiente de aprobación (CAL-304). Los estilos están en `lienzo/repaso.css`; todavía no están en `components/bundle.css` ni en el Design System de Claude Design. Se llevarán a `src/ui` al implementarlo.
+**Estado:** aprobado por Sergio el 23-nov-2026 (CAL-304) e implementado (CAL-378): estilos en `src/ui/repaso.css` (copia de `lienzo/repaso.css` más la maquetación), lógica en `src/ui/review.ts` y pantalla en `src/ui/review-screen.ts`. Todavía no están en `components/bundle.css` ni en el Design System de Claude Design.
 
 **Piezas.** Reutiliza `tablero`, `coach` (la jugada seleccionada es el panel del coach con el título «Jugada seleccionada»), `jugadas`, `boton` y `resultado`. Añade:
 - `paso`: seis botones de texto en dos filas (Inicio, Anterior, Siguiente, Final; Error clave anterior, Siguiente error clave). Con el foco en ellos, ← → Inicio y Fin (`aria-keyshortcuts`); no hay atajos globales.
@@ -16,4 +16,6 @@ Repaso de la partida: pantalla que se abre desde «Repasar la partida» en el pa
 
 **Datos del ejemplo.** Partida de 53 jugadas ganada por las blancas, analizada con `analyzeMove` a profundidad 4: 11 jugadas con imprecisión o error (5 errores, 6 imprecisiones).
 
-**Pendiente de decidir.** Móvil horizontal sin diseñar. El análisis completo tarda (unos 0,5 s por jugada): se hará en el Worker del coach, jugada a jugada.
+**Móvil horizontal.** Sin lámina propia: sigue el patrón del coach apaisado (tablero a la izquierda y, a la derecha, una región con scroll propio con los botones de paso fijos arriba).
+
+**Análisis.** Jugada a jugada en un Worker del coach propio del repaso (unos 0,2 a 0,6 s por jugada), primero la jugada seleccionada si falta y después en orden; reutiliza los informes que el coach ya calculó durante la partida. «Parar el análisis» lo detiene y el botón pasa a «Seguir con el análisis» (texto añadido al implementarlo, no está en el lienzo).

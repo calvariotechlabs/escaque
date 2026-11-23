@@ -16,12 +16,31 @@ const ICON_MATE = SVG(`<path d="M7 3h6M10 3v3M6 17h8M7.5 17l.8-7a3 3 0 1 1 3.4 0
 const SEVERITY_ICON = { grave: ICON_GRAVE, dudosa: ICON_DUDOSA, buena: ICON_BUENA } as const;
 const FINDING_ICON = { "mate-en-1": ICON_MATE, "pieza-colgando": ICON_GRAVE, "captura-gratis": ICON_DUDOSA } as const;
 
+/** Dónde está el panel y cómo se escribe la jugada. Por defecto, el coach de la partida. */
+export interface CoachPanelOptions {
+  /** Prefijo de los id del esqueleto: `<prefijo>`, `<prefijo>-jugada`, `-veredicto`, `-resumen` y `-avisos`. */
+  readonly prefix?: string;
+  /** Contenido de la línea de la jugada; por defecto, «Jugada revisada: 4. Cf3». */
+  readonly moveLine?: (label: string) => Node[];
+  /** Nivel de los subtítulos (Evaluación y avisos): un nivel por debajo del título del panel. Por defecto, h3. */
+  readonly subheading?: "h3" | "h4";
+}
+
 export interface CoachPanel {
   /** Antes de la primera jugada (o sin jugada que revisar). */
   showEmpty(): void;
   showReviewing(label: string): void;
   showFailed(label: string): void;
-  showReport(view: ReportView): void;
+  /**
+   * Informe de una jugada. `spoken` es un texto oculto que se lee antes del
+   * veredicto (en el repaso, «14. Th2, blancas. »).
+   */
+  showReport(view: ReportView, spoken?: string): void;
+  /**
+   * Jugada todavía sin informe (en el repaso): `spoken` se anuncia y `text` se
+   * ve; con `busy`, la barra de «pensando».
+   */
+  showWaiting(label: string, spoken: string, text: string, busy: boolean): void;
   /** Quita las casillas marcadas por «Ver en el tablero». */
   clearMarks(): void;
 }
@@ -65,18 +84,21 @@ function evaluationRows(label: string, evaluation: EvaluationView): [HTMLElement
   return [term, detail];
 }
 
-export function createCoachPanel(onMarks: (marks: readonly SquareMark[]) => void): CoachPanel {
-  const root = byId<HTMLElement>("coach");
-  const move = byId<HTMLElement>("coach-jugada");
-  const verdict = byId<HTMLElement>("coach-veredicto");
-  const summary = byId<HTMLElement>("coach-resumen");
-  const side = byId<HTMLElement>("coach-avisos");
+export function createCoachPanel(onMarks: (marks: readonly SquareMark[]) => void, options: CoachPanelOptions = {}): CoachPanel {
+  const prefix = options.prefix ?? "coach";
+  const moveLine = options.moveLine ?? ((label: string): Node[] => [document.createTextNode("Jugada revisada: "), el("span", "coach__san", label)]);
+  const sub = options.subheading ?? "h3";
+  const root = byId<HTMLElement>(prefix);
+  const move = byId<HTMLElement>(`${prefix}-jugada`);
+  const verdict = byId<HTMLElement>(`${prefix}-veredicto`);
+  const summary = byId<HTMLElement>(`${prefix}-resumen`);
+  const side = byId<HTMLElement>(`${prefix}-avisos`);
   let active: number | null = null;
   let findings: readonly FindingView[] = [];
 
   const setMove = (label: string): void => {
     move.hidden = label === "";
-    move.replaceChildren(document.createTextNode("Jugada revisada: "), el("span", "coach__san", label));
+    move.replaceChildren(...moveLine(label));
   };
 
   /** Deja la región viva vacía: lo que no es un veredicto no se anuncia. */
@@ -150,7 +172,23 @@ export function createCoachPanel(onMarks: (marks: readonly SquareMark[]) => void
       summary.replaceChildren();
     },
 
-    showReport(view) {
+    showWaiting(label, spoken, text, busy) {
+      reset();
+      // Sin aria-busy: lo oculto de `spoken` tiene que anunciarse.
+      root.removeAttribute("aria-busy");
+      setMove(label);
+      clearVerdict();
+      verdict.append(el("span", "oculto", spoken));
+      const parts: Node[] = [el("p", "coach__vacio", text)];
+      if (busy) {
+        const bar = el("div", "coach__barra-pensando");
+        bar.setAttribute("aria-hidden", "true");
+        parts.push(bar);
+      }
+      summary.replaceChildren(...parts);
+    },
+
+    showReport(view, spoken = "") {
       reset();
       root.removeAttribute("aria-busy");
       setMove(view.label);
@@ -159,6 +197,7 @@ export function createCoachPanel(onMarks: (marks: readonly SquareMark[]) => void
       const icon = el("span");
       icon.innerHTML = SEVERITY_ICON[view.severity]; // marcado fijo, sin datos
       const text = el("span");
+      if (spoken !== "") text.append(el("span", "oculto", spoken));
       text.append(el("strong", undefined, view.verdictTitle), document.createTextNode(view.verdictText));
       verdict.replaceChildren(icon.firstElementChild!, text);
 
@@ -171,7 +210,7 @@ export function createCoachPanel(onMarks: (marks: readonly SquareMark[]) => void
       const block = el("div");
       const list = el("dl", "coach__eval");
       list.append(...evaluationRows("Antes", view.before), ...evaluationRows("Después", view.after));
-      block.append(el("h3", "coach__sub", "Evaluación"), list, el("p", "coach__leyenda", COACH_TEXT.legend));
+      block.append(el(sub, "coach__sub", "Evaluación"), list, el("p", "coach__leyenda", COACH_TEXT.legend));
       parts.push(block);
       summary.replaceChildren(...parts);
 
@@ -186,7 +225,7 @@ export function createCoachPanel(onMarks: (marks: readonly SquareMark[]) => void
       findings.forEach((finding, index) => {
         const li = el("li", "coach__aviso");
         li.dataset["aviso"] = String(index);
-        const title = el("h3", "coach__aviso-titulo");
+        const title = el(sub, "coach__aviso-titulo");
         const iconHolder = el("span");
         iconHolder.innerHTML = FINDING_ICON[finding.kind];
         title.append(iconHolder.firstElementChild!, document.createTextNode(finding.title));
