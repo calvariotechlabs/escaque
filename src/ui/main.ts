@@ -35,6 +35,7 @@ import {
 import type { CoachReport, SquareMark } from "../coach/index.js";
 import { reportView, reviewJob, reviewKey, withCoachMarks } from "./coach.js";
 import { createCoachPanel } from "./coach-panel.js";
+import { createReviewScreen } from "./review-screen.js";
 import { createEngineClient, EngineCancelledError } from "../worker/client.js";
 import { createCoachClient } from "../worker/coach-client.js";
 import { startPwa } from "../pwa/pwa.js";
@@ -53,6 +54,8 @@ function byId<T extends HTMLElement>(id: string): T {
 
 const settingsScreen = byId<HTMLElement>("pantalla-ajustes");
 const gameScreen = byId<HTMLElement>("pantalla-partida");
+const reviewScreenRoot = byId<HTMLElement>("pantalla-repaso");
+const reviewButton = byId<HTMLButtonElement>("repasar");
 const settingsForm = byId<HTMLFormElement>("ajustes");
 const levelGroup = byId<HTMLFieldSetElement>("grupo-nivel");
 const colorGroup = byId<HTMLFieldSetElement>("grupo-color");
@@ -144,6 +147,24 @@ const coachPanel = createCoachPanel((marks) => {
   coachMarksFen = game.fen;
   applyMarks();
 });
+
+// Repaso de la partida terminada: su propia pantalla, con los informes del coach compartidos.
+const review = createReviewScreen({
+  cache: coachCache,
+  onBack: () => {
+    showScreen("partida");
+    reviewButton.focus();
+  },
+  onRematch: () => startGame(setup.mode === "maquina" ? { ...setup } : setup),
+  onNewGame: () => openSettings(),
+});
+
+/** Deja de revisar en el coach de la partida (otra pantalla a la vista). */
+function stopCoach(): void {
+  coachToken++;
+  coachKey = null;
+  coachClient?.cancel();
+}
 
 function applyMarks(): void {
   view.setMarks(withCoachMarks(ui.marks(), coachMarks));
@@ -490,13 +511,13 @@ function startGame(next: GameSetup): void {
 // --- Ajustes -------------------------------------------------------------------
 
 /** Pantalla de jugar que toca enseñar cuando la ruta es «jugar»: la de ajustes o la de la partida. */
-let playScreen: "ajustes" | "partida" = "ajustes";
+let playScreen: "ajustes" | "partida" | "repaso" = "ajustes";
 let route: Route = parseRoute(location.hash);
 /** ¿Se están enseñando las lecciones? Así se sabe cuándo se vuelve de ellas. */
 let onLessons = false;
 const BASE_TITLE = document.title;
 
-function showScreen(screen: "ajustes" | "partida"): void {
+function showScreen(screen: "ajustes" | "partida" | "repaso"): void {
   playScreen = screen;
   applyRoute(false);
 }
@@ -507,7 +528,9 @@ function applyRoute(moveFocus: boolean): void {
   const onPlay = route.kind === "jugar";
   settingsScreen.hidden = !onPlay || playScreen !== "ajustes";
   gameScreen.hidden = !onPlay || playScreen !== "partida";
-  headingSub.hidden = !(onPlay && playScreen === "partida");
+  reviewScreenRoot.hidden = !onPlay || playScreen !== "repaso";
+  headingSub.hidden = !(onPlay && playScreen !== "ajustes");
+  if (!onPlay || playScreen !== "repaso") review.hide();
   linkPlay.removeAttribute("aria-current");
   linkLessons.removeAttribute("aria-current");
   (onPlay ? linkPlay : linkLessons).setAttribute("aria-current", "page");
@@ -518,6 +541,10 @@ function applyRoute(moveFocus: boolean): void {
     // Al enseñar la partida (nueva, recuperada o de vuelta de las lecciones) se pinta y se reanuda lo que hubiera:
     // el coach y, si le toca, la máquina.
     if (playScreen === "partida") render();
+    if (playScreen === "repaso") {
+      stopCoach();
+      review.open(game, ui.orientation);
+    }
     onLessons = false;
     return;
   }
@@ -554,9 +581,7 @@ function fillSettings(choice: SetupChoice): void {
 
 function openSettings(): void {
   stopThinking();
-  coachToken++;
-  coachKey = null;
-  coachClient?.cancel();
+  stopCoach();
   fillSettings(choiceOf(setup));
   showScreen("ajustes");
   settingsForm.querySelector<HTMLInputElement>('input[name="modo"]:checked')?.focus();
@@ -580,6 +605,8 @@ newGameButton.addEventListener("click", () => {
   confirmDialog.showModal();
   keepPlayingButton.focus();
 });
+
+reviewButton.addEventListener("click", () => showScreen("repaso"));
 
 // La revancha repite modo, nivel y color.
 rematchButton.addEventListener("click", () => startGame(setup.mode === "maquina" ? { ...setup } : setup));

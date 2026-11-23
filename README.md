@@ -154,6 +154,15 @@ Todo en `src/coach`, sin dependencias ni DOM. `analyzeMove({ fen, moves }, jugad
 - **Mate en 1 que se escapó.** Se prueban todas las jugadas legales: es exacto, no depende de la búsqueda.
 - **Pieza colgando y captura que ganaba material.** Un intercambio estático (SEE) hecho con jugadas legales, así que respeta clavadas y jaques: en la casilla capturan los dos bandos por turnos con la pieza de menos valor, y cada uno para cuando ya no le conviene. Solo se avisa si el motor confirma que la jugada pierde al menos 0,8 peones: así no se marca un sacrificio que da mate ni un cambio igualado. La captura no vista, además, se busca con el motor para comprobar que de verdad era mejor (como mucho dos candidatas). En la pieza que se acaba de mover cuenta lo que capturó: un cambio igualado no es una pieza colgando. Limitación conocida: un peón que el rival puede tomar al paso no se marca como colgando.
 
+### Repaso de la partida
+
+Al terminar contra la máquina, «Repasar la partida» abre una pantalla que recorre la partida entera con el coach (diseño aprobado en `docs/design`, componente `Review`). Lógica sin DOM en `src/ui/review.ts` y pantalla en `src/ui/review-screen.ts`.
+
+- **Análisis jugada a jugada.** Un Worker del coach propio del repaso revisa cada jugada con `analyzeMove`, primero la que estás mirando si falta y después en orden. Lo que el coach ya revisó durante la partida no se vuelve a calcular. La partida de la ópera (33 jugadas) tarda unos 8 s en el navegador. Mientras tanto se puede recorrer lo revisado; el análisis se puede parar y seguir.
+- **Curva de evaluación.** Misma escala que el coach (puntos esperados), así que un error grave se ve como un salto grande. Es solo una vista (`role="img"` con un resumen escrito); todo lo que enseña se puede hacer con botones.
+- **Errores clave.** Errores y errores graves de los dos bandos, con las imprecisiones plegadas, el resumen por bando y la lista de jugadas con marcas. «Error clave anterior» y «Siguiente error clave» saltan entre ellos.
+- **Accesibilidad.** Con el foco en los botones de paso, ← → Inicio y Fin mueven por la partida, sin atajos globales. Al cambiar de jugada se anuncia «14. Th2, blancas.» y el veredicto. En móvil apaisado sigue el patrón del coach: tablero a la izquierda y el resto en una región con scroll propio.
+
 ### Perft y perft dividido
 
 [Perft](https://www.chessprogramming.org/Perft) cuenta las posiciones alcanzables a una profundidad dada. Para posiciones conocidas esos números están publicados, así que cualquier fallo del generador de jugadas (un enroque mal permitido, una captura al paso olvidada, una coronación que falta) cambia el conteo. Las posiciones de referencia y sus conteos están en `tests/perft-positions.ts`: la inicial, las posiciones 2 a 6 de la Chess Programming Wiki (Kiwipete entre ellas) y las posiciones «trampa» de Martin Sedlak (al paso ilegal por clavada, enroques que dan jaque, coronaciones que ahogan…).

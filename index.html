@@ -22,6 +22,7 @@
 <link rel="stylesheet" href="src/ui/ajustes.css">
 <link rel="stylesheet" href="src/ui/coach.css">
 <link rel="stylesheet" href="src/ui/lecciones.css">
+<link rel="stylesheet" href="src/ui/repaso.css">
 <script type="module" src="dist/src/ui/main.js"></script>
 </head>
 <body>
@@ -77,6 +78,7 @@
       <h2 id="resultado-titulo" class="resultado__titulo"></h2>
       <p id="resultado-texto" class="resultado__texto"></p>
       <button id="revancha" class="boton boton--principal" type="button">Revancha</button>
+      <button id="repasar" class="boton" type="button">Repasar la partida</button>
     </section>
   </div>
   <section class="partida__tablero" aria-label="Tablero">
@@ -104,6 +106,68 @@
     </section>
   </div>
   <p id="anuncio" class="solo-lector" aria-live="polite"></p>
+</main>
+<main id="pantalla-repaso" class="repaso" aria-labelledby="repaso-titulo" hidden>
+  <section class="repaso__tablero" aria-label="Tablero"><div id="repaso-tablero"></div></section>
+  <div id="repaso-panel" class="repaso__panel">
+    <section class="rep-cab repaso__cab" aria-labelledby="repaso-titulo">
+      <div class="rep-cab__txt"><h2 class="rep-cab__titulo" id="repaso-titulo" tabindex="-1">Repaso de la partida</h2><p id="repaso-intro" class="rep-cab__texto"></p></div>
+      <button class="boton" type="button" data-volver>Volver al resultado</button>
+    </section>
+    <div id="repaso-paso" class="paso repaso__paso" role="group" aria-label="Moverse por la partida">
+      <button class="boton" type="button" data-paso="inicio" aria-keyshortcuts="Home">Inicio</button><button class="boton" type="button" data-paso="anterior" aria-keyshortcuts="ArrowLeft">Anterior</button><button class="boton" type="button" data-paso="siguiente" aria-keyshortcuts="ArrowRight">Siguiente</button><button class="boton" type="button" data-paso="final" aria-keyshortcuts="End">Final</button>
+      <button class="boton paso__doble" type="button" data-paso="error-anterior">Error clave anterior</button><button class="boton paso__doble" type="button" data-paso="error-siguiente">Siguiente error clave</button>
+    </div>
+    <section id="repaso-fallo" class="rep-fallo repaso__curva" role="alert" aria-labelledby="repaso-fallo-titulo" hidden>
+      <h3 class="rep-fallo__titulo" id="repaso-fallo-titulo"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2.5 22.5 20.5h-21Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 9v5M12 16.8v.4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>No se pudo revisar la partida.</h3>
+      <p>Alfil Beta no ha podido analizar las jugadas. Tu partida sigue guardada en este dispositivo.</p>
+      <div class="rep-fallo__acciones"><button id="repaso-reintentar" class="boton boton--principal" type="button">Reintentar</button><button class="boton" type="button" data-volver>Volver al resultado</button></div>
+    </section>
+    <section id="repaso-curva" class="rep-sec repaso__curva" aria-labelledby="repaso-curva-titulo">
+      <h3 class="rep-sec__titulo" id="repaso-curva-titulo">Evaluación de la partida</h3>
+      <div id="repaso-avance" class="avance" hidden>
+        <p class="avance__texto" id="repaso-avance-texto"></p>
+        <div id="repaso-avance-barra" class="avance__barra" role="progressbar" aria-labelledby="repaso-avance-texto" aria-valuemin="0"><span></span></div>
+        <p class="avance__nota" id="repaso-avance-nota"></p>
+      </div>
+      <button id="repaso-parar" class="boton repaso__parar" type="button" hidden>Parar el análisis</button>
+      <figure class="curva">
+        <div id="repaso-lienzo" class="curva__lienzo" role="img"></div>
+        <div id="repaso-ejex" class="curva__ejex" aria-hidden="true"></div>
+        <ul class="curva__leyenda" aria-label="Leyenda de las marcas"><li><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path class="forma forma--b" d="M10 2 18.5 17.5H1.5Z"/></svg>Error o error grave</li><li><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path class="forma forma--b forma--dudosa" d="M10 2.5a7.5 7.5 0 1 0 0 15 7.5 7.5 0 1 0 0-15Z"/></svg>Imprecisión</li></ul>
+        <figcaption id="repaso-pie" class="curva__pie"></figcaption>
+      </figure>
+    </section>
+    <section class="rep-sec repaso__resumen"><table class="resumen"><caption>Resumen por bando</caption><thead><tr><th scope="col"><span class="oculto">Tipo de jugada</span></th><th scope="col">Blancas</th><th scope="col">Negras</th></tr></thead><tbody id="repaso-resumen"></tbody></table></section>
+    <div class="repaso__der">
+    <section id="rep-coach" class="coach repaso__coach" aria-labelledby="rep-coach-titulo">
+      <header class="coach__cab"><h3 class="coach__titulo" id="rep-coach-titulo">Jugada seleccionada</h3><p id="rep-coach-jugada" class="coach__jugada" hidden></p></header>
+      <div class="coach__col">
+        <p id="rep-coach-veredicto" class="coach__veredicto coach__veredicto--vacio" role="status"></p>
+        <div id="rep-coach-resumen" class="coach__col"></div>
+      </div>
+      <div id="rep-coach-avisos" class="coach__col" hidden></div>
+    </section>
+    <section class="rep-sec repaso__clave" aria-labelledby="repaso-clave-titulo">
+      <h3 class="rep-sec__titulo" id="repaso-clave-titulo">Errores clave</h3>
+      <p id="repaso-clave-nota" class="rep-sec__nota">Errores y errores graves de los dos bandos, en el orden de la partida.</p>
+      <ul id="repaso-clave" class="clave__lista" aria-label="Errores clave"></ul>
+      <p id="repaso-clave-vacio" class="clave__vacio" hidden></p>
+      <details id="repaso-mas" class="clave__mas" hidden><summary id="repaso-mas-titulo"></summary><ul id="repaso-imprecisiones" class="clave__lista" aria-label="Imprecisiones"></ul></details>
+    </section>
+    <section class="jugadas repaso__jugadas" aria-labelledby="repaso-jugadas-titulo">
+      <h3 class="jugadas__titulo" id="repaso-jugadas-titulo">Jugadas</h3>
+      <p class="rep-sec__nota repaso__nota-lista">Triángulo: error. Círculo discontinuo: imprecisión.</p>
+      <ol id="repaso-lista" class="jugadas__lista jugadas__lista--repaso" aria-label="Lista de jugadas con errores marcados"></ol>
+    </section>
+    <div class="repaso__acciones">
+      <button id="repaso-revancha" class="boton boton--principal" type="button">Revancha</button>
+      <button id="repaso-nueva" class="boton" type="button">Nueva partida</button>
+      <button class="boton" type="button" data-volver>Volver al resultado</button>
+    </div>
+    </div>
+  </div>
+  <p id="repaso-anuncio" class="solo-lector" aria-live="polite"></p>
 </main>
 <main id="pantalla-lecciones" class="lecc-pagina" aria-labelledby="titulo-lecciones" hidden>
   <div class="lecc-intro-bloque">
