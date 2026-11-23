@@ -1,0 +1,89 @@
+  Difícil contra azar #1 (blancas): 1-0 por checkmate en 25 medias jugadas
+  Difícil contra azar #2 (negras): 0-1 por checkmate en 40 medias jugadas
+  Difícil contra azar #3 (blancas): 1-0 por checkmate en 31 medias jugadas
+  Difícil contra azar #4 (negras): 0-1 por checkmate en 30 medias jugadas
+  Difícil contra azar #5 (blancas): 1-0 por checkmate en 21 medias jugadas
+  Difícil contra azar #6 (negras): 0-1 por checkmate en 32 medias jugadas
+  Difícil contra azar #7 (blancas): 1-0 por checkmate en 23 medias jugadas
+  Difícil contra azar #8 (negras): 0-1 por checkmate en 22 medias jugadas
+  Difícil contra azar #9 (blancas): 1-0 por checkmate en 19 medias jugadas
+  Difícil contra azar #10 (negras): 0-1 por checkmate en 24 medias jugadas
+  Difícil contra azar #11 (blancas): 1-0 por checkmate en 13 medias jugadas
+  Difícil contra azar #12 (negras): 0-1 por checkmate en 38 medias jugadas
+  Difícil contra azar #13 (blancas): 1-0 por checkmate en 25 medias jugadas
+  Difícil contra azar #14 (negras): 0-1 por checkmate en 28 medias jugadas
+  Difícil contra azar #15 (blancas): 1-0 por checkmate en 29 medias jugadas
+  Difícil contra azar #16 (negras): 0-1 por checkmate en 32 medias jugadas
+  Difícil contra azar #17 (blancas): 1-0 por checkmate en 17 medias jugadas
+  Difícil contra azar #18 (negras): 0-1 por checkmate en 8 medias jugadas
+  Difícil contra azar #19 (blancas): 1-0 por checkmate en 9 medias jugadas
+  Difícil contra azar #20 (negras): 0-1 por checkmate en 14 medias jugadas
+Difícil contra azar: +20 =0 -0 de 20
+
+  Difícil contra Fácil #1 (blancas): 1-0 por checkmate en 13 medias jugadas
+  Difícil contra Fácil #2 (negras): 0-1 por checkmate en 20 medias jugadas
+  Difícil contra Fácil #3 (blancas): 1-0 por checkmate en 69 medias jugadas
+  Difícil contra Fácil #4 (negras): 0-1 por checkmate en 76 medias jugadas
+  Difícil contra Fácil #5 (blancas): 1-0 por checkmate en 57 medias jugadas
+  Difícil contra Fácil #6 (negras): 0-1 por checkmate en 64 medias jugadas
+  Difícil contra Fácil #7 (blancas): 1-0 por checkmate en 33 medias jugadas
+  Difícil contra Fácil #8 (negras): 0-1 por checkmate en 72 medias jugadas
+  Difícil contra Fácil #9 (blancas): 1-0 por checkmate en 37 medias jugadas
+  Difícil contra Fácil #10 (negras): 0-1 por checkmate en 38 medias jugadas
+  Difícil contra Fácil #11 (blancas): 1-0 por checkmate en 9 medias jugadas
+  Difícil contra Fácil #12 (negras): 0-1 por checkmate en 44 medias jugadas
+  Difícil contra Fácil #13 (blancas): 1-0 por checkmate en 19 medias jugadas
+  Difícil contra Fácil #14 (negras): 0-1 por checkmate en 58 medias jugadas
+  Difícil contra Fácil #15 (blancas): 1-0 por checkmate en 29 medias jugadas
+  Difícil contra Fácil #16 (negras): 0-1 por checkmate en 10 medias jugadas
+  Difícil contra Fácil #17 (blancas): 1-0 por checkmate en 47 medias jugadas
+  Difícil contra Fácil #18 (negras): 0-1 por checkmate en 68 medias jugadas
+  Difícil contra Fácil #19 (blancas): 1-0 por checkmate en 45 medias jugadas
+  Difícil contra Fácil #20 (negras): 0-1 por checkmate en 26 medias jugadas
+Difícil contra Fácil: +20 =0 -0 de 20
+
+  Difícil contra Medio #1 (blancas): 1-0 por checkmate en 103 medias jugadas
+  Difícil contra Medio #2 (negras): 0-1 por checkmate en 146 medias jugadas
+  Difícil contra Medio #3 (blancas): 1-0 por checkmate en 103 medias jugadas
+  Difícil contra Medio #4 (negras): 0-1 por checkmate en 146 medias jugadas
+  Difícil contra Medio #5 (blancas): 1-0 por checkmate en 103 medias jugadas
+  Difícil contra Medio #6 (negras): 0-1 por checkmate en 102 medias jugadas
+  Difícil contra Medio #7 (blancas): 1-0 por checkmate en 169 medias jugadas
+  Difícil contra Medio #8 (negras): 0-1 por checkmate en 102 medias jugadas
+  Difícil contra Medio #9 (blancas): 1-0 por checkmate en 103 medias jugadas
+  Difícil contra Medio #10 (negras): 0-1 por checkmate en 102 medias jugadas
+  Difícil contra Medio #11 (blancas): 1-0 por checkmate en 97 medias jugadas
+  Difícil contra Medio #12 (negras): 0-1 por checkmate en 102 medias jugadas
+  Difícil contra Medio #13 (blancas): 1-0 por checkmate en 163 medias jugadas
+  Difícil contra Medio #14 (negras): 0-1 por checkmate en 126 medias jugadas
+  Difícil contra Medio #15 (blancas): 1-0 por checkmate en 163 medias jugadas
+  Difícil contra Medio #16 (negras): 0-1 por checkmate en 102 medias jugadas
+  Difícil contra Medio #17 (blancas): 1-0 por checkmate en 95 medias jugadas
+  Difícil contra Medio #18 (negras): 0-1 por checkmate en 100 medias jugadas
+  Difícil contra Medio #19 (blancas): 1-0 por checkmate en 167 medias jugadas
+  Difícil contra Medio #20 (negras): 0-1 por checkmate en 102 medias jugadas
+Difícil contra Medio: +20 =0 -0 de 20
+
+  Medio contra Fácil #1 (blancas): 1-0 por checkmate en 19 medias jugadas
+  Medio contra Fácil #2 (negras): 0-1 por checkmate en 36 medias jugadas
+  Medio contra Fácil #3 (blancas): 1-0 por checkmate en 97 medias jugadas
+  Medio contra Fácil #4 (negras): 0-1 por checkmate en 98 medias jugadas
+  Medio contra Fácil #5 (blancas): 1-0 por checkmate en 23 medias jugadas
+  Medio contra Fácil #6 (negras): 0-1 por checkmate en 22 medias jugadas
+  Medio contra Fácil #7 (blancas): 1-0 por checkmate en 29 medias jugadas
+  Medio contra Fácil #8 (negras): 0-1 por checkmate en 52 medias jugadas
+  Medio contra Fácil #9 (blancas): 1-0 por checkmate en 57 medias jugadas
+  Medio contra Fácil #10 (negras): 0-1 por checkmate en 14 medias jugadas
+  Medio contra Fácil #11 (blancas): 1-0 por checkmate en 27 medias jugadas
+  Medio contra Fácil #12 (negras): 0-1 por checkmate en 22 medias jugadas
+  Medio contra Fácil #13 (blancas): 1-0 por checkmate en 73 medias jugadas
+  Medio contra Fácil #14 (negras): 0-1 por checkmate en 70 medias jugadas
+  Medio contra Fácil #15 (blancas): 1-0 por checkmate en 11 medias jugadas
+  Medio contra Fácil #16 (negras): 0-1 por checkmate en 22 medias jugadas
+  Medio contra Fácil #17 (blancas): 1-0 por checkmate en 21 medias jugadas
+  Medio contra Fácil #18 (negras): 0-1 por checkmate en 60 medias jugadas
+  Medio contra Fácil #19 (blancas): 1-0 por checkmate en 31 medias jugadas
+  Medio contra Fácil #20 (negras): 0-1 por checkmate en 40 medias jugadas
+Medio contra Fácil: +20 =0 -0 de 20
+
+Difícil: 1870 jugadas, media 845 ms, máximo 909 ms

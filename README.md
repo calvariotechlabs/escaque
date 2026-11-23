@@ -42,7 +42,7 @@ Todas medidas, no estimadas. Las de velocidad salen de un contenedor cloud de 4 
 
 ## Fuerza del motor
 
-**No hay un Elo medido, y no voy a inventarme uno.** Para ponerle un Elo hace falta jugar contra rivales de fuerza conocida, y Alfil Beta solo se ha enfrentado a sí mismo y a un jugador al azar. Lo que sí hay son partidas medidas, con colores alternos, un hilo y los tiempos de cada nivel (`npm run match -- 20`, unos 40 minutos; 80 partidas, todas terminadas por jaque mate):
+**No hay un Elo medido, y no voy a inventarme uno.** Para ponerle un Elo hace falta jugar contra rivales de fuerza conocida, y Alfil Beta solo se ha enfrentado a sí mismo y a un jugador al azar. Lo que sí hay son partidas medidas, con colores alternos, un hilo y los tiempos de cada nivel (`npm run match -- 20`, unos 40 minutos; 80 partidas, todas terminadas por jaque mate; el registro completo está en [`docs/media/partidas-niveles.txt`](docs/media/partidas-niveles.txt)):
 
 | Enfrentamiento | Resultado (partidas ganadas, tablas, perdidas) | Qué dice |
 | --- | --- | --- |
@@ -51,7 +51,7 @@ Todas medidas, no estimadas. Las de velocidad salen de un contenedor cloud de 4 
 | Difícil contra Medio | +20 =0 −0 | |
 | Medio contra Fácil | +20 =0 −0 | |
 
-Con 20 victorias de 20, la estadística solo da una cota: con un 95 % de confianza cada nivel puntúa al menos un 86 % contra el de abajo, lo que equivale a **más de 300 puntos Elo de diferencia entre niveles contiguos** (sin techo, porque no hubo ni una tabla). Difícil piensa 845 ms de media y 909 ms como máximo (1.870 jugadas), a profundidad 5 en la apertura y más de 10 en finales de peones.
+Con 20 victorias de 20, la estadística solo da una cota: con un 95 % de confianza cada nivel puntúa al menos un 86 % contra el de abajo, lo que equivale a **más de 300 puntos Elo de diferencia entre niveles contiguos** (sin techo, porque no hubo ni una tabla). En esta pasada Difícil pensó 845 ms de media y 909 ms como máximo (1.870 jugadas; la tabla de Cifras usa otra pasada más corta, de ahí la pequeña diferencia), a profundidad 5 en la apertura y más de 10 en finales de peones.
 
 Para situarlo sin números inventados: Alfil Beta no usa poda por jugada nula, reducciones de jugadas tardías ni libro de aperturas; es un motor clásico de búsqueda con evaluación de material y tablas por casilla, pensado para enseñar, no para competir. La escala absoluta queda pendiente de medirla contra un motor externo con fuerza limitada (por ejemplo Stockfish con `UCI_Elo`), fuera del repositorio y solo como medición, para no romper el principio de cero dependencias.
 

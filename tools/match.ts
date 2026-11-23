@@ -1,11 +1,11 @@
 // Mide los niveles de Alfil Beta con partidas automáticas.
 //
-//   npm run match            (unos 15 minutos: Difícil piensa 0,9 s por jugada)
+//   npm run match            (unos 40 minutos con 20 por enfrentamiento: Difícil piensa 0,9 s por jugada)
 //   npm run match -- 4       (4 partidas por enfrentamiento en vez de las de serie)
 //
-// Enfrentamientos: Difícil contra un jugador al azar, Difícil contra Fácil y
-// Difícil contra Medio y Medio contra Fácil, alternando colores. Muestra el marcador y el tiempo por
-// jugada de Difícil (media y máximo).
+// Enfrentamientos: Difícil contra un jugador al azar, Difícil contra Fácil,
+// Difícil contra Medio y Medio contra Fácil, alternando colores. Muestra el
+// marcador y el tiempo por jugada de Difícil (media y máximo). Por defecto: 20, 10, 10 y 10 partidas.
 import { createRandom } from "../src/core/index.js";
 import { enginePlayer, playGame, randomPlayer } from "./match-core.js";
 import type { Player } from "./match-core.js";
