@@ -51,6 +51,22 @@ jobs:
       - name: Perft de referencia (unos 43 millones de nodos)
         run: npm run test:perft
 
+  accesibilidad:
+    name: Accesibilidad de extremo a extremo
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Teclado, ARIA y SAN en Chrome real (sin dependencias, con tools/cdp.mjs)
+        run: npm run test:e2e
+
   dependencias:
     name: Cero dependencias en ejecución
     runs-on: ubuntu-latest

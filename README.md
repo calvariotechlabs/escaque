@@ -38,6 +38,8 @@ Todas medidas, no estimadas. Las de velocidad salen de un contenedor cloud de 4 
 | Alfil Beta, nivel Difícil | Responde en 831 ms de media y 910 ms como máximo (158 jugadas medidas en esta pasada, contenedor de 4 núcleos); la pasada completa del punto de parada (más abajo) dio 818 ms y 909 ms. Gana 20 de 20 al azar, a Fácil y a Medio; Medio gana 20 de 20 a Fácil (detalle en [Fuerza del motor](#fuerza-del-motor)) |
 | Tabla de transposición | A la misma profundidad, Alfil Beta visita un **97 % menos de nodos** con la tabla que sin ella en las cinco posiciones de `npm run bench` (1,45 millones frente a 57,5 millones) y tarda 7,9 s en vez de 126 s. Va del −31 % en Kiwipete al −99,9 % en el final de peones Fine 70 (detalle más abajo) |
 | Sitio publicado | 64 ficheros, 516 KB en disco; JS + CSS + HTML suman unos 75 KB comprimidos con gzip |
+| Accesibilidad | **5 pruebas de extremo a extremo** en Chrome real, en la CI: se juega una partida entera solo con teclado, hay rejilla ARIA de 64 casillas etiquetadas y todo control tiene nombre, cada jugada se anuncia en SAN española («Negras: Dh4#. Dama de d8 a h4. Jaque mate.») y el repaso de la partida se maneja con ← → Inicio y Fin |
+| Lighthouse 12.8.2 (sitio servido en local, Chrome 153) | Escritorio: rendimiento **99**, accesibilidad **100**, buenas prácticas **100**, SEO 91 (FCP 0,5 s, LCP 0,8 s, TBT 0 ms, CLS 0). Móvil con la ralentización simulada de Lighthouse: rendimiento **86**, accesibilidad **100**, buenas prácticas **100**, SEO 91 (FCP 2,0 s, LCP 3,9 s, TBT 0 ms, CLS 0). El SEO pierde 9 puntos por no tener `robots.txt`; es a propósito, no busca público. Se mide a mano con `npx lighthouse@12.8.2`, no es una dependencia ni corre en la CI |
 | Cabeceras | CSP sin `unsafe-inline`, `X-Frame-Options: DENY`, `nosniff`, `Referrer-Policy`, `Permissions-Policy` y `COOP`, comprobadas por tests |
 
 ## Fuerza del motor
@@ -72,7 +74,7 @@ El diseño y las decisiones técnicas (arquitectura, tablero 0x88, estrategia de
 
 ## CI y despliegue
 
-- **CI** (`.github/workflows/ci.yml`, GitHub Actions, permisos solo de lectura, sin secretos). En cada pull request y en cada push a `main`: tipos con `tsc` estricto, `npm test`, montaje del sitio (`npm run build:site`), perft a profundidad completa (`npm run test:perft`) y comprobación de que `dependencies` sigue vacío.
+- **CI** (`.github/workflows/ci.yml`, GitHub Actions, permisos solo de lectura, sin secretos). En cada pull request y en cada push a `main`: tipos con `tsc` estricto, `npm test`, montaje del sitio (`npm run build:site`), perft a profundidad completa (`npm run test:perft`) pruebas de accesibilidad de extremo a extremo (`npm run test:e2e`) y comprobación de que `dependencies` sigue vacío. Las pruebas de navegador no usan Playwright ni Puppeteer: `tools/cdp.mjs` es un cliente mínimo del protocolo de Chrome (unas 130 líneas, con el `WebSocket` y `fetch` de Node 22) que maneja el Chrome que ya trae el ejecutor de GitHub, con teclado real (`Input.dispatchKeyEvent`).
 - **Despliegue.** Vercel publica `site/` desde el repositorio como web estática (`vercel.json`: región `fra1`, cabeceras de seguridad, sin funciones). Las vistas previas están protegidas con Vercel Authentication, hay Bot Protection en modo desafío con excepción para iconos y manifest, y un tope de gasto en el equipo.
 - **Qué no hace la CI:** no despliega. Cada fusión a `main` la despliega Vercel; la CI solo dice si el código está sano.
 
@@ -95,7 +97,7 @@ El diseño y las decisiones técnicas (arquitectura, tablero 0x88, estrategia de
 - **Calibrar el motor contra una referencia externa desde el principio.** Los niveles se miden entre sí y contra un jugador al azar, lo que dice cuál es más fuerte pero no cuánto. Una escala de referencia desde el hito 3 habría orientado mejor el ajuste de los niveles.
 - **Mejorar el motor con ideas que no entraron.** Alfil Beta no usa poda por jugada nula, reducciones de jugadas tardías, jugadas «killer» ni ventanas de aspiración. Me paré en el punto fijado a propósito; con más tiempo, son las siguientes.
 - **Medir el rendimiento en el navegador, no solo en Node.** Las cifras de velocidad salen de un contenedor; el repaso tarda unos 8 s en el navegador y no lo medí en móviles de gama baja.
-- **Automatizar antes la comprobación de accesibilidad en la CI.** Los fallos de etiquetas y foco se encuentran con un test, no con un portfolio ya publicado.
+- **Llevar la accesibilidad a la CI desde el primer día.** Las pruebas de accesibilidad en Chrome real (`npm run test:e2e`) llegaron al final; si hubieran estado desde el primer tablero, los fallos de etiquetas y foco se habrían visto en cada PR y no al cerrar.
 
 ## Estructura
 
@@ -128,6 +130,7 @@ npm run perft -- <profundidad> ["<fen>"] [jugadas UCI...] [--ref <fichero>]
 npm run build:site   # compila y monta site/ (lo que se publica) con el service worker versionado
 npm run bench    # misma búsqueda con y sin tabla de transposición: nodos, tiempo y nodos/s (unos 3 min)
 npm run match    # partidas automáticas entre niveles (unos 40 min con 20 por enfrentamiento; «-- 4» para 4)
+npm run test:e2e # accesibilidad en Chrome real (necesita Chrome; CHROME_PATH si no es `google-chrome`)
 npm run serve    # monta site/ y lo sirve en http://127.0.0.1:8080 (sin dependencias)
 ```
 
