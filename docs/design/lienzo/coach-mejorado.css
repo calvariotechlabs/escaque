@@ -2,8 +2,10 @@
 /* Flechas sobre el tablero: misma celda de la rejilla, por encima de las piezas y sin recibir clics. */
 .tablero__flechas{grid-column:2;grid-row:1;width:100%;height:100%;pointer-events:none;z-index:2;overflow:visible}
 .flecha{fill:none;stroke-linecap:round;stroke-linejoin:round}
-.flecha--mejor{stroke:var(--accent);stroke-width:.2;opacity:.88}
-.flecha-punta--mejor{fill:var(--accent);opacity:.88}
+/* Borde claro debajo de cada flecha: se distingue también sobre las casillas oscuras (WCAG 1.4.11). */
+.flecha-borde{fill:none;stroke:#fff;stroke-width:.3;stroke-linecap:round;stroke-linejoin:round;opacity:.85}
+.flecha--mejor{stroke:var(--accent);stroke-width:.2}
+.flecha-punta--mejor{fill:var(--accent)}
 .flecha--tuya{stroke:var(--ink);stroke-width:.13;stroke-dasharray:.24 .18;opacity:.6}
 .flecha-punta--tuya{fill:none;stroke:var(--ink);stroke-width:.09;stroke-linejoin:round;opacity:.6}
 /* Vista de la jugada revisada: aviso sobre el tablero con la salida. */
@@ -33,5 +35,6 @@
 @media (forced-colors: active){
   .flecha--mejor,.flecha--tuya,.flecha-punta--tuya{stroke:CanvasText;opacity:1}
   .flecha-punta--mejor{fill:CanvasText;opacity:1}
+  .flecha-borde{stroke:Canvas}
   .vista-revision,.coach__alternativa,.coach__pistas-lista li{border-color:CanvasText}
 }
