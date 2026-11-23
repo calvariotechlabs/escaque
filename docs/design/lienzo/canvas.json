@@ -582,14 +582,6 @@
    "title": "Imagen de vista previa (og:image)",
    "page": "escritorio"
   },
-  "OgImageCentrada.dc.html": {
-   "x": 1880,
-   "y": 27240,
-   "w": 1200,
-   "h": 630,
-   "title": "Imagen de vista previa · variante centrada (propuesta)",
-   "page": "escritorio"
-  },
   "InicioInstalarEscritorio.dc.html": {
    "x": 0,
    "y": 28240,
@@ -613,6 +605,54 @@
    "w": 390,
    "h": 1180,
    "title": "Móvil · inicio con aviso de instalar",
+   "page": "movil"
+  },
+  "OgImageCentrada.dc.html": {
+   "x": 1880,
+   "y": 27240,
+   "w": 1200,
+   "h": 630,
+   "title": "Imagen de vista previa · variante centrada (propuesta)",
+   "page": "escritorio"
+  },
+  "InicioEscritorio.dc.html": {
+   "x": 0,
+   "y": 29900,
+   "w": 1280,
+   "h": 720,
+   "title": "Escritorio · inicio compacto",
+   "page": "escritorio"
+  },
+  "InicioTablet.dc.html": {
+   "x": 0,
+   "y": 30000,
+   "w": 820,
+   "h": 1180,
+   "title": "Tablet · inicio compacto",
+   "page": "tablet"
+  },
+  "InicioMovil.dc.html": {
+   "x": 0,
+   "y": 35340,
+   "w": 390,
+   "h": 664,
+   "title": "Móvil · inicio compacto (pantalla visible)",
+   "page": "movil"
+  },
+  "InicioMovilCompleto.dc.html": {
+   "x": 470,
+   "y": 35340,
+   "w": 390,
+   "h": 1100,
+   "title": "Móvil · inicio compacto (página entera)",
+   "page": "movil"
+  },
+  "InicioMovilHorizontal.dc.html": {
+   "x": 940,
+   "y": 35340,
+   "w": 844,
+   "h": 390,
+   "title": "Móvil horizontal · inicio compacto",
    "page": "movil"
   }
  },
@@ -686,10 +726,15 @@
   "CoachMejoradoMovil.dc.html",
   "CoachMejoradoMovilHorizontal.dc.html",
   "OgImage.dc.html",
-  "OgImageCentrada.dc.html",
   "InicioInstalarEscritorio.dc.html",
   "InicioInstalarTablet.dc.html",
-  "InicioInstalarMovil.dc.html"
+  "InicioInstalarMovil.dc.html",
+  "OgImageCentrada.dc.html",
+  "InicioEscritorio.dc.html",
+  "InicioTablet.dc.html",
+  "InicioMovil.dc.html",
+  "InicioMovilCompleto.dc.html",
+  "InicioMovilHorizontal.dc.html"
  ],
  "notes": {
   "t_escritorio_0": {
@@ -1488,14 +1533,6 @@
    "page": "escritorio",
    "text": "Imagen de 1200x630 que muestran WhatsApp, Telegram, Slack, X, LinkedIn y Teams al compartir https://escaque.calvariotechlabs.com. Fondo del tema oscuro, icono y nombre, lema «Aprende ajedrez contra un motor hecho desde cero.», píldora «Sin cuentas · funciona sin conexión» y un tablero de 6x6 con una posición de ejemplo y la última jugada marcada. Aprobada el 23-nov (CAL-393). Texto alternativo: «Escaque: logo y un tablero de ajedrez con una posición de ejemplo»."
   },
-  "og_n2": {
-   "x": 3160,
-   "y": 27240,
-   "w": 520,
-   "fill": "gray",
-   "page": "escritorio",
-   "text": "Variante centrada, propuesta. Teams recorta la miniatura a un cuadrado central de 630x630 y cortaba el nombre y el lema de la primera versión. Aquí el icono, el nombre, el lema y la píldora caben en esa franja central (marcada por dos líneas finas); los lados llevan un tablero tenue con cuatro piezas, que se pueden perder al recortar. Pendiente del OK de Sergio (CAL-393)."
-  },
   "t_inst_escritorio": {
    "x": 0,
    "y": 28000,
@@ -1543,6 +1580,62 @@
    "fill": "gray",
    "page": "movil",
    "text": "El aviso «Instala Escaque» (CAL-395) sale solo en la pantalla de inicio, no durante la partida. Va después del botón «Empezar partida». En iPhone/iPad (Safari) el aviso es el de «Añadir a pantalla de inicio» con «Entendido»."
+  },
+  "og_n2": {
+   "x": 3160,
+   "y": 27240,
+   "w": 520,
+   "fill": "gray",
+   "page": "escritorio",
+   "text": "Variante centrada, propuesta. Teams recorta la miniatura a un cuadrado central de 630x630 y cortaba el nombre y el lema de la primera versión. Aquí el icono, el nombre, el lema y la píldora caben en esa franja central (marcada por dos líneas finas); los lados llevan un tablero tenue con cuatro piezas, que se pueden perder al recortar. Pendiente del OK de Sergio (CAL-393)."
+  },
+  "t_inicio_escritorio": {
+   "x": 0,
+   "y": 29640,
+   "text": "Inicio compacto",
+   "kind": "title1",
+   "maxW": 1280,
+   "page": "escritorio"
+  },
+  "t_inicio_tablet": {
+   "x": 0,
+   "y": 29740,
+   "text": "Inicio compacto",
+   "kind": "title1",
+   "maxW": 820,
+   "page": "tablet"
+  },
+  "t_inicio_movil": {
+   "x": 0,
+   "y": 35080,
+   "text": "Inicio compacto",
+   "kind": "title1",
+   "maxW": 1784,
+   "page": "movil"
+  },
+  "n_inicio_escritorio": {
+   "x": 1360,
+   "y": 29900,
+   "w": 520,
+   "text": "Propuesta CAL-396. «Empezar partida» se ve sin desplazar la pantalla (1280×720). Modo, Nivel y Tu color pasan a una fila de segmentos cada uno, con la descripción de la opción elegida debajo (las demás se quedan en el documento, ocultas a la vista, enlazadas con aria-describedby). El aviso «¿Nunca has jugado?» y el de instalar pasan a la columna derecha, bajo un tablero más pequeño.",
+   "fill": "gray",
+   "page": "escritorio"
+  },
+  "n_inicio_tablet": {
+   "x": 900,
+   "y": 30000,
+   "w": 520,
+   "text": "Tablet vertical (820×1180): una columna; el botón queda a la vista con los dos avisos debajo. En tablet horizontal vale el escritorio.",
+   "fill": "gray",
+   "page": "tablet"
+  },
+  "n_inicio_movil": {
+   "x": 1860,
+   "y": 35340,
+   "w": 520,
+   "text": "Móvil: en la pantalla visible de un móvil pequeño (390×664) caben los tres grupos y el botón. La barra del botón se queda pegada abajo (sticky) si el formulario es más alto que la pantalla; los avisos de principiante y de instalar van después del formulario, en la página entera. Tu color usa la muestra de color como marca de selección. Móvil apaisado (844×390): Modo y Nivel arriba, Tu color y el botón debajo, sin tablero.",
+   "fill": "gray",
+   "page": "movil"
   }
  },
  "designSystems": [
