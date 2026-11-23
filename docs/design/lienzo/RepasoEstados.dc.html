@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Repaso de la partida: estados</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/escaque/tokens.css">
+<link rel="stylesheet" href="ds/escaque/components/bundle.css">
+<link rel="stylesheet" href="lecciones.css">
+<link rel="stylesheet" href="coach.css">
+<link rel="stylesheet" href="repaso.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;600&family=Space+Grotesk:wght@600&display=swap">
+<style>
+body{margin:0}
+.casilla img{position:relative;z-index:1;display:block;width:100%;height:100%}
+</style>
+</helmet>
+<div style="width: 1280px; min-height: 860px; box-sizing: border-box; padding: 32px 60px 48px; background: var(--surface); color: var(--ink); font-family: var(--font-sans)">
+<div class="rep-estados"><section aria-labelledby="e1"><p class="lecc-etiqueta">1 · Analizando la partida</p>
+<div class="rep-sec"><h3 class="rep-sec__titulo" id="e1">Analizando la partida</h3>
+<div class="avance"><p class="avance__texto" id="av">Jugada 24 de 53.</p><div class="avance__barra" role="progressbar" aria-labelledby="av" aria-valuemin="0" aria-valuemax="53" aria-valuenow="24"><span style="width: 45%"></span></div><p class="avance__nota">Ya puedes recorrer las jugadas revisadas. Las demás aparecerán en cuanto estén listas.</p></div>
+<button class="boton" type="button">Parar el análisis</button>
+<figure class="curva">
+<div class="curva__lienzo" role="img" aria-label="Curva de evaluación de la partida, vista por las blancas. Revisadas 24 de 53 jugadas; el resto sigue pendiente.">
+<svg class="curva__svg" viewBox="0 0 520 170" aria-hidden="true" focusable="false"><path class="curva__area" d="M0 170 L0 85.0 L16.0 85.0 L25.2 85.0 L34.4 72.2 L43.6 81.9 L52.8 77.0 L62.0 82.5 L71.2 79.5 L80.5 82.5 L89.7 69.8 L98.9 72.2 L108.1 71.0 L117.3 72.2 L126.5 71.0 L135.7 78.8 L144.9 75.8 L154.1 78.2 L163.3 74.4 L172.5 78.8 L181.7 78.6 L190.9 78.8 L200.2 64.1 L209.4 64.1 L218.6 67.0 L227.8 67.0 L237.0 50.7 L237.0 50.7 L237.0 170 Z"/><path class="curva__igualdad curva__igualdad--a" d="M0 85.0 H520"/><path class="curva__igualdad curva__igualdad--b" d="M0 85.0 H520"/><path class="curva__pendiente" d="M237.0 85.0 L504.0 85.0"/></svg>
+<span class="curva__velo" style="left:45.57%"></span><span class="marca" style="left:6.62%;top:42.47%"><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path class="forma forma--n forma--dudosa" d="M10 2.5a7.5 7.5 0 1 0 0 15 7.5 7.5 0 1 0 0-15Z"/></svg></span><span class="marca" style="left:17.24%;top:41.09%"><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path class="forma forma--n forma--dudosa" d="M10 2.5a7.5 7.5 0 1 0 0 15 7.5 7.5 0 1 0 0-15Z"/></svg></span><span class="marca" style="left:38.49%;top:37.72%"><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path class="forma forma--n" d="M10 2 18.5 17.5H1.5Z"/></svg></span><span class="marca" style="left:45.57%;top:29.83%"><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path class="forma forma--n" d="M10 2 18.5 17.5H1.5Z"/></svg></span><span class="curva__cursor" style="left:34.95%"></span>
+</div>
+<div class="curva__ejex" aria-hidden="true"><span style="left:19.01%">5</span><span style="left:36.72%">10</span><span style="left:54.43%">15</span><span style="left:72.13%">20</span><span style="left:89.84%">25</span></div>
+<ul class="curva__leyenda" aria-label="Leyenda de las marcas"><li><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path class="forma forma--b" d="M10 2 18.5 17.5H1.5Z"/></svg>Error o error grave</li><li><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path class="forma forma--b forma--dudosa" d="M10 2.5a7.5 7.5 0 1 0 0 15 7.5 7.5 0 1 0 0-15Z"/></svg>Imprecisión</li></ul>
+<figcaption class="curva__pie">Valores en peones, vistos por las blancas: arriba, ventaja blanca; abajo, ventaja negra. La línea discontinua es la igualdad. Marca clara: jugada de las blancas; marca oscura: de las negras. Bajo la curva, el número de jugada.</figcaption>
+</figure></div></section><section aria-labelledby="e2"><p class="lecc-etiqueta">2 · Jugada que aún no está revisada</p>
+<section class="coach" aria-labelledby="e2"><header class="coach__cab"><h3 class="coach__titulo" id="e2">Jugada seleccionada</h3><p class="coach__jugada"><span class="coach__san">21... Ae8</span> · negras</p></header>
+<p class="oculto" role="status">21... Ae8, negras. Revisando esta jugada.</p>
+<p class="coach__vacio">Revisando esta jugada. La posición ya está en el tablero y el veredicto llega en unos segundos.</p><div class="coach__barra-pensando" aria-hidden="true"></div></section></section><section aria-labelledby="e3"><p class="lecc-etiqueta">3 · Sin errores clave</p>
+<section class="rep-sec"><h3 class="rep-sec__titulo" id="e3">Errores clave</h3><p class="clave__vacio">No hay errores clave. Ninguna jugada cambió el rumbo de la partida.</p>
+<details class="clave__mas"><summary>Imprecisiones (2)</summary><ul class="clave__lista" aria-label="Imprecisiones"><li><button class="clave__item" type="button"><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path class="forma forma--lista forma--dudosa" d="M10 2.5a7.5 7.5 0 1 0 0 15 7.5 7.5 0 1 0 0-15Z"/></svg><span><span class="clave__san">0... c6</span> · <span class="clave__tit">Imprecisión</span> · negras</span><span class="clave__eval">Evaluación: +0,4 → +1,1</span></button></li><li><button class="clave__item" type="button"><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path class="forma forma--lista forma--dudosa" d="M10 2.5a7.5 7.5 0 1 0 0 15 7.5 7.5 0 1 0 0-15Z"/></svg><span><span class="clave__san">0... Cg8</span> · <span class="clave__tit">Imprecisión</span> · negras</span><span class="clave__eval">Evaluación: +0,5 → +1,3</span></button></li></ul></details></section></section><section aria-labelledby="e4"><p class="lecc-etiqueta">4 · No se pudo revisar</p>
+<section class="rep-fallo" role="alert" aria-labelledby="e4"><h3 class="rep-fallo__titulo" id="e4"><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M10 2 18.5 17.5H1.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M10 7.5v5M10 14.6v.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>No se pudo revisar la partida.</h3><p>Alfil Beta no ha podido analizar las jugadas. Tu partida sigue guardada en este dispositivo.</p><div class="rep-fallo__acciones"><button class="boton boton--principal" type="button">Reintentar</button><button class="boton" type="button">Volver al resultado</button></div></section></section></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":860}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>
