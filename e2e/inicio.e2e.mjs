@@ -100,6 +100,7 @@ describe("pantalla de inicio compacta", () => {
     const sep = `getComputedStyle(document.querySelector('.ajustes__acciones'), '::before').opacity`;
     await page.call("Emulation.setDeviceMetricsOverride", { width: 580, height: 900, deviceScaleFactor: 1, mobile: true });
     await page.goto(base + "/?v=580x900b#/jugar");
+    if (!(await page.eval(`CSS.supports('container-type', 'scroll-state')`))) return; // sin consultas de estado de desplazamiento la barra se ve siempre (alternativa a propósito)
     await page.waitFor(`!document.getElementById('pantalla-ajustes').hidden`, { what: "pantalla de ajustes" });
     assert.equal(await page.eval(sep), "0", "en reposo la barra no pinta fondo ni línea");
     await page.call("Emulation.setDeviceMetricsOverride", { width: 390, height: 500, deviceScaleFactor: 1, mobile: true });
