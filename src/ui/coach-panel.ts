@@ -20,8 +20,8 @@ const FINDING_ICON = { "mate-en-1": ICON_MATE, "pieza-colgando": ICON_GRAVE, "ca
 export interface CoachPanelOptions {
   /** Prefijo de los id del esqueleto: `<prefijo>`, `<prefijo>-jugada`, `-veredicto`, `-resumen` y `-avisos`. */
   readonly prefix?: string;
-  /** Contenido de la línea de la jugada; por defecto, «Jugada revisada: 4. Cf3». */
-  readonly moveLine?: (label: string) => Node[];
+  /** Contenido de la línea de la jugada; por defecto, «Jugada revisada: 4. Cf3» (o «Tu jugada: 3. a3» si es la anterior). */
+  readonly moveLine?: (label: string, previous: boolean) => Node[];
   /** Nivel de los subtítulos (Evaluación y avisos): un nivel por debajo del título del panel. Por defecto, h3. */
   readonly subheading?: "h3" | "h4";
 }
@@ -41,6 +41,11 @@ export interface CoachPanel {
    * ve; con `busy`, la barra de «pensando».
    */
   showWaiting(label: string, spoken: string, text: string, busy: boolean): void;
+  /**
+   * La revisión es de tu jugada anterior (la máquina ya ha respondido): `note` es el texto de la nota,
+   * o `null` si es la última jugada. No toca la región viva, así que no vuelve a anunciar el veredicto.
+   */
+  setPrevious(note: string | null): void;
   /** Quita las casillas marcadas por «Ver en el tablero». */
   clearMarks(): void;
 }
@@ -86,7 +91,12 @@ function evaluationRows(label: string, evaluation: EvaluationView): [HTMLElement
 
 export function createCoachPanel(onMarks: (marks: readonly SquareMark[]) => void, options: CoachPanelOptions = {}): CoachPanel {
   const prefix = options.prefix ?? "coach";
-  const moveLine = options.moveLine ?? ((label: string): Node[] => [document.createTextNode("Jugada revisada: "), el("span", "coach__san", label)]);
+  const moveLine =
+    options.moveLine ??
+    ((label: string, previous: boolean): Node[] => [
+      document.createTextNode(previous ? COACH_TEXT.previousMove : COACH_TEXT.reviewedMove),
+      el("span", "coach__san", label),
+    ]);
   const sub = options.subheading ?? "h3";
   const root = byId<HTMLElement>(prefix);
   const move = byId<HTMLElement>(`${prefix}-jugada`);
@@ -96,9 +106,21 @@ export function createCoachPanel(onMarks: (marks: readonly SquareMark[]) => void
   let active: number | null = null;
   let findings: readonly FindingView[] = [];
 
+  // Etiqueta y nota de «jugada anterior»: solo existen en el coach de la partida.
+  const tag = document.getElementById(`${prefix}-etiqueta`);
+  const note = document.getElementById(`${prefix}-nota`);
+  let currentLabel = "";
+  let previousNote: string | null = null;
+
   const setMove = (label: string): void => {
+    currentLabel = label;
     move.hidden = label === "";
-    move.replaceChildren(...moveLine(label));
+    move.replaceChildren(...moveLine(label, previousNote !== null));
+    if (tag !== null) tag.hidden = label === "" || previousNote === null;
+    if (note !== null) {
+      note.hidden = label === "" || previousNote === null;
+      note.textContent = previousNote ?? "";
+    }
   };
 
   /** Deja la región viva vacía: lo que no es un veredicto no se anuncia. */
@@ -138,8 +160,14 @@ export function createCoachPanel(onMarks: (marks: readonly SquareMark[]) => void
   });
 
   return {
+    setPrevious(text) {
+      previousNote = text;
+      setMove(currentLabel);
+    },
+
     showEmpty() {
       reset();
+      previousNote = null;
       root.removeAttribute("aria-busy");
       setMove("");
       clearVerdict();

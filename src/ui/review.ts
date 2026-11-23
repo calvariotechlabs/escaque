@@ -56,7 +56,7 @@ export function reviewMoves(game: Game): ReviewMove[] {
         from: record.from,
         to: record.to,
         fenAfter: record.fenAfter,
-        job: { ply: entry.ply, fen: game.startFen, moves: uci.slice(0, entry.ply - 1), move: uci[entry.ply - 1]!, label },
+        job: { ply: entry.ply, fen: game.startFen, moves: uci.slice(0, entry.ply - 1), move: uci[entry.ply - 1]!, label, previous: false },
       });
     }
   }

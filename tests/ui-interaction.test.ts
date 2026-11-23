@@ -29,8 +29,8 @@ describe("clic", () => {
     assert.equal(ui.selected, null);
     assert.equal(game.turn, "b");
     // Tras jugar quedan las marcas de última jugada.
-    assert.deepEqual(ui.marks().get("e2"), ["last-move"]);
-    assert.deepEqual(ui.marks().get("e4"), ["last-move"]);
+    assert.deepEqual(ui.marks().get("e2"), ["last-move-from"]);
+    assert.deepEqual(ui.marks().get("e4"), ["last-move-to"]);
   });
 
   it("clic otra vez en la seleccionada la deselecciona", () => {
