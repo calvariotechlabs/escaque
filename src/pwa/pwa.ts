@@ -1,7 +1,7 @@
 // Parte de la app instalable que vive en la página: registra el service worker, escucha
-// instalación, conexión y versiones nuevas, y pinta un único aviso (ver notices.ts).
+// instalación, conexión y versiones nuevas, y pinta dos avisos: el de la partida (versión nueva o sin conexión, uno a la vez) y el de instalar de la pantalla de inicio (ver notices.ts).
 // Todo el texto va con textContent: nunca se construye HTML.
-import { INITIAL_STATE, iosInstallDevice, pickNotice, type NoticeAction, type NoticeKind, type PwaState } from "./notices.js";
+import { INITIAL_STATE, iosInstallDevice, pickInstallNotice, pickNotice, type Notice, type NoticeAction, type NoticeKind, type PwaState } from "./notices.js";
 
 interface InstallPromptEvent extends Event {
   prompt(): Promise<void>;
@@ -31,8 +31,12 @@ function isStandalone(): boolean {
   return iosStandalone || window.matchMedia("(display-mode: standalone)").matches;
 }
 
-/** Arranca la parte instalable. `container` es la región viva donde se pinta el aviso. */
-export function startPwa(container: HTMLElement): void {
+/**
+ * Arranca la parte instalable. `container` es la región viva de la partida (versión nueva y sin conexión);
+ * `installContainer`, la de la pantalla de inicio (instalar). `focusAfterInstall` lleva el foco a un sitio
+ * visible cuando el aviso de instalar desaparece con el botón pulsado.
+ */
+export function startPwa(container: HTMLElement, installContainer: HTMLElement, focusAfterInstall: () => void): void {
   let state: PwaState = {
     ...INITIAL_STATE,
     offline: !navigator.onLine,
@@ -80,12 +84,17 @@ export function startPwa(container: HTMLElement): void {
         break;
       }
     }
-    focusBoard();
+    if (kind === "instalar" || kind === "instalar-ios") focusAfterInstall();
+    else focusBoard();
   }
 
   function render(): void {
-    container.replaceChildren();
-    const notice = pickNotice(state);
+    paint(container, pickNotice(state));
+    paint(installContainer, pickInstallNotice(state));
+  }
+
+  function paint(target: HTMLElement, notice: Notice | null): void {
+    target.replaceChildren();
     if (notice === null) return;
     const box = document.createElement("div");
     box.className = `aviso aviso--${notice.kind === "instalar-ios" ? "instalar" : notice.kind}`;
@@ -106,7 +115,7 @@ export function startPwa(container: HTMLElement): void {
       actions.append(button);
     }
     box.append(title, text, actions);
-    container.append(box);
+    target.append(box);
   }
 
   window.addEventListener("beforeinstallprompt", (event) => {

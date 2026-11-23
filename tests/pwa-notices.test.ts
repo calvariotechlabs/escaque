@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { INITIAL_STATE, iosInstallDevice, pickNotice, type PwaState } from "../src/pwa/notices.js";
+import { INITIAL_STATE, iosInstallDevice, pickInstallNotice, pickNotice, type PwaState } from "../src/pwa/notices.js";
 
 const state = (change: Partial<PwaState>): PwaState => ({ ...INITIAL_STATE, ...change });
 
@@ -16,41 +16,57 @@ test("cada aviso lleva el texto del diseño", () => {
   const offline = pickNotice(state({ offline: true }));
   assert.equal(offline?.title, "Sin conexión.");
   assert.equal(offline?.text, "Puedes seguir jugando: Escaque funciona sin internet.");
-  const install = pickNotice(state({ canInstall: true }));
+  const install = pickInstallNotice(state({ canInstall: true }));
   assert.equal(install?.title, "Instala Escaque.");
   assert.deepEqual(install?.buttons.map((b) => b.label), ["Instalar", "Ahora no"]);
-  const ios = pickNotice(state({ iosDevice: "iphone" }));
+  const ios = pickInstallNotice(state({ iosDevice: "iphone" }));
   assert.equal(ios?.title, "Instala Escaque en tu iPhone.");
   assert.equal(ios?.text, "Toca Compartir y elige «Añadir a pantalla de inicio».");
 });
 
-test("solo uno a la vez: nueva versión, sin conexión, instalar", () => {
-  assert.equal(pickNotice(state({ updateReady: true, offline: true, canInstall: true }))?.kind, "nueva");
-  assert.equal(pickNotice(state({ offline: true, canInstall: true }))?.kind, "sin-conexion");
-  assert.equal(pickNotice(state({ canInstall: true, iosDevice: "iphone" }))?.kind, "instalar");
+test("en la partida solo uno a la vez: nueva versión y luego sin conexión", () => {
+  assert.equal(pickNotice(state({ updateReady: true, offline: true }))?.kind, "nueva");
+  assert.equal(pickNotice(state({ offline: true }))?.kind, "sin-conexion");
+});
+
+test("instalar no sale nunca en la partida, ni siquiera con el navegador listo", () => {
+  assert.equal(pickNotice(state({ canInstall: true })), null);
+  assert.equal(pickNotice(state({ iosDevice: "iphone" })), null);
+  assert.equal(pickNotice(state({ canInstall: true, iosDevice: "ipad" })), null);
 });
 
 test("un aviso descartado deja paso al siguiente", () => {
   assert.equal(pickNotice(state({ updateReady: true, updateDismissed: true, offline: true }))?.kind, "sin-conexion");
-  assert.equal(pickNotice(state({ offline: true, offlineDismissed: true, canInstall: true }))?.kind, "instalar");
-  assert.equal(pickNotice(state({ canInstall: true, installDismissed: true })), null);
+  assert.equal(pickNotice(state({ offline: true, offlineDismissed: true })), null);
+});
+
+test("en el inicio solo se ofrece instalar: Android y escritorio antes que iOS, y descartar lo quita", () => {
+  assert.equal(pickInstallNotice(INITIAL_STATE), null);
+  assert.equal(pickInstallNotice(state({ canInstall: true }))?.kind, "instalar");
+  assert.equal(pickInstallNotice(state({ canInstall: true, iosDevice: "iphone" }))?.kind, "instalar");
+  assert.equal(pickInstallNotice(state({ iosDevice: "iphone" }))?.kind, "instalar-ios");
+  assert.equal(pickInstallNotice(state({ canInstall: true, installDismissed: true })), null);
+  assert.equal(pickInstallNotice(state({ iosDevice: "ipad", installDismissed: true })), null);
+});
+
+test("lo demás no tapa el aviso de instalar del inicio", () => {
+  assert.equal(pickInstallNotice(state({ updateReady: true, offline: true, canInstall: true }))?.kind, "instalar");
 });
 
 test("ya instalada no se ofrece instalar, pero sí se avisa de lo demás", () => {
-  assert.equal(pickNotice(state({ standalone: true, canInstall: true, iosDevice: "iphone" })), null);
+  assert.equal(pickInstallNotice(state({ standalone: true, canInstall: true, iosDevice: "iphone" })), null);
   assert.equal(pickNotice(state({ standalone: true, offline: true }))?.kind, "sin-conexion");
 });
 
 test("los botones principales son la acción, no el descarte", () => {
-  for (const change of [{ updateReady: true }, { canInstall: true }]) {
-    const buttons = pickNotice(state(change))?.buttons ?? [];
-    assert.deepEqual(buttons.map((b) => b.primary), [true, false]);
+  for (const buttons of [pickNotice(state({ updateReady: true }))?.buttons, pickInstallNotice(state({ canInstall: true }))?.buttons]) {
+    assert.deepEqual((buttons ?? []).map((b) => b.primary), [true, false]);
   }
 });
 
 test("el aviso de iOS nombra el aparato", () => {
-  assert.equal(pickNotice(state({ iosDevice: "iphone" }))?.title, "Instala Escaque en tu iPhone.");
-  assert.equal(pickNotice(state({ iosDevice: "ipad" }))?.title, "Instala Escaque en tu iPad.");
+  assert.equal(pickInstallNotice(state({ iosDevice: "iphone" }))?.title, "Instala Escaque en tu iPhone.");
+  assert.equal(pickInstallNotice(state({ iosDevice: "ipad" }))?.title, "Instala Escaque en tu iPad.");
 });
 
 test("detecta iPhone, iPad y iPadOS solo en Safari, no un Mac ni Android", () => {

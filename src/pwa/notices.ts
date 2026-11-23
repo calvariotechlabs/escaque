@@ -83,10 +83,18 @@ function iosNotice(deviceName: "iPhone" | "iPad"): Notice {
   };
 }
 
-/** El aviso más urgente, o null. Solo se muestra uno a la vez: nueva versión, sin conexión, instalar. */
+/**
+ * El aviso de la partida, o null: nueva versión o sin conexión, uno a la vez. Instalar no sale aquí,
+ * solo en la pantalla de inicio (ver pickInstallNotice).
+ */
 export function pickNotice(state: PwaState): Notice | null {
   if (state.updateReady && !state.updateDismissed) return NOTICES.nueva;
   if (state.offline && !state.offlineDismissed) return NOTICES["sin-conexion"];
+  return null;
+}
+
+/** El aviso de instalar de la pantalla de inicio, o null. Independiente de los avisos de la partida. */
+export function pickInstallNotice(state: PwaState): Notice | null {
   if (state.standalone || state.installDismissed) return null;
   if (state.canInstall) return NOTICES.instalar;
   if (state.iosDevice) return iosNotice(state.iosDevice === "ipad" ? "iPad" : "iPhone");
