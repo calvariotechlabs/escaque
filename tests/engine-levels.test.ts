@@ -31,39 +31,20 @@ describe("niveles", () => {
     for (const other of ["", "Facil", "fácil", "toString", "__proto__", 3, null, undefined]) assert.equal(isLevel(other), false);
   });
 
-  // Dos pruebas distintas para el mismo criterio («Difícil responde en menos de 1 s»):
-  // la funcional, con reloj simulado, no depende de la máquina; la de rendimiento mide tiempo real.
-  it("Difícil respeta su presupuesto de 0,9 s: con un reloj simulado para en cuanto se agota", () => {
+  it("Difícil responde en menos de 1 s", () => {
+    // Mide la capacidad del motor, no el ruido del ejecutor: en una CI cargada (varias pruebas a la vez) una pausa
+    // del sistema puede estropear un intento suelto, así que cada posición cuenta si alguno de hasta 3 intentos cumple.
     for (const fen of MIDDLEGAMES) {
-      // Cada consulta del reloj «cuesta» 10 ms: 0,9 s de presupuesto = 90 consultas más la primera.
-      let ms = 0;
-      let calls = 0;
-      const now = (): number => {
-        calls++;
-        return (ms += 10);
-      };
-      const result = chooseMove(Position.fromFen(fen), "dificil", { now });
-      assert.ok(ms <= LEVELS.dificil.timeMs + 20, `${fen}: el reloj simulado llegó a ${ms} ms`);
-      assert.ok(calls <= 92, `${fen}: ${calls} consultas del reloj`);
-      assert.ok(result.best !== null && result.depth >= 3, `${fen}: profundidad ${result.depth}`);
-    }
-  });
-
-  it("Difícil responde en menos de 1 s (tiempo real; mejor de 3 intentos por posición)", () => {
-    // En CI los ficheros de test corren en paralelo y el ejecutor comparte CPU: una pausa puntual de
-    // decenas de ms no es un fallo del motor. Una regresión real (el motor pasándose del límite) falla
-    // en los 3 intentos. El criterio sigue siendo < 1000 ms.
-    for (const fen of MIDDLEGAMES) {
-      const times: number[] = [];
-      for (let attempt = 0; attempt < 3; attempt++) {
+      let last = "";
+      let ok = false;
+      for (let attempt = 0; attempt < 3 && !ok; attempt++) {
         const started = performance.now();
         const result = chooseMove(Position.fromFen(fen), "dificil");
-        times.push(performance.now() - started);
-        assert.ok(result.best !== null);
-        if (times[attempt]! < 1000) break;
+        const elapsed = performance.now() - started;
+        ok = elapsed < 1000 && result.best !== null && result.depth >= 3;
+        last = `${elapsed.toFixed(0)} ms, profundidad ${result.depth}`;
       }
-      const best = Math.min(...times);
-      assert.ok(best < 1000, `${fen}: ${times.map((t) => t.toFixed(0)).join(", ")} ms`);
+      assert.ok(ok, `${fen}: ${last}`);
     }
   });
 
@@ -114,6 +95,24 @@ describe("niveles", () => {
       const p = Position.fromFen("4k3/8/8/4p3/3Q4/8/8/4K3 w - - 0 1");
       const result = chooseMove(p, "facil", { random: createRandom(seed) });
       assert.ok(result.best?.startsWith("d4"), `semilla ${seed}: ${result.best}`);
+    }
+  });
+
+  // Parte funcional del criterio «Difícil responde en menos de 1 s» (la de rendimiento, en tiempo real, está arriba):
+  // con reloj simulado no depende de la máquina.
+  it("Difícil respeta su presupuesto de 0,9 s: con un reloj simulado para en cuanto se agota", () => {
+    for (const fen of MIDDLEGAMES) {
+      // Cada consulta del reloj «cuesta» 10 ms: 0,9 s de presupuesto = 90 consultas más la primera.
+      let ms = 0;
+      let calls = 0;
+      const now = (): number => {
+        calls++;
+        return (ms += 10);
+      };
+      const result = chooseMove(Position.fromFen(fen), "dificil", { now });
+      assert.ok(ms <= LEVELS.dificil.timeMs + 20, `${fen}: el reloj simulado llegó a ${ms} ms`);
+      assert.ok(calls <= 92, `${fen}: ${calls} consultas del reloj`);
+      assert.ok(result.best !== null && result.depth >= 3, `${fen}: profundidad ${result.depth}`);
     }
   });
 
