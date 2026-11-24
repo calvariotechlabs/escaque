@@ -68,6 +68,14 @@ Escaque no usa iconos en la interfaz: los botones llevan solo texto. Las únicas
 - **Estados vacíos.** Un trozo de tablero de 3×3 casi en blanco y dos frases: qué falta y qué va a pasar («Todavía no hay jugadas.» / «Mueve una pieza: cada jugada se apunta aquí…»).
 - **Colores forzados.** Escaque, bordes y etiquetas pasan a `CanvasText`; el sello conserva sus colores.
 
+## Firma de la creadora
+
+- **Escaque es la marca del producto; CalvarioTechLabs, la creadora.** La firma es solo tipografía, sin logotipo de la creadora: «by» en Plex Sans 400 y «CalvarioTechLabs» en Plex Sans 600, 14 px, `ink-muted`. Va en tres sitios y siempre en segundo plano.
+- **Cabecera.** Junto a «Escaque», con un separador fino de `line`, solo desde 720 px de ancho y 500 px de alto (`.cab-izq` y `.firma`). Es texto, no un enlace. En móvil y móvil apaisado no se muestra: no hay sitio.
+- **Pie** (`Firma`, `.pie`). Un `footer` con nombre «Información» al final de cada pantalla: «Escaque by CalvarioTechLabs» (el nombre enlaza a https://calvariotechlabs.com/ en una pestaña nueva, con `rel="noopener noreferrer"` y el aviso oculto «(se abre en una pestaña nueva)»), «Acerca de Escaque» y «© 2026 CalvarioTechLabs». Los enlaces miden 44 px de alto, van subrayados y el foco es un anillo de 3 px en `accent`. En móvil va en dos líneas y deja margen bajo la barra «Empezar partida»; en móvil apaisado va al final de la región con scroll del panel.
+- **Acerca de** (`.acerca`, `.firma-tarjeta`). Pantalla `#/acerca` a la que se llega desde el pie: título, qué es Escaque, tarjeta con la firma grande y el botón «Conocer CalvarioTechLabs», «Cómo está hecho», «Código y licencia» y «Volver a jugar». Dos columnas desde 720 px de ancho; una en móvil.
+- **«by»** lleva `lang="en"`. Sin anuncios, sin recursos de terceros y sin animación.
+
 ## Cómo usar este sistema
 
 Carga `components/bundle.css` tras los tokens y reproduce el marcado de cada componente tal como aparece en su vista previa. Las siluetas de las piezas están en `components/pieces.js` y como SVG sueltos en `assets/Piezas/`.

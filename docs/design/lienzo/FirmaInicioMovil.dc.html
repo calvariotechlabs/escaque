@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Inicio en móvil con el pie (oscuro)</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/escaque/tokens.css">
+<link rel="stylesheet" href="ds/escaque/components/bundle.css">
+<link rel="stylesheet" href="lecciones.css">
+<link rel="stylesheet" href="identidad.css">
+<link rel="stylesheet" href="firma.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;600&family=Space+Grotesk:wght@600&display=swap">
+<style>
+body{margin:0}
+.casilla img{position:relative;z-index:1;display:block;width:100%;height:100%}
+</style>
+</helmet>
+<div class="fc-root fc-root--m" data-theme="dark" style="width: 390px; min-height: 844px"><div class="fc-cont fc-cont--m"><header class="fc-cab fc-cab--p"><div class="cab-izq"><h1 class="id-marca fc-h1"><svg viewBox="0 0 64 64" width="24" height="24" aria-hidden="true" focusable="false" style="flex: none; display: block"><defs><clipPath id="fim"><path d="M32 5 L43 17 C49 24 50 29 47 35 C45 39 41 41 39 42 H25 C20 40 17 37 16 32 C14 25 18 20 22 16 Z"/></clipPath></defs><rect width="64" height="64" rx="12" fill="#0b2a38"/><path d="M32 5 L43 17 C49 24 50 29 47 35 C45 39 41 41 39 42 V45 L47 45 L53 57 H11 L17 45 H25 V42 C20 40 17 37 16 32 C14 25 18 20 22 16 Z" fill="#f1f3f5"/><path d="M17 18 L21 14 L49 41 L44 46 Z" clip-path="url(#fim)" fill="#0b6e8a"/></svg><span>Escaque</span></h1></div><nav class="lecc-nav" aria-label="Principal"><a class="lecc-enlace" href="#" aria-current="page">Jugar</a><a class="lecc-enlace" href="#">Lecciones</a><a class="enlace-gh enlace-gh--icono" href="https://github.com/calvariotechlabs/escaque" target="_blank" rel="noopener noreferrer" title="GitHub"><svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg><span class="oculto">GitHub (se abre en una pestaña nueva)</span></a></nav></header></div><main class="fc-inicio"><section aria-labelledby="th" style="display: flex; flex-direction: column">
+<h2 id="th" style="margin: 0 0 16px; font: 600 24px/32px var(--font-display)">Nueva partida</h2>
+<form class="ajustes">
+<fieldset class="grupo grupo--segmentos grupo--modo">
+<legend class="grupo__leyenda">Modo</legend>
+<div class="opciones">
+<div class="opcion"><div class="opcion__caja"><input class="opcion__entrada" type="radio" name="modo" id="modo-dos" value="dos" aria-describedby="modo-dos-d"><label class="opcion__tarjeta" for="modo-dos"><span class="opcion__nombre">Dos jugadores</span></label></div><p class="opcion__texto" id="modo-dos-d">Se juega en este dispositivo.</p></div>
+<div class="opcion"><div class="opcion__caja"><input class="opcion__entrada" type="radio" name="modo" id="modo-maquina" value="maquina" aria-describedby="modo-maquina-d" checked><label class="opcion__tarjeta" for="modo-maquina"><span class="opcion__nombre">Contra la máquina</span></label></div><p class="opcion__texto" id="modo-maquina-d">Juegas contra Alfil Beta, el motor de Escaque.</p></div>
+</div>
+</fieldset>
+<fieldset class="grupo grupo--segmentos grupo--nivel">
+<legend class="grupo__leyenda">Nivel</legend>
+<div class="opciones">
+<div class="opcion"><div class="opcion__caja"><input class="opcion__entrada" type="radio" name="nivel" id="nivel-facil" value="facil" aria-describedby="nivel-facil-d"><label class="opcion__tarjeta" for="nivel-facil"><span class="opcion__nombre">Fácil</span></label></div><p class="opcion__texto" id="nivel-facil-d">Elige jugadas con algo de azar. Para empezar.</p></div>
+<div class="opcion"><div class="opcion__caja"><input class="opcion__entrada" type="radio" name="nivel" id="nivel-medio" value="medio" aria-describedby="nivel-medio-d" checked><label class="opcion__tarjeta" for="nivel-medio"><span class="opcion__nombre">Medio</span></label></div><p class="opcion__texto" id="nivel-medio-d">Mira unas jugadas por delante y responde en menos de medio segundo.</p></div>
+<div class="opcion"><div class="opcion__caja"><input class="opcion__entrada" type="radio" name="nivel" id="nivel-dificil" value="dificil" aria-describedby="nivel-dificil-d"><label class="opcion__tarjeta" for="nivel-dificil"><span class="opcion__nombre">Difícil</span></label></div><p class="opcion__texto" id="nivel-dificil-d">Piensa cerca de un segundo y cuida sus piezas.</p></div>
+</div>
+</fieldset>
+<fieldset class="grupo grupo--segmentos grupo--color">
+<legend class="grupo__leyenda">Tu color</legend>
+<div class="opciones">
+<div class="opcion"><div class="opcion__caja"><input class="opcion__entrada" type="radio" name="color" id="color-blancas" value="blancas" aria-describedby="color-blancas-d" checked><label class="opcion__tarjeta" for="color-blancas"><span class="opcion__nombre"><span class="estado__turno estado__turno--w" aria-hidden="true"></span>Blancas</span></label></div><p class="opcion__texto" id="color-blancas-d">Mueves primero.</p></div>
+<div class="opcion"><div class="opcion__caja"><input class="opcion__entrada" type="radio" name="color" id="color-negras" value="negras" aria-describedby="color-negras-d"><label class="opcion__tarjeta" for="color-negras"><span class="opcion__nombre"><span class="estado__turno estado__turno--b" aria-hidden="true"></span>Negras</span></label></div><p class="opcion__texto" id="color-negras-d">Mueve primero la máquina.</p></div>
+<div class="opcion"><div class="opcion__caja"><input class="opcion__entrada" type="radio" name="color" id="color-azar" value="azar" aria-describedby="color-azar-d"><label class="opcion__tarjeta" for="color-azar"><span class="opcion__nombre"><span class="estado__turno estado__turno--azar" aria-hidden="true"></span>Al azar</span></label></div><p class="opcion__texto" id="color-azar-d">Se decide al empezar.</p></div>
+</div>
+</fieldset>
+<div class="ajustes__acciones"><button class="boton boton--principal" type="submit">Empezar partida</button></div>
+</form>
+</section></main><div class="fc-cont fc-cont--m fc-cont--barra"><footer class="pie pie--compacto "><p class="pie__firma"><strong>Escaque</strong> <a href="https://calvariotechlabs.com/" target="_blank" rel="noopener noreferrer"><span lang="en">by</span>&nbsp;CalvarioTechLabs<span class="oculto"> (se abre en una pestaña nueva)</span></a></p><nav class="pie__nav" aria-label="Información"><a href="#/acerca">Acerca de Escaque</a></nav><p class="pie__legal">© 2026 CalvarioTechLabs</p></footer></div></div></x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>
