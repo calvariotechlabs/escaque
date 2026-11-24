@@ -96,6 +96,18 @@ describe("coherencia del coach con los casos de las auditorías", () => {
     assertCoherent(report, CHATGPT_GAME, 24);
   });
 
+  it("H-08 · 13.Dd3+ (banco): la línea del panel enseña la dama que el texto dice que gana", () => {
+    // Antes la frase contaba las capturas de 12 medias jugadas y el panel enseñaba 4:
+    // «Dd3+ gana la dama y un peón» con la línea «13. Dd3+ Re7 14. Cd5+ Re8», que no
+    // captura nada (la dama cae en la novena media jugada, 17. Cxf6+).
+    const game = { fen: "r1b2b1r/ppp3pp/3k1q2/4p3/1NB5/P4Q2/1P1P1PPP/n1BK3R w - - 3 13" };
+    const report = analyzeMove(game, "f3d3", DEPTH4);
+    assert.equal(report.verdict, "mejor");
+    assert.match(report.summary, /^Dd3\+ gana la dama/);
+    assert.match(report.line, /^13\. Dd3\+ .*\bCxf6\+? gxf6$/);
+    assert.deepEqual(checkInvariants(report, game), [], `${report.summary} | ${report.line}`);
+  });
+
   it("H-09 · 16.Ab5+ solo aplaza la amenaza: no «pone a salvo» la dama", () => {
     const report = reportAt(CHATGPT_GAME, 30);
     assert.doesNotMatch(texts(report), /pone a salvo la dama/);

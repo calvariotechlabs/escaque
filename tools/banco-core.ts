@@ -262,20 +262,22 @@ const contrario = (c: Color): Color => (c === "w" ? "b" : "w");
 
 /**
  * Comprueba que el informe no se contradice (las invariantes de RC-01 en la consolidación).
- * Se aplica desde fuera, sin tocar el coach, para medir el «antes». `lineaMejor` es la
- * variante principal (UCI) de la búsqueda de antes; con ella se comprueba que la pieza que el
- * texto dice ganar se captura de verdad.
+ * Se aplica desde fuera, sin tocar el coach, para medir el «antes». `lineaPanel` es la
+ * línea que enseña el panel (UCI); con ella se comprueba que la pieza que el texto dice ganar
+ * se captura de verdad en las medias jugadas que se ven (`informe.line`).
  *
  * 1. «Mejor jugada» como veredicto y, debajo, otra jugada como «Mejor jugada».
  * 2. Hay un aviso táctico y el texto dice «no hay un motivo táctico».
  * 3. Tras la jugada hay mate en contra y el texto elogia material o dice que la diferencia es pequeña.
- * 4. El texto dice «X gana una torre» y en la línea no se captura ninguna torre.
+ * 4. El texto dice «X gana una torre» y en la parte de la línea que se ve no se captura ninguna torre.
  * 5. El veredicto es «Mejor» o «Buena» y la jugada permite un mate que antes no había.
  *
  * Desde B3 el banco suma además las violaciones de `checkInvariants` del propio coach
  * (regla «invariante-del-coach», ver `tools/banco.ts`).
  */
-export function invariantes(fen: string, informe: CoachReport, lineaMejor: readonly string[]): Violacion[] {
+export function invariantes(fen: string, informe: CoachReport, lineaPanel: readonly string[]): Violacion[] {
+  // La pieza tiene que caer en la parte de la línea que ve la persona en el panel (H-08).
+  const mostradas = jugadasMostradas(informe.line);
   const v: Violacion[] = [];
   const rival = contrario(informe.color);
   const textos = `${informe.summary} ${informe.why}`;
@@ -296,7 +298,7 @@ export function invariantes(fen: string, informe: CoachReport, lineaMejor: reado
   for (const texto of afirmaciones) {
     const m = GANA.exec(texto);
     if (m === null) continue;
-    const capturadas = capturasDe(fen, lineaMejor, informe.color);
+    const capturadas = capturasDe(fen, lineaPanel, informe.color, mostradas);
     const buscadas = PIEZAS_TEXTO[m[2]!]!;
     const necesarias = m[2] === "dos peones" ? 2 : 1;
     if (capturadas.filter((t) => t !== "coronación" && buscadas.includes(t)).length < necesarias && !(m[2] === "la dama" && capturadas.includes("coronación"))) {
@@ -310,11 +312,16 @@ export function invariantes(fen: string, informe: CoachReport, lineaMejor: reado
   return v;
 }
 
-/** Piezas que captura `color` en las 8 primeras medias jugadas de `linea` (y «coronación» si corona a dama). */
-export function capturasDe(fen: string, linea: readonly string[], color: Color): (PieceType | "coronación")[] {
+/** Medias jugadas que enseña la línea del panel («13. Dd3+ Re7 14. Cd5+ Re8» son 4): cuenta las jugadas, no los números. */
+export function jugadasMostradas(linea: string): number {
+  return linea.split(" ").filter((t) => t !== "" && !/^\d+[.…]$/.test(t)).length;
+}
+
+/** Piezas que captura `color` en las `medias` primeras medias jugadas de `linea` (y «coronación» si corona a dama). */
+export function capturasDe(fen: string, linea: readonly string[], color: Color, medias = 8): (PieceType | "coronación")[] {
   const pos = Position.fromFen(fen);
   const out: (PieceType | "coronación")[] = [];
-  for (const uci of linea.slice(0, 8)) {
+  for (const uci of linea.slice(0, medias)) {
     const move = pos.moveFromUci(uci);
     if (move === null) break;
     if (pos.turn === color) {
