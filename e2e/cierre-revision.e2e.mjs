@@ -69,7 +69,7 @@ describe("cierre de la revisión visual 2", () => {
     await page.goto("about:blank"); // corta el análisis del repaso antes de cerrar Chrome
   });
 
-  for (const [nombre, width, height, mobile] of [["escritorio", 1440, 900, false], ["tablet", 820, 1180, true], ["móvil", 390, 844, true]]) {
+  for (const [nombre, width, height, mobile] of [["escritorio", 1440, 900, false], ["tablet", 820, 1180, true], ["móvil", 390, 844, true], ["móvil estrecho", 320, 568, true]]) {
     test(`${nombre}: la navegación está en el mismo sitio en el inicio y en la partida, y el subtítulo va debajo`, async () => {
       await page.call("Emulation.setDeviceMetricsOverride", { width, height, deviceScaleFactor: 1, mobile });
       await freshStart(page, `cab-${width}`);
@@ -96,8 +96,9 @@ describe("cierre de la revisión visual 2", () => {
 
   test("repaso: «Resumen por bando» lleva el escaque y la tinta de marca, y sigue siendo el título de la tabla", async () => {
     await page.call("Emulation.setDeviceMetricsOverride", { width: 1440, height: 900, deviceScaleFactor: 1, mobile: false });
-    await page.goto(base + `/?v=resumen#/jugar`);
-    await page.waitFor(`document.getElementById('cargar-pgn')`, { what: "botón Cargar PGN" });
+    await freshStart(page, "resumen");
+    await page.eval(`document.querySelector('#ajustes [type=submit]').click()`);
+    await page.waitFor(`!document.getElementById('pantalla-partida').hidden && document.getElementById('cargar-pgn').checkVisibility()`, { what: "botón Cargar PGN a la vista" });
     await page.eval(`document.getElementById('cargar-pgn').click()`);
     await page.eval(`(() => { document.getElementById('pgn-campo').value = ${JSON.stringify(PGN)}; document.getElementById('pgn-cargar').click(); })()`);
     await page.waitFor(`!document.getElementById('pantalla-repaso').hidden`, { what: "pantalla de repaso" });

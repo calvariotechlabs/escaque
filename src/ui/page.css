@@ -3,6 +3,8 @@ body{margin:0;background:var(--surface);color:var(--ink);font:400 16px/24px var(
 .pagina__cabecera,.partida{max-width:1120px;margin:0 auto;box-sizing:border-box;padding-left:max(var(--space-4),env(safe-area-inset-left,0px));padding-right:max(var(--space-4),env(safe-area-inset-right,0px))}
 .pagina__cabecera{padding-top:max(var(--space-4),env(safe-area-inset-top,0px));display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--space-2) var(--space-6)}
 .pagina__cabecera h1{margin:0;font:600 24px/28px var(--font-display)}
+/* Si nombre y navegación no caben en una fila (menos de unos 360 px), la navegación baja pero sigue a la derecha (CAL-404). */
+.pagina__cabecera .lecc-nav{margin-left:auto}
 /* Logo junto al nombre (CAL-387). Diseño: «Logo junto al nombre» del lienzo. Decorativo: lleva aria-hidden. */
 .pagina__cabecera h1.cabecera-marca{display:flex;align-items:center;gap:var(--space-2)}
 .cabecera-marca__logo{flex:none;display:block;width:24px;height:24px}

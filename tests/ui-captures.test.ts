@@ -103,6 +103,12 @@ describe("capturesMarkup", () => {
     assert.equal(html, '<p class="capturas__vacio">Ninguna todavía</p>');
   });
 
+  it("una coronación sin capturas no pliega el panel: la ventaja se ve y se lee", () => {
+    const html = capturesMarkup(captureSummary([move("w", null, "q")]), "w");
+    assert.ok(!html.includes("capturas__vacio"));
+    assert.ok(html.includes('<span class="capturas__ventaja" aria-hidden="true">+8</span>'));
+  });
+
   it("con capturas e igualdad lo dice en una nota", () => {
     const html = capturesMarkup(captureSummary([move("w", "n"), move("b", "b")]), "w");
     assert.ok(html.includes('<p class="capturas__nota">Material igualado.</p>'));

@@ -94,7 +94,8 @@ function rowMarkup(color: Color, summary: Captures): string {
 export function capturesMarkup(summary: Captures, bottom: Color): string {
   const top: Color = bottom === "w" ? "b" : "w";
   const any = [...CAPTURABLE].some((t) => summary.w[t as keyof CapturedCounts] + summary.b[t as keyof CapturedCounts] > 0);
-  if (!any) return `<p class="capturas__vacio">Ninguna todavía</p>`;
-  const note = summary.lead.color === null ? `<p class="capturas__nota">Material igualado.</p>` : "";
+  // Plegado solo si no hay nada que contar: una coronación sin capturas ya da ventaja y se ve en su fila.
+  if (!any && summary.lead.color === null) return `<p class="capturas__vacio">Ninguna todavía</p>`;
+  const note = any && summary.lead.color === null ? `<p class="capturas__nota">Material igualado.</p>` : "";
   return `<ul class="capturas__lista">${rowMarkup(bottom, summary)}${rowMarkup(top, summary)}</ul>${note}`;
 }
