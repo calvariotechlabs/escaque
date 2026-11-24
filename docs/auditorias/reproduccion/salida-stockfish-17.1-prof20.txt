@@ -1,0 +1,12 @@
+H-01         2.g4       SF best=e2e3 -0.67 | played g2g4 M-1  (mover's view)  fen=rnbqkbnr/pppp1ppp/8/4p3/8/5P2/PPPPP1PP/RNBQKBNR w KQkq e6 0 2
+H-02         2.Cf3      SF best=g1f3 0.34 | played g1f3 0.43  (mover's view)  fen=rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2
+H-06         6.Cxf7     SF best=g5f7 0.73 | played g5f7 0.87  (mover's view)  fen=r1bqkb1r/ppp2ppp/2n5/3np1N1/2B5/8/PPPP1PPP/RNBQK2R w KQkq - 0 6
+H-14         10...Da5   SF best=b4a6 0.80 | played d8a5 -3.58  (mover's view)  fen=r1bq1b1r/pp4pp/2p1k3/3np3/1nB1Q3/P1N5/1PPP1PPP/R1B1K2R b KQ - 0 10
+H-02b        12.dxe5    SF best=a3b4 5.63 | played d4e5 3.58  (mover's view)  fen=r1b4r/pp4pp/2pbk3/q2np3/1nBPQ3/P1N5/1PP2PPP/R1B1K2R w KQ - 1 12
+H-07         13.O-O     SF best=e1g1 6.53 | played e1g1 6.42  (mover's view)  fen=r1b4r/ppb3pp/2p1k3/q2nP3/1nB1Q3/P1N5/1PP2PPP/R1B1K2R w KQ - 1 13
+H-05         32.Tc8+    SF best=c1c2 M-8 | played c1c8 M-5  (mover's view)  fen=r5k1/pp4pp/6r1/3p4/4n3/P5NP/1B2qbKP/2RR4 w - - 2 32
+H-03         4.Dg5      SF best=h5d1 -0.19 | played h5g5 -6.94  (mover's view)  fen=r1b1kbnr/ppppqppp/2n5/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR w KQkq - 4 4
+H-08         13.Dd5+    SF best=f3d3 5.10 | played f3d5 -1.54  (mover's view)  fen=r1b2b1r/ppp3pp/3k1q2/4p3/1NB5/P4Q2/1P1P1PPP/n1BK3R w - - 3 13
+H-04         40.gxf5    SF best=g4f5 M-1 | played g4f5 M-1  (mover's view)  fen=8/1p1b2rp/8/3k1n2/r5P1/P4K1P/1P1q4/8 w - - 2 40
+H-09         16.Ab5+    SF best=c4b5 -4.84 | played c4b5 -5.27  (mover's view)  fen=r1b1k2r/ppQ3pp/3b1q2/4p3/1NB5/P7/1P1P1PPP/n1BK3R w - - 1 16
+H-10         12...Df6   SF best=c7c6 3.10 | played d8f6 -5.42  (mover's view)  fen=r1bq1b1r/ppp3pp/3k4/4p3/1NB5/P4Q2/1P1P1PPP/n1BK3R b - - 2 12
