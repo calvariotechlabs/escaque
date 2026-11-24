@@ -169,6 +169,42 @@ describe("CoachClient", () => {
   });
 });
 
+describe("carreras del cliente del coach (RC-06)", () => {
+  it("el informe tardío de un Worker cancelado no resuelve la petición nueva", async () => {
+    const { client, workers } = clientWithFakes();
+    const first = client.analyze(JOB);
+    const staleHandler = workers[0]!.onmessage!;
+    const staleId = workers[0]!.lastId();
+    const second = client.analyze({ ...JOB, move: "c7c5" });
+    await assert.rejects(first, EngineCancelledError);
+    staleHandler({ data: { type: "report", id: staleId, report: { ...report, san: "VIEJO" } } });
+    workers[1]!.reply({ type: "report", id: workers[1]!.lastId(), report });
+    assert.deepEqual(await second, report);
+  });
+
+  it("una respuesta de otro tipo (pista) con el mismo id se ignora y no cierra la petición de informe", async () => {
+    const { client, workers } = clientWithFakes();
+    const pending = client.analyze(JOB);
+    const worker = workers[0]!;
+    worker.reply({ type: "hint", id: worker.lastId(), hint: { why: "x" } });
+    worker.reply({ type: "report", id: worker.lastId(), report });
+    assert.deepEqual(await pending, report);
+  });
+
+  it("un informe repetido no afecta a la petición siguiente", async () => {
+    const { client, workers } = clientWithFakes();
+    const first = client.analyze(JOB);
+    const worker = workers[0]!;
+    const id = worker.lastId();
+    worker.reply({ type: "report", id, report });
+    await first;
+    const second = client.analyze({ ...JOB, move: "c7c5" });
+    worker.reply({ type: "report", id, report }); // eco del id anterior
+    worker.reply({ type: "report", id: worker.lastId(), report });
+    assert.deepEqual(await second, report);
+  });
+});
+
 describe("pistas por el Worker (CAL-394)", () => {
   const hintRequest = (overrides: Record<string, unknown> = {}): Record<string, unknown> => ({
     type: "hint",

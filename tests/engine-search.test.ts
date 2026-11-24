@@ -144,11 +144,8 @@ describe("search()", () => {
     for (const uci of result.pv) playUci(p, uci);
   });
 
-  it("respeta el límite de tiempo y siempre devuelve una jugada", () => {
-    const started = performance.now();
+  it("con límite de tiempo siempre devuelve una jugada (el reloj se mide en tests/rendimiento)", () => {
     const result = search(Position.fromFen(KIWIPETE), { timeMs: 150 });
-    const elapsed = performance.now() - started;
-    assert.ok(elapsed < 400, `tardó ${elapsed.toFixed(0)} ms`);
     assert.ok(result.best !== null && result.depth >= 1);
   });
 

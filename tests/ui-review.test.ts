@@ -6,6 +6,7 @@ import { toEvaluation } from "../src/coach/index.js";
 import { MATE_SCORE } from "../src/engine/index.js";
 import { Game } from "../src/ui/game.js";
 import {
+  AnalysisGuard,
   curveLabel,
   curveNote,
   curveView,
@@ -282,5 +283,30 @@ describe("textos", () => {
 
   it("nota bajo la curva con la mayor ventaja", () => {
     assert.equal(curveNote(reviewMoves(scholarGame()), scholarReports(), { kind: "stalemate" }), "Máxima ventaja blanca: +15,9 tras 3... Cf6.");
+  });
+});
+
+describe("AnalysisGuard (integridad del estado en el repaso, RC-06)", () => {
+  it("el informe de una petición invalidada (otra partida, pantalla oculta) se descarta", () => {
+    const guard = new AnalysisGuard();
+    const old = guard.begin();
+    assert.equal(guard.busy, true);
+    guard.invalidate(); // se carga otra partida mientras el coach pensaba
+    assert.equal(guard.busy, false);
+    assert.equal(guard.finish(old), false);
+    assert.equal(guard.accepts(old), false);
+    const next = guard.begin();
+    assert.equal(guard.finish(old), false, "la respuesta vieja no cierra la petición nueva");
+    assert.equal(guard.busy, true);
+    assert.equal(guard.finish(next), true);
+    assert.equal(guard.busy, false);
+  });
+
+  it("una petición que termina en orden libera el turno", () => {
+    const guard = new AnalysisGuard();
+    const t = guard.begin();
+    assert.equal(guard.accepts(t), true);
+    assert.equal(guard.finish(t), true);
+    assert.equal(guard.busy, false);
   });
 });
