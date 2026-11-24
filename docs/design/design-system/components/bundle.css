@@ -267,3 +267,58 @@ section.grupo{display:flex;flex-direction:column;gap:var(--space-4)}
   .como,.ayuda,.contador,.novato{border-color:CanvasText}
   .contador__punto--hecho{background:CanvasText}
 }
+
+/* Firma «by CalvarioTechLabs», pie y Acerca de (B5, issue #65) */
+/* Cabecera: la firma va junto al nombre solo desde 720 px de ancho y 500 px de alto */
+.cab-izq{display:flex;align-items:center;gap:var(--space-3);min-width:0}
+
+/* La firma: texto en tono secundario, sin logotipo de la creadora ni enlace. */
+.firma{display:inline-flex;align-items:center;gap:4px;min-height:20px;padding-left:var(--space-3);border-left:1px solid var(--line);font:400 14px/20px var(--font-sans);color:var(--ink-muted);white-space:nowrap}
+.firma__nombre{font-weight:600}
+@media (max-width:719px),(max-height:499px){.cab-izq .firma{display:none}}
+
+/* Pie de página */
+.pie{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:0 var(--space-6);margin-top:var(--space-4);padding:var(--space-2) 0 var(--space-4);border-top:1px solid var(--line);font:400 14px/20px var(--font-sans);color:var(--ink-muted)}
+.pie p{margin:0}
+.pie__firma{display:flex;align-items:center;flex-wrap:wrap;gap:0 var(--space-1);color:var(--ink-muted)}
+.pie__firma strong{font-weight:600;color:var(--ink)}
+.pie__nav{display:flex;flex-wrap:wrap}
+.pie a,.pie__firma a,.enlace-texto{color:var(--ink);font-weight:600;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:4px;border-radius:var(--radius-sm)}
+.pie a,.pie__firma a{display:inline-flex;align-items:center;min-height:44px;padding:0 var(--space-2)}
+.pie a:hover,.pie__firma a:hover,.enlace-texto:hover,.pie-a--hover{color:var(--accent);text-decoration-thickness:2px}
+.pie a:focus-visible,.pie__firma a:focus-visible,.enlace-texto:focus-visible,.pie-a--foco{color:var(--ink);outline:3px solid var(--accent);outline-offset:2px}
+.pie a[aria-current="page"]{text-decoration-color:var(--accent);text-decoration-thickness:3px}
+.pie--compacto{gap:0 var(--space-2)}
+.pie--compacto .pie__firma{flex-basis:100%}
+.pie--compacto .pie__nav{margin-left:calc(-1 * var(--space-2))}
+.pie--region{margin-top:var(--space-2)}
+
+/* Acerca de */
+.acerca{width:100%;max-width:1120px;margin:0 auto;box-sizing:border-box;padding:var(--space-6) 32px 0;flex:1 0 auto}
+.acerca--t{max-width:732px;padding:var(--space-6) 16px 0}
+.acerca--m{max-width:none;padding:var(--space-4) 16px 0}
+.acerca--ap{max-width:none;padding:var(--space-4) 24px 0}
+.acerca--2{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:var(--space-8) 48px;align-items:start}
+.acerca--ap.acerca--2{grid-template-columns:minmax(0,1fr) 300px;gap:var(--space-6)}
+.acerca__texto{display:flex;flex-direction:column;gap:var(--space-6);min-width:0;max-width:640px}
+.acerca__titulo{margin:0;font:600 32px/36px var(--font-display);letter-spacing:-.02em;color:var(--marca)}
+.acerca--m .acerca__titulo{font-size:28px;line-height:32px}
+.acerca__intro{margin:0;font:400 18px/28px var(--font-sans)}
+.acerca--m .acerca__intro,.acerca--ap .acerca__intro{font-size:16px;line-height:24px}
+.acerca__sec{display:flex;flex-direction:column;gap:var(--space-3)}
+.acerca__lista{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:var(--space-2);font:400 16px/24px var(--font-sans)}
+.acerca__p{margin:0;font:400 16px/24px var(--font-sans)}
+.acerca__acciones{display:flex}
+.acerca__lado{position:sticky;top:var(--space-6);min-width:0}
+.firma-tarjeta{display:flex;flex-direction:column;gap:var(--space-4);padding:var(--space-6);background:var(--surface-raised);border:1px solid var(--line);border-radius:var(--radius-md)}
+.firma-tarjeta__marca{display:flex;align-items:center;gap:var(--space-3)}
+.firma-tarjeta__texto{display:flex;flex-direction:column;gap:2px;min-width:0}
+.firma-tarjeta__nombre{margin:0;font:600 28px/32px var(--font-display);letter-spacing:-.02em;color:var(--marca)}
+.firma-tarjeta__by{margin:0;font:400 14px/20px var(--font-sans);color:var(--ink-muted)}
+.firma-tarjeta__desc{margin:0;font:400 14px/20px var(--font-sans)}
+.firma-tarjeta .boton--enlace{align-self:flex-start}
+
+@media (forced-colors: active){
+  .firma,.pie{border-color:CanvasText}
+  .pie a,.pie__firma a,.enlace-texto{color:LinkText}
+}

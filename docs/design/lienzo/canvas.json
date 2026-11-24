@@ -863,6 +863,102 @@
       "h": 375,
       "title": "Móvil apaisado estrecho · 667×375 (CAL-405)",
       "page": "movil"
+    },
+    "FirmaMarca.dc.html": {
+      "x": 0,
+      "y": 45340,
+      "w": 1280,
+      "h": 2200,
+      "title": "Escritorio · firma «by CalvarioTechLabs»: marca, reglas, contraste y textos (B5, propuesta)",
+      "page": "escritorio"
+    },
+    "FirmaPartidaEscritorio.dc.html": {
+      "x": 1360,
+      "y": 45340,
+      "w": 1280,
+      "h": 980,
+      "title": "Escritorio · partida con la firma en la cabecera y el pie (claro)",
+      "page": "escritorio"
+    },
+    "FirmaPartidaEscritorioOscuro.dc.html": {
+      "x": 2720,
+      "y": 45340,
+      "w": 1280,
+      "h": 980,
+      "title": "Escritorio · partida con la firma en la cabecera y el pie (oscuro)",
+      "page": "escritorio"
+    },
+    "AcercaEscritorio.dc.html": {
+      "x": 1360,
+      "y": 46440,
+      "w": 1280,
+      "h": 880,
+      "title": "Escritorio · Acerca de Escaque (claro)",
+      "page": "escritorio"
+    },
+    "AcercaEscritorioOscuro.dc.html": {
+      "x": 2720,
+      "y": 46440,
+      "w": 1280,
+      "h": 880,
+      "title": "Escritorio · Acerca de Escaque (oscuro)",
+      "page": "escritorio"
+    },
+    "FirmaPartidaTablet.dc.html": {
+      "x": 0,
+      "y": 37960,
+      "w": 820,
+      "h": 1180,
+      "title": "Tablet · partida con la firma y el pie (claro)",
+      "page": "tablet"
+    },
+    "AcercaTablet.dc.html": {
+      "x": 900,
+      "y": 37960,
+      "w": 820,
+      "h": 1100,
+      "title": "Tablet · Acerca de Escaque (oscuro)",
+      "page": "tablet"
+    },
+    "FirmaPartidaMovil.dc.html": {
+      "x": 0,
+      "y": 44870,
+      "w": 390,
+      "h": 1010,
+      "title": "Móvil · partida con el pie (claro)",
+      "page": "movil"
+    },
+    "FirmaInicioMovil.dc.html": {
+      "x": 470,
+      "y": 44870,
+      "w": 390,
+      "h": 844,
+      "title": "Móvil · inicio con el pie (oscuro)",
+      "page": "movil"
+    },
+    "AcercaMovil.dc.html": {
+      "x": 940,
+      "y": 44870,
+      "w": 390,
+      "h": 1500,
+      "title": "Móvil · Acerca de Escaque (claro)",
+      "page": "movil"
+    },
+    "FirmaPartidaMovilHorizontal.dc.html": {
+      "x": 0,
+      "y": 46490,
+      "w": 844,
+      "h": 390,
+      "title": "Móvil apaisado · partida con el pie al final del panel (claro)",
+      "page": "movil"
+    },
+    "AcercaMovilHorizontal.dc.html": {
+      "x": 924,
+      "y": 46490,
+      "w": 844,
+      "h": 390,
+      "title": "Móvil apaisado · Acerca de Escaque (oscuro)",
+      "page": "movil"
     }
   },
   "order": [
@@ -969,7 +1065,19 @@
     "PulidoDosMovilRepaso.dc.html",
     "PulidoDosMovilDialogo.dc.html",
     "NavegacionMovilHorizontal.dc.html",
-    "NavegacionMovilHorizontalSE.dc.html"
+    "NavegacionMovilHorizontalSE.dc.html",
+    "FirmaMarca.dc.html",
+    "FirmaPartidaEscritorio.dc.html",
+    "FirmaPartidaEscritorioOscuro.dc.html",
+    "AcercaEscritorio.dc.html",
+    "AcercaEscritorioOscuro.dc.html",
+    "FirmaPartidaTablet.dc.html",
+    "AcercaTablet.dc.html",
+    "FirmaPartidaMovil.dc.html",
+    "FirmaInicioMovil.dc.html",
+    "AcercaMovil.dc.html",
+    "FirmaPartidaMovilHorizontal.dc.html",
+    "AcercaMovilHorizontal.dc.html"
   ],
   "notes": {
     "t_escritorio_0": {
@@ -2010,6 +2118,54 @@
       "text": "Propuesta CAL-405: en móvil apaisado, si «Escaque» y la navegación no caben juntos en la columna derecha (menos de unos 330 px, por ejemplo 720×450 o 667×375), la navegación baja a una segunda línea bajo el nombre, alineada a la izquierda con el texto de «Jugar» pegado al borde de la columna. El tablero no cambia. A partir de unos 330 px de columna la cabecera sigue en una sola fila, como en 844×390. Botones (CAL-407): en ese mismo caso los cuatro botones de la partida van en dos columnas de dos filas (Nueva partida y Deshacer jugada arriba; Rehacer jugada y Girar tablero debajo) en lugar de cuatro en una fila, donde «Deshacer» y «Rehacer» se cortaban. En el repaso, los botones de paso también van a dos columnas (Inicio y Anterior, Siguiente y Final, y debajo los dos de error clave).",
       "fill": "gray",
       "page": "movil"
+    },
+    "t_firma_e": {
+      "x": 0,
+      "y": 45060,
+      "text": "Firma «by CalvarioTechLabs» (B5)",
+      "page": "escritorio",
+      "kind": "title1",
+      "maxW": 4000
+    },
+    "t_firma_t": {
+      "x": 0,
+      "y": 37680,
+      "text": "Firma «by CalvarioTechLabs» (B5)",
+      "page": "tablet",
+      "kind": "title1",
+      "maxW": 1720
+    },
+    "t_firma_m": {
+      "x": 0,
+      "y": 44590,
+      "text": "Firma «by CalvarioTechLabs» (B5)",
+      "page": "movil",
+      "kind": "title1",
+      "maxW": 1768
+    },
+    "n_firma_e": {
+      "x": 0,
+      "y": 45170,
+      "text": "Propuesta pendiente de aprobar (issue #65). La firma sale en la cabecera (tablet y escritorio), en un pie nuevo en todas las pantallas y en la pantalla nueva «Acerca de». Escaque sigue siendo la marca; CalvarioTechLabs, la creadora. Móvil: sin firma en la cabecera por falta de sitio; solo en el pie.",
+      "page": "escritorio",
+      "w": 520,
+      "fill": "gray"
+    },
+    "n_firma_t": {
+      "x": 0,
+      "y": 37790,
+      "text": "Propuesta pendiente de aprobar (issue #65). La firma sale en la cabecera (tablet y escritorio), en un pie nuevo en todas las pantallas y en la pantalla nueva «Acerca de». Escaque sigue siendo la marca; CalvarioTechLabs, la creadora. Móvil: sin firma en la cabecera por falta de sitio; solo en el pie.",
+      "page": "tablet",
+      "w": 520,
+      "fill": "gray"
+    },
+    "n_firma_m": {
+      "x": 0,
+      "y": 44700,
+      "text": "Propuesta pendiente de aprobar (issue #65). La firma sale en la cabecera (tablet y escritorio), en un pie nuevo en todas las pantallas y en la pantalla nueva «Acerca de». Escaque sigue siendo la marca; CalvarioTechLabs, la creadora. Móvil: sin firma en la cabecera por falta de sitio; solo en el pie.",
+      "page": "movil",
+      "w": 520,
+      "fill": "gray"
     }
   },
   "designSystems": [
