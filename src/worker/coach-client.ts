@@ -30,9 +30,14 @@ const isText = (v: unknown): v is string => typeof v === "string" && v.length <=
 const isColor = (v: unknown): boolean => v === "w" || v === "b";
 const VERDICTS = ["mejor", "buena", "imprecision", "error", "error-grave"];
 const KINDS = ["mate-en-1", "pieza-colgando", "captura-gratis"];
+const CATEGORIES = ["correcta", "mate", "tactica", "material", "posicional", "sin-evidencia"];
+const UCI = /^[a-h][1-8][a-h][1-8][nbrq]?$/;
+/** Las líneas del coach tienen como mucho unas diez medias jugadas; 64 deja margen. */
+const MAX_LINE = 64;
 const SQUARE = /^[a-h][1-8]$/;
 
 const isMove = (v: unknown): boolean => isObject(v) && isText(v["uci"]) && isText(v["san"]);
+const isLine = (v: unknown): boolean => Array.isArray(v) && v.length <= MAX_LINE && v.every((m) => typeof m === "string" && UCI.test(m));
 
 function isEvaluation(v: unknown): boolean {
   if (!isObject(v) || typeof v["cp"] !== "number" || !isText(v["text"])) return false;
@@ -59,6 +64,11 @@ export function isReport(v: unknown): v is CoachReport {
     isColor(v["color"]) &&
     isMove(v["move"]) &&
     isMove(v["best"]) &&
+    (v["alternative"] === null || isMove(v["alternative"])) &&
+    CATEGORIES.includes(v["category"] as string) &&
+    isObject(v["lines"]) &&
+    isLine(v["lines"]["best"]) &&
+    isLine(v["lines"]["played"]) &&
     isEvaluation(v["before"]) &&
     isEvaluation(v["after"]) &&
     VERDICTS.includes(v["verdict"] as string) &&

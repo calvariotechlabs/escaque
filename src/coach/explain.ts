@@ -17,7 +17,7 @@ import type { Color, Move, PieceType, Square } from "../core/index.js";
 import { MATE_SCORE, PIECE_VALUES, TranspositionTable, search } from "../engine/index.js";
 import type { SearchLimits, SearchOptions } from "../engine/index.js";
 import { capturedValue, exchangeGain } from "./exchange.js";
-import { side, spanishSan, withArticle } from "./text.js";
+import { joinPhrases, pawns, side, spanishSan, withArticle } from "./text.js";
 
 export type MotiveKind = "mate" | "horquilla" | "clavada" | "material" | "salva" | "posicional";
 
@@ -47,8 +47,14 @@ const MATE_BOUND = MATE_SCORE - 1_000;
 const MIN_GAIN = PIECE_VALUES.p;
 /** Medias jugadas de la línea que se muestran. */
 const LINE_PLIES = 4;
-/** Medias jugadas de la línea que cuentan para el material. */
-const MATERIAL_PLIES = 8;
+/**
+ * Medias jugadas de la línea que cuentan para el material. Cubre las líneas
+ * que completa el coach (7 más hasta 4 para acabar un cambio, ver analyze.ts):
+ * una recaptura al final no puede quedarse fuera de la cuenta.
+ */
+const MATERIAL_PLIES = 12;
+/** Un mate en contra se escribe entero hasta esta distancia; más largo, sin línea. */
+const MATE_LINE_MOVES = 5;
 
 const KNIGHT = [-33, -31, -18, -14, 14, 18, 31, 33];
 const KING = [-17, -16, -15, -1, 1, 15, 16, 17];
@@ -107,14 +113,14 @@ function numbered(position: Position, move: Move): string {
 
 /**
  * Línea en texto, con números y SAN española: «5. Cxe5 dxe5 6. Dxg4 Cf6».
- * Como mucho cuatro medias jugadas; se corta en la primera que no es legal.
+ * Como mucho `plies` medias jugadas (cuatro); se corta en la primera que no es legal.
  * Deja `position` como estaba.
  */
-export function lineText(position: Position, line: readonly string[]): string {
+export function lineText(position: Position, line: readonly string[], plies = LINE_PLIES): string {
   const parts: string[] = [];
   let played = 0;
   try {
-    for (const uci of line.slice(0, LINE_PLIES)) {
+    for (const uci of line.slice(0, plies)) {
       const move = position.moveFromUci(uci);
       if (move === null) break;
       const san = spanishSan(position.moveToSan(move));
@@ -129,7 +135,7 @@ export function lineText(position: Position, line: readonly string[]): string {
 }
 
 /** Material que gana quien mueve en `position` siguiendo la línea (capturas y coronaciones). Deja `position` como estaba. */
-function lineGain(position: Position, line: readonly string[]): number {
+export function lineGain(position: Position, line: readonly string[]): number {
   const mover = position.turn;
   let gain = 0;
   let played = 0;
@@ -148,13 +154,86 @@ function lineGain(position: Position, line: readonly string[]): number {
   return gain;
 }
 
-/** «un peón», «dos peones», «una pieza», «una torre», «la dama». */
-function amount(cp: number): string {
-  if (cp < 150) return "un peón";
-  if (cp < 250) return "dos peones";
-  if (cp < 420) return "una pieza";
-  if (cp < 700) return "una torre";
-  return "la dama";
+/** Captura de una línea: quién captura y qué pieza (o coronación). */
+interface LineCapture {
+  readonly by: Color;
+  readonly type: PieceType | null;
+  readonly promotion: PieceType | null;
+}
+
+/** Capturas y coronaciones de las primeras `plies` medias jugadas de la línea. Deja `position` como estaba. */
+export function lineCaptures(position: Position, line: readonly string[], plies = MATERIAL_PLIES): LineCapture[] {
+  const out: LineCapture[] = [];
+  let played = 0;
+  try {
+    for (const uci of line.slice(0, plies)) {
+      const move = position.moveFromUci(uci);
+      if (move === null) break;
+      const target = position.pieceAt(move.to);
+      const enPassant = target === null && position.pieceAt(move.from)?.type === "p" && (move.from & 7) !== (move.to & 7);
+      const type = target !== null ? target.type : enPassant ? "p" : null;
+      if (type !== null || move.promotion !== null) out.push({ by: position.turn, type, promotion: move.promotion });
+      position.makeMove(move);
+      played++;
+    }
+  } finally {
+    for (let i = 0; i < played; i++) position.unmakeMove();
+  }
+  return out;
+}
+
+/** Clase de material para compensar cambios: caballo y alfil valen lo mismo. */
+const materialClass = (type: PieceType): string => (type === "n" || type === "b" ? "menor" : type);
+
+const COUNT = ["", "un", "dos", "tres", "cuatro", "cinco", "seis", "siete", "ocho"] as const;
+
+/** «un peón», «dos peones», «un caballo», «una torre», «la dama». */
+function counted(type: PieceType, count: number): string {
+  if (type === "q" && count === 1) return "la dama";
+  const name = type === "p" ? "peón" : type === "n" ? "caballo" : type === "b" ? "alfil" : type === "r" ? "torre" : "dama";
+  if (count === 1) return `${type === "r" || type === "q" ? "una" : "un"} ${name}`;
+  const plural = name === "peón" ? "peones" : `${name}s`;
+  return `${COUNT[count] ?? String(count)} ${plural}`;
+}
+
+/** «la dama», «una torre y un peón»: lista de piezas, de más a menos valiosa. */
+function pieceList(types: readonly PieceType[]): string {
+  const counts: [PieceType, number][] = [];
+  for (const type of types) {
+    const entry = counts.find(([t]) => t === type);
+    if (entry !== undefined) entry[1]++;
+    else counts.push([type, 1]);
+  }
+  counts.sort(([a], [b]) => value(b) - value(a));
+  return joinPhrases(counts.map(([type, count]) => counted(type, count)));
+}
+
+/**
+ * Qué gana `mover` en la línea, nombrando solo piezas que de verdad se
+ * capturan en ella: «un peón», «la dama a cambio de un caballo». Caballo y
+ * alfil se compensan entre sí. Si no se puede decir con piezas (coronaciones),
+ * da la cifra: «material (2,2 peones)». Así nunca se dice «gana una torre» si
+ * la línea no captura ninguna torre (H-08).
+ */
+function gainText(captures: readonly LineCapture[], mover: Color, gain: number): string {
+  const won: PieceType[] = [];
+  const lost: PieceType[] = [];
+  let promoted = false;
+  for (const capture of captures) {
+    if (capture.promotion !== null) promoted = true;
+    if (capture.type !== null) (capture.by === mover ? won : lost).push(capture.type);
+  }
+  // Se compensan las capturas de la misma pieza y luego las de la misma clase (caballo por alfil).
+  for (const same of [(a: PieceType, b: PieceType) => a === b, (a: PieceType, b: PieceType) => materialClass(a) === materialClass(b)]) {
+    for (let i = lost.length - 1; i >= 0; i--) {
+      const match = won.findIndex((type) => same(type, lost[i]!));
+      if (match === -1) continue;
+      won.splice(match, 1);
+      lost.splice(i, 1);
+    }
+  }
+  if (promoted || won.length === 0) return `material (${pawns(gain)} peones)`;
+  return lost.length === 0 ? pieceList(won) : `${pieceList(won)} a cambio de ${pieceList(lost)}`;
 }
 
 /** ¿Está atacada la pieza de `square` por algo que la gana (menos valiosa o sin defensa)? Devuelve el atacante más barato. */
@@ -229,6 +308,7 @@ export function explainMove(position: Position, uci: string, line: readonly stri
   }
 
   const gain = lineGain(position, fullLine);
+  const directGain = capturedValue(position, move);
   // Piezas propias atacadas antes de mover (para «pone a salvo»).
   const threatened: { square: Square; by: Square }[] = [];
   for (let square = 0; square < 120; square++) {
@@ -245,7 +325,9 @@ export function explainMove(position: Position, uci: string, line: readonly stri
 
   position.makeMove(move);
   try {
-    if (gain >= MIN_GAIN) {
+    // Si la propia captura ya explica lo ganado, el motivo es el material, no
+    // una táctica (4…Dxg5 gana la dama; no «clava el peón de g2», H-03).
+    if (gain - directGain >= MIN_GAIN) {
       const tactic = fork(position, move.to, san) ?? pin(position, move.to, san);
       if (tactic !== null) return { kind: tactic.includes(" clava ") ? "clavada" : "horquilla", text: tactic };
     }
@@ -253,13 +335,15 @@ export function explainMove(position: Position, uci: string, line: readonly stri
     position.unmakeMove();
   }
 
-  if (gain >= MIN_GAIN) return { kind: "material", text: materialText(position, fullLine, san, gain) };
+  if (gain >= MIN_GAIN) return { kind: "material", text: materialText(position, fullLine, san, gainText(lineCaptures(position, fullLine), color, gain)) };
 
   if (threatened.length > 0) {
     const target = threatened[0]!.square;
     const newSquare = move.from === target ? move.to : target;
     position.makeMove(move);
-    const safe = position.pieceAt(newSquare)?.color === color && exchangeGain(position, newSquare) === 0;
+    // A salvo de verdad: ni se gana ahora ni sigue atacada por algo que la gane
+    // cuando pase el jaque (un jaque solo aplaza la amenaza, H-09).
+    const safe = position.pieceAt(newSquare)?.color === color && exchangeGain(position, newSquare) === 0 && threat(position, newSquare) === null;
     position.unmakeMove();
     if (safe) {
       const attacked = savedType === "r" || savedType === "q" ? "atacada" : "atacado";
@@ -270,8 +354,8 @@ export function explainMove(position: Position, uci: string, line: readonly stri
 }
 
 /** «Cxe5 gana un peón. Si las negras responden 5… dxe5, 6. Dxg4 se lleva el alfil.» */
-function materialText(position: Position, line: readonly string[], san: string, gain: number): string {
-  const head = `${san} gana ${amount(gain)}.`;
+function materialText(position: Position, line: readonly string[], san: string, won: string): string {
+  const head = `${san} gana ${won}.`;
   if (line.length < 3) return head;
   const first = position.moveFromUci(line[0]!)!;
   position.makeMove(first);
@@ -344,4 +428,66 @@ export function hintForPosition(position: Position, limits: SearchLimits, option
     from: squareName(move.from),
     to: squareName(move.to),
   };
+}
+
+/** Lo que permite la jugada hecha (RC-02): la mejor respuesta del rival y por qué es fuerte. */
+export interface Refutation {
+  readonly kind: "mate" | "horquilla" | "clavada" | "material";
+  /** «Tras g4, las negras dan mate en 1: 2… Dh4#.» o «Tras Dg5, las negras tienen 4… Dxg5: gana la dama.» */
+  readonly text: string;
+  /** La respuesta captura la pieza recién movida, que había capturado o dado jaque: puede ser un sacrificio. */
+  readonly sacrifice: boolean;
+  /** Material que gana el rival en la línea, contando desde la jugada hecha (0 en un mate). */
+  readonly net: number;
+}
+
+/**
+ * Qué permite `uci` en `position`. `line` es la línea del motor que empieza
+ * por `uci` (la siguiente jugada es la respuesta del rival) y `replyScore`, la
+ * puntuación de esa respuesta para el rival (los mates como en el motor). Solo
+ * devuelve algo si la respuesta tiene un motivo comprobado en la línea: mate,
+ * ataque doble, clavada o material. Deja `position` como estaba.
+ */
+export function refutationOf(position: Position, uci: string, line: readonly string[], replyScore: number): Refutation | null {
+  const move = position.moveFromUci(uci);
+  if (move === null || line[0] !== uci || line.length < 2) return null;
+  const san = spanishSan(position.moveToSan(move));
+  const captured = capturedValue(position, move) > 0;
+  position.makeMove(move);
+  try {
+    if (position.status().kind !== "ongoing") return null;
+    const reply = position.moveFromUci(line[1]!);
+    if (reply === null) return null;
+    const opponent = position.turn;
+    const sacrifice = reply.to === move.to && (captured || position.isCheck());
+    if (replyScore > MATE_BOUND) {
+      const moves = Math.max(1, Math.ceil((MATE_SCORE - replyScore) / 2));
+      const head = moves === 1 ? `${side(opponent)} dan mate en 1` : `${side(opponent)} tienen mate en ${moves}`;
+      // La línea entera hasta el mate (2 × N − 1 medias jugadas); si es muy larga, solo la distancia.
+      const text =
+        moves <= MATE_LINE_MOVES ? `Tras ${san}, ${head}: ${lineText(position, line.slice(1), 2 * moves - 1)}.` : `Tras ${san}, ${head}.`;
+      return { kind: "mate", text, sacrifice, net: 0 };
+    }
+    const motive = explainMove(position, line[1]!, line.slice(1), replyScore);
+    if (motive.kind !== "horquilla" && motive.kind !== "clavada" && motive.kind !== "material") return null;
+    const replyText = numbered(position, reply);
+    const replySan = spanishSan(position.moveToSan(reply));
+    // El material se cuenta desde la jugada hecha: si ella ya capturó algo, la
+    // respuesta puede solo recuperarlo (20.Axd5 cxd5 es un cambio, no «gana un alfil»).
+    position.unmakeMove();
+    let net: number;
+    let won: string;
+    try {
+      net = -lineGain(position, line);
+      won = gainText(lineCaptures(position, line), opponent, net);
+    } finally {
+      position.makeMove(move);
+    }
+    if (net < MIN_GAIN) return null;
+    if (motive.kind === "material") return { kind: "material", text: `Tras ${san}, ${side(opponent)} responden ${replyText} y ganan ${won}.`, sacrifice, net };
+    const rest = motive.text.startsWith(`${replySan} `) ? motive.text.slice(replySan.length + 1) : motive.text;
+    return { kind: motive.kind, text: `Tras ${san}, ${side(opponent)} tienen ${replyText}: ${rest}`, sacrifice, net };
+  } finally {
+    position.unmakeMove();
+  }
 }

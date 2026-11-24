@@ -12,6 +12,14 @@
 //      captura, confirmado por el motor).
 //    Los dos últimos solo se dan si el motor también ve que la jugada pierde
 //    material: así no se señala un sacrificio bueno ni un cambio igualado.
+// 3. Una sola decisión (`decide`, RC-01 de la Release Candidate) fija el
+//    veredicto, la categoría (mate, táctica, material, posicional o sin
+//    evidencia), si se enseña otra jugada, la frase y el «por qué». Los mates se
+//    comparan por distancia; dos jugadas a 10 centipeones o menos son
+//    equivalentes; lo que permite la jugada hecha (la respuesta del rival) se
+//    explica si la línea lo prueba, y si no hay un hecho que lo respalde el
+//    texto dice lo que el coach no sabe. `checkInvariants` (invariants.ts)
+//    comprueba que el resultado no se contradiga.
 //
 // No depende de la interfaz: devuelve datos y textos en español, con la forma
 // del panel del coach aprobado en docs/design (veredicto, mejor jugada,
@@ -23,8 +31,8 @@ import type { Color, Move, PieceType, Square } from "../core/index.js";
 import { MATE_SCORE, PIECE_VALUES, TranspositionTable, search } from "../engine/index.js";
 import type { SearchLimits, SearchOptions } from "../engine/index.js";
 import { capturedValue, cheapestCapture, exchangeGain, moveBalance } from "./exchange.js";
-import { explainMove, hintForPosition, lineText } from "./explain.js";
-import type { Hint } from "./explain.js";
+import { explainMove, hintForPosition, lineCaptures, lineGain, lineText, refutationOf } from "./explain.js";
+import type { Hint, Motive } from "./explain.js";
 import {
   agree,
   joinPhrases,
@@ -40,6 +48,18 @@ import {
 
 /** Calificación de la jugada, de mejor a peor. */
 export type Verdict = "mejor" | "buena" | "imprecision" | "error" | "error-grave";
+
+/**
+ * De qué trata el informe (RC-01), por orden de importancia:
+ * - `mate`: hay un mate forzado en juego (se da, se permite, se escapa o ya no se evita);
+ * - `tactica`: un ataque doble o una clavada comprobados en la línea del motor;
+ * - `material`: se gana o se pierde material comprobado (línea o aviso del motor),
+ *   o una pieza atacada que la mejor jugada pone a salvo y la hecha no;
+ * - `posicional`: la diferencia es de evaluación y en las líneas nadie gana material;
+ * - `sin-evidencia`: el motor ve una diferencia que el coach no sabe explicar;
+ * - `correcta`: la jugada es la mejor o equivalente a ella.
+ */
+export type Category = "correcta" | "mate" | "tactica" | "material" | "posicional" | "sin-evidencia";
 
 /**
  * Evaluación de una posición, vista por las blancas (como la barra del panel).
@@ -119,8 +139,13 @@ export interface CoachReport {
   /** Bando que hizo la jugada. */
   readonly color: Color;
   readonly move: MoveInfo;
-  /** Mejor jugada según Alfil Beta. Si es la misma que `move`, el panel no la muestra. */
+  /** Primera opción de Alfil Beta (puede ser la jugada hecha). */
   readonly best: MoveInfo;
+  /**
+   * Jugada que el panel enseña como «Mejor jugada»: `null` si la hecha es la
+   * mejor o vale lo mismo (veredicto «mejor»). Nunca es la jugada hecha.
+   */
+  readonly alternative: MoveInfo | null;
   /** Evaluación antes de la jugada, suponiendo que se juega la mejor. */
   readonly before: Evaluation;
   /** Evaluación después de la jugada hecha. */
@@ -128,6 +153,7 @@ export interface CoachReport {
   /** Centipeones que pierde quien movió respecto a la mejor jugada (0 o más; un mate cuenta como 10 000). */
   readonly loss: number;
   readonly verdict: Verdict;
+  readonly category: Category;
   /** Nombre del veredicto, sin punto: «Error grave». El panel muestra «Error grave.» y luego `summary`. */
   readonly title: string;
   /** Frase corta con punto final: «Cf3 deja escapar el mate y deja la dama sin protección.» */
@@ -135,12 +161,18 @@ export interface CoachReport {
   /** Avisos, del más importante al menos. Vacío si no hay ninguno. */
   readonly findings: readonly Finding[];
   /**
-   * Por qué es mejor `best` (CAL-394): «Cxe5 gana un peón. Si las negras…». Vacío si `best`
-   * es la jugada hecha.
+   * Por qué es mejor `alternative` (CAL-394), o qué permite la jugada hecha
+   * (RC-02): «Cxe5 gana un peón…», «Tras g4, las negras dan mate en 1: 2… Dh4#.».
+   * Vacío si no hay alternativa.
    */
   readonly why: string;
-  /** Línea de Alfil Beta desde la posición de antes, en SAN española: «5. Cxe5 dxe5 6. Dxg4 Cf6». */
+  /**
+   * Línea de Alfil Beta desde la posición de antes, en SAN española: «5. Cxe5 dxe5 6. Dxg4 Cf6».
+   * Empieza por `alternative` si la hay; si no, por la jugada hecha.
+   */
   readonly line: string;
+  /** Líneas del motor en UCI desde la posición de antes: la de su primera opción y la de la jugada hecha. */
+  readonly lines: { readonly best: readonly string[]; readonly played: readonly string[] };
   /** Profundidad de la búsqueda usada. */
   readonly depth: number;
 }
@@ -205,13 +237,31 @@ const TITLES: Readonly<Record<Verdict, string>> = {
   "error-grave": "Error grave",
 };
 
-const SUMMARIES: Readonly<Record<Verdict, string>> = {
-  mejor: "Es la jugada que elige Alfil Beta.",
-  buena: "La diferencia con la mejor jugada es pequeña.",
-  imprecision: "Hay una jugada mejor y pierdes un poco de ventaja.",
-  error: "Hay una jugada bastante mejor y pierdes ventaja.",
-  "error-grave": "Hay una jugada mucho mejor y la partida cambia de rumbo.",
+const SUMMARIES = { mejor: "Es la jugada que elige Alfil Beta." } as const;
+
+/** Principio de la frase de los veredictos con pérdida; sigue «: la valoración baja 0,6 peones.». */
+const LOSS_HEAD: Readonly<Record<Verdict, string>> = {
+  mejor: "",
+  buena: "",
+  imprecision: "Había una jugada mejor",
+  error: "Había una jugada bastante mejor",
+  "error-grave": "Había una jugada mucho mejor",
 };
+
+/**
+ * Dos jugadas que puntúan a 10 centipeones o menos son equivalentes (H-02): a
+ * la profundidad del coach esa diferencia es ruido, y decir «Mejor jugada:
+ * otra» debajo de «Mejor jugada» se contradice.
+ */
+const EQUIVALENT_CP = 10;
+/** Por encima de esta pérdida, sin material en las líneas, el coach no se atreve a llamarlo posicional. */
+const POSITIONAL_MAX_CP = 150;
+/** Medias jugadas que se completan en cada línea para buscar en ellas el motivo. */
+const EVIDENCE_PLIES = 6;
+/** Medias jugadas de más que se permiten para que una línea no acabe en mitad de un cambio. */
+const EXTRA_CAPTURE_PLIES = 4;
+/** Tope de tiempo para completar las líneas cuando el análisis lleva reloj. */
+const EXTEND_BUDGET_MS = 1000;
 
 const FINDING_TITLES = {
   "mate-en-1": "Mate en 1 que se escapó",
@@ -286,19 +336,13 @@ export function analyzeMove(game: CoachGame, move: string, options: AnalyzeOptio
 
   // Después: la puntuación de la jugada hecha.
   const isBest = bestUci === moveInfo.uci;
-  const playedLine = isBest ? { score: beforeScore, line: beforeSearch.pv } : scoreLine(position, moveInfo.uci, replyLimits, searchOptions);
+  const playedLine = isBest ? { score: beforeScore, line: beforeSearch.pv, replyScore: null } : scoreLine(position, moveInfo.uci, replyLimits, searchOptions);
   const playedScore = playedLine.score;
   const loss = Math.max(0, toCp(beforeScore) - toCp(playedScore));
   const drop = isBest ? 0 : expected(toCp(beforeScore)) - expected(toCp(playedScore));
-  let verdict: Verdict = isBest || loss === 0 ? "mejor" : (THRESHOLDS.find(([limit]) => drop >= limit)?.[1] ?? "buena");
 
   const findings: Finding[] = [];
-  if (mates.length > 0 && !playedMates) {
-    findings.push(missedMate(position, mates[0]!, moveInfo, color));
-    // Aunque quede un mate más largo, dejar escapar el mate en 1 nunca es la mejor jugada.
-    if (verdict === "mejor" || verdict === "buena") verdict = "imprecision";
-  }
-
+  if (mates.length > 0 && !playedMates) findings.push(missedMate(position, mates[0]!, moveInfo, color));
   if (loss >= MIN_LOSS && !playedMates) {
     const hanging = hangingPiece(position, moveInfo.uci, color, playedBalance);
     if (hanging !== null) findings.push(hanging);
@@ -315,35 +359,250 @@ export function analyzeMove(game: CoachGame, move: string, options: AnalyzeOptio
     }
   }
 
+  // Las líneas que cortó la tabla de transposición se completan para poder
+  // comprobar en ellas los motivos (la horquilla de 13.Dd3+ tras 12…Df6 venía
+  // en una línea de una sola respuesta). Solo hace falta si hay otra jugada que
+  // explicar; si no, se usan las líneas tal cual (como hasta ahora para el elogio).
+  // Con reloj (en la interfaz), completar líneas tiene su propio tope; sin reloj
+  // (pruebas, banco), el resultado es determinista.
+  const extendDepth = Math.max(1, beforeSearch.depth - 1);
+  const limits = options.limits ?? COACH_LIMITS;
+  const clock = options.now ?? (() => performance.now());
+  const deadline = limits.timeMs === undefined ? null : clock() + Math.min(limits.timeMs, EXTEND_BUDGET_MS);
+  const extend = (line: readonly string[], plies: number): string[] => extendLine(position, line, plies, extendDepth, searchOptions, deadline, clock);
+
   const before = toEvaluation(beforeScore, color, 0);
   const after = toEvaluation(playedScore, color, 1);
-  let why = "";
-  if (!isBest && loss > 0) {
-    const motive = explainMove(position, bestUci, beforeSearch.pv, beforeScore);
-    why = motive.kind === "posicional" ? positionalWhy(before, after) : motive.text;
-  }
-  // Elogio: una jugada buena con un motivo concreto lo dice en lugar de la frase general.
-  let praise: string | null = null;
-  if ((verdict === "mejor" || verdict === "buena") && findings.length === 0 && !playedMates) {
-    const motive = explainMove(position, moveInfo.uci, playedLine.line, playedScore);
-    if (motive.kind !== "posicional") praise = motive.text;
-  }
+  const decision = decide({
+    position,
+    color,
+    move: moveInfo,
+    best: info(position, bestUci),
+    isBest,
+    playedMates,
+    beforeScore,
+    playedScore,
+    replyScore: playedLine.replyScore,
+    loss,
+    drop,
+    findings,
+    before,
+    after,
+    bestLine: beforeSearch.pv,
+    playedLine: playedLine.line,
+    extend,
+    depth: beforeSearch.depth,
+  });
 
   return {
     color,
     move: moveInfo,
     best: info(position, bestUci),
+    alternative: decision.alternative,
     before,
     after,
     loss,
-    verdict,
-    title: TITLES[verdict],
-    summary: praise ?? summarize(verdict, moveInfo, playedMates, findings),
+    verdict: decision.verdict,
+    category: decision.category,
+    title: TITLES[decision.verdict],
+    summary: decision.summary,
     findings,
-    why,
-    line: lineText(position, beforeSearch.pv),
+    why: decision.why,
+    line: lineText(position, decision.alternative === null ? decision.lines.played : decision.lines.best),
+    lines: decision.lines,
     depth: beforeSearch.depth,
   };
+}
+
+/** Lo que `decide` necesita saber de la jugada ya analizada. */
+interface DecisionInput {
+  readonly position: Position;
+  readonly color: Color;
+  readonly move: MoveInfo;
+  readonly best: MoveInfo;
+  readonly isBest: boolean;
+  readonly playedMates: boolean;
+  /** Puntuaciones del motor para quien mueve (mates como en el motor). */
+  readonly beforeScore: number;
+  readonly playedScore: number;
+  /** Puntuación de la respuesta del rival para el rival; `null` si la jugada acaba la partida. */
+  readonly replyScore: number | null;
+  readonly loss: number;
+  readonly drop: number;
+  readonly findings: readonly Finding[];
+  readonly before: Evaluation;
+  readonly after: Evaluation;
+  /** Líneas del motor (UCI, desde la posición de antes) de su primera opción y de la jugada hecha. */
+  readonly bestLine: readonly string[];
+  readonly playedLine: readonly string[];
+  /** Completa una línea hasta `plies` medias jugadas (ver `extendLine`). */
+  readonly extend: (line: readonly string[], plies: number) => string[];
+  readonly depth: number;
+}
+
+interface Decision {
+  readonly verdict: Verdict;
+  readonly category: Category;
+  readonly alternative: MoveInfo | null;
+  readonly summary: string;
+  readonly why: string;
+  /** Las líneas en que se apoyan los textos. */
+  readonly lines: { readonly best: readonly string[]; readonly played: readonly string[] };
+}
+
+const RANK: readonly Verdict[] = ["mejor", "buena", "imprecision", "error", "error-grave"];
+/** El peor de dos veredictos. */
+const worst = (a: Verdict, b: Verdict): Verdict => (RANK.indexOf(a) >= RANK.indexOf(b) ? a : b);
+
+const isMateFor = (score: number): boolean => score > MATE_BOUND;
+const isMateAgainst = (score: number): boolean => score < -MATE_BOUND;
+
+/**
+ * La decisión única del informe (RC-01): veredicto, categoría, si se enseña
+ * otra jugada como mejor, la frase del veredicto y el «por qué». Todo sale de
+ * aquí, en este orden de importancia: mate > táctica > material > posicional >
+ * sin evidencia. Cada frase se apoya en un hecho comprobado (una puntuación de
+ * mate, una captura de la línea, un aviso confirmado por el motor); si no lo
+ * hay, el texto dice lo que el coach no sabe en lugar de inventar un motivo.
+ * `checkInvariants` comprueba el resultado.
+ */
+function decide(input: DecisionInput): Decision {
+  const { position, color, move, best, isBest, playedMates, beforeScore, playedScore, loss, findings, before, after } = input;
+  const san = spanishSan(move.san);
+  const bestSan = spanishSan(best.san);
+  const lostAlready = isMateAgainst(beforeScore);
+  const allowsMate = isMateAgainst(playedScore) && !lostAlready;
+  const hadMate = isMateFor(beforeScore);
+  const keepsMate = isMateFor(playedScore);
+
+  // 1. Veredicto. Los mates se comparan por distancia, no con la curva.
+  let verdict: Verdict;
+  if (isBest) verdict = "mejor";
+  else if (lostAlready || (hadMate && keepsMate)) verdict = playedScore >= beforeScore ? "mejor" : "buena";
+  else if (!hadMate && loss <= EQUIVALENT_CP) verdict = "mejor";
+  else verdict = THRESHOLDS.find(([limit]) => input.drop >= limit)?.[1] ?? "buena";
+  // Un aviso confirmado por el motor, o dejar escapar un mate, nunca es «buena» ni «mejor».
+  if (findings.length > 0 || (hadMate && !keepsMate)) verdict = worst(verdict, "imprecision");
+  const alternative = verdict === "mejor" ? null : best;
+
+  // 2. Motivos comprobados en las líneas del motor (completadas si hay que explicar otra jugada;
+  //    las dos igual de largas, para comparar su material; la respuesta del rival queda con seis).
+  const bestLine = alternative === null ? [...input.bestLine] : input.extend(input.bestLine, EVIDENCE_PLIES + 1);
+  const playedLine = alternative === null ? [...input.playedLine] : isBest ? bestLine : input.extend(input.playedLine, EVIDENCE_PLIES + 1);
+  const bestMotive = alternative === null ? null : explainMove(position, best.uci, bestLine, beforeScore);
+  const refutation =
+    alternative === null || input.replyScore === null ? null : refutationOf(position, move.uci, playedLine, input.replyScore);
+  // El elogio usa la línea del motor tal cual (sin completar), como antes de este bloque.
+  const playedMotive = explainMove(position, move.uci, input.playedLine, playedScore);
+
+  // Un motivo solo explica la diferencia si los hechos la respaldan:
+  // - el material de la mejor jugada cuenta si su línea gana más que la de la jugada hecha
+  //   (si las dos ganan lo mismo, no es la razón de preferirla);
+  // - lo que gana el rival tras la jugada cuenta si la evaluación cae al menos eso (si cae
+  //   mucho menos, hay compensación que el coach no sabe nombrar, o la línea no es fiable).
+  const materialEdge = lineGain(position, bestLine) - lineGain(position, playedLine);
+  const bestExplains =
+    bestMotive !== null &&
+    bestMotive.kind !== "posicional" &&
+    (bestMotive.kind === "salva" || bestMotive.kind === "mate" || materialEdge >= MIN_GAIN);
+  const refutes = refutation !== null && (refutation.kind === "mate" || refutation.net <= loss + MIN_GAIN) ? refutation : null;
+  const quiet = findings.length === 0 && noMaterialChange(position, bestLine, playedLine) && loss < POSITIONAL_MAX_CP;
+
+  // 3. «Por qué» (solo si se enseña otra jugada) y de dónde sale.
+  let why = "";
+  let source: "mate" | "best" | "refutation" | "posicional" | "ninguno" = "ninguno";
+  if (alternative !== null) {
+    const difference = `${short(before)} frente a ${short(after)}`;
+    if (allowsMate && refutes !== null) [why, source] = [refutes.text, "mate"];
+    else if (lostAlready) [why, source] = [`Con ${bestSan} el mate tardaba más: ${lower(before.text)} frente a ${lower(after.text)}.`, "mate"];
+    else if (bestExplains) [why, source] = [sameMotive(bestMotive!, best, playedMotive, move, verdict === "buena" ? null : difference) ?? bestMotive!.text, "best"];
+    else if (refutes !== null) [why, source] = [refutes.text, "refutation"];
+    else if (findings.length > 0) why = `Mira los avisos: ahí está lo que pierde ${san}. Con ${bestSan}, ${difference}.`;
+    else if (quiet) [why, source] = [`Alfil Beta la prefiere por cómo quedan las piezas: en las líneas que ha mirado nadie gana material (${difference}).`, "posicional"];
+    else if (verdict === "buena") why = `Alfil Beta la prefiere por poco (${difference}) y no encuentra un motivo concreto que explicarte.`;
+    else why = `Alfil Beta la valora mejor (${difference}) mirando ${input.depth} medias jugadas, pero no encuentra un motivo concreto que explicarte.`;
+    // Si la respuesta solo recupera la pieza que se acaba de entregar, puede ser
+    // un sacrificio cuya compensación queda más allá de lo que mira el coach (H-06).
+    if (source === "refutation" && refutes!.sacrifice) {
+      why += ` Si era un sacrificio, Alfil Beta no ve la compensación mirando ${input.depth} medias jugadas.`;
+    }
+  }
+
+  // 4. Categoría: la del motivo que se enseña (o de los avisos).
+  const mateInvolved = before.mate !== null || after.mate !== null || findings.some((f) => f.kind === "mate-en-1");
+  const tactic = (kind: string): boolean => kind === "horquilla" || kind === "clavada";
+  let category: Category;
+  if (mateInvolved) category = "mate";
+  else if (verdict === "mejor") category = "correcta";
+  else if (source === "best") category = tactic(bestMotive!.kind) ? "tactica" : "material";
+  else if (source === "refutation") category = tactic(refutes!.kind) ? "tactica" : "material";
+  else if (findings.length > 0) category = "material";
+  else if (source === "posicional") category = "posicional";
+  else category = "sin-evidencia";
+
+  // 5. Frase del veredicto.
+  let summary: string;
+  if (playedMates) summary = "Da jaque mate.";
+  else if (allowsMate) summary = `${san} permite mate en ${after.mate!.moves}.`;
+  else if (lostAlready) {
+    summary =
+      verdict === "mejor"
+        ? `Ya no hay defensa: ninguna jugada evita el mate de ${side(opposite(color))}.`
+        : `Ya no había defensa, pero ${bestSan} retrasaba el mate.`;
+  } else if (hadMate && keepsMate) {
+    summary = isBest
+      ? "Es la jugada que elige Alfil Beta: lleva al mate."
+      : verdict === "mejor"
+        ? `Lleva al mate igual de rápido que ${bestSan}.`
+        : `Sigue habiendo mate, pero más lento: con ${bestSan} era ${lower(before.text)}.`;
+  } else if (keepsMate) summary = `${san} lleva al mate en ${after.mate!.moves}.`; // un mate que la búsqueda de antes no vio
+  else if (findings.length > 0) summary = summarize(move, findings);
+  else if (hadMate) summary = `${san} deja escapar ${lower(before.text).replace(/^mate/, "un mate")}.`;
+  else if ((verdict === "mejor" || verdict === "buena") && refutes === null && playedMotive.kind !== "posicional" && playedMotive.kind !== "mate") {
+    summary = playedMotive.text; // elogio con motivo, si el rival no tiene una respuesta que lo desmienta
+  }
+  else if (isBest) summary = SUMMARIES.mejor;
+  else if (verdict === "mejor") summary = `Igual de buena que ${bestSan}, la que elige Alfil Beta.`;
+  else if (verdict === "buena") {
+    summary =
+      loss < 100
+        ? `Casi tan buena como la mejor: la diferencia es de ${pawns(loss)} peones.`
+        : `Había una jugada mejor (la valoración baja ${pawns(loss)} peones), pero con la partida tan decidida cambia poco.`;
+  } else summary = `${LOSS_HEAD[verdict]}: la valoración baja ${pawns(loss)} peones.`;
+
+  return { verdict, category, alternative, summary, why, lines: { best: bestLine, played: playedLine } };
+}
+
+/**
+ * Si la jugada hecha y la mejor tienen el mismo motivo («pone a salvo la dama
+ * de g4»), el «por qué» no puede presentarlo como la diferencia: lo dice con
+ * «también» y deja la diferencia en la evaluación (`difference`; `null` si es
+ * pequeña). Devuelve `null` si los motivos difieren.
+ */
+function sameMotive(bestMotive: Motive, best: MoveInfo, playedMotive: Motive, move: MoveInfo, difference: string | null): string | null {
+  if (playedMotive.kind !== bestMotive.kind) return null;
+  const bestSan = spanishSan(best.san);
+  const playedSan = spanishSan(move.san);
+  if (!bestMotive.text.startsWith(`${bestSan} `) || !playedMotive.text.startsWith(`${playedSan} `)) return null;
+  const rest = bestMotive.text.slice(bestSan.length + 1);
+  if (rest !== playedMotive.text.slice(playedSan.length + 1)) return null;
+  const head = `${bestSan} también ${rest.replace(/\.$/, "")}`;
+  return difference === null ? `${head}, y Alfil Beta la prefiere por poco.` : `${head}, pero Alfil Beta la valora mejor (${difference}).`;
+}
+
+/** «Mate en 1 para las negras» → «mate en 1 para las negras». */
+const lower = (text: string): string => text.charAt(0).toLowerCase() + text.slice(1);
+
+/** Valor corto de una evaluación: «+1,7» o «mate en 1 de las negras». */
+function short(evaluation: Evaluation): string {
+  return evaluation.mate !== null
+    ? `mate en ${evaluation.mate.moves} de ${side(evaluation.mate.winner)}`
+    : evaluation.text.split(" ")[0]!.replace(/,$/, "");
+}
+
+/** ¿Ninguna de las dos líneas gana ni pierde material? */
+function noMaterialChange(position: Position, bestLine: readonly string[], playedLine: readonly string[]): boolean {
+  return lineCaptures(position, bestLine).length === 0 && lineCaptures(position, playedLine).length === 0;
 }
 
 /** Carga la partida y aplica sus jugadas. */
@@ -369,30 +628,74 @@ function info(position: Position, move: Move | string): MoveInfo {
   return { uci: moveToUci(legal), san: position.moveToSan(legal) };
 }
 
+/**
+ * Completa una línea del motor hasta `plies` medias jugadas buscando desde su
+ * final a profundidad `depth` (la búsqueda corta la línea principal cuando
+ * acierta en la tabla de transposición). Se para si la partida acaba o si se
+ * pasa `deadline` (con `null`, sin reloj). Deja `position` como estaba.
+ */
+function extendLine(
+  position: Position,
+  line: readonly string[],
+  plies: number,
+  depth: number,
+  options: SearchOptions,
+  deadline: number | null,
+  clock: () => number,
+): string[] {
+  const out: string[] = [];
+  let played = 0;
+  let lastCaptured = false;
+  try {
+    for (const uci of line) {
+      const move = position.moveFromUci(uci);
+      if (move === null) break;
+      lastCaptured = capturedValue(position, move) > 0;
+      out.push(uci);
+      position.makeMove(move);
+      played++;
+    }
+    // Hasta `plies`, y después mientras la última jugada sea una captura (con un
+    // tope): una línea que acaba capturando cuenta mal el material.
+    while ((out.length < plies || (lastCaptured && out.length < plies + EXTRA_CAPTURE_PLIES)) && position.status().kind === "ongoing") {
+      const left = deadline === null ? null : deadline - clock();
+      if (left !== null && left <= 0) break;
+      const next = search(position, left === null ? { maxDepth: depth } : { maxDepth: depth, timeMs: left }, options).best;
+      if (next === null) break;
+      const move = position.moveFromUci(next)!;
+      lastCaptured = capturedValue(position, move) > 0;
+      out.push(next);
+      position.makeMove(move);
+      played++;
+    }
+  } finally {
+    for (let i = 0; i < played; i++) position.unmakeMove();
+  }
+  return out;
+}
+
 /** Puntuación (para quien mueve en `position`) de hacer `uci`. Deja `position` como estaba. */
 function scoreMove(position: Position, uci: string, limits: SearchLimits, options: SearchOptions): number {
   return scoreLine(position, uci, limits, options).score;
 }
 
 /** Puntuación de hacer `uci` y la línea que sigue (empezando por `uci`). Deja `position` como estaba. */
-function scoreLine(position: Position, uci: string, limits: SearchLimits, options: SearchOptions): { score: number; line: readonly string[] } {
+function scoreLine(
+  position: Position,
+  uci: string,
+  limits: SearchLimits,
+  options: SearchOptions,
+): { score: number; line: readonly string[]; replyScore: number | null } {
   position.makeMove(position.moveFromUci(uci)!);
   try {
     const status = position.status();
-    if (status.kind === "checkmate") return { score: MATE_SCORE - 1, line: [uci] };
-    if (status.kind !== "ongoing") return { score: 0, line: [uci] }; // tablas
+    if (status.kind === "checkmate") return { score: MATE_SCORE - 1, line: [uci], replyScore: null };
+    if (status.kind !== "ongoing") return { score: 0, line: [uci], replyScore: null }; // tablas
     const reply = search(position, limits, options);
-    return { score: fromReply(reply.score), line: [uci, ...reply.pv] };
+    return { score: fromReply(reply.score), line: [uci, ...reply.pv], replyScore: reply.score };
   } finally {
     position.unmakeMove();
   }
-}
-
-/** Sin motivo táctico: «No hay un motivo táctico: Alfil Beta la prefiere por cómo quedan las piezas (+1,7 frente a +0,9).» */
-function positionalWhy(before: Evaluation, after: Evaluation): string {
-  const short = (evaluation: Evaluation): string =>
-    evaluation.mate !== null ? `mate en ${evaluation.mate.moves} de las ${evaluation.mate.winner === "w" ? "blancas" : "negras"}` : evaluation.text.split(" ")[0]!.replace(/,$/, "");
-  return `No hay un motivo táctico: Alfil Beta la prefiere por cómo quedan las piezas (${short(before)} frente a ${short(after)}).`;
 }
 
 /**
@@ -538,10 +841,8 @@ function hangingPiece(position: Position, uci: string, color: Color, playedBalan
   }
 }
 
-/** Frase del veredicto: con avisos, dice qué hace mal la jugada; si no, una frase según el veredicto. */
-function summarize(verdict: Verdict, move: MoveInfo, mates: boolean, findings: readonly Finding[]): string {
-  if (mates) return "Da jaque mate.";
-  if (findings.length === 0) return SUMMARIES[verdict];
+/** Frase del veredicto cuando hay avisos: qué hace mal la jugada. */
+function summarize(move: MoveInfo, findings: readonly Finding[]): string {
   const parts = findings.map((finding) => {
     switch (finding.kind) {
       case "mate-en-1":
