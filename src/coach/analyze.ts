@@ -53,7 +53,8 @@ export type Verdict = "mejor" | "buena" | "imprecision" | "error" | "error-grave
  * De qué trata el informe (RC-01), por orden de importancia:
  * - `mate`: hay un mate forzado en juego (se da, se permite, se escapa o ya no se evita);
  * - `tactica`: un ataque doble o una clavada comprobados en la línea del motor;
- * - `material`: se gana o se pierde material comprobado (línea o aviso del motor);
+ * - `material`: se gana o se pierde material comprobado (línea o aviso del motor),
+ *   o una pieza atacada que la mejor jugada pone a salvo y la hecha no;
  * - `posicional`: la diferencia es de evaluación y en las líneas nadie gana material;
  * - `sin-evidencia`: el motor ve una diferencia que el coach no sabe explicar;
  * - `correcta`: la jugada es la mejor o equivalente a ella.
@@ -259,6 +260,8 @@ const POSITIONAL_MAX_CP = 150;
 const EVIDENCE_PLIES = 6;
 /** Medias jugadas de más que se permiten para que una línea no acabe en mitad de un cambio. */
 const EXTRA_CAPTURE_PLIES = 4;
+/** Tope de tiempo para completar las líneas cuando el análisis lleva reloj. */
+const EXTEND_BUDGET_MS = 1000;
 
 const FINDING_TITLES = {
   "mate-en-1": "Mate en 1 que se escapó",
@@ -360,8 +363,13 @@ export function analyzeMove(game: CoachGame, move: string, options: AnalyzeOptio
   // comprobar en ellas los motivos (la horquilla de 13.Dd3+ tras 12…Df6 venía
   // en una línea de una sola respuesta). Solo hace falta si hay otra jugada que
   // explicar; si no, se usan las líneas tal cual (como hasta ahora para el elogio).
+  // Con reloj (en la interfaz), completar líneas tiene su propio tope; sin reloj
+  // (pruebas, banco), el resultado es determinista.
   const extendDepth = Math.max(1, beforeSearch.depth - 1);
-  const extend = (line: readonly string[], plies: number): string[] => extendLine(position, line, plies, extendDepth, searchOptions);
+  const limits = options.limits ?? COACH_LIMITS;
+  const clock = options.now ?? (() => performance.now());
+  const deadline = limits.timeMs === undefined ? null : clock() + Math.min(limits.timeMs, EXTEND_BUDGET_MS);
+  const extend = (line: readonly string[], plies: number): string[] => extendLine(position, line, plies, extendDepth, searchOptions, deadline, clock);
 
   const before = toEvaluation(beforeScore, color, 0);
   const after = toEvaluation(playedScore, color, 1);
@@ -478,8 +486,8 @@ function decide(input: DecisionInput): Decision {
   const alternative = verdict === "mejor" ? null : best;
 
   // 2. Motivos comprobados en las líneas del motor (completadas si hay que explicar otra jugada;
-  //    la de la jugada hecha, una más, para que la respuesta del rival también tenga las suyas).
-  const bestLine = alternative === null ? [...input.bestLine] : input.extend(input.bestLine, EVIDENCE_PLIES);
+  //    las dos igual de largas, para comparar su material; la respuesta del rival queda con seis).
+  const bestLine = alternative === null ? [...input.bestLine] : input.extend(input.bestLine, EVIDENCE_PLIES + 1);
   const playedLine = alternative === null ? [...input.playedLine] : isBest ? bestLine : input.extend(input.playedLine, EVIDENCE_PLIES + 1);
   const bestMotive = alternative === null ? null : explainMove(position, best.uci, bestLine, beforeScore);
   const refutation =
@@ -547,7 +555,8 @@ function decide(input: DecisionInput): Decision {
       : verdict === "mejor"
         ? `Lleva al mate igual de rápido que ${bestSan}.`
         : `Sigue habiendo mate, pero más lento: con ${bestSan} era ${lower(before.text)}.`;
-  } else if (findings.length > 0) summary = summarize(move, findings);
+  } else if (keepsMate) summary = `${san} lleva al mate en ${after.mate!.moves}.`; // un mate que la búsqueda de antes no vio
+  else if (findings.length > 0) summary = summarize(move, findings);
   else if (hadMate) summary = `${san} deja escapar ${lower(before.text).replace(/^mate/, "un mate")}.`;
   else if ((verdict === "mejor" || verdict === "buena") && refutes === null && playedMotive.kind !== "posicional" && playedMotive.kind !== "mate") {
     summary = playedMotive.text; // elogio con motivo, si el rival no tiene una respuesta que lo desmienta
@@ -622,10 +631,18 @@ function info(position: Position, move: Move | string): MoveInfo {
 /**
  * Completa una línea del motor hasta `plies` medias jugadas buscando desde su
  * final a profundidad `depth` (la búsqueda corta la línea principal cuando
- * acierta en la tabla de transposición). Se para si la partida acaba. Deja
- * `position` como estaba.
+ * acierta en la tabla de transposición). Se para si la partida acaba o si se
+ * pasa `deadline` (con `null`, sin reloj). Deja `position` como estaba.
  */
-function extendLine(position: Position, line: readonly string[], plies: number, depth: number, options: SearchOptions): string[] {
+function extendLine(
+  position: Position,
+  line: readonly string[],
+  plies: number,
+  depth: number,
+  options: SearchOptions,
+  deadline: number | null,
+  clock: () => number,
+): string[] {
   const out: string[] = [];
   let played = 0;
   let lastCaptured = false;
@@ -641,7 +658,9 @@ function extendLine(position: Position, line: readonly string[], plies: number, 
     // Hasta `plies`, y después mientras la última jugada sea una captura (con un
     // tope): una línea que acaba capturando cuenta mal el material.
     while ((out.length < plies || (lastCaptured && out.length < plies + EXTRA_CAPTURE_PLIES)) && position.status().kind === "ongoing") {
-      const next = search(position, { maxDepth: depth }, options).best;
+      const left = deadline === null ? null : deadline - clock();
+      if (left !== null && left <= 0) break;
+      const next = search(position, left === null ? { maxDepth: depth } : { maxDepth: depth, timeMs: left }, options).best;
       if (next === null) break;
       const move = position.moveFromUci(next)!;
       lastCaptured = capturedValue(position, move) > 0;

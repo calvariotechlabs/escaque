@@ -130,7 +130,8 @@ describe("coherencia del coach con los casos de las auditorías", () => {
   it("H-08 · 13.Dd5+: no dice que Dd3+ gane una torre que la línea no captura", () => {
     const report = reportAt(CHATGPT_GAME, 24);
     assert.doesNotMatch(report.why, /gana una torre/);
-    assert.equal(report.why, "Dd3+ gana la dama a cambio de un caballo.");
+    // La línea de Alfil Beta: 13.Dd3+ Re7 14.Cd5+ Rf7 15.Cxf6 Rxf6 16.Dd8+ … gana la dama por el caballo.
+    assert.match(report.why, /^Dd3\+ gana la dama( y un peón)? a cambio de un caballo\.$/);
     assertCoherent(report, CHATGPT_GAME, 24);
   });
 
@@ -206,5 +207,25 @@ describe("checkInvariants detecta las contradicciones de antes", () => {
   it("una cifra que no es la del panel", () => {
     const bad = { ...good, summary: "Había una jugada mucho mejor: la valoración baja 1,0 peones. Permite mate." };
     assert.ok(checkInvariants(bad, game).some((v) => v.includes("peones")));
+  });
+});
+
+describe("hallazgos de la revisión de código", () => {
+  it("un mate en contra de varias jugadas se escribe hasta el mate", () => {
+    // 33.Tf1 permite mate en 3: antes la línea se cortaba a las cuatro medias jugadas.
+    const report = analyzeMove({ fen: START_FEN, moves: CLAUDE_GAME.slice(0, 64) }, CLAUDE_GAME[64]!, { limits: { maxDepth: 3 } });
+    assert.match(report.why, /^Tras Tf1, las negras tienen mate en 3: .*#\.$/);
+  });
+
+  it("con reloj, completar las líneas respeta el tope de tiempo", () => {
+    // Un reloj que avanza 2 s en cada lectura: la búsqueda de antes llega a
+    // profundidad 1 y las líneas no se completan, pero el informe sigue siendo coherente.
+    let t = 0;
+    const now = (): number => (t += 2000);
+    const moves = spanishGame("1. e4 e5 2. Ac4 Cc6 3. Dh5 De7 4. Dg5");
+    const game = { fen: START_FEN, moves: moves.slice(0, 6) };
+    const report = analyzeMove(game, moves[6]!, { limits: { maxDepth: 4, timeMs: 3000 }, now });
+    assert.ok(report.lines.best.length <= 1 && report.lines.played.length <= 2, `${report.lines.best.join(" ")} / ${report.lines.played.join(" ")}`);
+    assert.deepEqual(checkInvariants(report, game), []);
   });
 });

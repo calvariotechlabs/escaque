@@ -47,8 +47,14 @@ const MATE_BOUND = MATE_SCORE - 1_000;
 const MIN_GAIN = PIECE_VALUES.p;
 /** Medias jugadas de la línea que se muestran. */
 const LINE_PLIES = 4;
-/** Medias jugadas de la línea que cuentan para el material. */
-const MATERIAL_PLIES = 8;
+/**
+ * Medias jugadas de la línea que cuentan para el material. Cubre las líneas
+ * que completa el coach (7 más hasta 4 para acabar un cambio, ver analyze.ts):
+ * una recaptura al final no puede quedarse fuera de la cuenta.
+ */
+const MATERIAL_PLIES = 12;
+/** Un mate en contra se escribe entero hasta esta distancia; más largo, sin línea. */
+const MATE_LINE_MOVES = 5;
 
 const KNIGHT = [-33, -31, -18, -14, 14, 18, 31, 33];
 const KING = [-17, -16, -15, -1, 1, 15, 16, 17];
@@ -107,14 +113,14 @@ function numbered(position: Position, move: Move): string {
 
 /**
  * Línea en texto, con números y SAN española: «5. Cxe5 dxe5 6. Dxg4 Cf6».
- * Como mucho cuatro medias jugadas; se corta en la primera que no es legal.
+ * Como mucho `plies` medias jugadas (cuatro); se corta en la primera que no es legal.
  * Deja `position` como estaba.
  */
-export function lineText(position: Position, line: readonly string[]): string {
+export function lineText(position: Position, line: readonly string[], plies = LINE_PLIES): string {
   const parts: string[] = [];
   let played = 0;
   try {
-    for (const uci of line.slice(0, LINE_PLIES)) {
+    for (const uci of line.slice(0, plies)) {
       const move = position.moveFromUci(uci);
       if (move === null) break;
       const san = spanishSan(position.moveToSan(move));
@@ -457,7 +463,10 @@ export function refutationOf(position: Position, uci: string, line: readonly str
     if (replyScore > MATE_BOUND) {
       const moves = Math.max(1, Math.ceil((MATE_SCORE - replyScore) / 2));
       const head = moves === 1 ? `${side(opponent)} dan mate en 1` : `${side(opponent)} tienen mate en ${moves}`;
-      return { kind: "mate", text: `Tras ${san}, ${head}: ${lineText(position, line.slice(1))}.`, sacrifice, net: 0 };
+      // La línea entera hasta el mate (2 × N − 1 medias jugadas); si es muy larga, solo la distancia.
+      const text =
+        moves <= MATE_LINE_MOVES ? `Tras ${san}, ${head}: ${lineText(position, line.slice(1), 2 * moves - 1)}.` : `Tras ${san}, ${head}.`;
+      return { kind: "mate", text, sacrifice, net: 0 };
     }
     const motive = explainMove(position, line[1]!, line.slice(1), replyScore);
     if (motive.kind !== "horquilla" && motive.kind !== "clavada" && motive.kind !== "material") return null;
