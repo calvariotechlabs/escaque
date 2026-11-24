@@ -55,6 +55,12 @@ const VIEWPORTS = [
   ["móvil pequeño 390×664", 390, 664, true],
   ["móvil apaisado 844×390", 844, 390, false],
   ["móvil estrecho 320×568", 320, 568, true],
+  ["móvil ancho 580×700 (justo bajo 600 px)", 580, 700, true],
+  ["móvil ancho y bajo 580×500", 580, 500, true],
+  ["móvil apaisado grande 932×430", 932, 430, false],
+  ["móvil apaisado bajo 640×360", 640, 360, false],
+  ["ventana baja 600×501", 600, 501, false],
+  ["ventana baja 1024×560", 1024, 560, false],
 ];
 
 describe("pantalla de inicio compacta", () => {
@@ -88,6 +94,21 @@ describe("pantalla de inicio compacta", () => {
     await page.eval(`window.scrollTo(0, document.body.scrollHeight)`);
     const box = await page.eval(`(() => { const r = document.querySelector('#ajustes [type=submit]').getBoundingClientRect(); return { top: r.top, bottom: r.bottom, h: window.innerHeight }; })()`);
     assert.ok(box.top >= 0 && box.bottom <= box.h, "el botón no sale de la pantalla");
+  });
+
+  test("580×900: sin barra flotando (fondo y línea solo cuando está pegada); 390×500: pegada abajo con su línea", async () => {
+    const sep = `getComputedStyle(document.querySelector('.ajustes__acciones'), '::before').opacity`;
+    await page.call("Emulation.setDeviceMetricsOverride", { width: 580, height: 900, deviceScaleFactor: 1, mobile: true });
+    await page.goto(base + "/?v=580x900b#/jugar");
+    if (!(await page.eval(`CSS.supports('container-type', 'scroll-state')`))) return; // sin consultas de estado de desplazamiento la barra se ve siempre (alternativa a propósito)
+    await page.waitFor(`!document.getElementById('pantalla-ajustes').hidden`, { what: "pantalla de ajustes" });
+    assert.equal(await page.eval(sep), "0", "en reposo la barra no pinta fondo ni línea");
+    await page.call("Emulation.setDeviceMetricsOverride", { width: 390, height: 500, deviceScaleFactor: 1, mobile: true });
+    await page.goto(base + "/?v=390x500#/jugar");
+    await page.waitFor(`!document.getElementById('pantalla-ajustes').hidden`, { what: "pantalla de ajustes" });
+    await page.waitFor(`${sep} === '1'`, { what: "línea de la barra pegada" });
+    const r = await page.eval(`(() => { const b = document.querySelector('#ajustes [type=submit]').getBoundingClientRect(); return { bottom: b.bottom, h: window.innerHeight }; })()`);
+    assert.ok(r.bottom <= r.h && r.h - r.bottom < 24, `el botón queda pegado abajo (${Math.round(r.bottom)} de ${r.h})`);
   });
 
   test("cada opción enlaza su descripción y solo se ve la de la elegida", async () => {

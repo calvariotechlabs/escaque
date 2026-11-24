@@ -19,7 +19,7 @@
     "build:site": "npm run clean && npm run build && node tools/build-site.mjs",
     "match": "npm run build && node dist/tools/match.js",
     "bench": "npm run build && node dist/tools/bench.js",
-    "test:e2e": "npm run build:site && node --test e2e/*.e2e.mjs"
+    "test:e2e": "npm run build:site && node --test --test-concurrency=1 e2e/*.e2e.mjs"
   },
   "dependencies": {},
   "devDependencies": {
