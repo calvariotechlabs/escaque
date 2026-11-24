@@ -239,7 +239,8 @@ export type Regla =
   | "aviso-y-sin-motivo"
   | "mate-en-contra-con-elogio"
   | "pieza-no-capturada"
-  | "veredicto-contra-evaluacion";
+  | "veredicto-contra-evaluacion"
+  | "invariante-del-coach";
 
 export interface Violacion {
   readonly regla: Regla;
@@ -270,14 +271,18 @@ const contrario = (c: Color): Color => (c === "w" ? "b" : "w");
  * 3. Tras la jugada hay mate en contra y el texto elogia material o dice que la diferencia es pequeña.
  * 4. El texto dice «X gana una torre» y en la línea no se captura ninguna torre.
  * 5. El veredicto es «Mejor» o «Buena» y la jugada permite un mate que antes no había.
+ *
+ * Desde B3 el banco suma además las violaciones de `checkInvariants` del propio coach
+ * (regla «invariante-del-coach», ver `tools/banco.ts`).
  */
 export function invariantes(fen: string, informe: CoachReport, lineaMejor: readonly string[]): Violacion[] {
   const v: Violacion[] = [];
   const rival = contrario(informe.color);
   const textos = `${informe.summary} ${informe.why}`;
 
-  if (informe.verdict === "mejor" && informe.best.uci !== informe.move.uci) {
-    v.push({ regla: "mejor-con-otra-mejor", detalle: `«Mejor jugada» y debajo «Mejor jugada: ${informe.best.san}»` });
+  // El panel enseña «Mejor jugada: X» debajo cuando hay `alternative` (desde B1); antes, cuando `best` no era la jugada.
+  if (informe.verdict === "mejor" && informe.alternative !== null && informe.alternative.uci !== informe.move.uci) {
+    v.push({ regla: "mejor-con-otra-mejor", detalle: `«Mejor jugada» y debajo «Mejor jugada: ${informe.alternative.san}»` });
   }
   if (informe.findings.length > 0 && SIN_MOTIVO.test(textos)) {
     v.push({ regla: "aviso-y-sin-motivo", detalle: `aviso «${informe.findings[0]!.title}» y «no hay un motivo táctico»` });
@@ -390,6 +395,8 @@ export interface ResultadoCoach {
   readonly violaciones: readonly Violacion[];
   readonly texto: string;
   readonly ms: number;
+  /** Profundidad de la búsqueda de antes que usó el coach (desde B3, con presupuesto adaptativo). */
+  readonly profundidad?: number;
 }
 
 const VEREDICTOS: readonly Verdict[] = ["mejor", "buena", "imprecision", "error", "error-grave"];
@@ -431,7 +438,7 @@ export function resumirCoach(filas: readonly ResultadoCoach[], refs: Readonly<Re
   const equivalentes = filas.filter((f) => f.referencia.equivalente);
   const falsos = equivalentes.filter((f) => esError(f.veredicto));
   const noVistos = filas.filter((f) => esError(f.referencia.veredicto) && (f.veredicto === "mejor" || f.veredicto === "buena"));
-  const violaciones = { "mejor-con-otra-mejor": 0, "aviso-y-sin-motivo": 0, "mate-en-contra-con-elogio": 0, "pieza-no-capturada": 0, "veredicto-contra-evaluacion": 0 } as Record<Regla, number>;
+  const violaciones = { "mejor-con-otra-mejor": 0, "aviso-y-sin-motivo": 0, "mate-en-contra-con-elogio": 0, "pieza-no-capturada": 0, "veredicto-contra-evaluacion": 0, "invariante-del-coach": 0 } as Record<Regla, number>;
   for (const f of filas) for (const x of f.violaciones) violaciones[x.regla]++;
   const conMate = filas.filter((f) => f.mateAntes !== null);
   const permitidos = filas.filter((f) => f.mateDespues !== null);
