@@ -49,7 +49,7 @@ const NOTICES: Readonly<Record<NoticeKind, Notice>> = {
   nueva: {
     kind: "nueva",
     title: "Hay una versión nueva.",
-    text: "Al actualizar se reinicia la partida en curso.",
+    text: "Al actualizar se recarga la página y tu partida se conserva.",
     buttons: [
       { action: "actualizar", label: "Actualizar ahora", primary: true },
       { action: "mas-tarde", label: "Más tarde", primary: false },

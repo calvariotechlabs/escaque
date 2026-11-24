@@ -6,7 +6,7 @@ Leyenda: **Ejecutada** (hecha aquí, con evidencia) · **Parcial** (hecha solo e
 
 ## 1. Resultado en una línea
 
-Sin defectos funcionales ni de seguridad nuevos. Un hallazgo de texto (F-01, bajo) que necesita decisión de Sergio porque el texto está en el diseño aprobado. No hay cambios de código en esta PR: solo este informe.
+Sin defectos funcionales ni de seguridad. Un hallazgo de texto (F-01, bajo), corregido en esta PR junto con su prueba.
 
 ## 2. Pruebas ejecutadas
 
@@ -65,13 +65,12 @@ Sin defectos funcionales ni de seguridad nuevos. Un hallazgo de texto (F-01, baj
 
 ## 5. Hallazgos
 
-### F-01 · Texto del aviso de versión nueva (bajo, pendiente de decisión)
+### F-01 · Texto del aviso de versión nueva (bajo, corregido en esta PR)
 
-El aviso dice «Al actualizar se reinicia la partida en curso.» Medido: al actualizar, la página se recarga pero **la partida en curso se restaura** (en la prueba, `1. d4 d5` seguía ahí). El texto asusta sin motivo.
+El aviso decía «Al actualizar se reinicia la partida en curso.» Medido: al actualizar, la página se recarga pero **la partida en curso se restaura** (en la prueba, `1. d4 d5` seguía ahí). El texto asustaba sin motivo.
 
-- Dónde: `src/pwa/notices.ts` (línea 52), y la prueba `tests/pwa-notices.test.ts`, que fija ese texto.
-- El texto forma parte del diseño aprobado (Lienzo, lámina «Avisos»; Design System, componente Notice). Por la regla de «diseño primero» no lo cambio sin tu OK.
-- Propuesta: «Al actualizar se recarga la página y tu partida se conserva.» Es un cambio de una línea más su prueba, sin cambio de maquetación. Si lo apruebas, lo hago en otra PR con la actualización de `docs/design`.
+- Corrección: «Al actualizar se recarga la página y tu partida se conserva.» en `src/pwa/notices.ts` y su prueba `tests/pwa-notices.test.ts`. Decidido por la coordinación del proyecto; es solo texto, sin cambio de maquetación.
+- Diseño: actualizados los exportes de `docs/design` (lámina `Avisos.dc.html` y componente Notice del Design System, con su README y su vista previa). **Pendiente:** hacer el mismo cambio de texto en el lienzo y el Design System vivos de Claude Design, que no son accesibles desde este entorno.
 
 ### Observaciones sin defecto
 
