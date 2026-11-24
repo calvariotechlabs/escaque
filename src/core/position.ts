@@ -114,11 +114,19 @@ const FLAG_NORMAL = 0;
 const FLAG_DOUBLE_PUSH = 1;
 const FLAG_EN_PASSANT = 2;
 const FLAG_CASTLE = 3;
+/** Marca de la jugada nula en el historial (ver `makeNullMove`). */
+const FLAG_NULL = 4;
 
 /** Jugada con los datos internos que necesita `makeMove`. Fuera del núcleo es un `Move` opaco. */
 interface CoreMove extends Move {
   readonly flags: number;
 }
+
+/** Piezas clavadas de la última generación (ver `pinnedPieces`): casilla → sello. */
+const PINNED = new Int32Array(128);
+let pinStamp = 0;
+
+const NULL_MOVE: CoreMove = Object.freeze({ from: 0, to: 0, promotion: null, flags: FLAG_NULL });
 
 
 /** Estado que una jugada destruye y que `unmakeMove` necesita para volver atrás. */
@@ -197,6 +205,8 @@ export class Position implements PerftTarget<Move> {
    * solo existe para posiciones de esta línea.
    */
   private readonly line: Move[] = [];
+  /** Listas de `generated` que solo tienen las jugadas ruidosas (de `noisyMoves`): no sirven para buscar una jugada. */
+  private readonly partial = new WeakSet<Move[]>();
 
   private constructor() {}
 
@@ -405,6 +415,32 @@ export class Position implements PerftTarget<Move> {
   }
 
   /**
+   * Copia el tablero en `out` (128 casillas, en el orden 0x88 de `Square`) con
+   * un código por casilla: 0 vacía; si no, el tipo (1 peón, 2 caballo, 3 alfil,
+   * 4 torre, 5 dama, 6 rey) más 8 si la pieza es negra. Es la forma rápida de
+   * leer el tablero entero (la evaluación del motor); `pieceAt` da lo mismo pieza a pieza.
+   */
+  copyBoard(out: Uint8Array): void {
+    if (out.length < 128) throw new RangeError("copyBoard: hacen falta 128 casillas");
+    out.set(this.board);
+  }
+
+  /**
+   * Solo las jugadas legales «ruidosas»: capturas (también al paso) y
+   * coronaciones. Es lo que mira la búsqueda de quietud del motor; comprueba la
+   * legalidad solo de estas, así que es mucho más barata que `legalMoves()`.
+   * Sus jugadas valen para `makeMove` igual que las de `legalMoves()` (y
+   * sustituyen a la lista anterior de esta posición) hasta que algo necesite
+   * la lista completa (`moveFromUci`, `moveFromSan`, `moveToSan`), que la vuelve a generar.
+   */
+  noisyMoves(): Move[] {
+    const noisy = this.filterLegal(this.pseudoLegalMoves(), true);
+    this.generated[this.history.length] = noisy;
+    this.partial.add(noisy);
+    return noisy.slice();
+  }
+
+  /**
    * Jugada en notación algebraica estándar (SAN), con las letras inglesas de
    * PGN: «e4», «Nbd2», «exd6», «O-O», «e8=Q+», «Qxf7#». La jugada debe ser
    * legal en esta posición; si no, lanza un error. No cambia la posición ni
@@ -467,7 +503,7 @@ export class Position implements PerftTarget<Move> {
   private currentMoves(): CoreMove[] {
     const ply = this.history.length;
     const existing = this.generated[ply];
-    if (existing !== undefined) return existing as CoreMove[];
+    if (existing !== undefined && !this.partial.has(existing)) return existing as CoreMove[];
     const legal = this.computeLegalMoves();
     this.generated[ply] = legal;
     return legal;
@@ -475,16 +511,70 @@ export class Position implements PerftTarget<Move> {
 
   /** Jugadas legales sin guardarlas en `generated`. */
   private computeLegalMoves(): CoreMove[] {
+    return this.filterLegal(this.pseudoLegalMoves(), false);
+  }
+
+  /**
+   * Deja las jugadas legales de `moves` (pseudolegales de esta posición); con
+   * `noisyOnly`, solo las capturas (también al paso) y coronaciones.
+   *
+   * Sin jaque, una jugada que no es del rey ni al paso solo puede dejar al rey en
+   * jaque si la pieza está clavada: esas se aceptan sin probarlas. Las del rey, al
+   * paso, las de piezas clavadas y todas si hay jaque se prueban haciéndolas (es
+   * el bucle caliente de perft y de la búsqueda; perft comprueba que coincide).
+   */
+  private filterLegal(moves: readonly CoreMove[], noisyOnly: boolean): CoreMove[] {
     const us = this.side;
     const them = opposite(us);
+    const board = this.board;
+    const king = this.kings[us];
+    const inCheck = this.isAttacked(king, them);
+    const pinned = inCheck ? -1 : this.pinnedPieces(king);
     const legal: CoreMove[] = [];
-    // Misma comprobación que isLegal(), escrita en línea: es el bucle caliente de perft.
-    for (const move of this.pseudoLegalMoves()) {
+    for (const move of moves) {
+      if (noisyOnly && move.promotion === null && board[move.to] === EMPTY && move.flags !== FLAG_EN_PASSANT) continue;
+      if (pinned !== -1 && move.from !== king && move.flags !== FLAG_EN_PASSANT && PINNED[move.from] !== pinned) {
+        legal.push(move);
+        continue;
+      }
       this.applyMove(move);
       if (!this.isAttacked(this.kings[us], them)) legal.push(move);
       this.unmakeMove();
     }
     return legal;
+  }
+
+  /**
+   * Marca en `PINNED` (con un sello nuevo, sin borrar) las piezas propias clavadas
+   * contra el rey de `king` por una pieza rival de largo alcance. Devuelve el sello.
+   */
+  private pinnedPieces(king: number): number {
+    const board = this.board;
+    const us = this.side;
+    // El sello cabe siempre en un Int32Array: al llegar al tope se vacía la tabla.
+    if (++pinStamp > 0x3fffffff) {
+      PINNED.fill(0);
+      pinStamp = 1;
+    }
+    const stamp = pinStamp;
+    for (let d = 0; d < 8; d++) {
+      const diagonal = d < 4;
+      const dir = diagonal ? BISHOP_DIRS[d]! : ROOK_DIRS[d - 4]!;
+      let own = -1;
+      for (let sq = king + dir; !offBoard(sq); sq += dir) {
+        const piece = board[sq]!;
+        if (piece === EMPTY) continue;
+        if (sideOf(piece) === us) {
+          if (own !== -1) break; // dos piezas propias: ninguna clavada
+          own = sq;
+          continue;
+        }
+        const type = typeOf(piece);
+        if (own !== -1 && (type === QUEEN || type === (diagonal ? BISHOP : ROOK))) PINNED[own] = stamp;
+        break;
+      }
+    }
+    return stamp;
   }
 
   /**
@@ -516,8 +606,63 @@ export class Position implements PerftTarget<Move> {
     this.applyMove(move as CoreMove);
   }
 
+  /**
+   * Jugada nula: pasa el turno sin mover nada. No es una jugada del ajedrez;
+   * solo la usa el motor (poda de jugada nula) y siempre la deshace con
+   * `unmakeNullMove`. No se puede estando en jaque. Borra la captura al paso y
+   * pone a cero el contador de la regla de 50 jugadas, así que las repeticiones
+   * no la cruzan. Las listas de jugadas obtenidas antes para el ply siguiente dejan de valer.
+   */
+  makeNullMove(): void {
+    if (this.isCheck()) throw new Error("makeNullMove: no se puede pasar estando en jaque");
+    const ply = this.history.length;
+    // Otra línea: `history` sigue siendo un prefijo de `line`, con la jugada nula en medio.
+    this.line.length = ply;
+    this.line.push(NULL_MOVE);
+    if (this.generated.length > ply + 1) this.generated.length = ply + 1;
+    this.history.push({
+      move: NULL_MOVE,
+      captured: EMPTY,
+      castling: this.castling,
+      epSquare: this.epSquare,
+      halfmove: this.halfmove,
+      hashHi: this.zHi,
+      hashLo: this.zLo,
+      epHashed: this.epHashed,
+    });
+    let zHi = this.zHi ^ Z_BLACK_HI;
+    let zLo = this.zLo ^ Z_BLACK_LO;
+    if (this.epHashed) {
+      zHi ^= Z_EP_HI[fileOf(this.epSquare)]!;
+      zLo ^= Z_EP_LO[fileOf(this.epSquare)]!;
+    }
+    this.zHi = zHi >>> 0;
+    this.zLo = zLo >>> 0;
+    this.epHashed = false;
+    this.epSquare = -1;
+    this.halfmove = 0;
+    if (this.side === BLACK) this.fullmove++;
+    this.side = opposite(this.side);
+  }
+
+  /** Deshace la jugada nula hecha con `makeNullMove`. */
+  unmakeNullMove(): void {
+    const undo = this.history[this.history.length - 1];
+    if (undo === undefined || undo.move !== NULL_MOVE) throw new Error("unmakeNullMove: la última jugada no es nula");
+    this.history.pop();
+    this.side = opposite(this.side);
+    if (this.side === BLACK) this.fullmove--;
+    this.castling = undo.castling;
+    this.epSquare = undo.epSquare;
+    this.halfmove = undo.halfmove;
+    this.zHi = undo.hashHi;
+    this.zLo = undo.hashLo;
+    this.epHashed = undo.epHashed;
+  }
+
   /** Deshace la última jugada aplicada y deja la posición exactamente como estaba. */
   unmakeMove(): void {
+    if (this.history[this.history.length - 1]?.move === NULL_MOVE) throw new Error("unmakeMove: la última jugada es nula (usa unmakeNullMove)");
     const undo = this.history.pop();
     if (undo === undefined) throw new Error("unmakeMove: no hay jugadas que deshacer");
     const { move, captured } = undo;

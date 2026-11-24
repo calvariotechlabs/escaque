@@ -259,11 +259,14 @@ const SLOPE = 0.00368208;
 /** Caídas de puntos esperados que marcan cada veredicto. */
 /** Caída a partir de la cual el veredicto es «Error» (o peor): se confirma más hondo. */
 const GRAVE_DROP = 0.1;
+const IMPRECISION_DROP = 0.05;
 const THRESHOLDS: readonly (readonly [number, Verdict])[] = [
   [0.15, "error-grave"],
   [GRAVE_DROP, "error"],
-  [0.05, "imprecision"],
+  [IMPRECISION_DROP, "imprecision"],
 ];
+/** Ventaja (en centipeones) a partir de la cual una imprecisión también se confirma más hondo. */
+const WON_CP = 500;
 
 const TITLES: Readonly<Record<Verdict, string>> = {
   mejor: "Mejor jugada",
@@ -388,7 +391,11 @@ export function analyzeMove(game: CoachGame, move: string, options: AnalyzeOptio
   // posiciones cargadas no cabe y se queda como estaba: el banco de posiciones
   // mide que ahí ir una media jugada más lejos no cambia los veredictos y
   // multiplica el tiempo por 3 o 4.
-  const grave = (score: number): boolean => expected(toCp(beforeSearch.score)) - expected(toCp(score)) >= GRAVE_DROP;
+  // Con mucha ventaja la curva se aplana: perder 4 peones de +9 parece una imprecisión,
+  // y lo que importa es si sigue habiendo mate (coronar torre). Ahí se confirma también
+  // la imprecisión.
+  const confirmDrop = Math.abs(toCp(beforeSearch.score)) >= WON_CP ? IMPRECISION_DROP : GRAVE_DROP;
+  const grave = (score: number): boolean => expected(toCp(beforeSearch.score)) - expected(toCp(score)) >= confirmDrop;
   const confirmTime = timeLeft();
   if (!isBest && Math.abs(beforeSearch.score) <= MATE_BOUND && grave(playedLine.score) && confirmTime !== null) {
     const budget: DeepenBudget = { ...CONFIRM_DEEPEN, minDepth: beforeSearch.depth, ...confirmTime };
@@ -596,8 +603,21 @@ function decide(input: DecisionInput): Decision {
   const bestExplains =
     bestMotive !== null &&
     bestMotive.kind !== "posicional" &&
-    (bestMotive.kind === "salva" || bestMotive.kind === "mate" || materialEdge >= MIN_GAIN);
-  const refutes = refutation !== null && (refutation.kind === "mate" || refutation.net <= loss + MIN_GAIN) ? refutation : null;
+    (bestMotive.kind === "mate" ||
+      materialEdge >= MIN_GAIN ||
+      // Salvar una pieza explica la diferencia si es grande; si es poca y las dos
+      // líneas acaban con el mismo material, la jugada hecha también la salvó (H-09).
+      (bestMotive.kind === "salva" && verdict !== "buena"));
+  // Lo que gana el rival solo explica la diferencia si con la mejor jugada no lo ganaba
+  // también (H-09: …Dxf2 sale en las dos líneas). Un sacrificio cuenta aunque el rival
+  // gane más de lo que cae la evaluación: esa diferencia es la compensación que el motor
+  // sí ve, y el texto lo dice (H-06).
+  const refutes =
+    refutation !== null &&
+    (refutation.kind === "mate" || refutation.sacrifice || (refutation.net <= loss + MIN_GAIN && materialEdge >= MIN_GAIN))
+      ? refutation
+      : null;
+  const partialCompensation = refutes !== null && refutes.kind !== "mate" && refutes.net > loss + MIN_GAIN;
   const quiet = findings.length === 0 && noMaterialChange(position, bestLine, playedLine) && loss < POSITIONAL_MAX_CP;
 
   // 3. «Por qué» (solo si se enseña otra jugada) y de dónde sale.
@@ -616,7 +636,9 @@ function decide(input: DecisionInput): Decision {
     // Si la respuesta solo recupera la pieza que se acaba de entregar, puede ser
     // un sacrificio cuya compensación queda más allá de lo que mira el coach (H-06).
     if (source === "refutation" && refutes!.sacrifice) {
-      why += ` Si era un sacrificio, Alfil Beta no ve la compensación mirando ${input.depth} medias jugadas.`;
+      why += partialCompensation
+        ? ` Si era un sacrificio, Alfil Beta ve parte de la compensación, pero no toda, mirando ${input.depth} medias jugadas.`
+        : ` Si era un sacrificio, Alfil Beta no ve la compensación mirando ${input.depth} medias jugadas.`;
     }
   }
 

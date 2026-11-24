@@ -4,6 +4,8 @@ declare module "node:test" {
   export function test(name: string, fn: () => void | Promise<void>): void;
   export function describe(name: string, fn: () => void): void;
   export function it(name: string, fn: () => void | Promise<void>): void;
+  /** Con `todo`, la prueba se ejecuta y se informa, pero un fallo no rompe la suite. */
+  export function it(name: string, options: { readonly todo?: string }, fn: () => void | Promise<void>): void;
 }
 declare module "node:assert/strict" {
   const assert: {
