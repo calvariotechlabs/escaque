@@ -106,7 +106,9 @@ describe("coherencia del coach con los casos de las auditorías", () => {
     const report = reportAt(CHATGPT_GAME, 23);
     assert.equal(report.verdict, "error-grave");
     assert.doesNotMatch(texts(report), NO_MOTIVE);
-    assert.equal(report.why, "Tras Df6, las blancas responden 13. Dd3+ y ganan la dama a cambio de un caballo.");
+    // Con el motor de B11 la línea confirmada a profundidad 6 se come también el peón de c7
+    // (13. Dd3+ Re7 14. Cd5+ Re8 15. Cxc7+ … Cxf6+ gxf6): el texto cuenta lo que pasa en ella.
+    assert.equal(report.why, "Tras Df6, las blancas responden 13. Dd3+ y ganan la dama y un peón a cambio de un caballo.");
     assert.equal(report.category, "material");
     assertCoherent(report, CHATGPT_GAME, 23);
   });

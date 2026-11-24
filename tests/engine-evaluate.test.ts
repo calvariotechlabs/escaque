@@ -67,6 +67,58 @@ describe("evaluate()", () => {
     assert.ok(evalOf(endingCentral) > evalOf(ending), "final");
   });
 
+  // B11: seguridad del rey y estructura de peones (H-14: el rey en el centro y abierto).
+  it("castiga al rey enrocado sin peones delante", () => {
+    const sheltered = "r4rk1/ppp2ppp/8/8/8/8/PPP2PPP/R4RK1 w - - 0 1";
+    const bare = "r4rk1/ppp2ppp/8/8/8/8/PPP5/R4RK1 w - - 0 1";
+    // Mismo material salvo los tres peones del enroque: pierde más que esos tres peones.
+    assert.ok(evalOf(sheltered) - evalOf(bare) > 300 + 30, `${evalOf(sheltered)} frente a ${evalOf(bare)}`);
+  });
+
+  it("castiga al rey rodeado de piezas rivales que atacan sus casillas", () => {
+    // Mismas piezas blancas: dama y caballo junto al enroque negro, o en el otro flanco.
+    const calm = "r1b2rk1/pp3ppp/8/8/8/1Q1B4/PPN2PPP/R4RK1 b - - 0 1";
+    const attacked = "r1b2rk1/pp3ppp/8/6NQ/8/3B4/PP3PPP/R4RK1 b - - 0 1";
+    assert.ok(evalOf(calm) - evalOf(attacked) >= 40, `${evalOf(calm)} frente a ${evalOf(attacked)}`);
+  });
+
+  it("castiga los peones doblados y los aislados", () => {
+    const healthy = "4k3/8/8/8/8/8/2PP4/4K3 w - - 0 1";
+    const doubled = "4k3/8/8/8/8/3P4/3P4/4K3 w - - 0 1";
+    const isolated = "4k3/8/8/8/8/8/P2P4/4K3 w - - 0 1";
+    assert.ok(evalOf(healthy) > evalOf(doubled) + 10, "doblados");
+    assert.ok(evalOf(healthy) > evalOf(isolated) + 10, "aislados");
+  });
+
+  it("premia el peón pasado, más cuanto más avanzado", () => {
+    // Mismo material: un peón por bando. El blanco de b4, frenado por el de b7 o pasado
+    // (el negro de g7, en una casilla que vale lo mismo, también es pasado pero sin avanzar).
+    const blocked = "4k3/1p6/8/8/1P6/8/8/4K3 w - - 0 1";
+    const passed = "4k3/6p1/8/8/1P6/8/8/4K3 w - - 0 1";
+    const advanced = "4k3/6p1/8/1P6/8/8/8/4K3 w - - 0 1";
+    assert.ok(evalOf(passed) > evalOf(blocked) + 10, "pasado");
+    assert.ok(evalOf(advanced) > evalOf(passed) + 10, "avanzado");
+  });
+
+  it("premia la pareja de alfiles", () => {
+    const pair = "4k3/8/8/8/8/8/8/2B1KB2 w - - 0 1";
+    const bishopKnight = "4k3/8/8/8/8/8/8/2B1KN2 w - - 0 1";
+    assert.ok(evalOf(pair) - evalOf(bishopKnight) >= 30);
+  });
+
+  it("da un número con cualquier FEN válida, también con más de 8 peones o 16 piezas (revisión de código)", () => {
+    for (const fen of ["4k3/8/8/8/8/P7/PPPPPPPP/4K3 w - - 0 1", "QQQQkQQQ/QQQQQQQQ/8/8/8/8/8/4K3 b - - 0 1".replace("QQQQkQQQ", "k7").replace("8/8/8/8/8/4K3", "8/8/8/8/QQQQQQQQ/4K3")]) {
+      const p = Position.fromFen(fen);
+      assert.ok(Number.isFinite(evaluate(p)), fen);
+    }
+  });
+
+  it("el peón pasado en séptima vale más que en sexta", () => {
+    const sixth = "4k3/8/1P6/8/8/8/8/4K3 w - - 0 1";
+    const seventh = "4k3/1P6/8/8/8/8/8/4K3 w - - 0 1";
+    assert.ok(evalOf(seventh) - evalOf(sixth) >= 30, `${evalOf(seventh)} frente a ${evalOf(sixth)}`);
+  });
+
   it("no cambia la posición", () => {
     const p = Position.fromFen(SAMPLES[1]!);
     const fen = p.toFen();

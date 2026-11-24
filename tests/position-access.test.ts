@@ -35,3 +35,18 @@ describe("halfmoveClock", () => {
     assert.equal(after(START_FEN, "g1f3", "e7e5").halfmoveClock, 0);
   });
 });
+
+describe("copyBoard()", () => {
+  it("da el mismo tablero que pieceAt, con los códigos documentados (B11)", () => {
+    const codes: Readonly<Record<string, number>> = { p: 1, n: 2, b: 3, r: 4, q: 5, k: 6 };
+    const p = Position.fromFen("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1");
+    const out = new Uint8Array(128);
+    p.copyBoard(out);
+    for (let sq = 0; sq < 128; sq++) {
+      if ((sq & 0x88) !== 0) continue;
+      const piece = p.pieceAt(sq);
+      assert.equal(out[sq], piece === null ? 0 : codes[piece.type]! + (piece.color === "b" ? 8 : 0), `casilla ${sq}`);
+    }
+    assert.throws(() => p.copyBoard(new Uint8Array(64)), RangeError);
+  });
+});

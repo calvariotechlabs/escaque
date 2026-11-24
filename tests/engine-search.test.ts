@@ -149,6 +149,17 @@ describe("search()", () => {
     assert.ok(result.best !== null && result.depth >= 1);
   });
 
+  it("con un tope de nodos para en cuanto lo pasa y es determinista (B11)", () => {
+    const a = search(Position.fromFen(KIWIPETE), { maxDepth: 64 }, { maxNodes: 20_000 });
+    const b = search(Position.fromFen(KIWIPETE), { maxDepth: 64 }, { maxNodes: 20_000 });
+    assert.ok(a.best !== null && a.depth >= 1);
+    assert.ok(a.nodes <= 20_000 + 1, `visitó ${a.nodes}`);
+    assert.deepEqual([a.best, a.score, a.depth, a.nodes], [b.best, b.score, b.depth, b.nodes]);
+    // La profundidad 1 se termina aunque el tope sea minúsculo.
+    assert.equal(search(Position.fromFen(KIWIPETE), { maxDepth: 64 }, { maxNodes: 1 }).depth, 1);
+    assert.throws(() => search(Position.fromFen(KIWIPETE), { maxDepth: 3 }, { maxNodes: 0 }), RangeError);
+  });
+
   it("deja la posición como estaba", () => {
     const p = after(START_FEN, "e2e4", "e7e5", "g1f3");
     const fen = p.toFen();

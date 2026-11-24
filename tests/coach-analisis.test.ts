@@ -45,3 +45,14 @@ describe("mates más largos que la búsqueda de antes", () => {
     assert.deepEqual(checkInvariants(report, { fen }), []);
   });
 });
+
+describe("el «por qué» nombra lo que más pesa", () => {
+  it("Td3 regala la torre: el motivo es …Cxd3+, no el peón que Td5 gana mucho después (banco, B11)", () => {
+    // Con líneas más largas, la de la mejor (Td5) acaba comiendo un peón en a6; lo que
+    // explica la diferencia es la torre que se pierde, no ese peón.
+    const fen = "4k3/p7/8/2n5/8/8/P7/3RK3 w - - 0 1";
+    const report = analyzeMove({ fen }, "d1d3", DEPTH4);
+    assert.equal(report.why, "Tras Td3, las negras responden 1… Cxd3+ y ganan una torre.");
+    assert.deepEqual(checkInvariants(report, { fen }), []);
+  });
+});
