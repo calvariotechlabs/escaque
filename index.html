@@ -104,13 +104,6 @@
       <button id="revancha" class="boton boton--principal" type="button">Revancha</button>
       <button id="repasar" class="boton" type="button">Repasar la partida</button>
     </section>
-    <fieldset id="tema-tablero" class="tema-tablero">
-      <legend class="tema-tablero__leyenda">Tablero</legend>
-      <div class="tema-tablero__opciones">
-        <div class="opcion opcion--bosque"><input class="opcion__entrada" type="radio" name="tablero" id="tablero-bosque" value="bosque" checked><label class="opcion__tarjeta" for="tablero-bosque"><span class="tema-tablero__muestra" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span class="opcion__nombre">Bosque</span></label></div>
-        <div class="opcion opcion--nogal"><input class="opcion__entrada" type="radio" name="tablero" id="tablero-nogal" value="nogal"><label class="opcion__tarjeta" for="tablero-nogal"><span class="tema-tablero__muestra" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span class="opcion__nombre">Nogal</span></label></div>
-      </div>
-    </fieldset>
   </div>
   <div id="partida-izq" class="partida__izq">
     <section class="partida__tablero" aria-label="Tablero">
@@ -157,15 +150,18 @@
       <p id="sin-jugadas" class="vacio vacio--jugadas jugadas__vacia"><span class="vacio__mini" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="vacio__txt"><span class="vacio__titulo">Todavía no hay jugadas.</span><span class="vacio__texto"> Mueve una pieza: cada jugada se apunta aquí en notación algebraica, como e4 o Cf3.</span></span></p>
       <ol id="lista-jugadas" class="jugadas__lista" aria-label="Lista de jugadas"></ol>
     </section>
+    <fieldset id="tema-tablero" class="tema-tablero">
+      <legend class="tema-tablero__leyenda">Tablero</legend>
+      <div class="tema-tablero__opciones">
+        <div class="opcion opcion--bosque"><input class="opcion__entrada" type="radio" name="tablero" id="tablero-bosque" value="bosque" checked><label class="opcion__tarjeta" for="tablero-bosque"><span class="tema-tablero__muestra" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span class="opcion__nombre">Bosque</span></label></div>
+        <div class="opcion opcion--nogal"><input class="opcion__entrada" type="radio" name="tablero" id="tablero-nogal" value="nogal"><label class="opcion__tarjeta" for="tablero-nogal"><span class="tema-tablero__muestra" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span class="opcion__nombre">Nogal</span></label></div>
+      </div>
+    </fieldset>
   </div>
   <p id="anuncio" class="solo-lector" aria-live="polite"></p>
 </main>
 <main id="pantalla-repaso" class="repaso" aria-labelledby="repaso-titulo" hidden>
   <section class="repaso__tablero" aria-label="Tablero"><div id="repaso-tablero"></div>
-    <section id="repaso-capturas" class="capturas" aria-labelledby="repaso-capturas-titulo">
-      <h3 class="capturas__titulo" id="repaso-capturas-titulo">Capturas</h3>
-      <div id="repaso-capturas-contenido"></div>
-    </section>
   </section>
   <div id="repaso-panel" class="repaso__panel">
     <section class="rep-cab repaso__cab" aria-labelledby="repaso-titulo">
@@ -176,6 +172,10 @@
       <button class="boton" type="button" data-paso="inicio" aria-keyshortcuts="Home">Inicio</button><button class="boton" type="button" data-paso="anterior" aria-keyshortcuts="ArrowLeft">Anterior</button><button class="boton" type="button" data-paso="siguiente" aria-keyshortcuts="ArrowRight">Siguiente</button><button class="boton" type="button" data-paso="final" aria-keyshortcuts="End">Final</button>
       <button class="boton paso__doble" type="button" data-paso="error-anterior">Error clave anterior</button><button class="boton paso__doble" type="button" data-paso="error-siguiente">Siguiente error clave</button>
     </div>
+    <section id="repaso-capturas" class="capturas repaso__capturas" aria-labelledby="repaso-capturas-titulo">
+      <h3 class="capturas__titulo" id="repaso-capturas-titulo">Capturas</h3>
+      <div id="repaso-capturas-contenido"></div>
+    </section>
     <section id="repaso-fallo" class="rep-fallo repaso__curva" role="alert" aria-labelledby="repaso-fallo-titulo" hidden>
       <h3 class="rep-fallo__titulo" id="repaso-fallo-titulo"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2.5 22.5 20.5h-21Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 9v5M12 16.8v.4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>No se pudo revisar la partida.</h3>
       <p>Alfil Beta no ha podido analizar las jugadas. Tu partida sigue guardada en este dispositivo.</p>

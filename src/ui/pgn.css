@@ -2,7 +2,7 @@
 .partida__pgn{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-2);min-width:0}
 .pgn-dialogo{box-sizing:border-box;width:calc(100% - 2 * var(--space-4));max-width:560px;max-height:calc(100dvh - 2 * var(--space-4));overflow:auto;padding:var(--space-4);background:var(--surface-raised);color:var(--ink);border:1px solid var(--control-border);border-radius:var(--radius-md)}
 .pgn-dialogo[open]{display:flex;flex-direction:column;gap:var(--space-3)}
-.pgn-dialogo::backdrop{background:color-mix(in srgb,var(--ink) 55%,transparent)}
+.pgn-dialogo::backdrop{background:var(--velo)}
 .pgn-dialogo__titulo{margin:0;font:600 20px/28px var(--font-display)}
 .pgn-dialogo__texto{margin:0;font:400 14px/20px var(--font-sans);color:var(--ink-muted)}
 .pgn-campo{display:flex;flex-direction:column;gap:var(--space-1)}
@@ -25,8 +25,8 @@
 
 /* Escritorio: los dos botones van bajo «Girar tablero», en la columna derecha. */
 @media (min-width:860px){
-  .partida{grid-template-rows:auto auto auto auto auto 1fr;grid-template-areas:"tablero avisos" "tablero estado" "tablero coach" "tablero jugadas" "tablero controles" "tablero pgn"}
-  .partida:has(.avisos:empty){grid-template-rows:auto auto auto auto 1fr;grid-template-areas:"tablero estado" "tablero coach" "tablero jugadas" "tablero controles" "tablero pgn"}
+  .partida{grid-template-rows:auto auto auto auto auto auto 1fr;grid-template-areas:"tablero avisos" "tablero estado" "tablero coach" "tablero jugadas" "tablero controles" "tablero pgn" "tablero tema"}
+  .partida:has(.avisos:empty){grid-template-rows:auto auto auto auto auto 1fr;grid-template-areas:"tablero estado" "tablero coach" "tablero jugadas" "tablero controles" "tablero pgn" "tablero tema"}
   .partida__pgn{grid-area:pgn}
 }
 

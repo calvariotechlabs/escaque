@@ -32,6 +32,7 @@
   --logro-vivo: #c9962f;
   --peligro: #b3261e;
   --peligro-suave: #fbeceb;
+  --velo: rgba(23, 26, 33, 0.55);
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -61,6 +62,7 @@
     --logro-vivo: #e3b55a;
     --peligro: #ff8f85;
     --peligro-suave: #2a1a1b;
+    --velo: rgba(0, 0, 0, 0.62);
     color-scheme: dark;
   }
 }
@@ -79,6 +81,7 @@
   --logro-vivo: #e3b55a;
   --peligro: #ff8f85;
   --peligro-suave: #2a1a1b;
+  --velo: rgba(0, 0, 0, 0.62);
   color-scheme: dark;
 }
 /* Tablero Nogal: madera clara y nogal. Solo cambia lo que depende del color de las casillas. */

@@ -49,6 +49,7 @@
 .clave__san{font:500 15px/24px var(--font-mono)}
 .clave__tit{font-weight:600}
 .clave__eval{grid-column:2;color:var(--ink-muted)}
+.clave__cifras{font:500 15px/24px var(--font-mono);color:var(--ink)}
 .clave__mas{border:1px solid var(--line);border-radius:var(--radius-sm)}
 .clave__mas > summary{display:flex;align-items:center;min-height:44px;padding:0 var(--space-3);font:600 14px/20px var(--font-sans);cursor:pointer}
 .clave__mas > summary:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
@@ -62,7 +63,8 @@
 .resumen th,.resumen td{padding:var(--space-2) var(--space-2);border-top:1px solid var(--line);text-align:left}
 .resumen thead th{border-top:0;border-bottom:2px solid var(--ink);font-weight:600}
 .resumen tbody th{font-weight:400}
-.resumen td,.resumen thead th:not(:first-child){text-align:right;font-family:var(--font-mono);font-weight:500;font-size:15px}
+.resumen td,.resumen thead th:not(:first-child){text-align:right}
+.resumen td{font-family:var(--font-mono);font-weight:500;font-size:15px}
 .resumen__cero{color:var(--ink-muted)}
 
 /* Marcas en la lista de jugadas */
@@ -130,10 +132,11 @@
 
 /* Escritorio y tablet horizontal: cabecera arriba; tablero, pasos, curva y resumen a la izquierda; el resto a la derecha. */
 @media (min-width:860px){
-  .repaso{padding-top:var(--space-6);padding-bottom:calc(var(--space-8) + var(--space-4));grid-template-columns:minmax(0,640px) minmax(340px,440px);grid-template-rows:auto auto auto auto auto 1fr;grid-template-areas:"cab cab" "tablero der" "paso der" "curva der" "resumen der" ". der";gap:var(--space-4) var(--space-8);justify-content:center}
+  .repaso{padding-top:var(--space-6);padding-bottom:calc(var(--space-8) + var(--space-4));grid-template-columns:minmax(0,640px) minmax(340px,440px);grid-template-rows:auto auto auto auto auto auto 1fr;grid-template-areas:"cab cab" "tablero der" "paso der" "capturas der" "curva der" "resumen der" ". der";gap:var(--space-4) var(--space-8);justify-content:center}
   .repaso__cab{grid-area:cab;margin-bottom:var(--space-2)}
   .repaso__tablero{grid-area:tablero}
   .repaso__paso{grid-area:paso}
+  .repaso__capturas{grid-area:capturas}
   .repaso__curva{grid-area:curva}
   .repaso__resumen{grid-area:resumen}
   .repaso__der{grid-area:der;display:flex;flex-direction:column;gap:var(--space-4);min-width:0}
