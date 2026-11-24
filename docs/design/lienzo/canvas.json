@@ -847,6 +847,22 @@
       "h": 844,
       "title": "Móvil · pulido 2: diálogo con velo, tema oscuro (propuesta, CAL-404)",
       "page": "movil"
+    },
+    "NavegacionMovilHorizontal.dc.html": {
+      "x": 0,
+      "y": 43940,
+      "w": 720,
+      "h": 450,
+      "title": "Móvil apaisado estrecho · 720×450 (CAL-405)",
+      "page": "movil"
+    },
+    "NavegacionMovilHorizontalSE.dc.html": {
+      "x": 800,
+      "y": 43940,
+      "w": 667,
+      "h": 375,
+      "title": "Móvil apaisado estrecho · 667×375 (CAL-405)",
+      "page": "movil"
     }
   },
   "order": [
@@ -951,7 +967,9 @@
     "PulidoDosTabletDialogo.dc.html",
     "PulidoDosMovil.dc.html",
     "PulidoDosMovilRepaso.dc.html",
-    "PulidoDosMovilDialogo.dc.html"
+    "PulidoDosMovilDialogo.dc.html",
+    "NavegacionMovilHorizontal.dc.html",
+    "NavegacionMovilHorizontalSE.dc.html"
   ],
   "notes": {
     "t_escritorio_0": {
@@ -1974,6 +1992,22 @@
       "y": 41320,
       "w": 420,
       "text": "Partida: modo y nivel bajo el nombre, estado, tablero, Capturas plegado en una línea, coach, botones, jugadas y, al final, «Tablero». Repaso: botones de paso pegados al tablero, Capturas, jugada seleccionada, curva, errores clave, resumen (con escaque) y jugadas. Diálogos: velo oscuro también en tema oscuro. Móvil apaisado no cambia salvo Capturas plegado.",
+      "fill": "gray",
+      "page": "movil"
+    },
+    "t_cal405_m": {
+      "x": 0,
+      "y": 43700,
+      "text": "Navegación en apaisado estrecho (CAL-405)",
+      "kind": "title1",
+      "maxW": 1467,
+      "page": "movil"
+    },
+    "n_cal405_m": {
+      "x": 0,
+      "y": 44470,
+      "w": 560,
+      "text": "Propuesta CAL-405: en móvil apaisado, si «Escaque» y la navegación no caben juntos en la columna derecha (menos de unos 330 px, por ejemplo 720×450 o 667×375), la navegación baja a una segunda línea bajo el nombre, alineada a la izquierda con el texto de «Jugar» pegado al borde de la columna. El tablero no cambia. A partir de unos 330 px de columna la cabecera sigue en una sola fila, como en 844×390.",
       "fill": "gray",
       "page": "movil"
     }

@@ -145,7 +145,7 @@
 /* Móvil apaisado (alto menor de 500 px): el patrón del coach. El tablero a la izquierda, limitado por el alto;
    a la derecha, una región con scroll propio con los botones de paso fijos arriba. */
 @media (orientation:landscape) and (max-height:500px){
-  .repaso{max-width:none;margin:0;height:100dvh;padding:max(var(--space-4),env(safe-area-inset-top,0px)) max(var(--space-6),env(safe-area-inset-right,0px)) max(var(--space-4),env(safe-area-inset-bottom,0px)) max(var(--space-6),env(safe-area-inset-left,0px));grid-template-columns:var(--tablero-ancho) minmax(0,1fr);grid-template-rows:44px minmax(0,1fr);grid-template-areas:"tablero titulo" "tablero panel";gap:var(--space-2) var(--space-6)}
+  .repaso{max-width:none;margin:0;height:100dvh;padding:max(var(--space-4),env(safe-area-inset-top,0px)) max(var(--space-6),env(safe-area-inset-right,0px)) max(var(--space-4),env(safe-area-inset-bottom,0px)) max(var(--space-6),env(safe-area-inset-left,0px));grid-template-columns:var(--tablero-ancho) minmax(0,1fr);grid-template-rows:var(--cab-alto) minmax(0,1fr);grid-template-areas:"tablero titulo" "tablero panel";gap:var(--space-2) var(--space-6)}
   .pagina__cabecera ~ .repaso::before{content:"";grid-area:titulo}
   .repaso__tablero{grid-area:tablero}
   .repaso__panel{grid-area:panel;display:flex;flex-direction:column;gap:var(--space-3);min-height:0;overflow:auto;padding:2px;scroll-padding-top:100px}
