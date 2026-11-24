@@ -133,4 +133,25 @@ describe("pantalla de inicio compacta", () => {
     assert.equal(await page.eval(`document.activeElement.id`), "nivel-dificil");
     assert.equal(await page.eval(`document.getElementById('nivel-dificil').checked`), true);
   });
+  // Revisión visual 2 (CAL-403): en móvil apaisado la cabecera dejaba el logo pegado al borde y «Blancas» se partía en dos líneas.
+  for (const [name, width, height] of [["844×390", 844, 390], ["667×375", 667, 375], ["568×320", 568, 320]]) {
+    test(`móvil apaisado ${name}: la cabecera respeta el margen y los nombres no se parten`, async () => {
+      await page.call("Emulation.setDeviceMetricsOverride", { width, height, deviceScaleFactor: 1, mobile: true });
+      await page.goto(base + `/?apaisado=${width}#/jugar`);
+      await page.waitFor(`!document.getElementById('pantalla-ajustes').hidden`, { what: "pantalla de ajustes" });
+      const m = await page.eval(`(() => {
+        const cab = document.querySelector('.pagina__cabecera');
+        const logo = cab.querySelector('.cabecera-marca__logo').getBoundingClientRect();
+        const nav = cab.querySelector('nav').getBoundingClientRect();
+        const titulo = document.querySelector('#pantalla-ajustes h2').getBoundingClientRect();
+        const lineas = [...document.querySelectorAll('#ajustes .opcion__nombre')].map((n) => ({ id: n.textContent.trim(), h: n.getBoundingClientRect().height }));
+        return { position: getComputedStyle(cab).position, logoLeft: logo.left, navRight: nav.right, w: window.innerWidth, tituloLeft: titulo.left, lineas };
+      })()`);
+      assert.equal(m.position, "static", "la cabecera no flota sobre el contenido");
+      assert.ok(m.logoLeft >= 16, `el logo no pega al borde (x=${m.logoLeft})`);
+      assert.ok(m.navRight <= m.w - 16, `la navegación no pega al borde derecho (${m.navRight} de ${m.w})`);
+      assert.ok(Math.abs(m.logoLeft - m.tituloLeft) <= 1, `logo y contenido comparten margen izquierdo (${m.logoLeft} y ${m.tituloLeft})`);
+      for (const l of m.lineas) assert.ok(l.h <= 32, `«${l.id}» cabe en una línea (${l.h} px de alto)`);
+    });
+  }
 });

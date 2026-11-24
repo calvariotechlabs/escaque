@@ -130,16 +130,47 @@ section.grupo{display:flex;flex-direction:column;gap:var(--space-4)}
   .lecciones{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 
-/* Escritorio y tablet horizontal (desde 860 px): tablero a la izquierda; turno, retroalimentación, pistas y acciones a la derecha. */
-@media (min-width:860px){
-  .lecc-pagina{padding-top:var(--space-6);gap:var(--space-6)}
-  .lecc-titulo{font-size:32px;line-height:36px}
-  .lecc-cuerpo{grid-template-columns:minmax(0,640px) minmax(300px,440px);grid-template-areas:"tablero estado" "tablero retro" "tablero pistas" "tablero acciones";grid-template-rows:auto auto auto 1fr;column-gap:var(--space-8)}
-  .lecc-tablero{grid-area:tablero}
-  .lecc-estado{grid-area:estado}
-  .lecc-retro{grid-area:retro}
-  .lecc-pistas{grid-area:pistas}
-  .lecc-acciones--leccion{grid-area:acciones}
+/* Turno dentro de la tarjeta del objetivo (CAL-403): en la misma fila que la etiqueta, sin caja propia. */
+.objetivo__cab{display:flex;align-items:center;justify-content:space-between;gap:var(--space-3)}
+.objetivo .lecc-estado{padding:0;border:0;background:none;border-radius:0}
+
+/* Lección «El tablero» (CAL-403; diseño: «Escritorio · lección rediseñada» y «Móvil · lección rediseñada» del lienzo).
+   El tablero entero, con la fila 1 y las letras a-h, se ve sin desplazar la pantalla.
+   Móvil y tablet vertical: título, objetivo con el turno y tablero van primero; «Cómo se mueve», ayuda, pistas,
+   progreso y botones, debajo. El orden visual es el de `order`; la cabecera y la rejilla del cuerpo no hacen caja. */
+@media (max-width:859px) and (min-height:501px){
+  #pantalla-leccion{gap:var(--space-3)}
+  #pantalla-leccion .lecc-encabezado,#pantalla-leccion .lecc-cuerpo{display:contents}
+  #pantalla-leccion .lecc-encabezado > div:first-child{order:1}
+  #pantalla-leccion .objetivo{order:2}
+  #pantalla-leccion .contador{order:3}
+  #pantalla-leccion .lecc-tablero{order:4}
+  #pantalla-leccion .lecc-retro{order:5}
+  #pantalla-leccion .como{order:6}
+  #pantalla-leccion .lecc-ayuda{order:7}
+  #pantalla-leccion .lecc-pistas{order:8}
+  #pantalla-leccion .lecc-progreso{order:9;width:100%}
+  #pantalla-leccion .lecc-acciones--leccion{order:10}
+  #pantalla-leccion .objetivo__texto{font-size:18px;line-height:24px}
+}
+
+/* Escritorio y tablet horizontal (desde 860 px): el tablero a la izquierda, fijo, y en la derecha título, objetivo,
+   «Cómo se mueve», ayuda, pistas y botones. Mide como mucho 560 px y nunca más que la pantalla menos 190 px (cabecera y margen),
+   ni más que lo que deja una columna derecha de 400 px. Los huecos van como margen de cada pieza: una fila vacía no deja hueco. */
+@media (min-width:860px) and (min-height:501px){
+  #pantalla-leccion:not([hidden]){display:grid;gap:0;align-content:start;--leccion-tablero:max(280px,min(560px,calc(100dvh - 190px),calc(100vw - 480px)));grid-template-columns:var(--leccion-tablero) minmax(0,1fr);column-gap:var(--space-8);grid-template-areas:"tablero encabezado" "tablero objetivo" "tablero contador" "tablero como" "tablero retro" "tablero ayuda" "tablero pistas" "tablero acciones" "tablero fin";grid-template-rows:repeat(8,auto) 1fr;padding-top:var(--space-2)}
+  #pantalla-leccion .lecc-cuerpo{display:contents}
+  #pantalla-leccion .lecc-tablero{grid-area:tablero;position:sticky;top:var(--space-4);align-self:start;max-width:none;margin:0;padding-left:24px;padding-bottom:var(--space-4);box-sizing:border-box}
+  #pantalla-leccion .lecc-encabezado{grid-area:encabezado;margin-bottom:var(--space-4)}
+  #pantalla-leccion .objetivo{grid-area:objetivo;margin-bottom:var(--space-4)}
+  #pantalla-leccion .contador{grid-area:contador;margin-bottom:var(--space-4)}
+  #pantalla-leccion .como{grid-area:como;margin-bottom:var(--space-4)}
+  #pantalla-leccion .lecc-retro{grid-area:retro;margin-bottom:var(--space-4)}
+  #pantalla-leccion .lecc-ayuda{grid-area:ayuda;margin-bottom:var(--space-4)}
+  #pantalla-leccion .lecc-pistas{grid-area:pistas;margin-bottom:var(--space-4)}
+  #pantalla-leccion .lecc-acciones--leccion{grid-area:acciones}
+  #pantalla-leccion .lecc-progreso{width:240px}
+  #pantalla-leccion .objetivo__texto{font-size:20px;line-height:28px}
 }
 
 /* Agrupa retroalimentación, pistas y acciones; solo es una caja propia en móvil apaisado. */
@@ -151,7 +182,7 @@ section.grupo{display:flex;flex-direction:column;gap:var(--space-4)}
 @media (orientation:landscape) and (max-height:500px){
   .pagina__cabecera:has(~ #pantalla-lecciones:not([hidden])){position:static;padding:max(var(--space-2),env(safe-area-inset-top,0px)) max(var(--space-6),env(safe-area-inset-right,0px)) 0 max(var(--space-6),env(safe-area-inset-left,0px));max-width:none;margin:0}
   #pantalla-lecciones{max-width:none;padding-top:var(--space-2);padding-left:max(var(--space-6),env(safe-area-inset-left,0px));padding-right:max(var(--space-6),env(safe-area-inset-right,0px))}
-  #pantalla-leccion:not([hidden]){display:grid;box-sizing:border-box;max-width:none;margin:0;height:100dvh;padding:max(var(--space-4),env(safe-area-inset-top,0px)) max(var(--space-6),env(safe-area-inset-right,0px)) max(var(--space-4),env(safe-area-inset-bottom,0px)) max(var(--space-6),env(safe-area-inset-left,0px));grid-template-columns:var(--tablero-ancho) minmax(0,1fr);grid-template-rows:44px auto auto auto minmax(0,1fr);grid-template-areas:"tablero nav" "tablero encabezado" "tablero objetivo" "tablero estado" "tablero panel";gap:var(--space-2) var(--space-6);align-items:start}
+  #pantalla-leccion:not([hidden]){display:grid;box-sizing:border-box;max-width:none;margin:0;height:100dvh;padding:max(var(--space-4),env(safe-area-inset-top,0px)) max(var(--space-6),env(safe-area-inset-right,0px)) max(var(--space-4),env(safe-area-inset-bottom,0px)) max(var(--space-6),env(safe-area-inset-left,0px));grid-template-columns:var(--tablero-ancho) minmax(0,1fr);grid-template-rows:44px auto auto minmax(0,1fr);grid-template-areas:"tablero nav" "tablero encabezado" "tablero objetivo" "tablero panel";gap:var(--space-2) var(--space-6);align-items:start}
   #pantalla-leccion::before{content:"";grid-area:nav}
   #pantalla-leccion .lecc-cuerpo{display:contents}
   #pantalla-leccion .lecc-encabezado{grid-area:encabezado;display:block}
@@ -160,14 +191,13 @@ section.grupo{display:flex;flex-direction:column;gap:var(--space-4)}
   #pantalla-leccion .lecc-titulo{font-size:20px;line-height:24px}
   #pantalla-leccion .objetivo{grid-area:objetivo;padding:var(--space-2) var(--space-3)}
   #pantalla-leccion .objetivo__texto{font-size:16px;line-height:24px}
-  #pantalla-leccion .lecc-estado{grid-area:estado}
   #pantalla-leccion .lecc-tablero{grid-area:tablero;max-width:none;margin:0;width:100%}
   #pantalla-leccion .lecc-panel{display:flex;flex-direction:column;grid-area:panel;align-self:stretch;min-height:0;overflow:auto;gap:var(--space-2);padding:2px;scroll-padding-bottom:60px}
   #pantalla-leccion .lecc-panel > *{flex:none}
   #pantalla-leccion .lecc-panel:focus-visible{outline:3px solid var(--accent);outline-offset:-3px}
   #pantalla-leccion .lecc-acciones--leccion{position:sticky;bottom:0;z-index:1;margin-top:auto;padding-top:var(--space-2);background:var(--surface)}
   /* Acierto: el resultado lleva sus propias acciones; objetivo, turno, pistas y botones fijos sobran. */
-  #pantalla-leccion:has(.retro__acciones) :is(.objetivo,.lecc-estado,.lecc-pistas,.lecc-acciones--leccion){display:none}
+  #pantalla-leccion:has(.retro__acciones) :is(.objetivo,.lecc-pistas,.lecc-acciones--leccion){display:none}
   #pantalla-leccion .retro__acciones{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
   #pantalla-leccion .retro__acciones > :first-child{grid-column:1 / -1}
 }
@@ -177,14 +207,10 @@ section.grupo{display:flex;flex-direction:column;gap:var(--space-4)}
 .lecc-grupos{display:flex;flex-direction:column;gap:var(--space-8)}
 .lecc-ayuda{display:flex;flex-direction:column;gap:var(--space-3)}
 .lecc-ayuda .lecc-pre:empty{display:none}
-@media (min-width:860px){
-  .lecc-cuerpo{grid-template-areas:"tablero estado" "tablero retro" "tablero ayuda" "tablero pistas" "tablero acciones";grid-template-rows:auto auto auto auto 1fr}
-  .lecc-ayuda{grid-area:ayuda}
-}
 /* Móvil apaisado en primeros pasos (sin lienzo propio todavía): el contador va en una fila fija y compacta bajo el objetivo;
    «Cómo se mueve» (lessons-screen.ts la mete en el panel) y la ayuda van en la región con scroll, con la retroalimentación y las pistas. */
 @media (orientation:landscape) and (max-height:500px){
-  #pantalla-leccion:not([hidden]){grid-template-rows:44px auto auto auto auto minmax(0,1fr);grid-template-areas:"tablero nav" "tablero encabezado" "tablero objetivo" "tablero contador" "tablero estado" "tablero panel"}
+  #pantalla-leccion:not([hidden]){grid-template-rows:44px auto auto auto minmax(0,1fr);grid-template-areas:"tablero nav" "tablero encabezado" "tablero objetivo" "tablero contador" "tablero panel"}
   #pantalla-leccion .como__texto{font-size:14px;line-height:20px}
   #pantalla-leccion .contador{grid-area:contador;padding:var(--space-2) var(--space-3)}
   #pantalla-leccion:has(.retro__acciones) :is(.como,.contador,.lecc-ayuda){display:none}
