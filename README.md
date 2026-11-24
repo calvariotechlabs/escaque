@@ -10,11 +10,13 @@
 
 App web para aprender ajedrez con motor propio (**Alfil Beta**), escrita desde cero en TypeScript sin dependencias en ejecución: ni librerías de ajedrez, ni frameworks de interfaz. TypeScript solo se usa para compilar.
 
-**Qué hay dentro:** reglas completas verificadas con perft, un motor con tres niveles que corre en un Web Worker, un coach que explica por qué una jugada fue mala, seis lecciones guiadas, repaso de la partida con curva de evaluación, importación y exportación de PGN, y PWA. Todo accesible con teclado y lector de pantalla. [Cifras](#cifras), [fuerza del motor](#fuerza-del-motor), [decisiones técnicas](#decisiones-técnicas), [qué aprendí](#qué-aprendí-y-qué-haría-distinto) y [auditorías externas](#auditorías-externas) más abajo.
+**Qué hay dentro:** reglas completas verificadas con perft, un motor con tres niveles que corre en un Web Worker, un coach que explica por qué una jugada fue mala, 15 lecciones guiadas, repaso de la partida con curva de evaluación, importación y exportación de PGN, y PWA. Se juega entero con teclado y todo lleva etiquetas para lectores de pantalla (probado en el árbol de accesibilidad; falta probarlo con un lector real). [Cifras](#cifras), [fuerza del motor](#fuerza-del-motor), [decisiones técnicas](#decisiones-técnicas), [auditorías externas](#auditorías-externas), [capacidades verificadas y limitaciones conocidas](#capacidades-verificadas-y-limitaciones-conocidas) y [qué aprendí](#qué-aprendí-y-qué-haría-distinto) más abajo.
 
 ## Estado
 
-Los seis hitos están hechos, más el repaso de la partida y el PGN. Alfil Beta juega con tres niveles en un Web Worker, el coach explica los errores y hay seis lecciones guiadas. La web se instala como app (PWA) y se publica como sitio estático en Vercel. La demo está detrás de un desafío anti-bots de Vercel: la primera visita puede tardar un instante.
+Los seis hitos están hechos, más el repaso de la partida y el PGN. Alfil Beta juega con tres niveles en un Web Worker, el coach explica los errores y hay 15 lecciones guiadas. La web se instala como app (PWA) y se publica como sitio estático en Vercel. La demo está detrás de un desafío anti-bots de Vercel: la primera visita puede tardar un instante.
+
+**Release Candidate (24 de noviembre de 2026).** Tras las dos [auditorías externas](#auditorías-externas) se está cerrando una primera versión estable: coach coherente (B1), banco de posiciones contra Stockfish (B2), análisis del coach (B3), pruebas de regresión (B4), firma de CalvarioTechLabs (B5, B7), validación integral (B6) y esta documentación viva (B9). La afinación del motor (B11, #78) ya está fusionada; el informe de la RC (B10) va en su propia PR. Lo que todavía no está resuelto está en [limitaciones conocidas](#capacidades-verificadas-y-limitaciones-conocidas).
 
 | Hito | Descripción | Estado |
 | --- | --- | --- |
@@ -23,26 +25,43 @@ Los seis hitos están hechos, más el repaso de la partida y el PGN. Alfil Beta 
 | 2 | Tablero jugable (dos jugadores) | Hecho |
 | 3 | Máquina en Web Worker, 3 niveles | Hecho |
 | 4 | Coach: explicación de errores | Hecho |
-| 5 | Seis lecciones guiadas | Hecho |
+| 5 | Lecciones guiadas (ampliadas después del hito; ver [Cifras](#cifras)) | Hecho |
 | 6 | Pulido para portfolio, CI y despliegue | Hecho (este README, CI en GitHub Actions, Vercel) |
 
 ## Cifras
 
-Todas medidas, no estimadas. Las de velocidad salen de un contenedor cloud de 4 núcleos con Node 22; en un portátil moderno salen bastante mejor (el perft pasaba de 9 millones de nodos por segundo), así que léelas como suelo, no como techo.
+Las cifras de la primera tabla **las genera `npm run metrics`** a partir del propio repositorio (se cuentan las pruebas, las lecciones, las dependencias y los ficheros del sitio, y se leen los resultados guardados del banco de posiciones) y la CI falla si el README o [`docs/metricas.json`](docs/metricas.json) no coinciden con lo medido (`npm run metrics:check`). Eso es a propósito: quien añada una prueba, una lección o un fichero al sitio, o regenere el banco, ejecuta `npm run metrics` y confirma el README y el JSON regenerados. Las que dependen del equipo llevan su fecha y su comando, y no las vuelve a medir la CI.
+
+<!-- metricas:inicio (generado por `npm run metrics`; no editar a mano) -->
+
+Generado el 2026-11-24 sobre el commit `4f448ef5c8a9` con `npm run metrics` (datos en [`docs/metricas.json`](docs/metricas.json)).
+
+| Qué | Cifra | Cómo se comprueba |
+| --- | --- | --- |
+| Dependencias en ejecución | **0** (la única devDependency es typescript, solo para compilar) | CI (trabajo `dependencias`) y `tools/metricas.test.mjs` |
+| Pruebas funcionales | **1.167** pruebas en 209 suites (`node --test`, sin las de reloj ni el perft completo) | `npm test`; `npm run metrics:check` en la CI |
+| Lecciones guiadas | **15**: 9 de primeros pasos y 6 de tácticas | Datos en `src/lessons`; `npm run metrics:check` |
+| Posiciones de referencia de perft | **21**, todas exactas (la inicial, Kiwipete, las posiciones 3 a 6 de la Chess Programming Wiki y las «trampa» de Sedlak) | `npm run test:perft` en la CI |
+| Sitio publicado | 92 ficheros, 807 KB en disco; JS + CSS + HTML suman 187 KB comprimidos con gzip (cada fichero por separado) | `npm run metrics:check` (margen del 5 %) |
+| Banco de 82 posiciones (`despues-b11`) | Alfil Beta Difícil: mejor jugada de la referencia en 49 de 82 y equivalente (a menos de 30 cp) en 70; 3 errores de más de 2 peones en tácticas; mantiene 18 de 18 mates. Coach: veredicto igual al de la referencia en 97 de 152 informes (64 %), detecta 20 de 23 errores graves, 3 falsos positivos en 123 jugadas equivalentes y 1 informes con contradicciones | `bench/resultados/despues-b11.json` (2026-11-24, commit `0b549a2dc35d`); metodología en `bench/README.md` |
+| Tiempo del banco (depende del equipo) | Difícil: 749 ms de media y 905 ms como máximo. Coach: 119 ms de media, 537 ms el percentil 95 y 828 ms como máximo | Registrado en el mismo fichero; no lo vuelve a medir la CI |
+| Pruebas de extremo a extremo | **97** en 14 ficheros, con Chrome real (teclado, ARIA, SAN, arrastre, PGN, instalación) | CI (trabajo `accesibilidad`) en cada PR; el recuento se registra con `npm run metrics -- --e2e` (2026-11-24) |
+| Velocidad de perft (depende del equipo) | 13,0 millones de nodos por segundo (inicial, profundidad 5: 4.865.609 nodos; Node v22.23.5, 4 núcleos) | Registrado con `npm run metrics -- --rendimiento` (2026-11-24); no lo comprueba la CI |
+
+<!-- metricas:fin -->
+
+### Mediciones puntuales
+
+Medidas a mano en un contenedor cloud de 4 núcleos con Node 22 durante el hito 6, **antes** de la firma de CalvarioTechLabs; las del motor se midieron al cerrar B11. No las comprueba ninguna prueba: léelas como una fotografía con fecha, no como una garantía. En un portátil moderno salen mejor, así que son un suelo, no un techo.
 
 | Qué | Cifra |
 | --- | --- |
-| Dependencias en ejecución | **0** (`dependencies` vacío; la única `devDependency` es TypeScript, solo para compilar; lo comprueba la CI) |
-| Código | 9.048 líneas de TypeScript en `src` y 5.521 en `tests` |
-| Tests | **894** en 150 suites con `node --test`, unos 5 s (más 109 tests de perft a profundidad completa, unos 10 s) |
-| Perft | 21 posiciones de referencia, todas exactas: la inicial (20 / 400 / 8.902 / 197.281), Kiwipete (48 / 2.039 / 97.862), las posiciones 3 a 6 de la Chess Programming Wiki y las «trampa» de Sedlak (al paso ilegal, enroques que dan jaque, coronaciones que ahogan). `npm run perft` llega más lejos: 119.060.324 nodos desde la inicial a profundidad 6 y 193.690.690 en Kiwipete a profundidad 5 |
-| Velocidad de perft | Entre 5,9 y 6,5 millones de nodos por segundo en este contenedor: la inicial a profundidad 6 (119.060.324 nodos) en 18,8 s y Kiwipete a profundidad 5 (193.690.690) en 30 s |
-| Alfil Beta, nivel Difícil | Responde en 840 ms de media y 939 ms como máximo (4.945 jugadas del duelo de B11, contenedor de 4 núcleos con 4 partidas a la vez). Gana 10 de 10 al azar y a Fácil, y +9 =1 −0 a Medio. Contra la versión anterior a B11: +96 =1 −3 en 100 partidas (detalle en [Fuerza del motor](#fuerza-del-motor)) |
-| Tabla de transposición | Con el motor anterior a B11, a la misma profundidad, Alfil Beta visitaba un **97 % menos de nodos** con la tabla que sin ella en las cinco posiciones de `npm run bench` (1,45 millones frente a 57,5 millones) y tardaba 7,9 s en vez de 126 s; con el de B11, −80 % y 0,7 s (detalle más abajo). Va del −31 % en Kiwipete al −99,9 % en el final de peones Fine 70 (detalle más abajo) |
-| Sitio publicado | 64 ficheros, 516 KB en disco; JS + CSS + HTML suman unos 75 KB comprimidos con gzip |
-| Accesibilidad | **5 pruebas de extremo a extremo** en Chrome real, en la CI: se juega una partida entera solo con teclado, hay rejilla ARIA de 64 casillas etiquetadas y todo control tiene nombre, cada jugada se anuncia en SAN española («Negras: Dh4#. Dama de d8 a h4. Jaque mate.») y el repaso de la partida se maneja con ← → Inicio y Fin |
+| Perft profundo | `npm run perft` llega más lejos que los tests: 119.060.324 nodos desde la inicial a profundidad 6 en 18,8 s y 193.690.690 en Kiwipete a profundidad 5 en 30 s |
+| Tabla de transposición | Con el motor anterior a B11, a la misma profundidad, Alfil Beta visitaba un **97 % menos de nodos** con la tabla que sin ella en las cinco posiciones de `npm run bench` (1,45 millones frente a 57,5 millones) y tardaba 7,9 s en vez de 126 s; con el de B11, −80 % y 0,7 s. Va del −31 % en Kiwipete al −99,9 % en el final de peones Fine 70 (detalle más abajo) |
+| Partidas entre niveles | Con el motor de B11: Difícil gana 10 de 10 al azar y a Fácil, y +9 =1 −0 a Medio. Contra la versión anterior a B11: +96 =1 −3 en 100 partidas (detalle en [Fuerza del motor](#fuerza-del-motor)) |
 | Lighthouse 12.8.2 (sitio servido en local, Chrome 153) | Escritorio: rendimiento **99**, accesibilidad **100**, buenas prácticas **100**, SEO 91 (FCP 0,5 s, LCP 0,8 s, TBT 0 ms, CLS 0). Móvil con la ralentización simulada de Lighthouse: rendimiento **86**, accesibilidad **100**, buenas prácticas **100**, SEO 91 (FCP 2,0 s, LCP 3,9 s, TBT 0 ms, CLS 0). El SEO pierde 9 puntos por no tener `robots.txt`; es a propósito, no busca público. Se mide a mano con `npx lighthouse@12.8.2`, no es una dependencia ni corre en la CI |
-| Cabeceras | CSP sin `unsafe-inline`, `X-Frame-Options: DENY`, `nosniff`, `Referrer-Policy`, `Permissions-Policy` y `COOP`, comprobadas por tests |
+| Cabeceras de seguridad | CSP sin `unsafe-inline`, `X-Frame-Options: DENY`, `nosniff`, `Referrer-Policy`, `Permissions-Policy` y `COOP`, comprobadas por tests sobre `vercel.json`. **No están medidas en las páginas HTML de producción** (ver [limitaciones](#capacidades-verificadas-y-limitaciones-conocidas)) |
+| Accesibilidad | Las pruebas de extremo a extremo juegan una partida entera solo con teclado, comprueban la rejilla ARIA de 64 casillas etiquetadas, que todo control tiene nombre, que cada jugada se anuncia en SAN española («Negras: Dh4#. Dama de d8 a h4. Jaque mate.») y que el repaso se maneja con ← → Inicio y Fin. **No se ha probado con un lector de pantalla real** |
 
 ## Fuerza del motor
 
@@ -55,7 +74,7 @@ Todas medidas, no estimadas. Las de velocidad salen de un contenedor cloud de 4 
 | Difícil contra Medio | +20 =0 −0 | |
 | Medio contra Fácil | +20 =0 −0 | |
 
-Con 20 victorias de 20, la estadística solo da una cota: con un 95 % de confianza cada nivel puntúa al menos un 86 % contra el de abajo, lo que equivale a **más de 300 puntos Elo de diferencia entre niveles contiguos** (sin techo, porque no hubo ni una tabla). En esta pasada Difícil pensó 845 ms de media y 909 ms como máximo (1.870 jugadas; la tabla de Cifras usa otra pasada más corta, de ahí la pequeña diferencia), a profundidad 5 en la apertura y más de 10 en finales de peones.
+Con 20 victorias de 20, la estadística solo da una cota: con un 95 % de confianza cada nivel puntúa al menos un 86 % contra el de abajo, lo que equivale a **más de 300 puntos Elo de diferencia entre niveles contiguos** (sin techo, porque no hubo ni una tabla). En esta pasada Difícil pensó 845 ms de media y 909 ms como máximo (1.870 jugadas; el banco de [Cifras](#cifras) mide otro conjunto de posiciones, de ahí la diferencia), a profundidad 5 en la apertura y más de 10 en finales de peones.
 
 **Versión nueva contra la anterior (B11, issue #63).** Tras afinar la búsqueda y la evaluación, la versión nueva jugó 100 partidas en Difícil contra la de main antes del cambio, con 50 aperturas variadas (`bench/aperturas.json`), cada una con los dos colores, en 4 procesos (`node tools/duelo.mjs`, 36 minutos; resultado completo en [`bench/resultados/duelo-b11-dificil.json`](bench/resultados/duelo-b11-dificil.json)):
 
@@ -65,7 +84,7 @@ Con 20 victorias de 20, la estadística solo da una cota: con un 95 % de confian
 
 El Elo es solo entre estas dos versiones, con este reloj y este equipo: dice que el cambio la hace mucho más fuerte, no cuánto juega contra personas o contra otros motores. Las dos pensaron lo mismo (840 y 858 ms de media, 939 y 933 ms como máximo).
 
-Para situarlo sin números inventados: Alfil Beta no tiene libro de aperturas ni evaluación ajustada con partidas; es un motor clásico de búsqueda alfa-beta con las podas y reducciones habituales, pensado para enseñar, no para competir. La escala absoluta queda pendiente de medirla contra un motor externo con fuerza limitada (por ejemplo Stockfish con `UCI_Elo`), fuera del repositorio y solo como medición, para no romper el principio de cero dependencias.
+Para situarlo sin números inventados: Alfil Beta no tiene libro de aperturas ni evaluación ajustada con partidas; es un motor clásico de búsqueda alfa-beta con las podas y reducciones habituales, pensado para enseñar, no para competir. El [banco de posiciones](bench/README.md) compara a Alfil Beta con Stockfish 17.1 como referencia externa (solo en desarrollo: no es una dependencia ni entra en el sitio), pero mide si elige buenas jugadas, no cuánto «Elo» tiene. Poner un Elo absoluto exigiría partidas contra un rival de fuerza conocida (por ejemplo Stockfish con `UCI_Elo`) y un número de partidas estadísticamente válido; no está hecho.
 
 ## Cómo se hizo
 
@@ -85,7 +104,7 @@ El diseño y las decisiones técnicas (arquitectura, tablero 0x88, estrategia de
 
 ## CI y despliegue
 
-- **CI** (`.github/workflows/ci.yml`, GitHub Actions, permisos solo de lectura, sin secretos). En cada pull request y en cada push a `main`: tipos con `tsc` estricto, `npm test`, montaje del sitio (`npm run build:site`), perft a profundidad completa (`npm run test:perft`) pruebas de accesibilidad de extremo a extremo (`npm run test:e2e`) y comprobación de que `dependencies` sigue vacío. Las pruebas de navegador no usan Playwright ni Puppeteer: `tools/cdp.mjs` es un cliente mínimo del protocolo de Chrome (unas 130 líneas, con el `WebSocket` y `fetch` de Node 22) que maneja el Chrome que ya trae el ejecutor de GitHub, con teclado real (`Input.dispatchKeyEvent`).
+- **CI** (`.github/workflows/ci.yml`, GitHub Actions, permisos solo de lectura, sin secretos). En cada pull request y en cada push a `main`: tipos con `tsc` estricto, `npm test`, montaje del sitio (`npm run build:site`), perft a profundidad completa (`npm run test:perft`) pruebas de accesibilidad de extremo a extremo (`npm run test:e2e`) y comprobación de que `dependencies` sigue vacío y comprobación de que las cifras de este README siguen al día (`npm run metrics:check`). Aparte corren la cobertura (sin las pruebas de reloj real) y un trabajo de rendimiento con las aserciones de milisegundos, una a una (`npm run test:perf`). Las pruebas de navegador no usan Playwright ni Puppeteer: `tools/cdp.mjs` es un cliente mínimo del protocolo de Chrome (unas 130 líneas, con el `WebSocket` y `fetch` de Node 22) que maneja el Chrome que ya trae el ejecutor de GitHub, con teclado real (`Input.dispatchKeyEvent`).
 - **Despliegue.** Vercel publica `site/` desde el repositorio como web estática (`vercel.json`: región `fra1`, cabeceras de seguridad, sin funciones). Las vistas previas están protegidas con Vercel Authentication, hay Bot Protection en modo desafío con excepción para iconos y manifest, y un tope de gasto en el equipo.
 - **Qué no hace la CI:** no despliega. Cada fusión a `main` la despliega Vercel; la CI solo dice si el código está sano.
 
@@ -99,6 +118,55 @@ El 24 de noviembre de 2026 Escaque pasó dos auditorías independientes, hechas 
 | Claude | 8,0/10 global, 5,0/10 el coach | [Copia del informe](docs/auditorias/auditoria-claude-2026-11-24.md) |
 
 Coinciden en que reglas, arquitectura, pruebas y seguridad son sólidas y en que el coach a veces se contradice: dice «Mejor jugada» y recomienda otra, o explica como «posicional» un mate que acabas de recibir. Los hallazgos se reprodujeron, se agruparon por causa raíz y se convirtieron en el plan de la Release Candidate: [consolidación y plan](docs/auditorias/consolidacion-rc.md). Los informes se guardan tal como se entregaron, como evidencia; las correcciones se documentan aparte.
+
+## Capacidades verificadas y limitaciones conocidas
+
+Lo que sigue distingue lo que se **ha ejecutado** (con su evidencia) de lo que **necesita a una persona o un dispositivo físico**. La validación integral completa está en [`docs/auditorias/b6-validacion-integral.md`](docs/auditorias/b6-validacion-integral.md) (24 de noviembre de 2026, Chrome real contra el sitio construido con las cabeceras de `vercel.json`).
+
+### Capacidades verificadas
+
+| Capacidad | Cómo se verificó |
+| --- | --- |
+| Reglas completas (enroque, al paso, coronación, mate, ahogado, triple repetición, 50 jugadas, material insuficiente) | Perft exacto en las posiciones de referencia de [Cifras](#cifras) y tests de cada regla |
+| Instalación como PWA y funcionamiento sin conexión | Criterios de instalabilidad de Chrome sin errores; recarga sin red que restaura la partida; se sigue jugando y la máquina responde sin red |
+| Actualización del service worker | Con una versión nueva se avisa, «Actualizar ahora» recarga, borra la caché vieja y la partida en curso se conserva |
+| Recuperación de partidas | Recarga a medias, datos guardados corruptos (seis casos) y `localStorage` bloqueado: arranca limpio y sin errores |
+| PGN | Exportar e importar sin pérdidas, PGN con jugada ilegal y PGN de 12.000 medias jugadas con mensajes claros |
+| Teclado | Partida entera con teclado, foco visible, diálogos modales con foco atrapado y devuelto |
+| Pantallas | Sin desbordes en 8 tamaños (móvil vertical y apaisado, tablet, escritorio) y a 200 % de zoom; respeta `prefers-reduced-motion` |
+| Privacidad | Cero peticiones a otros orígenes, cero cookies, `localStorage` solo con claves `escaque:`; no hay backend, cuentas ni analítica |
+| CSP | Sin violaciones en cuatro rutas con la CSP de producción; el sitio no lleva código en línea |
+| Coherencia del coach | Las invariantes (`checkInvariants`) y las reglas del banco se cumplen salvo una contradicción conocida (abajo); cifras en [Cifras](#cifras) |
+
+### Limitaciones conocidas
+
+**Motor (Alfil Beta)**
+
+- Sigue cometiendo errores tácticos de más de 2 peones en tres posiciones del banco (se cuentan en [Cifras](#cifras)): 10…Da5 en la H-14, 12.dxe5 en la H-02b y, según cuánto llegue a mirar en 0,9 s, 12…Dh4 en la H-10. Son ataques a un rey expuesto que se ven varias jugadas después y que su evaluación no ve. Sergio aprobó esta excepción al segundo punto de parada del motor el 24 de noviembre de 2026 (issue #63): no se sigue afinando sin pedirlo.
+- No tiene un Elo medido (ver [Fuerza del motor](#fuerza-del-motor)).
+- El rendimiento solo se ha medido en Node y en Chrome de escritorio, no en móviles de gama baja.
+
+**Coach**
+
+- Sacrificios correctos pueden salir como «Error grave» (el sacrificio griego, Axf7+ contra el Traxler y axb4 en H-02b), porque la evaluación no ve su compensación; el texto avisa de esa posibilidad. Los falsos positivos y los errores que no ve (Cxe5 del Blackburne-Shilling, Dxd4 del arca de Noé, 10…Da5 de H-14: el motor no ve la refutación a profundidad 4) están contados y listados en el [banco](bench/resultados/despues-b11.md).
+- Mira a profundidad 4 (más no mejora los veredictos y cuesta mucho tiempo): con el motor de B11 el tiempo por análisis (en [Cifras](#cifras)) queda dentro del objetivo de 2 s fijado para la Release Candidate.
+- Una contradicción conocida en el banco: en la H-08 (Dd3+) el texto dice «gana la dama» y la línea solo captura un peón (regla `pieza-no-capturada`). No hay arreglo todavía.
+- Un peón que el rival puede tomar al paso no se marca como pieza colgando.
+- El coach es un comparador de evaluaciones con detectores tácticos, no un profesor: cuando no tiene evidencia suficiente para un motivo concreto, lo dice.
+
+**Validación pendiente de una persona o de un dispositivo físico**
+
+| Prueba | Dispositivo | Qué comprobar |
+| --- | --- | --- |
+| Instalar | Android (Chrome) e iPhone (Safari) | Aviso o menú de instalación, icono (también el maskable) y apertura a pantalla completa |
+| Sin conexión real | Los mismos, en modo avión | Que abre, que se puede jugar contra la máquina y que sale «Sin conexión» |
+| Actualización | App instalada en el móvil, tras una fusión a `main` | Que sale «Hay una versión nueva» |
+| Uso a una mano | Móvil vertical y apaisado | Alcance de «Empezar partida», «Deshacer» y arrastrar con el pulgar |
+| Lector de pantalla | TalkBack (Android) y VoiceOver (iPhone y Mac) | Que anuncia jugadas, casillas, el diálogo de PGN y los avisos; solo se ha comprobado el árbol de accesibilidad y la región `aria-live` |
+| Cabeceras en producción | Navegador de una persona | La Protección contra bots de Vercel responde 429 a los centros de datos, así que las cabeceras de las páginas HTML de `escaque.calvariotechlabs.com` no se han medido; hay que mirar también que no salga `x-robots-tag: noindex` |
+| Cortafuegos de Vercel | Panel de Vercel | Las reglas no se pueden leer por API; no se enviaron peticiones de prueba al sitio real |
+
+**Fuera de alcance:** multijugador en línea, cuentas, backend y la mejora de los mensajes de error de entrada (bloque B8, no aprobado para la RC).
 
 ## Qué aprendí y qué haría distinto
 
@@ -114,7 +182,7 @@ Coinciden en que reglas, arquitectura, pruebas y seguridad son sólidas y en que
 **Qué haría distinto**
 
 - **Probar con tecnologías de asistencia reales desde el principio.** La accesibilidad está pensada (teclado, ARIA, jugadas en notación algebraica) y probada en el código, pero todavía no con un lector de pantalla real en un móvil Android. Lo haría desde el primer tablero, no al final.
-- **Calibrar el motor contra una referencia externa desde el principio.** Los niveles se miden entre sí y contra un jugador al azar, lo que dice cuál es más fuerte pero no cuánto. Una escala de referencia desde el hito 3 habría orientado mejor el ajuste de los niveles.
+- **Calibrar el motor contra una referencia externa desde el principio.** Los niveles se midieron entre sí y contra un jugador al azar, lo que dice cuál es más fuerte pero no cuánto. El banco contra Stockfish llegó con la Release Candidate, tras las auditorías; desde el hito 3 habría orientado mejor el ajuste de los niveles.
 - **Mejorar el motor con ideas que no entraron.** B11 añadió poda por jugada nula, LMR, jugadas asesinas, historial, ventanas de aspiración y una evaluación con seguridad del rey. Quedan fuera un libro de aperturas, la evaluación afinada con partidas (tuning) y una búsqueda que vea los ataques largos al rey: dos posiciones tácticas del banco siguen fallando por eso (ver el punto de parada).
 - **Medir el rendimiento en el navegador, no solo en Node.** Las cifras de velocidad salen de un contenedor; el repaso tarda unos 8 s en el navegador y no lo medí en móviles de gama baja.
 - **Llevar la accesibilidad a la CI desde el primer día.** Las pruebas de accesibilidad en Chrome real (`npm run test:e2e`) llegaron al final; si hubieran estado desde el primer tablero, los fallos de etiquetas y foco se habrían visto en cada PR y no al cerrar.
@@ -151,6 +219,9 @@ npm run build:site   # compila y monta site/ (lo que se publica) con el service 
 npm run bench    # misma búsqueda con y sin tabla de transposición: nodos, tiempo y nodos/s (unos 3 min)
 npm run match    # partidas automáticas entre niveles (unos 40 min con 20 por enfrentamiento; «-- 4» para 4)
 npm run bench:posiciones  # banco de 82 posiciones: Alfil Beta y el coach frente a la referencia de Stockfish (unos 4 min; ver bench/README.md)
+npm run test:perf  # aserciones de reloj real (el rendimiento va aparte de los tests funcionales para que la cobertura no las falsee)
+npm run metrics    # regenera docs/metricas.json y la tabla de cifras del README (compila antes; -- --e2e y -- --rendimiento añaden lo que necesita Chrome o mide este equipo)
+npm run metrics:check # falla si el README o docs/metricas.json no coinciden con el repositorio (lo corre la CI)
 npm run test:e2e # accesibilidad en Chrome real (necesita Chrome; CHROME_PATH si no es `google-chrome`)
 npm run serve    # monta site/ y lo sirve en http://127.0.0.1:8080 (sin dependencias)
 ```
@@ -203,7 +274,7 @@ Todo en `src/engine`, sin dependencias ni DOM: funciona igual en Node y en el na
 
 | Criterio | Resultado |
 | --- | --- |
-| Difícil responde en menos de 1 s | Media de 818 ms y máximo de 909 ms en 505 jugadas |
+| Difícil responde en menos de 1 s | Media de 818 ms y máximo de 909 ms en 505 jugadas (pasada del hito 3; el tiempo del banco vigente está en [Cifras](#cifras)) |
 | Resuelve mates en 1 y en 2 y gana piezas que se dan gratis | Batería en `tests/engine-search.test.ts`. Las posiciones de mate se comprueban con un buscador por fuerza bruta independiente del motor. |
 | No regala piezas | Aparta la pieza atacada, no toma el peón envenenado y Fácil no deja la dama colgada |
 | Difícil gana 20 de 20 a un jugador al azar | +20 =0 −0 |
@@ -227,11 +298,12 @@ Las cifras de las partidas salen de `npm run match` (Node 22, un hilo, colores a
 
 Todo en `src/coach`, sin dependencias ni DOM. `analyzeMove({ fen, moves }, jugada)` devuelve datos y textos en español con la forma del panel aprobado en `docs/design`: veredicto y frase corta, mejor jugada, evaluación antes y después vista por las blancas («+0,3 a favor de las blancas», «Mate en 1 para las blancas»), y avisos con título, explicación, etiqueta accesible y casillas para «Ver en el tablero». Habla de tú a quien ha movido, así que sirve igual contra la máquina y a dos jugadores.
 
-**En la interfaz.** El panel (`src/ui/coach-panel.ts`, lógica sin DOM en `src/ui/coach.ts`) sale en las partidas contra la máquina y en las de dos jugadores. Contra la máquina revisa tus jugadas y a dos revisa siempre la última; sigue a la jugada que se ve al deshacer, rehacer o saltar por la lista. El cálculo va en un Worker propio (`src/worker/coach-*.ts`), aparte del de Alfil Beta, para que revisar tu jugada no retrase la respuesta de la máquina; las respuestas del Worker se validan y el informe de cada jugada se guarda para no repetir el cálculo. Accesibilidad: solo el veredicto es una región `role="status"`, el coach nunca toma el foco (ni al pulsar «Ver en el tablero») y los botones miden 44 px. En móvil apaisado no se muestra todavía, porque el lienzo no tiene ese diseño.
+**En la interfaz.** El panel (`src/ui/coach-panel.ts`, lógica sin DOM en `src/ui/coach.ts`) sale en las partidas contra la máquina y en las de dos jugadores. Contra la máquina revisa tus jugadas y a dos revisa siempre la última; sigue a la jugada que se ve al deshacer, rehacer o saltar por la lista. El cálculo va en un Worker propio (`src/worker/coach-*.ts`), aparte del de Alfil Beta, para que revisar tu jugada no retrase la respuesta de la máquina; las respuestas del Worker se validan y el informe de cada jugada se guarda para no repetir el cálculo. Accesibilidad: solo el veredicto es una región `role="status"`, el coach nunca toma el foco (ni al pulsar «Ver en el tablero») y los botones miden 44 px. En móvil apaisado comparte región con scroll con los botones y la lista de jugadas.
 
-- **Valoración.** Alfil Beta busca la posición antes de la jugada (su mejor jugada y su puntuación) y la jugada hecha a la misma profundidad. La diferencia en centipeones se pasa a puntos esperados con una curva logística, como hacen los analizadores habituales, porque perder un peón con la partida igualada pesa mucho más que perderlo ganando por una torre. Según cuánto caen: mejor jugada, buena (menos de 0,05), imprecisión (0,05), error (0,10) o error grave (0,15). Por defecto, profundidad 4 y como mucho 0,6 s en la búsqueda de antes; la jugada hecha se busca luego a la profundidad alcanzada, sin reloj, para que las dos miren igual de lejos. Sin límite de tiempo el análisis es determinista, y así se prueba. En Node tarda de 0,05 a 0,8 s por jugada. Dejar escapar un mate en 1 nunca se califica como mejor ni buena jugada, aunque quede un mate más largo.
+- **Valoración.** Alfil Beta busca la posición antes de la jugada (su mejor jugada y su puntuación) y la jugada hecha a la misma profundidad. La diferencia en centipeones se pasa a puntos esperados con una curva logística, como hacen los analizadores habituales, porque perder un peón con la partida igualada pesa mucho más que perderlo ganando por una torre. Según cuánto caen: mejor jugada, buena (menos de 0,05), imprecisión (0,05), error (0,10) o error grave (0,15). Por defecto, profundidad 4 y como mucho 3 s en la búsqueda de antes; la jugada hecha se busca luego a la profundidad alcanzada, sin reloj, para que las dos miren igual de lejos. La profundidad es lo que fija el veredicto y el reloj solo es una red de seguridad, así que el mismo análisis da lo mismo en un móvil lento y en un portátil; sin límite de tiempo es determinista, y así se prueba. Hay dos búsquedas extra con presupuesto en nodos (150.000, también deterministas): si la mejor jugada daba mate y la hecha no lo mantiene, se mira la hecha más hondo, y antes de decir «Error» o «Error grave» se vuelve a buscar más hondo cuando cabe (finales y posiciones forzadas). Medido en el banco, más profundidad fija (5 o 6) no mejora los veredictos y multiplica el tiempo por 3 a 5 (`docs/auditorias/b3-calidad-analisis.md`); el tiempo por análisis está en [Cifras](#cifras). Dejar escapar un mate en 1 nunca se califica como mejor ni buena jugada, aunque quede un mate más largo.
+- **Coherencia.** Un informe no puede contradecirse: la frase del veredicto, «Mejor jugada», el «por qué», los avisos y la evaluación salen de una sola decisión y `checkInvariants` (`src/coach/invariants.ts`) lo comprueba en las pruebas y en el banco (en las 152 jugadas del banco queda una sola contradicción, ver limitaciones; no corre en la interfaz). Cuando el coach no ve un motivo concreto lo dice, en lugar de inventarlo: por ejemplo, ante un sacrificio al que llama error avisa de que puede tener una compensación que no alcanza a ver.
 - **Mate en 1 que se escapó.** Se prueban todas las jugadas legales: es exacto, no depende de la búsqueda.
-- **Pieza colgando y captura que ganaba material.** Un intercambio estático (SEE) hecho con jugadas legales, así que respeta clavadas y jaques: en la casilla capturan los dos bandos por turnos con la pieza de menos valor, y cada uno para cuando ya no le conviene. Solo se avisa si el motor confirma que la jugada pierde al menos 0,8 peones: así no se marca un sacrificio que da mate ni un cambio igualado. La captura no vista, además, se busca con el motor para comprobar que de verdad era mejor (como mucho dos candidatas). En la pieza que se acaba de mover cuenta lo que capturó: un cambio igualado no es una pieza colgando. Limitación conocida: un peón que el rival puede tomar al paso no se marca como colgando.
+- **Pieza colgando y captura que ganaba material.** Un intercambio estático (SEE) hecho con jugadas legales, así que respeta clavadas y jaques: en la casilla capturan los dos bandos por turnos con la pieza de menos valor, y cada uno para cuando ya no le conviene. Solo se avisa si el motor confirma que la jugada pierde al menos 0,8 peones y que capturar esa pieza le sale bien al rival (no está clavada ni refutada por un contraataque): así no se marca un sacrificio que da mate ni un cambio igualado. La captura no vista, además, se busca con el motor para comprobar que de verdad era mejor (como mucho dos candidatas). En la pieza que se acaba de mover cuenta lo que capturó: un cambio igualado no es una pieza colgando. Limitación conocida: un peón que el rival puede tomar al paso no se marca como colgando.
 
 ### Repaso de la partida
 

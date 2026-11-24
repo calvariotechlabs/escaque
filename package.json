@@ -23,7 +23,9 @@
     "bench": "npm run build && node dist/tools/bench.js",
     "bench:posiciones": "npm run build && node dist/tools/banco.js",
     "bench:referencia": "npm run build && node tools/stockfish-ref.mjs",
-    "test:e2e": "npm run build:site && node --test --test-concurrency=1 e2e/*.e2e.mjs"
+    "test:e2e": "npm run build:site && node --test --test-concurrency=1 e2e/*.e2e.mjs",
+    "metrics": "npm run build:site && node tools/metricas.mjs",
+    "metrics:check": "npm run build:site && node tools/metricas.mjs --check"
   },
   "dependencies": {},
   "devDependencies": {
