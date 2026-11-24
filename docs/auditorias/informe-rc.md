@@ -96,7 +96,7 @@ Lectura honesta: el coach ya no se contradice y da menos falsos positivos, pero 
 
 ### 4.3 La contradicción que queda
 
-`auditoria-h-08 Qd3+`: el informe dice «gana la dama» y la línea que enseña solo captura un peón. Es la regla `pieza-no-capturada` del banco, que mira **8 medias jugadas**; la captura de la dama puede llegar después. No la detecta `checkInvariants` (0 violaciones). Propuesta: tratarla como medida del banco y no como defecto del coach, salvo que Sergio prefiera ampliar la ventana de la regla.
+`auditoria-h-08 Qd3+`: el informe dice «gana la dama» y la línea que enseña solo captura un peón. Es la regla `pieza-no-capturada` del banco, que mira **8 medias jugadas**; la captura de la dama puede llegar después. No la detecta `checkInvariants` (0 violaciones). Según el hilo de B9, **es un defecto real y no solo de medida**: el texto dice «gana la dama» y la línea mostrada solo captura un peón. Queda como **limitación conocida** (B9 la recoge en el README, PR #77) y no se corrige en la RC. Por eso el criterio «el coach no se contradice» se da por cumplido con esta excepción: 1 informe de 152.
 
 ## 5. Excepciones documentadas del motor
 
@@ -149,6 +149,7 @@ Se rehicieron en un clon limpio de `main` (`7e38bba`), Node de la sesión, sin d
 ## 9. Limitaciones conocidas
 
 - **El coach ve lo que ve Alfil Beta a profundidad 4 y en 3 s.** No detecta 3 de 23 errores graves del banco, y puede llamar «Error grave» a un sacrificio correcto con compensación lejana (3 casos).
+- **Una contradicción residual en el coach** (H-08, `auditoria-h-08 Qd3+`): dice «gana la dama» y la línea mostrada solo captura un peón.
 - **Difícil es determinista** (H-15): la misma línea gana siempre. Decisión de diseño, no se ha tocado.
 - **Alfil Beta no es un rival fuerte.** No hay Elo (82 posiciones elegidas a mano no dan validez estadística; ver `bench/README.md`). Las cifras comparan versiones del mismo código.
 - **La referencia de Stockfish no es una verdad**: en finales que necesitan tablas puede discrepar.
@@ -158,8 +159,8 @@ Se rehicieron en un clon limpio de `main` (`7e38bba`), Node de la sesión, sin d
 
 ## 10. Decisiones y pasos que quedan
 
-1. **Contradicción de medida de H-08** (4.3): se trata como límite del banco, no como defecto del coach (indicación de la coordinación).
-2. **Fusionar #77** tras actualizarla contra `main` y regenerar las cifras; si cambian, este informe se ajusta.
+1. **H-08** (4.3): defecto real que queda como limitación conocida. Si Sergio prefiere corregirlo antes de la RC, es un bloque nuevo (la frase de «gana la dama» debe salir de la línea mostrada).
+2. **Fusionar #77**: según su hilo ya está sin conflicto con `main` y con 1.167 pruebas y el banco `despues-b11`. Yo medí 1.152 en `main`; la diferencia habrá que comprobarla cuando se fusione.
 3. **Fusionar esta PR** con el OK de Sergio, para fijar el informe en el commit de la RC.
 
 ## 11. Registro de decisiones para el caso de estudio
