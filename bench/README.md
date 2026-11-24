@@ -71,7 +71,7 @@ Cuatro perfiles sobre las 82 posiciones:
 | Perfil | Cómo | ¿Determinista? |
 | --- | --- | --- |
 | Fácil | `chooseMove(…, "facil")` con una semilla fija por posición | Sí |
-| Medio | `chooseMove(…, "medio")`: profundidad 3, tope de 0,5 s | Sí, salvo en un equipo muy lento |
+| Medio | `chooseMove(…, "medio")`: profundidad 3, tope de 0,5 s | **No del todo**: en la posición H-02b el tope corta la profundidad 3 en unos 0,5 s, y según la ejecución se queda en 2 o en 3 |
 | Difícil | `chooseMove(…, "dificil")`: 0,9 s de reloj real | **No**: la profundidad depende del equipo |
 | Profundidad 5 | `search` a profundidad fija 5 con tabla nueva | Sí |
 
@@ -109,7 +109,7 @@ Diferencia de la evaluación de Alfil Beta entre profundidad 4 (la del coach) y 
 
 ## Reproducibilidad
 
-- El informe trae una **huella** (FNV-1a de 32 bits) de todo lo determinista: jugadas de Fácil, Medio y profundidad 5, estabilidad e informes completos del coach (veredicto, mejor jugada y textos). Deja fuera los tiempos y el nivel Difícil. Dos ejecuciones del mismo commit dan la misma huella; si cambia, ha cambiado el comportamiento.
+- El informe trae una **huella** (FNV-1a de 32 bits) de todo lo determinista: jugadas de Fácil y de profundidad 5, estabilidad e informes completos del coach (veredicto, mejor jugada y textos). Deja fuera los tiempos y los niveles Medio y Difícil, que dependen del reloj. Dos ejecuciones del mismo commit dan la misma huella; si cambia, ha cambiado el comportamiento.
 - Las posiciones de las auditorías se analizan desde su FEN, sin el historial de la partida: no cuentan repeticiones anteriores (en ninguna de las 12 influyen).
 
 ## Limitaciones

@@ -49,21 +49,31 @@ function leerOpciones(argv: readonly string[]): Opciones {
   return out;
 }
 
-/** Commit actual leyendo .git (sin lanzar procesos). */
+/** Commit actual leyendo .git (sin lanzar procesos). Admite worktrees, donde .git es un fichero «gitdir: …». */
 function commitActual(): string {
-  try {
-    const head = fs.readFileSync(".git/HEAD", "utf8").trim();
-    if (!head.startsWith("ref: ")) return head.slice(0, 12);
-    const ref = head.slice(5);
+  const leer = (ruta: string): string | null => {
     try {
-      return fs.readFileSync(`.git/${ref}`, "utf8").trim().slice(0, 12);
+      return fs.readFileSync(ruta, "utf8").trim();
     } catch {
-      const linea = fs.readFileSync(".git/packed-refs", "utf8").split("\n").find((l) => l.endsWith(` ${ref}`));
-      return linea?.slice(0, 12) ?? "desconocido";
+      return null;
     }
-  } catch {
-    return "desconocido";
+  };
+  let gitDir = ".git";
+  let comun = ".git";
+  const enlace = leer(".git");
+  if (enlace !== null && enlace.startsWith("gitdir: ")) {
+    gitDir = enlace.slice(8);
+    const commondir = leer(`${gitDir}/commondir`);
+    comun = commondir === null ? gitDir : commondir.startsWith("/") ? commondir : `${gitDir}/${commondir}`;
   }
+  const head = leer(`${gitDir}/HEAD`);
+  if (head === null) return "desconocido";
+  if (!head.startsWith("ref: ")) return head.slice(0, 12);
+  const ref = head.slice(5);
+  const directo = leer(`${gitDir}/${ref}`) ?? leer(`${comun}/${ref}`);
+  if (directo !== null) return directo.slice(0, 12);
+  const linea = leer(`${comun}/packed-refs`)?.split("\n").find((l) => l.endsWith(` ${ref}`));
+  return linea?.slice(0, 12) ?? "desconocido";
 }
 
 /** Puntuación del motor (para quien mueve) → centipeones recortados, con los mates como ±LIMITE_CP. */
@@ -87,7 +97,7 @@ function nivel(level: Level): (pos: Position, id: string) => SearchResult {
 
 const PERFILES: readonly Perfil[] = [
   { nombre: "facil", descripcion: "Nivel Fácil (azar con semilla fija por posición)", determinista: true, elegir: nivel("facil") },
-  { nombre: "medio", descripcion: "Nivel Medio (profundidad 3, tope 0,5 s)", determinista: true, elegir: nivel("medio") },
+  { nombre: "medio", descripcion: "Nivel Medio (profundidad 3, tope 0,5 s: en posiciones pesadas el reloj decide)", determinista: false, elegir: nivel("medio") },
   { nombre: "dificil", descripcion: "Nivel Difícil (0,9 s de reloj real: depende del equipo)", determinista: false, elegir: nivel("dificil") },
   {
     nombre: "prof5",
@@ -143,7 +153,8 @@ function ejecutar(lista: readonly PosicionBanco[]): void {
   const filasCoach: ResultadoCoach[] = [];
   for (const p of lista) {
     const ref = referencia.posiciones[p.id]!;
-    const ucis = [ref.mejor, ...p.jugadas.map((j) => j.uci)].filter((u, i, all) => all.indexOf(u) === i);
+    // La primera de la referencia (la que usan las métricas), el bestmove de Stockfish si es otra y las marcadas.
+    const ucis = [ref.jugadas[0]!.uci, ref.mejor, ...p.jugadas.map((j) => j.uci)].filter((u, i, all) => all.indexOf(u) === i);
     for (const uci of ucis) {
       const t0 = performance.now();
       const informe = analyzeMove({ fen: p.fen }, uci, { limits: { maxDepth: COACH_LIMITS.maxDepth } });

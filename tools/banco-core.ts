@@ -113,6 +113,10 @@ export function validarBanco(posiciones: readonly PosicionBanco[], referencia: R
     }
     if (pos.status().kind !== "ongoing") errores.push(`${donde}: la partida ya ha terminado`);
     if (pos.toFen() !== p.fen) errores.push(`${donde}: FEN no canónica`);
+    if (!Array.isArray(p.jugadas)) {
+      errores.push(`${donde}: faltan las jugadas`);
+      continue;
+    }
     const vistas = new Set<string>();
     for (const j of p.jugadas) {
       const move = pos.moveFromUci(j.uci);
@@ -128,12 +132,20 @@ export function validarBanco(posiciones: readonly PosicionBanco[], referencia: R
       continue;
     }
     if (ref.fen !== p.fen) errores.push(`${donde}: la referencia es de otra FEN`);
+    if (!Array.isArray(ref.jugadas) || ref.jugadas.length === 0) {
+      errores.push(`${donde}: la referencia no tiene jugadas`);
+      continue;
+    }
     const legales = pos.legalMoves().map(moveToUci).sort();
     const valoradas = ref.jugadas.map((j) => j.uci).sort();
     if (legales.join(" ") !== valoradas.join(" ")) errores.push(`${donde}: la referencia no valora exactamente las jugadas legales`);
-    for (const j of ref.jugadas) {
+    let ordenada = true;
+    for (const [i, j] of ref.jugadas.entries()) {
       if ((j.cp === undefined) === (j.mate === undefined)) errores.push(`${donde}: ${j.uci} necesita cp o mate`);
+      else if (i > 0 && valorCp(ref.jugadas[i - 1]!) < valorCp(j)) ordenada = false;
     }
+    // Las métricas toman la primera como la mejor: la lista tiene que ir de mejor a peor.
+    if (!ordenada) errores.push(`${donde}: la referencia no está ordenada de mejor a peor`);
     // `mejor` es el bestmove de Stockfish; la lista va ordenada por valoración. Pueden no
     // coincidir cuando la última iteración deja alguna línea como cota, pero no deben alejarse.
     const elegida = jugadaRef(ref, ref.mejor);
@@ -205,7 +217,9 @@ export function calidad(ref: PosicionReferencia, uci: string): Calidad {
   const perdidaCp = Math.max(0, recorta(vMejor, LIMITE_CP) - recorta(v, LIMITE_CP));
   const caida = Math.max(0, esperado(recorta(vMejor, MATE_CP)) - esperado(recorta(v, MATE_CP)));
   const equivalente = vMejor - v <= TOLERANCIA_CP;
-  const veredicto: Verdict = equivalente ? "mejor" : (UMBRALES.find(([limite]) => caida >= limite)?.[1] ?? "buena");
+  let veredicto: Verdict = equivalente ? "mejor" : (UMBRALES.find(([limite]) => caida >= limite)?.[1] ?? "buena");
+  // Misma regla que el coach: dejar escapar un mate en 1 nunca es «Mejor» ni «Buena».
+  if (mejor.mate === 1 && jugada.mate !== 1 && (veredicto === "mejor" || veredicto === "buena")) veredicto = "imprecision";
   return {
     perdidaCp,
     caida,
@@ -449,7 +463,7 @@ export function resumirCoach(filas: readonly ResultadoCoach[], refs: Readonly<Re
     violaciones,
     informesConViolaciones: filas.filter((f) => f.violaciones.length > 0).length,
     msMedia: Math.round(media(tiempos)),
-    msP95: Math.round(tiempos[Math.min(tiempos.length - 1, Math.floor(tiempos.length * 0.95))] ?? 0),
+    msP95: Math.round(tiempos[Math.max(0, Math.ceil(tiempos.length * 0.95) - 1)] ?? 0),
     msMax: Math.round(tiempos.at(-1) ?? 0),
   };
 }

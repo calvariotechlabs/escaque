@@ -1,7 +1,7 @@
 {
  "fecha": "2026-11-24",
- "commit": "5e9e946ae52d",
- "huellaDeterminista": "5601b7ac",
+ "commit": "02bdcb273cee",
+ "huellaDeterminista": "d981a3e0",
  "configuracion": {
   "posiciones": 82,
   "coach": "analyzeMove con profundidad 4 y sin reloj (determinista)",
@@ -13,8 +13,8 @@
    },
    {
     "nombre": "medio",
-    "descripcion": "Nivel Medio (profundidad 3, tope 0,5 s)",
-    "determinista": true
+    "descripcion": "Nivel Medio (profundidad 3, tope 0,5 s: en posiciones pesadas el reloj decide)",
+    "determinista": false
    },
    {
     "nombre": "dificil",
@@ -69,7 +69,7 @@
     "matesDisponibles": 18,
     "matesMantenidos": 13,
     "msMedia": 5,
-    "msMax": 73
+    "msMax": 66
    },
    "filas": [
     {
@@ -88,7 +88,7 @@
      },
      "mateDisponible": true,
      "profundidad": 1,
-     "ms": 8
+     "ms": 6
     },
     {
      "id": "mate1-loco",
@@ -160,7 +160,7 @@
      },
      "mateDisponible": true,
      "profundidad": 1,
-     "ms": 11
+     "ms": 10
     },
     {
      "id": "mate1-dama-rey",
@@ -232,7 +232,7 @@
      },
      "mateDisponible": true,
      "profundidad": 1,
-     "ms": 12
+     "ms": 10
     },
     {
      "id": "mate2-philidor",
@@ -268,7 +268,7 @@
      },
      "mateDisponible": true,
      "profundidad": 1,
-     "ms": 16
+     "ms": 13
     },
     {
      "id": "mate-opera",
@@ -286,7 +286,7 @@
      },
      "mateDisponible": true,
      "profundidad": 1,
-     "ms": 4
+     "ms": 3
     },
     {
      "id": "clavada-englund",
@@ -304,7 +304,7 @@
      },
      "mateDisponible": false,
      "profundidad": 1,
-     "ms": 8
+     "ms": 6
     },
     {
      "id": "mate-dama-rey-largo",
@@ -322,7 +322,7 @@
      },
      "mateDisponible": true,
      "profundidad": 1,
-     "ms": 2
+     "ms": 1
     },
     {
      "id": "doble-caballo-rey-torre",
@@ -358,7 +358,7 @@
      },
      "mateDisponible": false,
      "profundidad": 1,
-     "ms": 3
+     "ms": 4
     },
     {
      "id": "doble-dama-rey-torre",
@@ -376,7 +376,7 @@
      },
      "mateDisponible": true,
      "profundidad": 1,
-     "ms": 2
+     "ms": 1
     },
     {
      "id": "doble-blackburne-dg5",
@@ -394,7 +394,7 @@
      },
      "mateDisponible": false,
      "profundidad": 1,
-     "ms": 8
+     "ms": 7
     },
     {
      "id": "doble-alfil-rey-torre",
@@ -484,7 +484,7 @@
      },
      "mateDisponible": false,
      "profundidad": 1,
-     "ms": 13
+     "ms": 10
     },
     {
      "id": "clavada-dama-torre",
@@ -502,7 +502,7 @@
      },
      "mateDisponible": false,
      "profundidad": 1,
-     "ms": 1
+     "ms": 0
     },
     {
      "id": "descubierto-caballo",
@@ -520,7 +520,7 @@
      },
      "mateDisponible": false,
      "profundidad": 1,
-     "ms": 3
+     "ms": 2
     },
     {
      "id": "descubierto-petrov",
@@ -538,7 +538,7 @@
      },
      "mateDisponible": false,
      "profundidad": 1,
-     "ms": 3
+     "ms": 4
     },
     {
      "id": "descubierto-alfil",
@@ -556,7 +556,7 @@
      },
      "mateDisponible": false,
      "profundidad": 1,
-     "ms": 2
+     "ms": 1
     },
     {
      "id": "descubierto-negras",
@@ -574,7 +574,7 @@
      },
      "mateDisponible": false,
      "profundidad": 1,
-     "ms": 2
+     "ms": 1
     },
     {
      "id": "sacrificio-legal",
@@ -592,7 +592,7 @@
      },
      "mateDisponible": false,
      "profundidad": 1,
-     "ms": 7
+     "ms": 5
     },
     {
      "id": "sacrificio-opera-txd7",
@@ -610,7 +610,7 @@
      },
      "mateDisponible": false,
      "profundidad": 1,
-     "ms": 14
+     "ms": 11
     },
     {
      "id": "sacrificio-damiano",
@@ -664,7 +664,7 @@
      },
      "mateDisponible": false,
      "profundidad": 1,
-     "ms": 3
+     "ms": 2
     },
     {
      "id": "sacrificio-mal-griego",
@@ -682,7 +682,7 @@
      },
      "mateDisponible": false,
      "profundidad": 1,
-     "ms": 2
+     "ms": 1
     },
     {
      "id": "sacrificio-traxler",
@@ -700,7 +700,7 @@
      },
      "mateDisponible": false,
      "profundidad": 1,
-     "ms": 8
+     "ms": 7
     },
     {
      "id": "sacrificio-mal-axf7-d3",
@@ -718,7 +718,7 @@
      },
      "mateDisponible": false,
      "profundidad": 1,
-     "ms": 9
+     "ms": 7
     },
     {
      "id": "sacrificio-mal-cxe5",
@@ -772,7 +772,7 @@
      },
      "mateDisponible": false,
      "profundidad": 1,
-     "ms": 7
+     "ms": 4
     },
     {
      "id": "gana-torre-esquina",
@@ -808,7 +808,7 @@
      },
      "mateDisponible": false,
      "profundidad": 1,
-     "ms": 5
+     "ms": 4
     },
     {
      "id": "gana-dama-colgada",
@@ -844,7 +844,7 @@
      },
      "mateDisponible": false,
      "profundidad": 1,
-     "ms": 1
+     "ms": 2
     },
     {
      "id": "pierde-blackburne",
@@ -862,7 +862,7 @@
      },
      "mateDisponible": false,
      "profundidad": 1,
-     "ms": 5
+     "ms": 3
     },
     {
      "id": "pierde-arca-noe",
@@ -880,7 +880,7 @@
      },
      "mateDisponible": false,
      "profundidad": 1,
-     "ms": 4
+     "ms": 3
     },
     {
      "id": "pierde-englund",
@@ -898,7 +898,7 @@
      },
      "mateDisponible": false,
      "profundidad": 1,
-     "ms": 4
+     "ms": 5
     },
     {
      "id": "pierde-torre-caballo",
@@ -970,7 +970,7 @@
      },
      "mateDisponible": false,
      "profundidad": 1,
-     "ms": 0
+     "ms": 1
     },
     {
      "id": "equiv-inicial",
@@ -1024,7 +1024,7 @@
      },
      "mateDisponible": false,
      "profundidad": 1,
-     "ms": 2
+     "ms": 1
     },
     {
      "id": "equiv-italiana",
@@ -1096,7 +1096,7 @@
      },
      "mateDisponible": false,
      "profundidad": 1,
-     "ms": 3
+     "ms": 2
     },
     {
      "id": "tranq-gambito-dama",
@@ -1114,7 +1114,7 @@
      },
      "mateDisponible": false,
      "profundidad": 1,
-     "ms": 9
+     "ms": 6
     },
     {
      "id": "tranq-najdorf",
@@ -1132,7 +1132,7 @@
      },
      "mateDisponible": false,
      "profundidad": 1,
-     "ms": 3
+     "ms": 2
     },
     {
      "id": "tranq-francesa",
@@ -1222,7 +1222,7 @@
      },
      "mateDisponible": false,
      "profundidad": 1,
-     "ms": 1
+     "ms": 0
     },
     {
      "id": "final-philidor",
@@ -1258,7 +1258,7 @@
      },
      "mateDisponible": true,
      "profundidad": 1,
-     "ms": 1
+     "ms": 2
     },
     {
      "id": "final-torres",
@@ -1294,7 +1294,7 @@
      },
      "mateDisponible": false,
      "profundidad": 1,
-     "ms": 1
+     "ms": 0
     },
     {
      "id": "final-alfil-malo",
@@ -1330,7 +1330,7 @@
      },
      "mateDisponible": true,
      "profundidad": 1,
-     "ms": 1
+     "ms": 0
     },
     {
      "id": "auditoria-h-01",
@@ -1348,7 +1348,7 @@
      },
      "mateDisponible": false,
      "profundidad": 1,
-     "ms": 1
+     "ms": 0
     },
     {
      "id": "auditoria-h-02",
@@ -1384,7 +1384,7 @@
      },
      "mateDisponible": false,
      "profundidad": 1,
-     "ms": 5
+     "ms": 4
     },
     {
      "id": "auditoria-h-14",
@@ -1402,7 +1402,7 @@
      },
      "mateDisponible": false,
      "profundidad": 1,
-     "ms": 33
+     "ms": 34
     },
     {
      "id": "auditoria-h-02b",
@@ -1420,7 +1420,7 @@
      },
      "mateDisponible": false,
      "profundidad": 1,
-     "ms": 63
+     "ms": 66
     },
     {
      "id": "auditoria-h-07",
@@ -1438,7 +1438,7 @@
      },
      "mateDisponible": false,
      "profundidad": 1,
-     "ms": 73
+     "ms": 56
     },
     {
      "id": "auditoria-h-05",
@@ -1456,7 +1456,7 @@
      },
      "mateDisponible": false,
      "profundidad": 1,
-     "ms": 15
+     "ms": 16
     },
     {
      "id": "auditoria-h-03",
@@ -1474,7 +1474,7 @@
      },
      "mateDisponible": false,
      "profundidad": 1,
-     "ms": 1
+     "ms": 2
     },
     {
      "id": "auditoria-h-08",
@@ -1492,7 +1492,7 @@
      },
      "mateDisponible": false,
      "profundidad": 1,
-     "ms": 2
+     "ms": 3
     },
     {
      "id": "auditoria-h-04",
@@ -1528,7 +1528,7 @@
      },
      "mateDisponible": false,
      "profundidad": 1,
-     "ms": 3
+     "ms": 4
     },
     {
      "id": "auditoria-h-10",
@@ -1546,7 +1546,7 @@
      },
      "mateDisponible": false,
      "profundidad": 1,
-     "ms": 1
+     "ms": 2
     }
    ]
   },
@@ -1570,8 +1570,8 @@
     ],
     "matesDisponibles": 18,
     "matesMantenidos": 17,
-    "msMedia": 40,
-    "msMax": 511
+    "msMedia": 33,
+    "msMax": 502
    },
    "filas": [
     {
@@ -1626,7 +1626,7 @@
      },
      "mateDisponible": true,
      "profundidad": 1,
-     "ms": 0
+     "ms": 1
     },
     {
      "id": "mate1-ahogado-caballo",
@@ -1644,7 +1644,7 @@
      },
      "mateDisponible": true,
      "profundidad": 1,
-     "ms": 0
+     "ms": 2
     },
     {
      "id": "mate1-legal",
@@ -1662,7 +1662,7 @@
      },
      "mateDisponible": true,
      "profundidad": 1,
-     "ms": 2
+     "ms": 3
     },
     {
      "id": "mate1-dama-rey",
@@ -1680,7 +1680,7 @@
      },
      "mateDisponible": true,
      "profundidad": 1,
-     "ms": 1
+     "ms": 0
     },
     {
      "id": "mate1-negras-pasillo",
@@ -1698,7 +1698,7 @@
      },
      "mateDisponible": true,
      "profundidad": 1,
-     "ms": 1
+     "ms": 0
     },
     {
      "id": "mate1-coronacion",
@@ -1734,7 +1734,7 @@
      },
      "mateDisponible": true,
      "profundidad": 1,
-     "ms": 2
+     "ms": 1
     },
     {
      "id": "mate2-philidor",
@@ -1770,7 +1770,7 @@
      },
      "mateDisponible": true,
      "profundidad": 3,
-     "ms": 28
+     "ms": 22
     },
     {
      "id": "mate-opera",
@@ -1788,7 +1788,7 @@
      },
      "mateDisponible": true,
      "profundidad": 3,
-     "ms": 18
+     "ms": 13
     },
     {
      "id": "clavada-englund",
@@ -1806,7 +1806,7 @@
      },
      "mateDisponible": false,
      "profundidad": 3,
-     "ms": 27
+     "ms": 22
     },
     {
      "id": "mate-dama-rey-largo",
@@ -1824,7 +1824,7 @@
      },
      "mateDisponible": true,
      "profundidad": 3,
-     "ms": 9
+     "ms": 7
     },
     {
      "id": "doble-caballo-rey-torre",
@@ -1860,7 +1860,7 @@
      },
      "mateDisponible": false,
      "profundidad": 3,
-     "ms": 18
+     "ms": 13
     },
     {
      "id": "doble-dama-rey-torre",
@@ -1878,7 +1878,7 @@
      },
      "mateDisponible": true,
      "profundidad": 3,
-     "ms": 10
+     "ms": 9
     },
     {
      "id": "doble-blackburne-dg5",
@@ -1896,7 +1896,7 @@
      },
      "mateDisponible": false,
      "profundidad": 3,
-     "ms": 65
+     "ms": 48
     },
     {
      "id": "doble-alfil-rey-torre",
@@ -1932,7 +1932,7 @@
      },
      "mateDisponible": false,
      "profundidad": 3,
-     "ms": 4
+     "ms": 3
     },
     {
      "id": "clavada-torre-peon",
@@ -1950,7 +1950,7 @@
      },
      "mateDisponible": false,
      "profundidad": 3,
-     "ms": 6
+     "ms": 5
     },
     {
      "id": "clavada-alfil-peon",
@@ -1968,7 +1968,7 @@
      },
      "mateDisponible": false,
      "profundidad": 3,
-     "ms": 5
+     "ms": 4
     },
     {
      "id": "clavada-elefante",
@@ -1986,7 +1986,7 @@
      },
      "mateDisponible": false,
      "profundidad": 3,
-     "ms": 31
+     "ms": 23
     },
     {
      "id": "clavada-dama-torre",
@@ -2004,7 +2004,7 @@
      },
      "mateDisponible": false,
      "profundidad": 3,
-     "ms": 3
+     "ms": 2
     },
     {
      "id": "descubierto-caballo",
@@ -2022,7 +2022,7 @@
      },
      "mateDisponible": false,
      "profundidad": 3,
-     "ms": 5
+     "ms": 4
     },
     {
      "id": "descubierto-petrov",
@@ -2040,7 +2040,7 @@
      },
      "mateDisponible": false,
      "profundidad": 3,
-     "ms": 62
+     "ms": 47
     },
     {
      "id": "descubierto-alfil",
@@ -2058,7 +2058,7 @@
      },
      "mateDisponible": false,
      "profundidad": 3,
-     "ms": 21
+     "ms": 65
     },
     {
      "id": "descubierto-negras",
@@ -2076,7 +2076,7 @@
      },
      "mateDisponible": false,
      "profundidad": 3,
-     "ms": 8
+     "ms": 7
     },
     {
      "id": "sacrificio-legal",
@@ -2094,7 +2094,7 @@
      },
      "mateDisponible": false,
      "profundidad": 3,
-     "ms": 67
+     "ms": 49
     },
     {
      "id": "sacrificio-opera-txd7",
@@ -2112,7 +2112,7 @@
      },
      "mateDisponible": false,
      "profundidad": 3,
-     "ms": 95
+     "ms": 109
     },
     {
      "id": "sacrificio-damiano",
@@ -2130,7 +2130,7 @@
      },
      "mateDisponible": false,
      "profundidad": 3,
-     "ms": 13
+     "ms": 15
     },
     {
      "id": "sacrificio-griego",
@@ -2148,7 +2148,7 @@
      },
      "mateDisponible": false,
      "profundidad": 3,
-     "ms": 27
+     "ms": 32
     },
     {
      "id": "sacrificio-mal-axf7",
@@ -2166,7 +2166,7 @@
      },
      "mateDisponible": false,
      "profundidad": 3,
-     "ms": 41
+     "ms": 50
     },
     {
      "id": "sacrificio-mal-griego",
@@ -2184,7 +2184,7 @@
      },
      "mateDisponible": false,
      "profundidad": 3,
-     "ms": 27
+     "ms": 32
     },
     {
      "id": "sacrificio-traxler",
@@ -2202,7 +2202,7 @@
      },
      "mateDisponible": false,
      "profundidad": 3,
-     "ms": 23
+     "ms": 33
     },
     {
      "id": "sacrificio-mal-axf7-d3",
@@ -2220,7 +2220,7 @@
      },
      "mateDisponible": false,
      "profundidad": 3,
-     "ms": 47
+     "ms": 66
     },
     {
      "id": "sacrificio-mal-cxe5",
@@ -2238,7 +2238,7 @@
      },
      "mateDisponible": false,
      "profundidad": 3,
-     "ms": 109
+     "ms": 123
     },
     {
      "id": "gana-alfil-suelto",
@@ -2274,7 +2274,7 @@
      },
      "mateDisponible": false,
      "profundidad": 3,
-     "ms": 10
+     "ms": 9
     },
     {
      "id": "gana-torre-esquina",
@@ -2310,7 +2310,7 @@
      },
      "mateDisponible": false,
      "profundidad": 3,
-     "ms": 62
+     "ms": 35
     },
     {
      "id": "gana-dama-colgada",
@@ -2328,7 +2328,7 @@
      },
      "mateDisponible": true,
      "profundidad": 3,
-     "ms": 2
+     "ms": 1
     },
     {
      "id": "pierde-elefante",
@@ -2346,7 +2346,7 @@
      },
      "mateDisponible": false,
      "profundidad": 3,
-     "ms": 58
+     "ms": 36
     },
     {
      "id": "pierde-blackburne",
@@ -2364,7 +2364,7 @@
      },
      "mateDisponible": false,
      "profundidad": 3,
-     "ms": 23
+     "ms": 20
     },
     {
      "id": "pierde-arca-noe",
@@ -2382,7 +2382,7 @@
      },
      "mateDisponible": false,
      "profundidad": 3,
-     "ms": 32
+     "ms": 28
     },
     {
      "id": "pierde-englund",
@@ -2400,7 +2400,7 @@
      },
      "mateDisponible": false,
      "profundidad": 3,
-     "ms": 23
+     "ms": 18
     },
     {
      "id": "pierde-torre-caballo",
@@ -2436,7 +2436,7 @@
      },
      "mateDisponible": false,
      "profundidad": 3,
-     "ms": 9
+     "ms": 8
     },
     {
      "id": "permite-mate-pastor",
@@ -2454,7 +2454,7 @@
      },
      "mateDisponible": false,
      "profundidad": 3,
-     "ms": 14
+     "ms": 12
     },
     {
      "id": "permite-mate-pasillo-negras",
@@ -2472,7 +2472,7 @@
      },
      "mateDisponible": false,
      "profundidad": 3,
-     "ms": 5
+     "ms": 4
     },
     {
      "id": "equiv-inicial",
@@ -2508,7 +2508,7 @@
      },
      "mateDisponible": false,
      "profundidad": 3,
-     "ms": 11
+     "ms": 10
     },
     {
      "id": "equiv-escocesa",
@@ -2526,7 +2526,7 @@
      },
      "mateDisponible": false,
      "profundidad": 3,
-     "ms": 31
+     "ms": 34
     },
     {
      "id": "equiv-italiana",
@@ -2544,7 +2544,7 @@
      },
      "mateDisponible": false,
      "profundidad": 3,
-     "ms": 50
+     "ms": 40
     },
     {
      "id": "equiv-ruy",
@@ -2562,7 +2562,7 @@
      },
      "mateDisponible": false,
      "profundidad": 3,
-     "ms": 12
+     "ms": 10
     },
     {
      "id": "equiv-final-peones",
@@ -2598,7 +2598,7 @@
      },
      "mateDisponible": false,
      "profundidad": 3,
-     "ms": 59
+     "ms": 45
     },
     {
      "id": "tranq-gambito-dama",
@@ -2616,7 +2616,7 @@
      },
      "mateDisponible": false,
      "profundidad": 3,
-     "ms": 73
+     "ms": 56
     },
     {
      "id": "tranq-najdorf",
@@ -2634,7 +2634,7 @@
      },
      "mateDisponible": false,
      "profundidad": 3,
-     "ms": 74
+     "ms": 55
     },
     {
      "id": "tranq-francesa",
@@ -2652,7 +2652,7 @@
      },
      "mateDisponible": false,
      "profundidad": 3,
-     "ms": 48
+     "ms": 39
     },
     {
      "id": "tranq-caro-kann",
@@ -2670,7 +2670,7 @@
      },
      "mateDisponible": false,
      "profundidad": 3,
-     "ms": 25
+     "ms": 20
     },
     {
      "id": "tranq-india-rey",
@@ -2688,7 +2688,7 @@
      },
      "mateDisponible": false,
      "profundidad": 3,
-     "ms": 40
+     "ms": 34
     },
     {
      "id": "tranq-inglesa",
@@ -2706,7 +2706,7 @@
      },
      "mateDisponible": false,
      "profundidad": 3,
-     "ms": 46
+     "ms": 24
     },
     {
      "id": "final-lucena",
@@ -2724,7 +2724,7 @@
      },
      "mateDisponible": false,
      "profundidad": 3,
-     "ms": 9
+     "ms": 7
     },
     {
      "id": "final-philidor",
@@ -2742,7 +2742,7 @@
      },
      "mateDisponible": false,
      "profundidad": 3,
-     "ms": 11
+     "ms": 6
     },
     {
      "id": "final-oposicion",
@@ -2778,7 +2778,7 @@
      },
      "mateDisponible": false,
      "profundidad": 3,
-     "ms": 13
+     "ms": 8
     },
     {
      "id": "final-peon-pasado",
@@ -2796,7 +2796,7 @@
      },
      "mateDisponible": false,
      "profundidad": 3,
-     "ms": 3
+     "ms": 1
     },
     {
      "id": "final-alfil-malo",
@@ -2814,7 +2814,7 @@
      },
      "mateDisponible": false,
      "profundidad": 3,
-     "ms": 2
+     "ms": 1
     },
     {
      "id": "final-subpromocion",
@@ -2850,7 +2850,7 @@
      },
      "mateDisponible": false,
      "profundidad": 3,
-     "ms": 13
+     "ms": 8
     },
     {
      "id": "auditoria-h-02",
@@ -2868,7 +2868,7 @@
      },
      "mateDisponible": false,
      "profundidad": 3,
-     "ms": 11
+     "ms": 9
     },
     {
      "id": "auditoria-h-06",
@@ -2886,7 +2886,7 @@
      },
      "mateDisponible": false,
      "profundidad": 3,
-     "ms": 43
+     "ms": 32
     },
     {
      "id": "auditoria-h-14",
@@ -2904,7 +2904,7 @@
      },
      "mateDisponible": false,
      "profundidad": 3,
-     "ms": 293
+     "ms": 227
     },
     {
      "id": "auditoria-h-02b",
@@ -2922,7 +2922,7 @@
      },
      "mateDisponible": false,
      "profundidad": 2,
-     "ms": 511
+     "ms": 502
     },
     {
      "id": "auditoria-h-07",
@@ -2940,7 +2940,7 @@
      },
      "mateDisponible": false,
      "profundidad": 3,
-     "ms": 356
+     "ms": 222
     },
     {
      "id": "auditoria-h-05",
@@ -2958,7 +2958,7 @@
      },
      "mateDisponible": false,
      "profundidad": 3,
-     "ms": 93
+     "ms": 58
     },
     {
      "id": "auditoria-h-03",
@@ -2976,7 +2976,7 @@
      },
      "mateDisponible": false,
      "profundidad": 3,
-     "ms": 99
+     "ms": 59
     },
     {
      "id": "auditoria-h-08",
@@ -2994,7 +2994,7 @@
      },
      "mateDisponible": false,
      "profundidad": 3,
-     "ms": 99
+     "ms": 61
     },
     {
      "id": "auditoria-h-04",
@@ -3012,7 +3012,7 @@
      },
      "mateDisponible": false,
      "profundidad": 2,
-     "ms": 5
+     "ms": 4
     },
     {
      "id": "auditoria-h-09",
@@ -3030,7 +3030,7 @@
      },
      "mateDisponible": false,
      "profundidad": 3,
-     "ms": 74
+     "ms": 47
     },
     {
      "id": "auditoria-h-10",
@@ -3048,29 +3048,28 @@
      },
      "mateDisponible": false,
      "profundidad": 3,
-     "ms": 104
+     "ms": 66
     }
    ]
   },
   "dificil": {
    "resumen": {
     "posiciones": 82,
-    "coincide": 46,
+    "coincide": 45,
     "equivalente": 67,
-    "perdidaMediaCp": 33.5,
-    "erroresMas2Peones": 5,
-    "erroresMas2PeonesTacticas": 5,
+    "perdidaMediaCp": 31.8,
+    "erroresMas2Peones": 4,
+    "erroresMas2PeonesTacticas": 4,
     "erroresTacticas": [
      "gana-arca-noe (c8e6, −331 cp)",
      "pierde-arca-noe (d1d4, −278 cp)",
      "auditoria-h-14 (d8a5, −485 cp)",
-     "auditoria-h-02b (a1b1, −398 cp)",
-     "auditoria-h-07 (a1b1, −304 cp)"
+     "auditoria-h-02b (a1b1, −398 cp)"
     ],
     "matesDisponibles": 18,
     "matesMantenidos": 18,
-    "msMedia": 750,
-    "msMax": 908
+    "msMedia": 749,
+    "msMax": 906
    },
    "filas": [
     {
@@ -3161,7 +3160,7 @@
      },
      "mateDisponible": true,
      "profundidad": 1,
-     "ms": 5
+     "ms": 4
     },
     {
      "id": "mate1-dama-rey",
@@ -3251,7 +3250,7 @@
      },
      "mateDisponible": true,
      "profundidad": 3,
-     "ms": 9
+     "ms": 5
     },
     {
      "id": "mate-boden",
@@ -3269,7 +3268,7 @@
      },
      "mateDisponible": true,
      "profundidad": 3,
-     "ms": 26
+     "ms": 22
     },
     {
      "id": "mate-opera",
@@ -3287,7 +3286,7 @@
      },
      "mateDisponible": true,
      "profundidad": 3,
-     "ms": 15
+     "ms": 14
     },
     {
      "id": "clavada-englund",
@@ -3305,24 +3304,24 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 901
+     "ms": 903
     },
     {
      "id": "mate-dama-rey-largo",
      "categoria": "mate-forzado",
-     "uci": "b1f5",
+     "uci": "b1d3",
      "calidad": {
       "perdidaCp": 0,
       "caida": 0,
-      "puesto": 3,
-      "mejor": true,
+      "puesto": 15,
+      "mejor": false,
       "equivalente": true,
       "veredicto": "mejor",
       "mateEscapado": false,
       "matePermitido": false
      },
      "mateDisponible": true,
-     "profundidad": 7,
+     "profundidad": 6,
      "ms": 901
     },
     {
@@ -3341,7 +3340,7 @@
      },
      "mateDisponible": false,
      "profundidad": 9,
-     "ms": 901
+     "ms": 902
     },
     {
      "id": "doble-truco-centro",
@@ -3359,7 +3358,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 902
+     "ms": 904
     },
     {
      "id": "doble-dama-rey-torre",
@@ -3377,7 +3376,7 @@
      },
      "mateDisponible": true,
      "profundidad": 7,
-     "ms": 902
+     "ms": 901
     },
     {
      "id": "doble-blackburne-dg5",
@@ -3413,7 +3412,7 @@
      },
      "mateDisponible": false,
      "profundidad": 9,
-     "ms": 901
+     "ms": 902
     },
     {
      "id": "doble-peon",
@@ -3467,7 +3466,7 @@
      },
      "mateDisponible": false,
      "profundidad": 7,
-     "ms": 903
+     "ms": 901
     },
     {
      "id": "clavada-elefante",
@@ -3485,7 +3484,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 905
+     "ms": 901
     },
     {
      "id": "clavada-dama-torre",
@@ -3502,7 +3501,7 @@
       "matePermitido": false
      },
      "mateDisponible": false,
-     "profundidad": 8,
+     "profundidad": 9,
      "ms": 901
     },
     {
@@ -3521,7 +3520,7 @@
      },
      "mateDisponible": false,
      "profundidad": 7,
-     "ms": 901
+     "ms": 902
     },
     {
      "id": "descubierto-petrov",
@@ -3539,7 +3538,7 @@
      },
      "mateDisponible": false,
      "profundidad": 4,
-     "ms": 901
+     "ms": 900
     },
     {
      "id": "descubierto-alfil",
@@ -3574,8 +3573,8 @@
       "matePermitido": false
      },
      "mateDisponible": false,
-     "profundidad": 7,
-     "ms": 902
+     "profundidad": 6,
+     "ms": 903
     },
     {
      "id": "sacrificio-legal",
@@ -3593,7 +3592,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 905
+     "ms": 902
     },
     {
      "id": "sacrificio-opera-txd7",
@@ -3611,7 +3610,7 @@
      },
      "mateDisponible": false,
      "profundidad": 4,
-     "ms": 905
+     "ms": 902
     },
     {
      "id": "sacrificio-damiano",
@@ -3629,7 +3628,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 901
+     "ms": 903
     },
     {
      "id": "sacrificio-griego",
@@ -3647,7 +3646,7 @@
      },
      "mateDisponible": false,
      "profundidad": 4,
-     "ms": 904
+     "ms": 902
     },
     {
      "id": "sacrificio-mal-axf7",
@@ -3665,7 +3664,7 @@
      },
      "mateDisponible": false,
      "profundidad": 4,
-     "ms": 902
+     "ms": 906
     },
     {
      "id": "sacrificio-mal-griego",
@@ -3682,8 +3681,8 @@
       "matePermitido": false
      },
      "mateDisponible": false,
-     "profundidad": 5,
-     "ms": 902
+     "profundidad": 4,
+     "ms": 901
     },
     {
      "id": "sacrificio-traxler",
@@ -3701,7 +3700,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 901
+     "ms": 904
     },
     {
      "id": "sacrificio-mal-axf7-d3",
@@ -3719,7 +3718,7 @@
      },
      "mateDisponible": false,
      "profundidad": 4,
-     "ms": 908
+     "ms": 901
     },
     {
      "id": "sacrificio-mal-cxe5",
@@ -3737,7 +3736,7 @@
      },
      "mateDisponible": false,
      "profundidad": 4,
-     "ms": 905
+     "ms": 903
     },
     {
      "id": "gana-alfil-suelto",
@@ -3755,7 +3754,7 @@
      },
      "mateDisponible": false,
      "profundidad": 6,
-     "ms": 901
+     "ms": 902
     },
     {
      "id": "gana-caballo-negras",
@@ -3773,7 +3772,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 904
+     "ms": 903
     },
     {
      "id": "gana-torre-esquina",
@@ -3809,7 +3808,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 902
+     "ms": 904
     },
     {
      "id": "gana-dama-colgada",
@@ -3845,7 +3844,7 @@
      },
      "mateDisponible": false,
      "profundidad": 4,
-     "ms": 902
+     "ms": 903
     },
     {
      "id": "pierde-blackburne",
@@ -3863,7 +3862,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 902
+     "ms": 903
     },
     {
      "id": "pierde-arca-noe",
@@ -3881,7 +3880,7 @@
      },
      "mateDisponible": false,
      "profundidad": 4,
-     "ms": 904
+     "ms": 901
     },
     {
      "id": "pierde-englund",
@@ -3899,7 +3898,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 901
+     "ms": 904
     },
     {
      "id": "pierde-torre-caballo",
@@ -3917,7 +3916,7 @@
      },
      "mateDisponible": false,
      "profundidad": 7,
-     "ms": 902
+     "ms": 901
     },
     {
      "id": "permite-mate-pasillo",
@@ -3953,7 +3952,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 901
+     "ms": 903
     },
     {
      "id": "permite-mate-pasillo-negras",
@@ -3971,7 +3970,7 @@
      },
      "mateDisponible": false,
      "profundidad": 6,
-     "ms": 902
+     "ms": 901
     },
     {
      "id": "equiv-inicial",
@@ -3989,7 +3988,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 905
+     "ms": 902
     },
     {
      "id": "equiv-e4e5",
@@ -4024,8 +4023,8 @@
       "matePermitido": false
      },
      "mateDisponible": false,
-     "profundidad": 4,
-     "ms": 906
+     "profundidad": 5,
+     "ms": 904
     },
     {
      "id": "equiv-italiana",
@@ -4061,7 +4060,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 903
+     "ms": 905
     },
     {
      "id": "equiv-final-peones",
@@ -4079,7 +4078,7 @@
      },
      "mateDisponible": false,
      "profundidad": 14,
-     "ms": 902
+     "ms": 901
     },
     {
      "id": "tranq-ruy-cerrada",
@@ -4115,7 +4114,7 @@
      },
      "mateDisponible": false,
      "profundidad": 4,
-     "ms": 904
+     "ms": 903
     },
     {
      "id": "tranq-najdorf",
@@ -4133,7 +4132,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 901
+     "ms": 906
     },
     {
      "id": "tranq-francesa",
@@ -4151,7 +4150,7 @@
      },
      "mateDisponible": false,
      "profundidad": 4,
-     "ms": 905
+     "ms": 901
     },
     {
      "id": "tranq-caro-kann",
@@ -4169,7 +4168,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 905
+     "ms": 902
     },
     {
      "id": "tranq-india-rey",
@@ -4187,7 +4186,7 @@
      },
      "mateDisponible": false,
      "profundidad": 4,
-     "ms": 906
+     "ms": 901
     },
     {
      "id": "tranq-inglesa",
@@ -4205,7 +4204,7 @@
      },
      "mateDisponible": false,
      "profundidad": 4,
-     "ms": 903
+     "ms": 902
     },
     {
      "id": "final-lucena",
@@ -4241,7 +4240,7 @@
      },
      "mateDisponible": false,
      "profundidad": 6,
-     "ms": 901
+     "ms": 903
     },
     {
      "id": "final-oposicion",
@@ -4259,7 +4258,7 @@
      },
      "mateDisponible": true,
      "profundidad": 14,
-     "ms": 902
+     "ms": 901
     },
     {
      "id": "final-torres",
@@ -4277,7 +4276,7 @@
      },
      "mateDisponible": false,
      "profundidad": 7,
-     "ms": 903
+     "ms": 901
     },
     {
      "id": "final-peon-pasado",
@@ -4295,7 +4294,7 @@
      },
      "mateDisponible": false,
      "profundidad": 11,
-     "ms": 901
+     "ms": 902
     },
     {
      "id": "final-alfil-malo",
@@ -4331,7 +4330,7 @@
      },
      "mateDisponible": true,
      "profundidad": 7,
-     "ms": 28
+     "ms": 27
     },
     {
      "id": "auditoria-h-01",
@@ -4349,7 +4348,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 902
+     "ms": 905
     },
     {
      "id": "auditoria-h-02",
@@ -4367,7 +4366,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 902
+     "ms": 903
     },
     {
      "id": "auditoria-h-06",
@@ -4385,7 +4384,7 @@
      },
      "mateDisponible": false,
      "profundidad": 4,
-     "ms": 902
+     "ms": 904
     },
     {
      "id": "auditoria-h-14",
@@ -4403,7 +4402,7 @@
      },
      "mateDisponible": false,
      "profundidad": 4,
-     "ms": 903
+     "ms": 901
     },
     {
      "id": "auditoria-h-02b",
@@ -4421,25 +4420,25 @@
      },
      "mateDisponible": false,
      "profundidad": 3,
-     "ms": 907
+     "ms": 903
     },
     {
      "id": "auditoria-h-07",
      "categoria": "auditoria",
-     "uci": "a1b1",
+     "uci": "c1d2",
      "calidad": {
-      "perdidaCp": 304,
-      "caida": 0.14333027371508522,
-      "puesto": 15,
+      "perdidaCp": 161,
+      "caida": 0.062171644248130264,
+      "puesto": 2,
       "mejor": false,
       "equivalente": false,
-      "veredicto": "error",
+      "veredicto": "imprecision",
       "mateEscapado": false,
       "matePermitido": false
      },
      "mateDisponible": false,
-     "profundidad": 3,
-     "ms": 905
+     "profundidad": 4,
+     "ms": 906
     },
     {
      "id": "auditoria-h-05",
@@ -4457,7 +4456,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 905
+     "ms": 902
     },
     {
      "id": "auditoria-h-03",
@@ -4492,7 +4491,7 @@
       "matePermitido": false
      },
      "mateDisponible": false,
-     "profundidad": 5,
+     "profundidad": 4,
      "ms": 902
     },
     {
@@ -4511,7 +4510,7 @@
      },
      "mateDisponible": false,
      "profundidad": 2,
-     "ms": 3
+     "ms": 5
     },
     {
      "id": "auditoria-h-09",
@@ -4529,7 +4528,7 @@
      },
      "mateDisponible": false,
      "profundidad": 4,
-     "ms": 904
+     "ms": 901
     },
     {
      "id": "auditoria-h-10",
@@ -4547,7 +4546,7 @@
      },
      "mateDisponible": false,
      "profundidad": 4,
-     "ms": 902
+     "ms": 901
     }
    ]
   },
@@ -4566,8 +4565,8 @@
     ],
     "matesDisponibles": 18,
     "matesMantenidos": 18,
-    "msMedia": 749,
-    "msMax": 12789
+    "msMedia": 695,
+    "msMax": 11048
    },
    "filas": [
     {
@@ -4766,7 +4765,7 @@
      },
      "mateDisponible": true,
      "profundidad": 3,
-     "ms": 19
+     "ms": 20
     },
     {
      "id": "mate-opera",
@@ -4784,7 +4783,7 @@
      },
      "mateDisponible": true,
      "profundidad": 3,
-     "ms": 12
+     "ms": 13
     },
     {
      "id": "clavada-englund",
@@ -4802,7 +4801,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 243
+     "ms": 374
     },
     {
      "id": "mate-dama-rey-largo",
@@ -4820,7 +4819,7 @@
      },
      "mateDisponible": true,
      "profundidad": 5,
-     "ms": 64
+     "ms": 105
     },
     {
      "id": "doble-caballo-rey-torre",
@@ -4838,7 +4837,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 20
+     "ms": 24
     },
     {
      "id": "doble-truco-centro",
@@ -4856,7 +4855,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 334
+     "ms": 357
     },
     {
      "id": "doble-dama-rey-torre",
@@ -4874,7 +4873,7 @@
      },
      "mateDisponible": true,
      "profundidad": 5,
-     "ms": 92
+     "ms": 84
     },
     {
      "id": "doble-blackburne-dg5",
@@ -4892,7 +4891,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 655
+     "ms": 600
     },
     {
      "id": "doble-alfil-rey-torre",
@@ -4910,7 +4909,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 21
+     "ms": 23
     },
     {
      "id": "doble-peon",
@@ -4928,7 +4927,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 21
+     "ms": 23
     },
     {
      "id": "clavada-torre-peon",
@@ -4946,7 +4945,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 120
+     "ms": 128
     },
     {
      "id": "clavada-alfil-peon",
@@ -4964,7 +4963,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 48
+     "ms": 52
     },
     {
      "id": "clavada-elefante",
@@ -4982,7 +4981,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 211
+     "ms": 270
     },
     {
      "id": "clavada-dama-torre",
@@ -5000,7 +4999,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 16
+     "ms": 26
     },
     {
      "id": "descubierto-caballo",
@@ -5018,7 +5017,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 64
+     "ms": 47
     },
     {
      "id": "descubierto-petrov",
@@ -5036,7 +5035,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 1160
+     "ms": 1189
     },
     {
      "id": "descubierto-alfil",
@@ -5054,7 +5053,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 208
+     "ms": 194
     },
     {
      "id": "descubierto-negras",
@@ -5072,7 +5071,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 84
+     "ms": 78
     },
     {
      "id": "sacrificio-legal",
@@ -5090,7 +5089,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 582
+     "ms": 508
     },
     {
      "id": "sacrificio-opera-txd7",
@@ -5108,7 +5107,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 1854
+     "ms": 1691
     },
     {
      "id": "sacrificio-damiano",
@@ -5126,7 +5125,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 706
+     "ms": 633
     },
     {
      "id": "sacrificio-griego",
@@ -5144,7 +5143,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 1627
+     "ms": 1358
     },
     {
      "id": "sacrificio-mal-axf7",
@@ -5162,7 +5161,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 1267
+     "ms": 1186
     },
     {
      "id": "sacrificio-mal-griego",
@@ -5180,7 +5179,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 896
+     "ms": 968
     },
     {
      "id": "sacrificio-traxler",
@@ -5198,7 +5197,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 590
+     "ms": 725
     },
     {
      "id": "sacrificio-mal-axf7-d3",
@@ -5216,7 +5215,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 3191
+     "ms": 2982
     },
     {
      "id": "sacrificio-mal-cxe5",
@@ -5234,7 +5233,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 1150
+     "ms": 977
     },
     {
      "id": "gana-alfil-suelto",
@@ -5252,7 +5251,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 151
+     "ms": 212
     },
     {
      "id": "gana-caballo-negras",
@@ -5270,7 +5269,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 315
+     "ms": 316
     },
     {
      "id": "gana-torre-esquina",
@@ -5288,7 +5287,7 @@
      },
      "mateDisponible": true,
      "profundidad": 5,
-     "ms": 95
+     "ms": 96
     },
     {
      "id": "gana-arca-noe",
@@ -5306,7 +5305,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 730
+     "ms": 511
     },
     {
      "id": "gana-dama-colgada",
@@ -5324,7 +5323,7 @@
      },
      "mateDisponible": true,
      "profundidad": 5,
-     "ms": 10
+     "ms": 8
     },
     {
      "id": "pierde-elefante",
@@ -5342,7 +5341,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 1399
+     "ms": 1077
     },
     {
      "id": "pierde-blackburne",
@@ -5360,7 +5359,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 482
+     "ms": 416
     },
     {
      "id": "pierde-arca-noe",
@@ -5378,7 +5377,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 1538
+     "ms": 1211
     },
     {
      "id": "pierde-englund",
@@ -5396,7 +5395,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 308
+     "ms": 339
     },
     {
      "id": "pierde-torre-caballo",
@@ -5414,7 +5413,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 37
+     "ms": 40
     },
     {
      "id": "permite-mate-pasillo",
@@ -5432,7 +5431,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 199
+     "ms": 223
     },
     {
      "id": "permite-mate-pastor",
@@ -5450,7 +5449,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 378
+     "ms": 390
     },
     {
      "id": "permite-mate-pasillo-negras",
@@ -5468,7 +5467,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 356
+     "ms": 298
     },
     {
      "id": "equiv-inicial",
@@ -5486,7 +5485,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 204
+     "ms": 216
     },
     {
      "id": "equiv-e4e5",
@@ -5504,7 +5503,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 724
+     "ms": 690
     },
     {
      "id": "equiv-escocesa",
@@ -5522,7 +5521,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 797
+     "ms": 788
     },
     {
      "id": "equiv-italiana",
@@ -5540,7 +5539,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 1330
+     "ms": 1331
     },
     {
      "id": "equiv-ruy",
@@ -5558,7 +5557,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 304
+     "ms": 285
     },
     {
      "id": "equiv-final-peones",
@@ -5576,7 +5575,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 5
+     "ms": 4
     },
     {
      "id": "tranq-ruy-cerrada",
@@ -5594,7 +5593,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 747
+     "ms": 698
     },
     {
      "id": "tranq-gambito-dama",
@@ -5612,7 +5611,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 1434
+     "ms": 1124
     },
     {
      "id": "tranq-najdorf",
@@ -5630,7 +5629,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 732
+     "ms": 665
     },
     {
      "id": "tranq-francesa",
@@ -5648,7 +5647,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 3151
+     "ms": 2613
     },
     {
      "id": "tranq-caro-kann",
@@ -5666,7 +5665,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 594
+     "ms": 563
     },
     {
      "id": "tranq-india-rey",
@@ -5684,7 +5683,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 968
+     "ms": 950
     },
     {
      "id": "tranq-inglesa",
@@ -5702,7 +5701,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 1633
+     "ms": 1456
     },
     {
      "id": "final-lucena",
@@ -5720,7 +5719,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 69
+     "ms": 64
     },
     {
      "id": "final-philidor",
@@ -5738,7 +5737,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 77
+     "ms": 70
     },
     {
      "id": "final-oposicion",
@@ -5774,7 +5773,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 62
+     "ms": 59
     },
     {
      "id": "final-peon-pasado",
@@ -5846,7 +5845,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 265
+     "ms": 208
     },
     {
      "id": "auditoria-h-02",
@@ -5864,7 +5863,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 683
+     "ms": 528
     },
     {
      "id": "auditoria-h-06",
@@ -5882,7 +5881,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 1236
+     "ms": 1107
     },
     {
      "id": "auditoria-h-14",
@@ -5900,7 +5899,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 3819
+     "ms": 3232
     },
     {
      "id": "auditoria-h-02b",
@@ -5918,7 +5917,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 12789
+     "ms": 11048
     },
     {
      "id": "auditoria-h-07",
@@ -5936,7 +5935,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 3512
+     "ms": 4169
     },
     {
      "id": "auditoria-h-05",
@@ -5954,7 +5953,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 288
+     "ms": 348
     },
     {
      "id": "auditoria-h-03",
@@ -5972,7 +5971,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 855
+     "ms": 1022
     },
     {
      "id": "auditoria-h-08",
@@ -5990,7 +5989,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 744
+     "ms": 885
     },
     {
      "id": "auditoria-h-04",
@@ -6026,7 +6025,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 1187
+     "ms": 1144
     },
     {
      "id": "auditoria-h-10",
@@ -6044,7 +6043,7 @@
      },
      "mateDisponible": false,
      "profundidad": 5,
-     "ms": 1939
+     "ms": 1914
     }
    ]
   }
@@ -6549,12 +6548,12 @@
  },
  "coach": {
   "resumen": {
-   "analisis": 145,
-   "veredictoIgual": 90,
+   "analisis": 152,
+   "veredictoIgual": 91,
    "matriz": {
     "mejor": {
-     "mejor": 68,
-     "buena": 30,
+     "mejor": 69,
+     "buena": 36,
      "imprecision": 11,
      "error": 3,
      "error-grave": 4
@@ -6590,7 +6589,7 @@
    },
    "gravesReferencia": 23,
    "gravesDetectados": 20,
-   "equivalentes": 116,
+   "equivalentes": 123,
    "falsosPositivos": 7,
    "listaFalsosPositivos": [
     "mate2-philidor Nf7+: error",
@@ -6613,16 +6612,16 @@
    "matesPermitidos": 4,
    "matesPermitidosVistos": 4,
    "violaciones": {
-    "mejor-con-otra-mejor": 17,
+    "mejor-con-otra-mejor": 18,
     "aviso-y-sin-motivo": 14,
     "mate-en-contra-con-elogio": 1,
     "pieza-no-capturada": 6,
     "veredicto-contra-evaluacion": 0
    },
-   "informesConViolaciones": 38,
-   "msMedia": 211,
-   "msP95": 720,
-   "msMax": 3795
+   "informesConViolaciones": 39,
+   "msMedia": 190,
+   "msP95": 715,
+   "msMax": 3592
   },
   "filas": [
    {
@@ -6669,7 +6668,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Error grave. d3 deja escapar el mate y deja la dama sin protección. | Dxf7 da mate. | [Mate en 1 que se escapó] Con Dxf7# ganabas la partida en el acto. Con d3 el rey negro sigue vivo. | [Pieza colgando] Tu dama de h5 está atacada por el caballo negro de f6 y no la defiende ninguna pieza.",
-    "ms": 4
+    "ms": 3
    },
    {
     "id": "mate1-loco",
@@ -6715,7 +6714,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Error grave. Cc6 deja escapar el mate. | Dh4 da mate. | [Mate en 1 que se escapó] Con Dh4# ganabas la partida en el acto. Con Cc6 el rey blanco sigue vivo.",
-    "ms": 4
+    "ms": 1
    },
    {
     "id": "mate1-pasillo",
@@ -6830,7 +6829,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Error grave. Rxd1 deja escapar el mate y deja el caballo sin protección. | Cd5 da mate. | [Mate en 1 que se escapó] Con Cd5# ganabas la partida en el acto. Con Rxd1 el rey negro sigue vivo. | [Pieza colgando] Tu caballo de e5 está atacado por el peón negro de d6 y no lo defiende ninguna pieza.",
-    "ms": 3
+    "ms": 2
    },
    {
     "id": "mate1-dama-rey",
@@ -7042,7 +7041,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Mejor jugada. Dxc3+ lleva al mate en 2.",
-    "ms": 24
+    "ms": 21
    },
    {
     "id": "mate-opera",
@@ -7065,7 +7064,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Mejor jugada. Db8+ lleva al mate en 2.",
-    "ms": 15
+    "ms": 14
    },
    {
     "id": "mate-opera",
@@ -7111,7 +7110,30 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Mejor jugada. Ab4 clava el alfil de c3: si se mueve, el rey queda en jaque.",
-    "ms": 64
+    "ms": 61
+   },
+   {
+    "id": "mate-dama-rey-largo",
+    "categoria": "mate-forzado",
+    "uci": "a1b2",
+    "san": "Kb2",
+    "referencia": {
+     "perdidaCp": 0,
+     "caida": 0,
+     "puesto": 1,
+     "mejor": true,
+     "equivalente": true,
+     "veredicto": "mejor",
+     "mateEscapado": false,
+     "matePermitido": false
+    },
+    "veredicto": "buena",
+    "mejorCoach": "b1d3",
+    "mateAntes": null,
+    "mateDespues": null,
+    "violaciones": [],
+    "texto": "Buena jugada. La diferencia con la mejor jugada es pequeña. | No hay un motivo táctico: Alfil Beta la prefiere por cómo quedan las piezas (+8,9 frente a +8,8).",
+    "ms": 26
    },
    {
     "id": "mate-dama-rey-largo",
@@ -7134,7 +7156,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Buena jugada. La diferencia con la mejor jugada es pequeña. | No hay un motivo táctico: Alfil Beta la prefiere por cómo quedan las piezas (+8,9 frente a +8,8).",
-    "ms": 38
+    "ms": 28
    },
    {
     "id": "doble-caballo-rey-torre",
@@ -7157,7 +7179,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Mejor jugada. Cc7+ da jaque y a la vez ataca la torre de a8.",
-    "ms": 13
+    "ms": 8
    },
    {
     "id": "doble-truco-centro",
@@ -7180,7 +7202,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Mejor jugada. d5 ataca a la vez el alfil de c4 y el caballo de e4: una de las dos se pierde.",
-    "ms": 74
+    "ms": 49
    },
    {
     "id": "doble-dama-rey-torre",
@@ -7208,7 +7230,7 @@
      }
     ],
     "texto": "Mejor jugada. Es la jugada que elige Alfil Beta.",
-    "ms": 36
+    "ms": 26
    },
    {
     "id": "doble-dama-rey-torre",
@@ -7231,7 +7253,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Mejor jugada. De5+ da jaque y a la vez ataca la torre de h8.",
-    "ms": 36
+    "ms": 24
    },
    {
     "id": "doble-blackburne-dg5",
@@ -7254,7 +7276,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Mejor jugada. Es la jugada que elige Alfil Beta.",
-    "ms": 276
+    "ms": 210
    },
    {
     "id": "doble-alfil-rey-torre",
@@ -7277,7 +7299,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Mejor jugada. Ae4+ da jaque y a la vez ataca la torre de h1.",
-    "ms": 7
+    "ms": 5
    },
    {
     "id": "doble-peon",
@@ -7305,7 +7327,7 @@
      }
     ],
     "texto": "Buena jugada. c3 deja el peón sin protección. | No hay un motivo táctico: Alfil Beta la prefiere por cómo quedan las piezas (−5,8 frente a −6,9). | [Pieza colgando] Tu peón de c3 está atacado por el alfil negro de d4 y no lo defiende ninguna pieza.",
-    "ms": 10
+    "ms": 8
    },
    {
     "id": "clavada-torre-peon",
@@ -7328,7 +7350,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Mejor jugada. d4 gana una pieza. Si las negras responden 1… Re7, 2. dxe5 se lleva el caballo.",
-    "ms": 35
+    "ms": 25
    },
    {
     "id": "clavada-alfil-peon",
@@ -7351,7 +7373,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Mejor jugada. d5 pone a salvo el peón de d4, que estaba atacado por el caballo de c6.",
-    "ms": 14
+    "ms": 10
    },
    {
     "id": "clavada-elefante",
@@ -7374,7 +7396,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Mejor jugada. Cxd5 gana una pieza.",
-    "ms": 82
+    "ms": 55
    },
    {
     "id": "clavada-dama-torre",
@@ -7402,7 +7424,7 @@
      }
     ],
     "texto": "Mejor jugada. Txe7+ gana una pieza.",
-    "ms": 6
+    "ms": 4
    },
    {
     "id": "descubierto-caballo",
@@ -7425,7 +7447,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Mejor jugada. Cxc3+ gana la dama.",
-    "ms": 12
+    "ms": 8
    },
    {
     "id": "descubierto-petrov",
@@ -7453,7 +7475,7 @@
      }
     ],
     "texto": "Mejor jugada. Cc6+ gana una torre. Si las negras responden 5… De7, 6. Cxe7 se lleva la dama.",
-    "ms": 220
+    "ms": 157
    },
    {
     "id": "descubierto-alfil",
@@ -7481,7 +7503,7 @@
      }
     ],
     "texto": "Mejor jugada. Ad1+ gana la dama. Si las negras responden 1… Rd7, 2. Axb3 se lleva la dama.",
-    "ms": 65
+    "ms": 51
    },
    {
     "id": "descubierto-alfil",
@@ -7504,7 +7526,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Mejor jugada. Ac4+ gana la dama. Si las negras responden 1… Rd7, 2. Axb3 se lleva la dama.",
-    "ms": 65
+    "ms": 48
    },
    {
     "id": "descubierto-negras",
@@ -7532,7 +7554,7 @@
      }
     ],
     "texto": "Mejor jugada. Cd5+ gana la dama. Si las blancas responden 2. Rd2, 2… Cxb4 se lleva la dama.",
-    "ms": 25
+    "ms": 18
    },
    {
     "id": "sacrificio-legal",
@@ -7555,7 +7577,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Mejor jugada. Cxe5 gana un peón. Si las negras responden 5… dxe5, 6. Dxg4 se lleva el alfil.",
-    "ms": 177
+    "ms": 148
    },
    {
     "id": "sacrificio-legal",
@@ -7578,7 +7600,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Imprecisión. Hay una jugada mejor y pierdes un poco de ventaja. | Cxe5 gana un peón. Si las negras responden 5… dxe5, 6. Dxg4 se lleva el alfil.",
-    "ms": 163
+    "ms": 160
    },
    {
     "id": "sacrificio-opera-txd7",
@@ -7606,7 +7628,7 @@
      }
     ],
     "texto": "Mejor jugada. Txd7 gana un peón.",
-    "ms": 591
+    "ms": 544
    },
    {
     "id": "sacrificio-damiano",
@@ -7634,7 +7656,7 @@
      }
     ],
     "texto": "Imprecisión. Cxe5 deja el caballo sin protección. | No hay un motivo táctico: Alfil Beta la prefiere por cómo quedan las piezas (+0,7 frente a −0,4). | [Pieza colgando] Tu caballo de e5 está atacado por el peón negro de f6 y no lo defiende ninguna pieza.",
-    "ms": 127
+    "ms": 128
    },
    {
     "id": "sacrificio-griego",
@@ -7662,7 +7684,7 @@
      }
     ],
     "texto": "Error grave. Axh7+ deja el alfil sin protección. | No hay un motivo táctico: Alfil Beta la prefiere por cómo quedan las piezas (+3,4 frente a +1,2). | [Pieza colgando] Tu alfil de h7 está atacado por el rey negro de g8 y no lo defiende ninguna pieza.",
-    "ms": 393
+    "ms": 327
    },
    {
     "id": "sacrificio-mal-axf7",
@@ -7690,7 +7712,7 @@
      }
     ],
     "texto": "Mejor jugada. Es la jugada que elige Alfil Beta.",
-    "ms": 279
+    "ms": 275
    },
    {
     "id": "sacrificio-mal-axf7",
@@ -7718,7 +7740,7 @@
      }
     ],
     "texto": "Error grave. Axf7+ deja el alfil sin protección. | No hay un motivo táctico: Alfil Beta la prefiere por cómo quedan las piezas (0,0 frente a −2,0). | [Pieza colgando] Tu alfil de f7 está atacado por el rey negro de e8 y no lo defiende ninguna pieza.",
-    "ms": 313
+    "ms": 276
    },
    {
     "id": "sacrificio-mal-axf7",
@@ -7741,7 +7763,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Buena jugada. La diferencia con la mejor jugada es pequeña. | No hay un motivo táctico: Alfil Beta la prefiere por cómo quedan las piezas (0,0 frente a −0,4).",
-    "ms": 375
+    "ms": 311
    },
    {
     "id": "sacrificio-mal-griego",
@@ -7764,7 +7786,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Mejor jugada. Es la jugada que elige Alfil Beta.",
-    "ms": 174
+    "ms": 157
    },
    {
     "id": "sacrificio-mal-griego",
@@ -7792,7 +7814,7 @@
      }
     ],
     "texto": "Error grave. Axh7+ deja el alfil sin protección. | No hay un motivo táctico: Alfil Beta la prefiere por cómo quedan las piezas (+0,3 frente a −2,1). | [Pieza colgando] Tu alfil de h7 está atacado por el caballo negro de f6 y no lo defiende ninguna pieza.",
-    "ms": 182
+    "ms": 195
    },
    {
     "id": "sacrificio-traxler",
@@ -7815,7 +7837,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Mejor jugada. Cxf7 ataca a la vez la dama de d8 y la torre de h8: una de las dos se pierde.",
-    "ms": 118
+    "ms": 131
    },
    {
     "id": "sacrificio-traxler",
@@ -7838,7 +7860,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Error grave. Hay una jugada mucho mejor y la partida cambia de rumbo. | Cxf7 ataca a la vez la dama de d8 y la torre de h8: una de las dos se pierde.",
-    "ms": 504
+    "ms": 516
    },
    {
     "id": "sacrificio-mal-axf7-d3",
@@ -7861,7 +7883,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Imprecisión. Hay una jugada mejor y pierdes un poco de ventaja. | No hay un motivo táctico: Alfil Beta la prefiere por cómo quedan las piezas (0,0 frente a −0,9).",
-    "ms": 501
+    "ms": 464
    },
    {
     "id": "sacrificio-mal-axf7-d3",
@@ -7889,7 +7911,7 @@
      }
     ],
     "texto": "Error grave. Axf7+ deja el alfil sin protección. | No hay un motivo táctico: Alfil Beta la prefiere por cómo quedan las piezas (0,0 frente a −2,2). | [Pieza colgando] Tu alfil de f7 está atacado por el rey negro de e8 y no lo defiende ninguna pieza.",
-    "ms": 581
+    "ms": 502
    },
    {
     "id": "sacrificio-mal-cxe5",
@@ -7912,7 +7934,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Buena jugada. La diferencia con la mejor jugada es pequeña. | No hay un motivo táctico: Alfil Beta la prefiere por cómo quedan las piezas (+0,5 frente a +0,6).",
-    "ms": 306
+    "ms": 257
    },
    {
     "id": "sacrificio-mal-cxe5",
@@ -7940,7 +7962,7 @@
      }
     ],
     "texto": "Error. Cxe4 deja el caballo sin protección. | No hay un motivo táctico: Alfil Beta la prefiere por cómo quedan las piezas (+0,5 frente a +2,0). | [Pieza colgando] Tu caballo de e4 está atacado por el caballo blanco de c3 y no lo defiende ninguna pieza.",
-    "ms": 302
+    "ms": 281
    },
    {
     "id": "gana-alfil-suelto",
@@ -7963,7 +7985,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Mejor jugada. Cxd5 gana una pieza.",
-    "ms": 28
+    "ms": 27
    },
    {
     "id": "gana-caballo-negras",
@@ -7986,7 +8008,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Mejor jugada. Cxe4 gana una pieza.",
-    "ms": 79
+    "ms": 74
    },
    {
     "id": "gana-torre-esquina",
@@ -8009,7 +8031,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Mejor jugada. Dxa8+ gana una torre.",
-    "ms": 34
+    "ms": 30
    },
    {
     "id": "gana-arca-noe",
@@ -8032,7 +8054,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Mejor jugada. Es la jugada que elige Alfil Beta.",
-    "ms": 195
+    "ms": 222
    },
    {
     "id": "gana-dama-colgada",
@@ -8078,7 +8100,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Buena jugada. La diferencia con la mejor jugada es pequeña. | No hay un motivo táctico: Alfil Beta la prefiere por cómo quedan las piezas (−0,1 frente a −0,5).",
-    "ms": 720
+    "ms": 775
    },
    {
     "id": "pierde-elefante",
@@ -8106,7 +8128,7 @@
      }
     ],
     "texto": "Error grave. Cxd5 deja el caballo sin protección. | No hay un motivo táctico: Alfil Beta la prefiere por cómo quedan las piezas (−0,1 frente a −2,5). | [Pieza colgando] Tu caballo de d5 está atacado por el caballo negro de f6 y no lo defiende ninguna pieza.",
-    "ms": 836
+    "ms": 715
    },
    {
     "id": "pierde-blackburne",
@@ -8129,7 +8151,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Error. Cxd4 no aprovecha la captura del peón de e5. | Cxe5 gana un peón. | [Captura gratis no vista] Podías capturar el peón de e5 con el caballo y nadie lo recuperaba. No lo has visto.",
-    "ms": 92
+    "ms": 90
    },
    {
     "id": "pierde-blackburne",
@@ -8152,7 +8174,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Mejor jugada. Cxe5 gana un peón.",
-    "ms": 79
+    "ms": 77
    },
    {
     "id": "pierde-arca-noe",
@@ -8175,7 +8197,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Imprecisión. Hay una jugada mejor y pierdes un poco de ventaja. | Dxd4 gana un peón.",
-    "ms": 248
+    "ms": 269
    },
    {
     "id": "pierde-arca-noe",
@@ -8198,7 +8220,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Mejor jugada. Dxd4 gana un peón.",
-    "ms": 197
+    "ms": 198
    },
    {
     "id": "pierde-arca-noe",
@@ -8221,7 +8243,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Imprecisión. c3 no aprovecha la captura del peón de d4. | Dxd4 gana un peón. | [Captura gratis no vista] Podías capturar el peón de d4 con la dama y nadie lo recuperaba. No lo has visto.",
-    "ms": 242
+    "ms": 203
    },
    {
     "id": "pierde-englund",
@@ -8244,7 +8266,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Mejor jugada. Cc3 pone a salvo la torre de a1, que estaba atacada por la dama de b2.",
-    "ms": 97
+    "ms": 70
    },
    {
     "id": "pierde-englund",
@@ -8267,7 +8289,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Error grave. Hay una jugada mucho mejor y la partida cambia de rumbo. | Cc3 pone a salvo la torre de a1, que estaba atacada por la dama de b2.",
-    "ms": 132
+    "ms": 81
    },
    {
     "id": "pierde-torre-caballo",
@@ -8290,7 +8312,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Mejor jugada. Es la jugada que elige Alfil Beta.",
-    "ms": 17
+    "ms": 14
    },
    {
     "id": "pierde-torre-caballo",
@@ -8318,7 +8340,7 @@
      }
     ],
     "texto": "Error grave. Td3 deja la torre sin protección. | No hay un motivo táctico: Alfil Beta la prefiere por cómo quedan las piezas (+2,0 frente a −2,9). | [Pieza colgando] Tu torre de d3 está atacada por el caballo negro de c5 y no la defiende ninguna pieza.",
-    "ms": 19
+    "ms": 14
    },
    {
     "id": "permite-mate-pasillo",
@@ -8341,7 +8363,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Buena jugada. La diferencia con la mejor jugada es pequeña. | No hay un motivo táctico: Alfil Beta la prefiere por cómo quedan las piezas (+4,0 frente a +4,0).",
-    "ms": 34
+    "ms": 29
    },
    {
     "id": "permite-mate-pasillo",
@@ -8364,7 +8386,7 @@
     "mateDespues": true,
     "violaciones": [],
     "texto": "Error grave. Hay una jugada mucho mejor y la partida cambia de rumbo. | No hay un motivo táctico: Alfil Beta la prefiere por cómo quedan las piezas (+4,0 frente a mate en 1 de las negras).",
-    "ms": 28
+    "ms": 23
    },
    {
     "id": "permite-mate-pasillo",
@@ -8392,7 +8414,7 @@
      }
     ],
     "texto": "Mejor jugada. Es la jugada que elige Alfil Beta.",
-    "ms": 31
+    "ms": 24
    },
    {
     "id": "permite-mate-pastor",
@@ -8415,7 +8437,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Buena jugada. La diferencia con la mejor jugada es pequeña. | No hay un motivo táctico: Alfil Beta la prefiere por cómo quedan las piezas (−0,3 frente a −0,1).",
-    "ms": 111
+    "ms": 90
    },
    {
     "id": "permite-mate-pastor",
@@ -8443,7 +8465,30 @@
      }
     ],
     "texto": "Error grave. Cf6 deja el peón sin protección. | No hay un motivo táctico: Alfil Beta la prefiere por cómo quedan las piezas (−0,3 frente a mate en 1 de las blancas). | [Pieza colgando] Tu peón de f7 está atacado por el alfil blanco de c4 y no lo defiende ninguna pieza.",
-    "ms": 112
+    "ms": 89
+   },
+   {
+    "id": "permite-mate-pasillo-negras",
+    "categoria": "perdida-material",
+    "uci": "b8c8",
+    "san": "Rc8",
+    "referencia": {
+     "perdidaCp": 0,
+     "caida": 0,
+     "puesto": 1,
+     "mejor": true,
+     "equivalente": true,
+     "veredicto": "mejor",
+     "mateEscapado": false,
+     "matePermitido": false
+    },
+    "veredicto": "buena",
+    "mejorCoach": "h7h6",
+    "mateAntes": null,
+    "mateDespues": null,
+    "violaciones": [],
+    "texto": "Buena jugada. La diferencia con la mejor jugada es pequeña. | No hay un motivo táctico: Alfil Beta la prefiere por cómo quedan las piezas (0,0 frente a +0,2).",
+    "ms": 22
    },
    {
     "id": "permite-mate-pasillo-negras",
@@ -8466,7 +8511,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Buena jugada. La diferencia con la mejor jugada es pequeña. | No hay un motivo táctico: Alfil Beta la prefiere por cómo quedan las piezas (0,0 frente a 0,0).",
-    "ms": 26
+    "ms": 19
    },
    {
     "id": "permite-mate-pasillo-negras",
@@ -8489,7 +8534,7 @@
     "mateDespues": true,
     "violaciones": [],
     "texto": "Error grave. Hay una jugada mucho mejor y la partida cambia de rumbo. | No hay un motivo táctico: Alfil Beta la prefiere por cómo quedan las piezas (0,0 frente a mate en 1 de las blancas).",
-    "ms": 22
+    "ms": 17
    },
    {
     "id": "permite-mate-pasillo-negras",
@@ -8512,7 +8557,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Mejor jugada. Es la jugada que elige Alfil Beta.",
-    "ms": 23
+    "ms": 18
    },
    {
     "id": "equiv-inicial",
@@ -8535,7 +8580,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Buena jugada. La diferencia con la mejor jugada es pequeña. | No hay un motivo táctico: Alfil Beta la prefiere por cómo quedan las piezas (0,0 frente a −0,1).",
-    "ms": 33
+    "ms": 26
    },
    {
     "id": "equiv-inicial",
@@ -8558,7 +8603,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Buena jugada. La diferencia con la mejor jugada es pequeña. | No hay un motivo táctico: Alfil Beta la prefiere por cómo quedan las piezas (0,0 frente a −0,1).",
-    "ms": 37
+    "ms": 27
    },
    {
     "id": "equiv-inicial",
@@ -8586,7 +8631,7 @@
      }
     ],
     "texto": "Mejor jugada. Es la jugada que elige Alfil Beta.",
-    "ms": 32
+    "ms": 26
    },
    {
     "id": "equiv-inicial",
@@ -8609,7 +8654,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Imprecisión. Hay una jugada mejor y pierdes un poco de ventaja. | No hay un motivo táctico: Alfil Beta la prefiere por cómo quedan las piezas (0,0 frente a −0,6).",
-    "ms": 34
+    "ms": 29
    },
    {
     "id": "equiv-e4e5",
@@ -8637,7 +8682,7 @@
      }
     ],
     "texto": "Mejor jugada. Es la jugada que elige Alfil Beta.",
-    "ms": 119
+    "ms": 98
    },
    {
     "id": "equiv-e4e5",
@@ -8660,7 +8705,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Mejor jugada. Es la jugada que elige Alfil Beta.",
-    "ms": 113
+    "ms": 95
    },
    {
     "id": "equiv-e4e5",
@@ -8683,7 +8728,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Buena jugada. La diferencia con la mejor jugada es pequeña. | No hay un motivo táctico: Alfil Beta la prefiere por cómo quedan las piezas (0,0 frente a −0,3).",
-    "ms": 124
+    "ms": 108
    },
    {
     "id": "equiv-escocesa",
@@ -8706,7 +8751,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Mejor jugada. Cxd4 gana un peón. Si las negras responden 4… Cxd4, 5. Dxd4 se lleva el caballo.",
-    "ms": 222
+    "ms": 196
    },
    {
     "id": "equiv-escocesa",
@@ -8729,7 +8774,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Imprecisión. Ac4 no aprovecha la captura del peón de d4. | Cxd4 gana un peón. Si las negras responden 4… Cxd4, 5. Dxd4 se lleva el caballo. | [Captura gratis no vista] Podías capturar el peón de d4 con el caballo: aunque el rival responda capturando, ganabas material. No lo has visto.",
-    "ms": 343
+    "ms": 236
    },
    {
     "id": "equiv-escocesa",
@@ -8752,7 +8797,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Imprecisión. Hay una jugada mejor y pierdes un poco de ventaja. | Cxd4 gana un peón. Si las negras responden 4… Cxd4, 5. Dxd4 se lleva el caballo.",
-    "ms": 349
+    "ms": 228
    },
    {
     "id": "equiv-italiana",
@@ -8780,7 +8825,7 @@
      }
     ],
     "texto": "Mejor jugada. Es la jugada que elige Alfil Beta.",
-    "ms": 332
+    "ms": 220
    },
    {
     "id": "equiv-italiana",
@@ -8803,7 +8848,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Buena jugada. La diferencia con la mejor jugada es pequeña. | No hay un motivo táctico: Alfil Beta la prefiere por cómo quedan las piezas (0,0 frente a −0,1).",
-    "ms": 278
+    "ms": 272
    },
    {
     "id": "equiv-italiana",
@@ -8826,7 +8871,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Buena jugada. La diferencia con la mejor jugada es pequeña. | No hay un motivo táctico: Alfil Beta la prefiere por cómo quedan las piezas (0,0 frente a −0,4).",
-    "ms": 294
+    "ms": 383
    },
    {
     "id": "equiv-ruy",
@@ -8849,7 +8894,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Imprecisión. Hay una jugada mejor y pierdes un poco de ventaja. | No hay un motivo táctico: Alfil Beta la prefiere por cómo quedan las piezas (+0,8 frente a −0,2).",
-    "ms": 50
+    "ms": 59
    },
    {
     "id": "equiv-ruy",
@@ -8872,7 +8917,30 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Mejor jugada. Es la jugada que elige Alfil Beta.",
-    "ms": 35
+    "ms": 44
+   },
+   {
+    "id": "equiv-final-peones",
+    "categoria": "equivalentes",
+    "uci": "e2d1",
+    "san": "Kd1",
+    "referencia": {
+     "perdidaCp": 0,
+     "caida": 0,
+     "puesto": 1,
+     "mejor": true,
+     "equivalente": true,
+     "veredicto": "mejor",
+     "mateEscapado": false,
+     "matePermitido": false
+    },
+    "veredicto": "buena",
+    "mejorCoach": "e2e3",
+    "mateAntes": null,
+    "mateDespues": null,
+    "violaciones": [],
+    "texto": "Buena jugada. La diferencia con la mejor jugada es pequeña. | No hay un motivo táctico: Alfil Beta la prefiere por cómo quedan las piezas (−0,1 frente a −0,4).",
+    "ms": 3
    },
    {
     "id": "equiv-final-peones",
@@ -8951,7 +9019,7 @@
      }
     ],
     "texto": "Mejor jugada. Es la jugada que elige Alfil Beta.",
-    "ms": 2
+    "ms": 3
    },
    {
     "id": "tranq-ruy-cerrada",
@@ -8974,7 +9042,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Buena jugada. La diferencia con la mejor jugada es pequeña. | No hay un motivo táctico: Alfil Beta la prefiere por cómo quedan las piezas (−0,2 frente a −0,5).",
-    "ms": 205
+    "ms": 209
    },
    {
     "id": "tranq-gambito-dama",
@@ -8997,7 +9065,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Buena jugada. La diferencia con la mejor jugada es pequeña. | No hay un motivo táctico: Alfil Beta la prefiere por cómo quedan las piezas (+0,2 frente a −0,2).",
-    "ms": 705
+    "ms": 788
    },
    {
     "id": "tranq-gambito-dama",
@@ -9025,7 +9093,7 @@
      }
     ],
     "texto": "Mejor jugada. Es la jugada que elige Alfil Beta.",
-    "ms": 819
+    "ms": 707
    },
    {
     "id": "tranq-najdorf",
@@ -9048,7 +9116,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Mejor jugada. Es la jugada que elige Alfil Beta.",
-    "ms": 235
+    "ms": 217
    },
    {
     "id": "tranq-najdorf",
@@ -9071,7 +9139,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Buena jugada. La diferencia con la mejor jugada es pequeña. | No hay un motivo táctico: Alfil Beta la prefiere por cómo quedan las piezas (+0,6 frente a +0,3).",
-    "ms": 193
+    "ms": 204
    },
    {
     "id": "tranq-francesa",
@@ -9094,7 +9162,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Buena jugada. La diferencia con la mejor jugada es pequeña. | No hay un motivo táctico: Alfil Beta la prefiere por cómo quedan las piezas (0,0 frente a −0,4).",
-    "ms": 435
+    "ms": 535
    },
    {
     "id": "tranq-francesa",
@@ -9117,7 +9185,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Buena jugada. La diferencia con la mejor jugada es pequeña. | No hay un motivo táctico: Alfil Beta la prefiere por cómo quedan las piezas (0,0 frente a −0,1).",
-    "ms": 446
+    "ms": 505
    },
    {
     "id": "tranq-caro-kann",
@@ -9140,7 +9208,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Buena jugada. La diferencia con la mejor jugada es pequeña. | No hay un motivo táctico: Alfil Beta la prefiere por cómo quedan las piezas (+0,7 frente a +0,6).",
-    "ms": 212
+    "ms": 176
    },
    {
     "id": "tranq-caro-kann",
@@ -9163,7 +9231,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Mejor jugada. Es la jugada que elige Alfil Beta.",
-    "ms": 161
+    "ms": 160
    },
    {
     "id": "tranq-india-rey",
@@ -9186,7 +9254,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Buena jugada. La diferencia con la mejor jugada es pequeña. | No hay un motivo táctico: Alfil Beta la prefiere por cómo quedan las piezas (+0,5 frente a +0,2).",
-    "ms": 206
+    "ms": 217
    },
    {
     "id": "tranq-india-rey",
@@ -9209,7 +9277,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Buena jugada. La diferencia con la mejor jugada es pequeña. | No hay un motivo táctico: Alfil Beta la prefiere por cómo quedan las piezas (+0,5 frente a +0,2).",
-    "ms": 219
+    "ms": 224
    },
    {
     "id": "tranq-inglesa",
@@ -9232,7 +9300,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Buena jugada. La diferencia con la mejor jugada es pequeña. | No hay un motivo táctico: Alfil Beta la prefiere por cómo quedan las piezas (−0,3 frente a −0,5).",
-    "ms": 208
+    "ms": 234
    },
    {
     "id": "tranq-inglesa",
@@ -9260,7 +9328,7 @@
      }
     ],
     "texto": "Mejor jugada. Es la jugada que elige Alfil Beta.",
-    "ms": 149
+    "ms": 177
    },
    {
     "id": "final-lucena",
@@ -9283,7 +9351,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Mejor jugada. Es la jugada que elige Alfil Beta.",
-    "ms": 21
+    "ms": 23
    },
    {
     "id": "final-lucena",
@@ -9306,7 +9374,30 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Buena jugada. La diferencia con la mejor jugada es pequeña. | No hay un motivo táctico: Alfil Beta la prefiere por cómo quedan las piezas (+1,6 frente a +1,4).",
-    "ms": 27
+    "ms": 29
+   },
+   {
+    "id": "final-philidor",
+    "categoria": "final",
+    "uci": "a6a7",
+    "san": "Ra7",
+    "referencia": {
+     "perdidaCp": 0,
+     "caida": 0,
+     "puesto": 1,
+     "mejor": true,
+     "equivalente": true,
+     "veredicto": "mejor",
+     "mateEscapado": false,
+     "matePermitido": false
+    },
+    "veredicto": "buena",
+    "mejorCoach": "e8d7",
+    "mateAntes": null,
+    "mateDespues": null,
+    "violaciones": [],
+    "texto": "Buena jugada. La diferencia con la mejor jugada es pequeña. | No hay un motivo táctico: Alfil Beta la prefiere por cómo quedan las piezas (+1,5 frente a +1,7).",
+    "ms": 25
    },
    {
     "id": "final-philidor",
@@ -9329,7 +9420,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Buena jugada. La diferencia con la mejor jugada es pequeña. | No hay un motivo táctico: Alfil Beta la prefiere por cómo quedan las piezas (+1,5 frente a +1,9).",
-    "ms": 22
+    "ms": 21
    },
    {
     "id": "final-oposicion",
@@ -9380,6 +9471,29 @@
    {
     "id": "final-torres",
     "categoria": "final",
+    "uci": "a1a3",
+    "san": "Ra3",
+    "referencia": {
+     "perdidaCp": 0,
+     "caida": 0,
+     "puesto": 1,
+     "mejor": true,
+     "equivalente": true,
+     "veredicto": "mejor",
+     "mateEscapado": false,
+     "matePermitido": false
+    },
+    "veredicto": "buena",
+    "mejorCoach": "a1a6",
+    "mateAntes": null,
+    "mateDespues": null,
+    "violaciones": [],
+    "texto": "Buena jugada. La diferencia con la mejor jugada es pequeña. | No hay un motivo táctico: Alfil Beta la prefiere por cómo quedan las piezas (−0,1 frente a −0,3).",
+    "ms": 24
+   },
+   {
+    "id": "final-torres",
+    "categoria": "final",
     "uci": "a1a8",
     "san": "Ra8",
     "referencia": {
@@ -9398,7 +9512,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Buena jugada. La diferencia con la mejor jugada es pequeña. | No hay un motivo táctico: Alfil Beta la prefiere por cómo quedan las piezas (−0,1 frente a −0,2).",
-    "ms": 26
+    "ms": 24
    },
    {
     "id": "final-torres",
@@ -9421,7 +9535,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Buena jugada. La diferencia con la mejor jugada es pequeña. | No hay un motivo táctico: Alfil Beta la prefiere por cómo quedan las piezas (−0,1 frente a −0,2).",
-    "ms": 24
+    "ms": 25
    },
    {
     "id": "final-torres",
@@ -9449,7 +9563,30 @@
      }
     ],
     "texto": "Error grave. Tb1 deja la torre sin protección. | No hay un motivo táctico: Alfil Beta la prefiere por cómo quedan las piezas (−0,1 frente a −5,0). | [Pieza colgando] Tu torre de b1 está atacada por la torre negra de b2 y no la defiende ninguna pieza.",
-    "ms": 20
+    "ms": 21
+   },
+   {
+    "id": "final-peon-pasado",
+    "categoria": "final",
+    "uci": "f2e1",
+    "san": "Ke1",
+    "referencia": {
+     "perdidaCp": 0,
+     "caida": 0,
+     "puesto": 1,
+     "mejor": true,
+     "equivalente": true,
+     "veredicto": "mejor",
+     "mateEscapado": false,
+     "matePermitido": false
+    },
+    "veredicto": "buena",
+    "mejorCoach": "f2e3",
+    "mateAntes": null,
+    "mateDespues": null,
+    "violaciones": [],
+    "texto": "Buena jugada. La diferencia con la mejor jugada es pequeña. | No hay un motivo táctico: Alfil Beta la prefiere por cómo quedan las piezas (+1,2 frente a +0,7).",
+    "ms": 3
    },
    {
     "id": "final-peon-pasado",
@@ -9597,7 +9734,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Error. Hay una jugada bastante mejor y pierdes ventaja. | Rc6 gana la dama.",
-    "ms": 3
+    "ms": 2
    },
    {
     "id": "auditoria-h-01",
@@ -9620,7 +9757,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Mejor jugada. Es la jugada que elige Alfil Beta.",
-    "ms": 51
+    "ms": 54
    },
    {
     "id": "auditoria-h-01",
@@ -9643,7 +9780,7 @@
     "mateDespues": true,
     "violaciones": [],
     "texto": "Error grave. Hay una jugada mucho mejor y la partida cambia de rumbo. | No hay un motivo táctico: Alfil Beta la prefiere por cómo quedan las piezas (−0,7 frente a mate en 1 de las negras).",
-    "ms": 53
+    "ms": 94
    },
    {
     "id": "auditoria-h-02",
@@ -9671,7 +9808,7 @@
      }
     ],
     "texto": "Mejor jugada. Es la jugada que elige Alfil Beta.",
-    "ms": 121
+    "ms": 130
    },
    {
     "id": "auditoria-h-06",
@@ -9699,7 +9836,7 @@
      }
     ],
     "texto": "Imprecisión. d4 deja el peón en peligro. | No hay un motivo táctico: Alfil Beta la prefiere por cómo quedan las piezas (−0,4 frente a −1,4). | [Pieza colgando] Tu peón de d4 está atacado por el peón negro de e5 y no está bien defendido: hay más piezas atacándolo que defendiéndolo.",
-    "ms": 474
+    "ms": 453
    },
    {
     "id": "auditoria-h-06",
@@ -9727,7 +9864,7 @@
      }
     ],
     "texto": "Error grave. Cxf7 deja el caballo sin protección. | No hay un motivo táctico: Alfil Beta la prefiere por cómo quedan las piezas (−0,4 frente a −2,2). | [Pieza colgando] Tu caballo de f7 está atacado por el rey negro de e8 y no lo defiende ninguna pieza.",
-    "ms": 278
+    "ms": 277
    },
    {
     "id": "auditoria-h-14",
@@ -9750,7 +9887,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Imprecisión. Hay una jugada mejor y pierdes un poco de ventaja. | No hay un motivo táctico: Alfil Beta la prefiere por cómo quedan las piezas (−1,3 frente a −0,4).",
-    "ms": 498
+    "ms": 510
    },
    {
     "id": "auditoria-h-14",
@@ -9773,7 +9910,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Mejor jugada. Es la jugada que elige Alfil Beta.",
-    "ms": 363
+    "ms": 419
    },
    {
     "id": "auditoria-h-02b",
@@ -9796,7 +9933,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Error grave. axb4 deja la torre sin protección. | dxe5 gana un peón. | [Pieza colgando] Tu torre de a1 está atacada por la dama negra de a5 y no la defiende ninguna pieza.",
-    "ms": 3795
+    "ms": 3592
    },
    {
     "id": "auditoria-h-02b",
@@ -9819,7 +9956,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Mejor jugada. dxe5 gana un peón.",
-    "ms": 3480
+    "ms": 3245
    },
    {
     "id": "auditoria-h-07",
@@ -9847,7 +9984,7 @@
      }
     ],
     "texto": "Imprecisión. O-O deja el peón en peligro. | Ad2 gana dos peones. Si las negras responden 13… Axe5, 14. Cxd5 se lleva el caballo. | [Pieza colgando] Tu peón de e5 está atacado por el alfil negro de c7 y no está bien defendido: hay más piezas atacándolo que defendiéndolo.",
-    "ms": 1202
+    "ms": 1198
    },
    {
     "id": "auditoria-h-05",
@@ -9870,7 +10007,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Mejor jugada. Tc2 pone a salvo el alfil de b2, que estaba atacado por la dama de e2.",
-    "ms": 106
+    "ms": 97
    },
    {
     "id": "auditoria-h-05",
@@ -9893,7 +10030,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Buena jugada. Tc8+ deja la torre sin protección. | Tc2 pone a salvo el alfil de b2, que estaba atacado por la dama de e2. | [Pieza colgando] Tu torre de c8 está atacada por la torre negra de a8 y no la defiende ninguna pieza.",
-    "ms": 253
+    "ms": 198
    },
    {
     "id": "auditoria-h-03",
@@ -9916,7 +10053,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Buena jugada. La diferencia con la mejor jugada es pequeña. | No hay un motivo táctico: Alfil Beta la prefiere por cómo quedan las piezas (−0,5 frente a −0,8).",
-    "ms": 267
+    "ms": 248
    },
    {
     "id": "auditoria-h-03",
@@ -9944,7 +10081,7 @@
      }
     ],
     "texto": "Error grave. Dg5 deja la dama sin protección. | No hay un motivo táctico: Alfil Beta la prefiere por cómo quedan las piezas (−0,5 frente a −9,7). | [Pieza colgando] Tu dama de g5 está atacada por la dama negra de e7 y no la defiende ninguna pieza.",
-    "ms": 264
+    "ms": 224
    },
    {
     "id": "auditoria-h-08",
@@ -9972,7 +10109,7 @@
      }
     ],
     "texto": "Mejor jugada. Dd3+ gana una torre.",
-    "ms": 306
+    "ms": 185
    },
    {
     "id": "auditoria-h-08",
@@ -10000,7 +10137,35 @@
      }
     ],
     "texto": "Error grave. Hay una jugada mucho mejor y la partida cambia de rumbo. | Dd3+ gana una torre.",
-    "ms": 389
+    "ms": 296
+   },
+   {
+    "id": "auditoria-h-04",
+    "categoria": "auditoria",
+    "uci": "b2b3",
+    "san": "b3",
+    "referencia": {
+     "perdidaCp": 0,
+     "caida": 0,
+     "puesto": 1,
+     "mejor": true,
+     "equivalente": true,
+     "veredicto": "mejor",
+     "mateEscapado": false,
+     "matePermitido": false
+    },
+    "veredicto": "mejor",
+    "mejorCoach": "g4f5",
+    "mateAntes": null,
+    "mateDespues": null,
+    "violaciones": [
+     {
+      "regla": "mejor-con-otra-mejor",
+      "detalle": "«Mejor jugada» y debajo «Mejor jugada: gxf5»"
+     }
+    ],
+    "texto": "Mejor jugada. b3 pone a salvo el peón de b2, que estaba atacado por la dama de d2.",
+    "ms": 4
    },
    {
     "id": "auditoria-h-04",
@@ -10079,7 +10244,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Mejor jugada. Da5 pone a salvo la dama de c7, que estaba atacada por el alfil de d6.",
-    "ms": 221
+    "ms": 242
    },
    {
     "id": "auditoria-h-09",
@@ -10102,7 +10267,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Buena jugada. Ab5+ pone a salvo la dama de c7, que estaba atacada por el alfil de d6. | Da5 pone a salvo la dama de c7, que estaba atacada por el alfil de d6.",
-    "ms": 231
+    "ms": 253
    },
    {
     "id": "auditoria-h-10",
@@ -10125,7 +10290,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Mejor jugada. Es la jugada que elige Alfil Beta.",
-    "ms": 904
+    "ms": 791
    },
    {
     "id": "auditoria-h-10",
@@ -10148,7 +10313,7 @@
     "mateDespues": null,
     "violaciones": [],
     "texto": "Error grave. Hay una jugada mucho mejor y la partida cambia de rumbo. | No hay un motivo táctico: Alfil Beta la prefiere por cómo quedan las piezas (−4,3 frente a +1,1).",
-    "ms": 972
+    "ms": 903
    }
   ]
  }

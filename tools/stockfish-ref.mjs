@@ -28,7 +28,10 @@ function args(argv) {
     const a = argv[i];
     if (a === "--nodos") out.nodos = Number(argv[++i]);
     else if (a === "--procesos") out.procesos = Number(argv[++i]);
-    else if (a === "--solo") out.solo = String(argv[++i]);
+    else if (a === "--solo") {
+      out.solo = argv[++i];
+      if (typeof out.solo !== "string" || !/^[a-z0-9][a-z0-9-]{0,63}$/.test(out.solo)) throw new Error("--solo necesita el id de una posición");
+    }
     else if (out.binario === null) out.binario = a;
     else throw new Error(`Argumento desconocido: ${a}`);
   }
@@ -42,6 +45,14 @@ function args(argv) {
 class Motor {
   constructor(binario) {
     this.proc = spawn(binario, [], { stdio: ["pipe", "pipe", "inherit"] });
+    // Si Stockfish no arranca o se cae, se para todo con un mensaje claro en vez de quedarse esperando.
+    const fallo = (motivo) => {
+      process.stderr.write(`Stockfish ha fallado (${motivo}). No se ha escrito la referencia.\n`);
+      process.exit(1);
+    };
+    this.proc.on("error", (e) => fallo(e.message));
+    this.proc.stdin.on("error", (e) => fallo(e.message));
+    this.proc.on("exit", (code, signal) => { if (!this.cerrando) fallo(`salió con ${signal ?? code}`); });
     this.buf = "";
     this.oyentes = new Set();
     this.proc.stdout.setEncoding("utf8");
@@ -90,12 +101,13 @@ class Motor {
     const mejor = lineas.at(-1).split(" ")[1];
     return { mejor, lineas: [...porLinea.values()] };
   }
-  cerrar() { this.enviar("quit"); }
+  cerrar() { this.cerrando = true; this.enviar("quit"); }
 }
 
 const opciones = args(process.argv.slice(2));
 const posiciones = JSON.parse(readFileSync(new URL("bench/posiciones.json", ROOT), "utf8"));
 const lista = opciones.solo ? posiciones.filter((p) => p.id === opciones.solo) : posiciones;
+if (lista.length === 0) throw new Error(`No hay ninguna posición ${opciones.solo}`);
 
 const resultados = new Map();
 let siguiente = 0;
