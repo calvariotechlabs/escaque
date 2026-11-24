@@ -117,6 +117,8 @@ body{margin:0;background:var(--surface);color:var(--ink);font:400 16px/24px var(
    si sobran, la fila es algo más alta de lo necesario, nunca se pisa con el estado. */
 @media (orientation:landscape) and (max-height:500px) and (max-width:calc(100vh + 376px)){
   :root{--cab-alto:68px}
+  /* Los cuatro botones no caben en una fila de unos 230 px (CAL-407): dos columnas de dos filas. */
+  .partida__controles{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 
 /* Los botones responden al toque sin esperar al doble toque de zoom. */

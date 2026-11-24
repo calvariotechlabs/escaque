@@ -110,6 +110,22 @@ describe("navegación de la cabecera en móvil apaisado (CAL-405)", () => {
     assert.ok(m.hb <= titulo + 0.5, `la cabecera acaba en ${m.hb} y el encabezado empieza en ${titulo}`);
   });
 
+  // CAL-407: los botones no se cortan (su texto cabe en su caja) en la partida y en el repaso.
+  const cortados = `[...document.querySelectorAll('button, a.boton')].filter((b) => b.checkVisibility() && b.getBoundingClientRect().width > 0 && b.scrollWidth > b.clientWidth + 0.5).map((b) => b.textContent.trim())`;
+  for (const [width, height] of ESTRECHOS) {
+    test(`${width}×${height}: ningún botón de la partida ni del repaso se corta`, async () => {
+      await page.call("Emulation.setDeviceMetricsOverride", { width, height, deviceScaleFactor: 1, mobile: true });
+      await freshStart(page, `botones-${width}`);
+      await page.eval(`document.querySelector('#ajustes [type=submit]').click()`);
+      await page.waitFor(`!document.getElementById('pantalla-partida').hidden && document.getElementById('cargar-pgn').checkVisibility()`, { what: "partida" });
+      assert.deepEqual(await page.eval(cortados), [], "botones cortados en la partida");
+      await page.eval(`document.getElementById('cargar-pgn').click()`);
+      await page.eval(`(() => { document.getElementById('pgn-campo').value = "1. e4 e5 2. Nf3 Nc6 3. Bb5 a6"; document.getElementById('pgn-cargar').click(); })()`);
+      await page.waitFor(`!document.getElementById('pantalla-repaso').hidden`, { what: "pantalla de repaso" });
+      assert.deepEqual(await page.eval(cortados), [], "botones cortados en el repaso");
+    });
+  }
+
   test("el repaso cabe a 720×450, sin pisar su título", async () => {
     await page.call("Emulation.setDeviceMetricsOverride", { width: 720, height: 450, deviceScaleFactor: 1, mobile: true });
     await freshStart(page, "nav-repaso");
