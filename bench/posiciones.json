@@ -1,0 +1,1331 @@
+[
+ {
+  "id": "mate1-pastor",
+  "categoria": "mate-inmediato",
+  "descripcion": "Mate del pastor: Dxf7#",
+  "fen": "r1bqkb1r/pppp1ppp/2n2n2/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR w KQkq - 4 4",
+  "jugadas": [
+   {
+    "uci": "h5f7",
+    "san": "Qxf7#",
+    "nota": "mate"
+   },
+   {
+    "uci": "d2d3",
+    "san": "d3",
+    "nota": "deja escapar el mate"
+   }
+  ],
+  "origen": "e4 e5 Bc4 Nc6 Qh5 Nf6"
+ },
+ {
+  "id": "mate1-loco",
+  "categoria": "mate-inmediato",
+  "descripcion": "Mate del loco: …Dh4#",
+  "fen": "rnbqkbnr/pppp1ppp/8/4p3/6P1/5P2/PPPPP2P/RNBQKBNR b KQkq g3 0 2",
+  "jugadas": [
+   {
+    "uci": "d8h4",
+    "san": "Qh4#",
+    "nota": "mate"
+   },
+   {
+    "uci": "b8c6",
+    "san": "Nc6",
+    "nota": "deja escapar el mate"
+   }
+  ],
+  "origen": "f3 e5 g4"
+ },
+ {
+  "id": "mate1-pasillo",
+  "categoria": "mate-inmediato",
+  "descripcion": "Mate del pasillo con torre",
+  "fen": "6k1/5ppp/8/8/8/8/5PPP/R5K1 w - - 0 1",
+  "jugadas": [
+   {
+    "uci": "a1a8",
+    "san": "Ra8#",
+    "nota": "mate"
+   },
+   {
+    "uci": "h2h3",
+    "san": "h3",
+    "nota": "deja escapar el mate"
+   }
+  ]
+ },
+ {
+  "id": "mate1-ahogado-caballo",
+  "categoria": "mate-inmediato",
+  "descripcion": "Mate de la coz (caballo)",
+  "fen": "6rk/6pp/8/6N1/8/8/8/6K1 w - - 0 1",
+  "jugadas": [
+   {
+    "uci": "g5f7",
+    "san": "Nf7#",
+    "nota": "mate"
+   }
+  ]
+ },
+ {
+  "id": "mate1-legal",
+  "categoria": "mate-inmediato",
+  "descripcion": "Mate de Légal: Cd5#",
+  "fen": "rn1q1bnr/ppp1kB1p/3p2p1/4N3/4P3/2N5/PPPP1PPP/R1BbK2R w KQ - 1 7",
+  "jugadas": [
+   {
+    "uci": "c3d5",
+    "san": "Nd5#",
+    "nota": "mate"
+   },
+   {
+    "uci": "e1d1",
+    "san": "Kxd1",
+    "nota": "recupera la dama pero deja escapar el mate"
+   }
+  ],
+  "origen": "e4 e5 Nf3 d6 Bc4 Bg4 Nc3 g6 Nxe5 Bxd1 Bxf7+ Ke7"
+ },
+ {
+  "id": "mate1-dama-rey",
+  "categoria": "mate-inmediato",
+  "descripcion": "Dama y rey contra rey: mate en 1",
+  "fen": "7k/8/6K1/8/8/8/8/1Q6 w - - 0 1",
+  "jugadas": [
+   {
+    "uci": "b1b8",
+    "san": "Qb8#",
+    "nota": "mate"
+   }
+  ]
+ },
+ {
+  "id": "mate1-negras-pasillo",
+  "categoria": "mate-inmediato",
+  "descripcion": "Las negras dan mate del pasillo",
+  "fen": "3r2k1/8/8/8/8/8/5PPP/6K1 b - - 0 1",
+  "jugadas": [
+   {
+    "uci": "d8d1",
+    "san": "Rd1#",
+    "nota": "mate"
+   }
+  ]
+ },
+ {
+  "id": "mate1-coronacion",
+  "categoria": "mate-inmediato",
+  "descripcion": "Mate coronando",
+  "fen": "k7/2P5/1K6/8/8/8/8/8 w - - 0 1",
+  "jugadas": [
+   {
+    "uci": "c7c8q",
+    "san": "c8=Q#",
+    "nota": "mate"
+   },
+   {
+    "uci": "c7c8r",
+    "san": "c8=R#",
+    "nota": "mate con torre"
+   }
+  ]
+ },
+ {
+  "id": "mate1-blackburne",
+  "categoria": "mate-inmediato",
+  "descripcion": "Trampa Blackburne-Shilling: …Cf3#",
+  "fen": "r1b1kbnr/pppp1Npp/8/8/3nq3/8/PPPPBP1P/RNBQKR2 b Qkq - 1 7",
+  "jugadas": [
+   {
+    "uci": "d4f3",
+    "san": "Nf3#",
+    "nota": "mate"
+   },
+   {
+    "uci": "e4e2",
+    "san": "Qxe2+",
+    "nota": "gana pieza pero deja escapar el mate"
+   }
+  ],
+  "origen": "e4 e5 Nf3 Nc6 Bc4 Nd4 Nxe5 Qg5 Nxf7 Qxg2 Rf1 Qxe4+ Be2"
+ },
+ {
+  "id": "mate2-philidor",
+  "categoria": "mate-forzado",
+  "descripcion": "Mate de Philidor: Dg8+ Txg8 Cf7#",
+  "fen": "5r1k/6pp/7N/3Q4/8/8/8/6K1 w - - 0 1",
+  "jugadas": [
+   {
+    "uci": "d5g8",
+    "san": "Qg8+",
+    "nota": "sacrificio de dama con mate"
+   },
+   {
+    "uci": "h6f7",
+    "san": "Nf7+",
+    "nota": "jaque sin mate"
+   }
+  ],
+  "etiquetas": [
+   "sacrificio"
+  ]
+ },
+ {
+  "id": "mate-boden",
+  "categoria": "mate-forzado",
+  "descripcion": "Schulder–Boden 1853: …Dxc3+ y Aa3#",
+  "fen": "2k1rb1r/ppp3pp/2n2q2/3B1b2/5P2/2P1BQ2/PP1N1P1P/2KR3R b - - 0 14",
+  "jugadas": [
+   {
+    "uci": "f6c3",
+    "san": "Qxc3+",
+    "nota": "sacrificio de dama con mate"
+   }
+  ],
+  "etiquetas": [
+   "sacrificio"
+  ],
+  "origen": "e4 e5 Nf3 d6 c3 f5 Bc4 Nf6 d4 fxe4 dxe5 exf3 exf6 Qxf6 gxf3 Nc6 f4 Bd7 Be3 O-O-O Nd2 Re8 Qf3 Bf5 O-O-O d5 Bxd5"
+ },
+ {
+  "id": "mate-opera",
+  "categoria": "mate-forzado",
+  "descripcion": "Morphy, partida de la Ópera: Db8+! Cxb8 Td8#",
+  "fen": "4kb1r/p2n1ppp/4q3/4p1B1/4P3/1Q6/PPP2PPP/2KR4 w k - 0 16",
+  "jugadas": [
+   {
+    "uci": "b3b8",
+    "san": "Qb8+",
+    "nota": "sacrificio de dama con mate"
+   },
+   {
+    "uci": "d1d7",
+    "san": "Rxd7",
+    "nota": "gana material sin mate"
+   }
+  ],
+  "etiquetas": [
+   "sacrificio"
+  ],
+  "origen": "e4 e5 Nf3 d6 d4 Bg4 dxe5 Bxf3 Qxf3 dxe5 Bc4 Nf6 Qb3 Qe7 Nc3 c6 Bg5 b5 Nxb5 cxb5 Bxb5+ Nbd7 O-O-O Rd8 Rxd7 Rxd7 Rd1 Qe6 Bxd7+ Nxd7"
+ },
+ {
+  "id": "clavada-englund",
+  "categoria": "clavada",
+  "descripcion": "Gambito Englund: tras 6.Ac3? …Ab4 clava el alfil",
+  "fen": "r1b1kbnr/pppp1ppp/2n5/4P3/8/2B2N2/PqP1PPPP/RN1QKB1R b KQkq - 1 6",
+  "jugadas": [
+   {
+    "uci": "f8b4",
+    "san": "Bb4",
+    "nota": "clavada que lleva al mate"
+   }
+  ],
+  "etiquetas": [
+   "clavada"
+  ],
+  "origen": "d4 e5 dxe5 Nc6 Nf3 Qe7 Bf4 Qb4+ Bd2 Qxb2 Bc3"
+ },
+ {
+  "id": "mate-dama-rey-largo",
+  "categoria": "mate-forzado",
+  "descripcion": "Dama y rey contra rey desde lejos",
+  "fen": "8/8/8/3k4/8/8/8/KQ6 w - - 0 1",
+  "jugadas": [],
+  "etiquetas": [
+   "final"
+  ]
+ },
+ {
+  "id": "doble-caballo-rey-torre",
+  "categoria": "doblete",
+  "descripcion": "Horquilla de caballo a rey y torre",
+  "fen": "r3k3/7p/8/3N4/8/8/7P/4K3 w - - 0 1",
+  "jugadas": [
+   {
+    "uci": "d5c7",
+    "san": "Nc7+",
+    "nota": "horquilla"
+   }
+  ]
+ },
+ {
+  "id": "doble-truco-centro",
+  "categoria": "doblete",
+  "descripcion": "Truco de la horquilla en los dos caballos: …d5",
+  "fen": "r1bqkb1r/pppp1ppp/2n5/4p3/2B1N3/5N2/PPPP1PPP/R1BQK2R b KQkq - 0 5",
+  "jugadas": [
+   {
+    "uci": "d7d5",
+    "san": "d5",
+    "nota": "horquilla de peón"
+   }
+  ],
+  "origen": "e4 e5 Nf3 Nc6 Bc4 Nf6 Nc3 Nxe4 Nxe4"
+ },
+ {
+  "id": "doble-dama-rey-torre",
+  "categoria": "doblete",
+  "descripcion": "Doble ataque de dama a rey y torre",
+  "fen": "4k2r/8/8/8/8/6Q1/7P/4K3 w - - 0 1",
+  "jugadas": [
+   {
+    "uci": "g3e5",
+    "san": "Qe5+",
+    "nota": "doble ataque"
+   }
+  ]
+ },
+ {
+  "id": "doble-blackburne-dg5",
+  "categoria": "doblete",
+  "descripcion": "Blackburne-Shilling: …Dg5 ataca e5 y g2",
+  "fen": "r1bqkbnr/pppp1ppp/8/4N3/2BnP3/8/PPPP1PPP/RNBQK2R b KQkq - 0 4",
+  "jugadas": [
+   {
+    "uci": "d8g5",
+    "san": "Qg5",
+    "nota": "doble ataque"
+   }
+  ],
+  "origen": "e4 e5 Nf3 Nc6 Bc4 Nd4 Nxe5"
+ },
+ {
+  "id": "doble-alfil-rey-torre",
+  "categoria": "doblete",
+  "descripcion": "Alfil a rey y torre",
+  "fen": "8/pk6/8/8/8/8/P1B1K3/7r w - - 0 1",
+  "jugadas": [
+   {
+    "uci": "c2e4",
+    "san": "Be4+",
+    "nota": "doble ataque"
+   }
+  ]
+ },
+ {
+  "id": "doble-peon",
+  "categoria": "doblete",
+  "descripcion": "Horquilla de peón a caballo y alfil",
+  "fen": "8/8/2k5/8/1n1b4/8/2P5/3K4 w - - 0 1",
+  "jugadas": [
+   {
+    "uci": "c2c3",
+    "san": "c3",
+    "nota": "horquilla de peón"
+   }
+  ]
+ },
+ {
+  "id": "clavada-torre-peon",
+  "categoria": "clavada",
+  "descripcion": "Caballo clavado en la columna e: d4 lo gana",
+  "fen": "r3k3/pp6/3p4/4n3/8/8/PP1P4/4RK2 w - - 0 1",
+  "jugadas": [
+   {
+    "uci": "d2d4",
+    "san": "d4",
+    "nota": "ataca la pieza clavada"
+   }
+  ]
+ },
+ {
+  "id": "clavada-alfil-peon",
+  "categoria": "clavada",
+  "descripcion": "Caballo clavado por el alfil: d5 lo gana",
+  "fen": "r3k3/pp6/2n5/1B6/3P4/8/PP6/R3K3 w - - 0 1",
+  "jugadas": [
+   {
+    "uci": "d4d5",
+    "san": "d5",
+    "nota": "ataca la pieza clavada"
+   }
+  ]
+ },
+ {
+  "id": "clavada-elefante",
+  "categoria": "clavada",
+  "descripcion": "Trampa del elefante: la clavada de f6 es falsa (…Cxd5!)",
+  "fen": "r1bqkb1r/pppn1ppp/5n2/3N2B1/3P4/8/PP2PPPP/R2QKBNR b KQkq - 0 6",
+  "jugadas": [
+   {
+    "uci": "f6d5",
+    "san": "Nxd5",
+    "nota": "sacrificio de dama correcto"
+   }
+  ],
+  "etiquetas": [
+   "sacrificio"
+  ],
+  "origen": "d4 d5 c4 e6 Nc3 Nf6 Bg5 Nbd7 cxd5 exd5 Nxd5"
+ },
+ {
+  "id": "clavada-dama-torre",
+  "categoria": "clavada",
+  "descripcion": "Dama clavada contra el rey",
+  "fen": "4k3/p3q3/8/8/8/8/PP4P1/4R1K1 w - - 0 1",
+  "jugadas": [
+   {
+    "uci": "e1e7",
+    "san": "Rxe7+",
+    "nota": "gana la dama clavada"
+   }
+  ]
+ },
+ {
+  "id": "descubierto-caballo",
+  "categoria": "descubierto",
+  "descripcion": "Jaque descubierto con captura de dama",
+  "fen": "4k3/8/8/8/8/2q5/4N3/4R1K1 w - - 0 1",
+  "jugadas": [
+   {
+    "uci": "e2c3",
+    "san": "Nxc3+",
+    "nota": "descubierto"
+   }
+  ]
+ },
+ {
+  "id": "descubierto-petrov",
+  "categoria": "descubierto",
+  "descripcion": "Trampa de la Petrov: Cc6+ gana la dama",
+  "fen": "rnbqkb1r/pppp1ppp/5n2/4N3/8/8/PPPPQPPP/RNB1KB1R w KQkq - 2 5",
+  "jugadas": [
+   {
+    "uci": "e5c6",
+    "san": "Nc6+",
+    "nota": "descubierto"
+   }
+  ],
+  "origen": "e4 e5 Nf3 Nf6 Nxe5 Nxe4 Qe2 Nf6"
+ },
+ {
+  "id": "descubierto-alfil",
+  "categoria": "descubierto",
+  "descripcion": "Jaque descubierto: el alfil ataca la dama",
+  "fen": "r3k3/pp6/8/8/8/1q6/4BPPP/4R1K1 w - - 0 1",
+  "jugadas": [
+   {
+    "uci": "e2c4",
+    "san": "Bc4+",
+    "nota": "descubierto"
+   }
+  ]
+ },
+ {
+  "id": "descubierto-negras",
+  "categoria": "descubierto",
+  "descripcion": "Las negras: jaque descubierto y horquilla",
+  "fen": "4r1k1/4n3/8/8/1Q6/8/8/4K3 b - - 0 1",
+  "jugadas": [
+   {
+    "uci": "e7d5",
+    "san": "Nd5+",
+    "nota": "descubierto"
+   }
+  ]
+ },
+ {
+  "id": "sacrificio-legal",
+  "categoria": "sacrificio-correcto",
+  "descripcion": "Trampa de Légal: Cxe5! entrega la dama",
+  "fen": "rn1qkbnr/ppp2p1p/3p2p1/4p3/2B1P1b1/2N2N2/PPPP1PPP/R1BQK2R w KQkq - 0 5",
+  "jugadas": [
+   {
+    "uci": "f3e5",
+    "san": "Nxe5",
+    "nota": "sacrificio correcto"
+   },
+   {
+    "uci": "h2h3",
+    "san": "h3",
+    "nota": "tranquila"
+   }
+  ],
+  "origen": "e4 e5 Nf3 d6 Bc4 Bg4 Nc3 g6"
+ },
+ {
+  "id": "sacrificio-opera-txd7",
+  "categoria": "sacrificio-correcto",
+  "descripcion": "Ópera: Txd7! entrega calidad",
+  "fen": "3rkb1r/p2nqppp/5n2/1B2p1B1/4P3/1Q6/PPP2PPP/2KR3R w k - 3 13",
+  "jugadas": [
+   {
+    "uci": "d1d7",
+    "san": "Rxd7",
+    "nota": "sacrificio de calidad"
+   }
+  ],
+  "origen": "e4 e5 Nf3 d6 d4 Bg4 dxe5 Bxf3 Qxf3 dxe5 Bc4 Nf6 Qb3 Qe7 Nc3 c6 Bg5 b5 Nxb5 cxb5 Bxb5+ Nbd7 O-O-O Rd8"
+ },
+ {
+  "id": "sacrificio-damiano",
+  "categoria": "sacrificio-correcto",
+  "descripcion": "Defensa Damiano: Cxe5! es correcto",
+  "fen": "rnbqkbnr/pppp2pp/5p2/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 3",
+  "jugadas": [
+   {
+    "uci": "f3e5",
+    "san": "Nxe5",
+    "nota": "sacrificio correcto"
+   }
+  ],
+  "origen": "e4 e5 Nf3 f6"
+ },
+ {
+  "id": "sacrificio-griego",
+  "categoria": "sacrificio-correcto",
+  "descripcion": "Sacrificio griego Axh7+",
+  "fen": "r1bq1rk1/pppnbppp/4p3/3pP3/3P3P/3B1N2/PPP2PP1/RNBQK2R w KQ - 0 1",
+  "jugadas": [
+   {
+    "uci": "d3h7",
+    "san": "Bxh7+",
+    "nota": "sacrificio griego"
+   }
+  ]
+ },
+ {
+  "id": "sacrificio-mal-axf7",
+  "categoria": "sacrificio-incorrecto",
+  "descripcion": "Axf7+ prematuro en la Italiana",
+  "fen": "r1bqk1nr/pppp1ppp/2n5/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4",
+  "jugadas": [
+   {
+    "uci": "c4f7",
+    "san": "Bxf7+",
+    "nota": "sacrificio incorrecto"
+   },
+   {
+    "uci": "c2c3",
+    "san": "c3",
+    "nota": "tranquila"
+   }
+  ],
+  "origen": "e4 e5 Nf3 Nc6 Bc4 Bc5"
+ },
+ {
+  "id": "sacrificio-mal-griego",
+  "categoria": "sacrificio-incorrecto",
+  "descripcion": "Axh7+ con el caballo de f6 defendiendo",
+  "fen": "r1bq1rk1/pppnbppp/4pn2/3p4/3P4/2NBPN2/PPP2PPP/R1BQ1RK1 w - - 0 1",
+  "jugadas": [
+   {
+    "uci": "d3h7",
+    "san": "Bxh7+",
+    "nota": "sacrificio incorrecto"
+   }
+  ]
+ },
+ {
+  "id": "sacrificio-traxler",
+  "categoria": "sacrificio-correcto",
+  "descripcion": "Contra el Traxler, Cxf7 y Axf7+ son buenos",
+  "fen": "r1bqk2r/pppp1ppp/2n2n2/2b1p1N1/2B1P3/8/PPPP1PPP/RNBQK2R w KQkq - 6 5",
+  "jugadas": [
+   {
+    "uci": "g5f7",
+    "san": "Nxf7",
+    "nota": "sacrificio correcto"
+   },
+   {
+    "uci": "c4f7",
+    "san": "Bxf7+",
+    "nota": "sacrificio correcto"
+   }
+  ],
+  "origen": "e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 Bc5"
+ },
+ {
+  "id": "sacrificio-mal-axf7-d3",
+  "categoria": "sacrificio-incorrecto",
+  "descripcion": "Axf7+ tras …Ac5 en la Italiana lenta",
+  "fen": "r1bqk2r/pppp1ppp/2n2n2/2b1p3/2B1P3/3P1N2/PPP2PPP/RNBQK2R w KQkq - 1 5",
+  "jugadas": [
+   {
+    "uci": "c4f7",
+    "san": "Bxf7+",
+    "nota": "¿sacrificio?"
+   },
+   {
+    "uci": "c2c3",
+    "san": "c3",
+    "nota": "tranquila"
+   }
+  ],
+  "origen": "e4 e5 Nf3 Nc6 Bc4 Nf6 d3 Bc5"
+ },
+ {
+  "id": "sacrificio-mal-cxe5",
+  "categoria": "sacrificio-incorrecto",
+  "descripcion": "…Cxe4? (el truco de la horquilla aquí no funciona)",
+  "fen": "rnbqkb1r/ppp2ppp/3p1n2/4p3/2B1P3/2N2N2/PPPP1PPP/R1BQK2R b KQkq - 1 4",
+  "jugadas": [
+   {
+    "uci": "f6e4",
+    "san": "Nxe4",
+    "nota": "¿sacrificio?"
+   },
+   {
+    "uci": "f8e7",
+    "san": "Be7",
+    "nota": "tranquila"
+   }
+  ],
+  "origen": "e4 e5 Nf3 Nf6 Nc3 d6 Bc4"
+ },
+ {
+  "id": "gana-alfil-suelto",
+  "categoria": "ganancia-material",
+  "descripcion": "Alfil sin defensa",
+  "fen": "r3k2r/ppp2ppp/2n5/3b4/8/2N5/PPP2PPP/R1B1K2R w KQkq - 0 1",
+  "jugadas": [
+   {
+    "uci": "c3d5",
+    "san": "Nxd5",
+    "nota": "gana pieza"
+   }
+  ]
+ },
+ {
+  "id": "gana-caballo-negras",
+  "categoria": "ganancia-material",
+  "descripcion": "Las negras capturan un caballo suelto",
+  "fen": "r1b1k2r/ppppbppp/2n2n2/8/4N3/8/PPP2PPP/R1B1KB1R b KQkq - 0 1",
+  "jugadas": [
+   {
+    "uci": "f6e4",
+    "san": "Nxe4",
+    "nota": "gana pieza"
+   }
+  ]
+ },
+ {
+  "id": "gana-torre-esquina",
+  "categoria": "ganancia-material",
+  "descripcion": "Torre suelta en a8",
+  "fen": "r3k3/8/8/3Q4/8/8/8/4K3 w - - 0 1",
+  "jugadas": [
+   {
+    "uci": "d5a8",
+    "san": "Qxa8+",
+    "nota": "gana torre"
+   }
+  ]
+ },
+ {
+  "id": "gana-arca-noe",
+  "categoria": "ganancia-material",
+  "descripcion": "Arca de Noé: …c5 encierra el alfil",
+  "fen": "r1bqkbnr/2p2ppp/p2p4/1p6/3QP3/1B6/PPP2PPP/RNB1K2R b KQkq - 0 8",
+  "jugadas": [
+   {
+    "uci": "c7c5",
+    "san": "c5",
+    "nota": "encierra el alfil"
+   }
+  ],
+  "origen": "e4 e5 Nf3 Nc6 Bb5 a6 Ba4 d6 d4 b5 Bb3 Nxd4 Nxd4 exd4 Qxd4"
+ },
+ {
+  "id": "gana-dama-colgada",
+  "categoria": "ganancia-material",
+  "descripcion": "Dama colgada",
+  "fen": "4k3/8/8/3q4/8/8/8/3RK3 w - - 0 1",
+  "jugadas": [
+   {
+    "uci": "d1d5",
+    "san": "Rxd5",
+    "nota": "gana la dama"
+   }
+  ]
+ },
+ {
+  "id": "pierde-elefante",
+  "categoria": "perdida-material",
+  "descripcion": "Trampa del elefante: Cxd5?? pierde pieza",
+  "fen": "r1bqkb1r/pppn1ppp/5n2/3p2B1/3P4/2N5/PP2PPPP/R2QKBNR w KQkq - 0 6",
+  "jugadas": [
+   {
+    "uci": "c3d5",
+    "san": "Nxd5",
+    "nota": "pierde pieza"
+   },
+   {
+    "uci": "e2e3",
+    "san": "e3",
+    "nota": "tranquila"
+   }
+  ],
+  "origen": "d4 d5 c4 e6 Nc3 Nf6 Bg5 Nbd7 cxd5 exd5"
+ },
+ {
+  "id": "pierde-blackburne",
+  "categoria": "perdida-material",
+  "descripcion": "Blackburne-Shilling: Cxe5? pierde",
+  "fen": "r1bqkbnr/pppp1ppp/8/4p3/2BnP3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4",
+  "jugadas": [
+   {
+    "uci": "f3e5",
+    "san": "Nxe5",
+    "nota": "pierde material"
+   },
+   {
+    "uci": "f3d4",
+    "san": "Nxd4",
+    "nota": "tranquila"
+   }
+  ],
+  "origen": "e4 e5 Nf3 Nc6 Bc4 Nd4"
+ },
+ {
+  "id": "pierde-arca-noe",
+  "categoria": "perdida-material",
+  "descripcion": "Arca de Noé: Dxd4?? pierde el alfil",
+  "fen": "r1bqkbnr/2p2ppp/p2p4/1p6/3pP3/1B6/PPP2PPP/RNBQK2R w KQkq - 0 8",
+  "jugadas": [
+   {
+    "uci": "d1d4",
+    "san": "Qxd4",
+    "nota": "pierde pieza"
+   },
+   {
+    "uci": "c2c3",
+    "san": "c3",
+    "nota": "gambito"
+   }
+  ],
+  "origen": "e4 e5 Nf3 Nc6 Bb5 a6 Ba4 d6 d4 b5 Bb3 Nxd4 Nxd4 exd4"
+ },
+ {
+  "id": "pierde-englund",
+  "categoria": "perdida-material",
+  "descripcion": "Gambito Englund: Ac3?? permite …Ab4",
+  "fen": "r1b1kbnr/pppp1ppp/2n5/4P3/8/5N2/PqPBPPPP/RN1QKB1R w KQkq - 0 6",
+  "jugadas": [
+   {
+    "uci": "d2c3",
+    "san": "Bc3",
+    "nota": "error grave"
+   },
+   {
+    "uci": "b1c3",
+    "san": "Nc3",
+    "nota": "defensa"
+   }
+  ],
+  "origen": "d4 e5 dxe5 Nc6 Nf3 Qe7 Bf4 Qb4+ Bd2 Qxb2"
+ },
+ {
+  "id": "pierde-torre-caballo",
+  "categoria": "perdida-material",
+  "descripcion": "Torre a una casilla atacada",
+  "fen": "4k3/p7/8/2n5/8/8/P7/3RK3 w - - 0 1",
+  "jugadas": [
+   {
+    "uci": "d1d3",
+    "san": "Rd3",
+    "nota": "cuelga la torre"
+   },
+   {
+    "uci": "d1d5",
+    "san": "Rd5",
+    "nota": "ataca al caballo"
+   }
+  ]
+ },
+ {
+  "id": "permite-mate-pasillo",
+  "categoria": "perdida-material",
+  "descripcion": "La dama abandona la primera fila: …Td1#",
+  "fen": "3r2k1/5ppp/8/8/8/8/5PPP/1Q4K1 w - - 0 1",
+  "jugadas": [
+   {
+    "uci": "b1b7",
+    "san": "Qb7",
+    "nota": "permite mate"
+   },
+   {
+    "uci": "h2h3",
+    "san": "h3",
+    "nota": "abre escape"
+   }
+  ],
+  "etiquetas": [
+   "mate"
+  ]
+ },
+ {
+  "id": "permite-mate-pastor",
+  "categoria": "perdida-material",
+  "descripcion": "…Cf6?? permite el mate del pastor",
+  "fen": "r1bqkbnr/pppp1ppp/2n5/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR b KQkq - 3 3",
+  "jugadas": [
+   {
+    "uci": "g8f6",
+    "san": "Nf6",
+    "nota": "permite mate"
+   },
+   {
+    "uci": "g7g6",
+    "san": "g6",
+    "nota": "defiende"
+   }
+  ],
+  "etiquetas": [
+   "mate"
+  ],
+  "origen": "e4 e5 Bc4 Nc6 Qh5"
+ },
+ {
+  "id": "permite-mate-pasillo-negras",
+  "categoria": "perdida-material",
+  "descripcion": "La torre negra abandona la octava: Td8#",
+  "fen": "1r4k1/5ppp/8/8/8/8/5PPP/3R2K1 b - - 0 1",
+  "jugadas": [
+   {
+    "uci": "b8b2",
+    "san": "Rb2",
+    "nota": "permite mate"
+   },
+   {
+    "uci": "h7h6",
+    "san": "h6",
+    "nota": "abre escape"
+   }
+  ],
+  "etiquetas": [
+   "mate"
+  ]
+ },
+ {
+  "id": "equiv-inicial",
+  "categoria": "equivalentes",
+  "descripcion": "Posición inicial",
+  "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+  "jugadas": [
+   {
+    "uci": "e2e4",
+    "san": "e4",
+    "nota": "apertura"
+   },
+   {
+    "uci": "d2d4",
+    "san": "d4",
+    "nota": "apertura"
+   },
+   {
+    "uci": "g1f3",
+    "san": "Nf3",
+    "nota": "apertura"
+   },
+   {
+    "uci": "c2c4",
+    "san": "c4",
+    "nota": "apertura"
+   }
+  ]
+ },
+ {
+  "id": "equiv-e4e5",
+  "categoria": "equivalentes",
+  "descripcion": "Tras 1.e4 e5",
+  "fen": "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2",
+  "jugadas": [
+   {
+    "uci": "g1f3",
+    "san": "Nf3",
+    "nota": "principal"
+   },
+   {
+    "uci": "b1c3",
+    "san": "Nc3",
+    "nota": "Vienesa"
+   },
+   {
+    "uci": "f1c4",
+    "san": "Bc4",
+    "nota": "Alfil"
+   }
+  ],
+  "origen": "e4 e5"
+ },
+ {
+  "id": "equiv-escocesa",
+  "categoria": "equivalentes",
+  "descripcion": "Escocesa: recaptura o gambito",
+  "fen": "r1bqkbnr/pppp1ppp/2n5/8/3pP3/5N2/PPP2PPP/RNBQKB1R w KQkq - 0 4",
+  "jugadas": [
+   {
+    "uci": "f3d4",
+    "san": "Nxd4",
+    "nota": "recaptura"
+   },
+   {
+    "uci": "f1c4",
+    "san": "Bc4",
+    "nota": "gambito"
+   },
+   {
+    "uci": "c2c3",
+    "san": "c3",
+    "nota": "gambito"
+   }
+  ],
+  "origen": "e4 e5 Nf3 Nc6 d4 exd4"
+ },
+ {
+  "id": "equiv-italiana",
+  "categoria": "equivalentes",
+  "descripcion": "Italiana: enroque, d3 o c3",
+  "fen": "r1bqk1nr/pppp1ppp/2n5/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4",
+  "jugadas": [
+   {
+    "uci": "e1g1",
+    "san": "O-O",
+    "nota": "enroque"
+   },
+   {
+    "uci": "d2d3",
+    "san": "d3",
+    "nota": "tranquila"
+   },
+   {
+    "uci": "c2c3",
+    "san": "c3",
+    "nota": "tranquila"
+   }
+  ],
+  "origen": "e4 e5 Nf3 Nc6 Bc4 Bc5"
+ },
+ {
+  "id": "equiv-ruy",
+  "categoria": "equivalentes",
+  "descripcion": "Ruy López: retirada o cambio",
+  "fen": "r1bqkbnr/1ppp1ppp/p1n5/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 0 4",
+  "jugadas": [
+   {
+    "uci": "b5a4",
+    "san": "Ba4",
+    "nota": "retirada"
+   },
+   {
+    "uci": "b5c6",
+    "san": "Bxc6",
+    "nota": "cambio"
+   }
+  ],
+  "origen": "e4 e5 Nf3 Nc6 Bb5 a6"
+ },
+ {
+  "id": "equiv-final-peones",
+  "categoria": "equivalentes",
+  "descripcion": "Final de peones simétrico",
+  "fen": "8/5p2/8/4k3/8/8/4KP2/8 w - - 0 1",
+  "jugadas": [
+   {
+    "uci": "e2f3",
+    "san": "Kf3",
+    "nota": "rey"
+   },
+   {
+    "uci": "e2e3",
+    "san": "Ke3",
+    "nota": "rey"
+   },
+   {
+    "uci": "e2d3",
+    "san": "Kd3",
+    "nota": "rey"
+   }
+  ]
+ },
+ {
+  "id": "tranq-ruy-cerrada",
+  "categoria": "tranquila",
+  "descripcion": "Ruy López cerrada",
+  "fen": "r1bq1rk1/2p1bppp/p1np1n2/1p2p3/4P3/1BP2N2/PP1P1PPP/RNBQR1K1 w - - 1 9",
+  "jugadas": [
+   {
+    "uci": "h2h3",
+    "san": "h3",
+    "nota": "principal"
+   }
+  ],
+  "origen": "e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Be7 Re1 b5 Bb3 d6 c3 O-O"
+ },
+ {
+  "id": "tranq-gambito-dama",
+  "categoria": "tranquila",
+  "descripcion": "Gambito de dama rehusado",
+  "fen": "rnbq1rk1/p1p1bpp1/1p2pn1p/3p4/2PP3B/2N1PN2/PP3PPP/R2QKB1R w KQ - 0 8",
+  "jugadas": [
+   {
+    "uci": "c4d5",
+    "san": "cxd5",
+    "nota": "principal"
+   }
+  ],
+  "origen": "d4 d5 c4 e6 Nc3 Nf6 Bg5 Be7 e3 O-O Nf3 h6 Bh4 b6"
+ },
+ {
+  "id": "tranq-najdorf",
+  "categoria": "tranquila",
+  "descripcion": "Siciliana Najdorf",
+  "fen": "rnbqkb1r/1p2pppp/p2p1n2/8/3NP3/2N5/PPP2PPP/R1BQKB1R w KQkq - 0 6",
+  "jugadas": [
+   {
+    "uci": "c1e3",
+    "san": "Be3",
+    "nota": "principal"
+   },
+   {
+    "uci": "c1g5",
+    "san": "Bg5",
+    "nota": "principal"
+   }
+  ],
+  "origen": "e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6"
+ },
+ {
+  "id": "tranq-francesa",
+  "categoria": "tranquila",
+  "descripcion": "Francesa clásica",
+  "fen": "rnb2rk1/pppnqppp/4p3/3pP3/3P1P2/2N5/PPP3PP/R2QKBNR w KQ - 1 8",
+  "jugadas": [
+   {
+    "uci": "g1f3",
+    "san": "Nf3",
+    "nota": "principal"
+   }
+  ],
+  "origen": "e4 e6 d4 d5 Nc3 Nf6 Bg5 Be7 e5 Nfd7 Bxe7 Qxe7 f4 O-O"
+ },
+ {
+  "id": "tranq-caro-kann",
+  "categoria": "tranquila",
+  "descripcion": "Caro-Kann clásica",
+  "fen": "r2qkbnr/pp1nppp1/2p3bp/8/3P3P/5NN1/PPP2PP1/R1BQKB1R w KQkq - 2 8",
+  "jugadas": [
+   {
+    "uci": "h4h5",
+    "san": "h5",
+    "nota": "principal"
+   }
+  ],
+  "origen": "e4 c6 d4 d5 Nc3 dxe4 Nxe4 Bf5 Ng3 Bg6 h4 h6 Nf3 Nd7"
+ },
+ {
+  "id": "tranq-india-rey",
+  "categoria": "tranquila",
+  "descripcion": "India de rey, Mar del Plata",
+  "fen": "r1bq1rk1/ppp1npbp/3p1np1/3Pp3/2P1P3/2N2N2/PP2BPPP/R1BQ1RK1 w - - 1 9",
+  "jugadas": [
+   {
+    "uci": "f3e1",
+    "san": "Ne1",
+    "nota": "principal"
+   },
+   {
+    "uci": "b2b4",
+    "san": "b4",
+    "nota": "principal"
+   }
+  ],
+  "origen": "d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 Nf3 O-O Be2 e5 O-O Nc6 d5 Ne7"
+ },
+ {
+  "id": "tranq-inglesa",
+  "categoria": "tranquila",
+  "descripcion": "Inglesa, cuatro caballos",
+  "fen": "r1bqk2r/ppp1bppp/1nn5/4p3/8/2N2NP1/PP1PPPBP/R1BQ1RK1 w kq - 4 8",
+  "jugadas": [
+   {
+    "uci": "d2d3",
+    "san": "d3",
+    "nota": "principal"
+   },
+   {
+    "uci": "a2a3",
+    "san": "a3",
+    "nota": "principal"
+   }
+  ],
+  "origen": "c4 e5 Nc3 Nf6 Nf3 Nc6 g3 d5 cxd5 Nxd5 Bg2 Nb6 O-O Be7"
+ },
+ {
+  "id": "final-lucena",
+  "categoria": "final",
+  "descripcion": "Posición de Lucena",
+  "fen": "1K6/1P1k4/8/8/8/8/r7/2R5 w - - 0 1",
+  "jugadas": [
+   {
+    "uci": "c1d1",
+    "san": "Rd1+",
+    "nota": "método del puente"
+   }
+  ]
+ },
+ {
+  "id": "final-philidor",
+  "categoria": "final",
+  "descripcion": "Defensa de Philidor (tablas)",
+  "fen": "4k3/8/r7/4PK2/8/8/8/1R6 b - - 0 1",
+  "jugadas": []
+ },
+ {
+  "id": "final-oposicion",
+  "categoria": "final",
+  "descripcion": "Rey y peón contra rey: gana con la oposición",
+  "fen": "4k3/8/4K3/4P3/8/8/8/8 w - - 0 1",
+  "jugadas": [
+   {
+    "uci": "e6d6",
+    "san": "Kd6",
+    "nota": "tablas"
+   },
+   {
+    "uci": "e6f6",
+    "san": "Kf6",
+    "nota": "tablas"
+   }
+  ]
+ },
+ {
+  "id": "final-torres",
+  "categoria": "final",
+  "descripcion": "Final de torres igualado",
+  "fen": "8/5pk1/6p1/7p/7P/6P1/1r3PK1/R7 w - - 0 1",
+  "jugadas": [
+   {
+    "uci": "a1a7",
+    "san": "Ra7",
+    "nota": "activa"
+   },
+   {
+    "uci": "a1b1",
+    "san": "Rb1",
+    "nota": "pasiva"
+   }
+  ]
+ },
+ {
+  "id": "final-peon-pasado",
+  "categoria": "final",
+  "descripcion": "Peón pasado alejado",
+  "fen": "8/p5k1/8/8/8/8/5KPP/8 w - - 0 1",
+  "jugadas": []
+ },
+ {
+  "id": "final-alfil-malo",
+  "categoria": "final",
+  "descripcion": "Alfil del color equivocado (Stockfish no ve las tablas con este presupuesto)",
+  "fen": "7k/8/6KP/8/8/8/8/1B6 w - - 0 1",
+  "jugadas": [
+   {
+    "uci": "b1e4",
+    "san": "Be4",
+    "nota": "tablas"
+   }
+  ]
+ },
+ {
+  "id": "final-subpromocion",
+  "categoria": "final",
+  "descripcion": "Coronar dama ahoga; torre gana",
+  "fen": "8/k1P5/8/1K6/8/8/8/8 w - - 0 1",
+  "jugadas": [
+   {
+    "uci": "c7c8q",
+    "san": "c8=Q",
+    "nota": "ahogado"
+   },
+   {
+    "uci": "c7c8r",
+    "san": "c8=R",
+    "nota": "gana"
+   }
+  ]
+ },
+ {
+  "id": "auditoria-h-01",
+  "categoria": "auditoria",
+  "descripcion": "H-01 · 2.g4",
+  "fen": "rnbqkbnr/pppp1ppp/8/4p3/8/5P2/PPPPP1PP/RNBQKBNR w KQkq e6 0 2",
+  "jugadas": [
+   {
+    "uci": "g2g4",
+    "san": "g4",
+    "nota": "jugada de la auditoría"
+   }
+  ],
+  "hallazgo": "H-01",
+  "origenUci": "f2f3 e7e5"
+ },
+ {
+  "id": "auditoria-h-02",
+  "categoria": "auditoria",
+  "descripcion": "H-02 · 2.Cf3",
+  "fen": "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2",
+  "jugadas": [
+   {
+    "uci": "g1f3",
+    "san": "Nf3",
+    "nota": "jugada de la auditoría"
+   }
+  ],
+  "hallazgo": "H-02",
+  "origenUci": "e2e4 e7e5"
+ },
+ {
+  "id": "auditoria-h-06",
+  "categoria": "auditoria",
+  "descripcion": "H-06 · 6.Cxf7",
+  "fen": "r1bqkb1r/ppp2ppp/2n5/3np1N1/2B5/8/PPPP1PPP/RNBQK2R w KQkq - 0 6",
+  "jugadas": [
+   {
+    "uci": "g5f7",
+    "san": "Nxf7",
+    "nota": "jugada de la auditoría"
+   }
+  ],
+  "hallazgo": "H-06",
+  "origenUci": "e2e4 e7e5 g1f3 b8c6 f1c4 g8f6 f3g5 d7d5 e4d5 f6d5"
+ },
+ {
+  "id": "auditoria-h-14",
+  "categoria": "auditoria",
+  "descripcion": "H-14 · 10...Da5",
+  "fen": "r1bq1b1r/pp4pp/2p1k3/3np3/1nB1Q3/P1N5/1PPP1PPP/R1B1K2R b KQ - 0 10",
+  "jugadas": [
+   {
+    "uci": "d8a5",
+    "san": "Qa5",
+    "nota": "jugada de la auditoría"
+   }
+  ],
+  "hallazgo": "H-14",
+  "origenUci": "e2e4 e7e5 g1f3 b8c6 f1c4 g8f6 f3g5 d7d5 e4d5 f6d5 g5f7 e8f7 d1f3 f7e6 b1c3 c6b4 f3e4 c7c6 a2a3"
+ },
+ {
+  "id": "auditoria-h-02b",
+  "categoria": "auditoria",
+  "descripcion": "H-02b · 12.dxe5",
+  "fen": "r1b4r/pp4pp/2pbk3/q2np3/1nBPQ3/P1N5/1PP2PPP/R1B1K2R w KQ - 1 12",
+  "jugadas": [
+   {
+    "uci": "d4e5",
+    "san": "dxe5",
+    "nota": "jugada de la auditoría"
+   }
+  ],
+  "hallazgo": "H-02b",
+  "origenUci": "e2e4 e7e5 g1f3 b8c6 f1c4 g8f6 f3g5 d7d5 e4d5 f6d5 g5f7 e8f7 d1f3 f7e6 b1c3 c6b4 f3e4 c7c6 a2a3 d8a5 d2d4 f8d6"
+ },
+ {
+  "id": "auditoria-h-07",
+  "categoria": "auditoria",
+  "descripcion": "H-07 · 13.O-O",
+  "fen": "r1b4r/ppb3pp/2p1k3/q2nP3/1nB1Q3/P1N5/1PP2PPP/R1B1K2R w KQ - 1 13",
+  "jugadas": [
+   {
+    "uci": "e1g1",
+    "san": "O-O",
+    "nota": "jugada de la auditoría"
+   }
+  ],
+  "hallazgo": "H-07",
+  "origenUci": "e2e4 e7e5 g1f3 b8c6 f1c4 g8f6 f3g5 d7d5 e4d5 f6d5 g5f7 e8f7 d1f3 f7e6 b1c3 c6b4 f3e4 c7c6 a2a3 d8a5 d2d4 f8d6 d4e5 d6c7"
+ },
+ {
+  "id": "auditoria-h-05",
+  "categoria": "auditoria",
+  "descripcion": "H-05 · 32.Tc8+",
+  "fen": "r5k1/pp4pp/6r1/3p4/4n3/P5NP/1B2qbKP/2RR4 w - - 2 32",
+  "jugadas": [
+   {
+    "uci": "c1c8",
+    "san": "Rc8+",
+    "nota": "jugada de la auditoría"
+   }
+  ],
+  "hallazgo": "H-05",
+  "origenUci": "e2e4 e7e5 g1f3 b8c6 f1c4 g8f6 f3g5 d7d5 e4d5 f6d5 g5f7 e8f7 d1f3 f7e6 b1c3 c6b4 f3e4 c7c6 a2a3 d8a5 d2d4 f8d6 d4e5 d6c7 e1g1 b4a6 f1d1 h8d8 b2b4 a6b4 c1b2 b4a6 e4g4 e6f7 e5e6 c8e6 g4f3 f7g8 c4d5 c6d5 f3e3 a6c5 c3e2 c5e4 e2d4 c7b6 e3h3 e6h3 g2h3 d8d6 d4f5 d6g6 f5g3 b6f2 g1g2 a5c7 g2f1 c7c4 f1g2 c4c2 a1c1 c2e2"
+ },
+ {
+  "id": "auditoria-h-03",
+  "categoria": "auditoria",
+  "descripcion": "H-03 · 4.Dg5",
+  "fen": "r1b1kbnr/ppppqppp/2n5/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR w KQkq - 4 4",
+  "jugadas": [
+   {
+    "uci": "h5g5",
+    "san": "Qg5",
+    "nota": "jugada de la auditoría"
+   }
+  ],
+  "hallazgo": "H-03",
+  "origenUci": "e2e4 e7e5 f1c4 b8c6 d1h5 d8e7"
+ },
+ {
+  "id": "auditoria-h-08",
+  "categoria": "auditoria",
+  "descripcion": "H-08 · 13.Dd5+",
+  "fen": "r1b2b1r/ppp3pp/3k1q2/4p3/1NB5/P4Q2/1P1P1PPP/n1BK3R w - - 3 13",
+  "jugadas": [
+   {
+    "uci": "f3d5",
+    "san": "Qd5+",
+    "nota": "jugada de la auditoría"
+   }
+  ],
+  "hallazgo": "H-08",
+  "origenUci": "e2e4 e7e5 g1f3 b8c6 f1c4 g8f6 f3g5 d7d5 e4d5 f6d5 g5f7 e8f7 d1f3 f7e6 b1c3 c6b4 a2a3 b4c2 e1d1 c2a1 c3d5 e6d6 d5b4 d8f6"
+ },
+ {
+  "id": "auditoria-h-04",
+  "categoria": "auditoria",
+  "descripcion": "H-04 · 40.gxf5",
+  "fen": "8/1p1b2rp/8/3k1n2/r5P1/P4K1P/1P1q4/8 w - - 2 40",
+  "jugadas": [
+   {
+    "uci": "g4f5",
+    "san": "gxf5",
+    "nota": "jugada de la auditoría"
+   }
+  ],
+  "hallazgo": "H-04",
+  "origenUci": "e2e4 e7e5 g1f3 b8c6 f1c4 g8f6 f3g5 d7d5 e4d5 f6d5 g5f7 e8f7 d1f3 f7e6 b1c3 c6b4 a2a3 b4c2 e1d1 c2a1 c3d5 e6d6 d5b4 d8f6 f3d5 d6e7 d5c5 e7e8 c5c7 f8d6 c4b5 e8f8 c7c4 a7a6 b4d5 a6b5 d5f6 b5c4 f6e4 f8e7 e4d6 e7d6 d2d4 c4d3 c1e3 a1b3 h1e1 c8g4 f2f3 g4e6 e3d2 h8e8 d2b4 d6d5 e1e5 d5e5 b4c3 e5d5 c3g7 e8g8 f3f4 e6g4 d1e1 d3d2 e1f2 g8g7 h2h3 g4d7 g2g4 d2d1q f4f5 d1d2 f2f3 b3d4 f3g3 d4f5 g3f3 a8a4"
+ },
+ {
+  "id": "auditoria-h-09",
+  "categoria": "auditoria",
+  "descripcion": "H-09 · 16.Ab5+",
+  "fen": "r1b1k2r/ppQ3pp/3b1q2/4p3/1NB5/P7/1P1P1PPP/n1BK3R w - - 1 16",
+  "jugadas": [
+   {
+    "uci": "c4b5",
+    "san": "Bb5+",
+    "nota": "jugada de la auditoría"
+   }
+  ],
+  "hallazgo": "H-09",
+  "origenUci": "e2e4 e7e5 g1f3 b8c6 f1c4 g8f6 f3g5 d7d5 e4d5 f6d5 g5f7 e8f7 d1f3 f7e6 b1c3 c6b4 a2a3 b4c2 e1d1 c2a1 c3d5 e6d6 d5b4 d8f6 f3d5 d6e7 d5c5 e7e8 c5c7 f8d6"
+ },
+ {
+  "id": "auditoria-h-10",
+  "categoria": "auditoria",
+  "descripcion": "H-10 · 12...Df6",
+  "fen": "r1bq1b1r/ppp3pp/3k4/4p3/1NB5/P4Q2/1P1P1PPP/n1BK3R b - - 2 12",
+  "jugadas": [
+   {
+    "uci": "d8f6",
+    "san": "Qf6",
+    "nota": "jugada de la auditoría"
+   }
+  ],
+  "hallazgo": "H-10",
+  "origenUci": "e2e4 e7e5 g1f3 b8c6 f1c4 g8f6 f3g5 d7d5 e4d5 f6d5 g5f7 e8f7 d1f3 f7e6 b1c3 c6b4 a2a3 b4c2 e1d1 c2a1 c3d5 e6d6 d5b4"
+ }
+]

@@ -19,6 +19,8 @@
     "build:site": "npm run clean && npm run build && node tools/build-site.mjs",
     "match": "npm run build && node dist/tools/match.js",
     "bench": "npm run build && node dist/tools/bench.js",
+    "bench:posiciones": "npm run build && node dist/tools/banco.js",
+    "bench:referencia": "npm run build && node tools/stockfish-ref.mjs",
     "test:e2e": "npm run build:site && node --test --test-concurrency=1 e2e/*.e2e.mjs"
   },
   "dependencies": {},

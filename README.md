@@ -129,6 +129,7 @@ npm run perft -- <profundidad> ["<fen>"] [jugadas UCI...] [--ref <fichero>]
 npm run build:site   # compila y monta site/ (lo que se publica) con el service worker versionado
 npm run bench    # misma búsqueda con y sin tabla de transposición: nodos, tiempo y nodos/s (unos 3 min)
 npm run match    # partidas automáticas entre niveles (unos 40 min con 20 por enfrentamiento; «-- 4» para 4)
+npm run bench:posiciones  # banco de 82 posiciones: Alfil Beta y el coach frente a la referencia de Stockfish (unos 4 min; ver bench/README.md)
 npm run test:e2e # accesibilidad en Chrome real (necesita Chrome; CHROME_PATH si no es `google-chrome`)
 npm run serve    # monta site/ y lo sirve en http://127.0.0.1:8080 (sin dependencias)
 ```
