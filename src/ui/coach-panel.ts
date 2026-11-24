@@ -100,7 +100,7 @@ function evaluationRows(label: string, evaluation: EvaluationView): [HTMLElement
   const fill = el("span");
   fill.style.width = `${evaluation.percent}%`; // por CSSOM: la CSP bloquea el atributo en línea
   bar.append(fill);
-  detail.append(el("span", "coach__valor", evaluation.value), document.createTextNode(evaluation.rest), bar);
+  detail.append(el("span", evaluation.value.startsWith("Mate") ? "coach__valor coach__valor--frase" : "coach__valor", evaluation.value), document.createTextNode(evaluation.rest), bar);
   return [term, detail];
 }
 

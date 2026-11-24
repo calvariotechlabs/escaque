@@ -58,6 +58,7 @@ body{margin:0;background:var(--surface);color:var(--ink);font:400 16px/24px var(
   .partida__izq{display:flex;flex-direction:column;gap:var(--space-4);grid-area:tablero;min-width:0}
   .partida__jugadas{grid-area:jugadas}
   .partida__controles{grid-area:controles}
+  .partida .tema-tablero{grid-area:tema}
 }
 
 /* Móvil apaisado (alto menor de 500 px): el tablero se limita por el alto y el panel pasa a la derecha
@@ -125,12 +126,12 @@ body{margin:0;background:var(--surface);color:var(--ink);font:400 16px/24px var(
 
 /* Diálogo modal de coronación: fondo del lienzo «Coronación · móvil». */
 .coronacion-dialogo{padding:0;border:0;background:none;max-width:calc(100vw - 2 * var(--space-4))}
-.coronacion-dialogo::backdrop{background:color-mix(in srgb,var(--ink) 55%,transparent)}
+.coronacion-dialogo::backdrop{background:var(--velo)}
 
 /* Diálogo modal para confirmar una partida nueva (lienzo «Nueva partida · móvil»). */
 .confirmacion{box-sizing:border-box;width:calc(100% - 2 * var(--space-4));max-width:340px;background:var(--surface-raised);color:var(--ink);border:1px solid var(--control-border);border-radius:var(--radius-md);padding:var(--space-4)}
 .confirmacion[open]{display:flex;flex-direction:column;gap:var(--space-3)}
-.confirmacion::backdrop{background:color-mix(in srgb,var(--ink) 55%,transparent)}
+.confirmacion::backdrop{background:var(--velo)}
 .confirmacion__titulo{margin:0;font:600 20px/28px var(--font-display)}
 .confirmacion__texto{margin:0;font:400 14px/20px var(--font-sans);color:var(--ink-muted)}
 .confirmacion__botones{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-2);margin-top:var(--space-1)}

@@ -759,6 +759,38 @@
       "h": 390,
       "title": "Móvil horizontal · inicio corregido (propuesta, CAL-403)",
       "page": "movil"
+    },
+    "PulidoDosDialogos.dc.html": {
+      "x": 0,
+      "y": 39860,
+      "w": 1280,
+      "h": 900,
+      "title": "Escritorio · pulido 2: velo de los diálogos (propuesta)",
+      "page": "escritorio"
+    },
+    "PulidoDosRepaso.dc.html": {
+      "x": 1360,
+      "y": 39860,
+      "w": 1280,
+      "h": 1000,
+      "title": "Escritorio · pulido 2: repaso con botones de paso (propuesta)",
+      "page": "escritorio"
+    },
+    "PulidoDosPartida.dc.html": {
+      "x": 0,
+      "y": 41000,
+      "w": 1280,
+      "h": 1040,
+      "title": "Escritorio · pulido 2: coach primero y selector al final (propuesta)",
+      "page": "escritorio"
+    },
+    "PulidoDosNotacion.dc.html": {
+      "x": 1360,
+      "y": 41000,
+      "w": 1280,
+      "h": 680,
+      "title": "Escritorio · pulido 2: regla de notación (propuesta)",
+      "page": "escritorio"
     }
   },
   "order": [
@@ -852,7 +884,11 @@
     "IdentidadMovilHorizontal.dc.html",
     "LeccionTableroEscritorio.dc.html",
     "LeccionTableroMovil.dc.html",
-    "InicioMovilHorizontalAjuste.dc.html"
+    "InicioMovilHorizontalAjuste.dc.html",
+    "PulidoDosDialogos.dc.html",
+    "PulidoDosRepaso.dc.html",
+    "PulidoDosPartida.dc.html",
+    "PulidoDosNotacion.dc.html"
   ],
   "notes": {
     "t_escritorio_0": {

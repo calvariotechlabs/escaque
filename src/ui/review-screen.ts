@@ -27,7 +27,7 @@ import {
   type ReviewItem,
   type ReviewMove,
 } from "./review.js";
-import { createCapturesView, placeCapturesInLandscape } from "./captures-view.js";
+import { createCapturesView } from "./captures-view.js";
 import { bindScrollRegion } from "./scroll-region.js";
 import { PGN_TEXT } from "./pgn.js";
 import { createCoachClient } from "../worker/coach-client.js";
@@ -106,13 +106,22 @@ function plyOf(target: EventTarget | null): number | null {
   return button === null ? null : Number(button.dataset["ply"]);
 }
 
+/** «Evaluación: +0,6 → +1,8»: solo las cifras van en mono; «Mate en 3» es una frase y va en Sans. */
+function evaluationLine(evaluation: string): HTMLElement {
+  const line = el("span", "clave__eval", "Evaluación: ");
+  evaluation.split(" → ").forEach((part, index) => {
+    if (index > 0) line.append(document.createTextNode(" → "));
+    line.append(part.startsWith("Mate") ? document.createTextNode(part) : el("span", "clave__cifras", part));
+  });
+  return line;
+}
+
 export function createReviewScreen(options: ReviewScreenOptions): ReviewScreen {
   const screen = byId<HTMLElement>("pantalla-repaso");
   const title = byId<HTMLElement>("repaso-titulo");
   const intro = byId<HTMLElement>("repaso-intro");
   const board = createBoard(byId("repaso-tablero"));
   const captures = createCapturesView(byId<HTMLElement>("repaso-capturas-contenido"));
-  placeCapturesInLandscape(byId<HTMLElement>("repaso-capturas"), byId<HTMLElement>("repaso-tablero").parentElement!, () => byId<HTMLElement>("repaso-paso").after(byId<HTMLElement>("repaso-capturas")));
   const steps = byId<HTMLElement>("repaso-paso");
   const failure = byId<HTMLElement>("repaso-fallo");
   const curveBox = byId<HTMLElement>("repaso-curva");
@@ -377,7 +386,7 @@ export function createReviewScreen(options: ReviewScreenOptions): ReviewScreen {
     if (item.ply === selected) button.setAttribute("aria-current", "true");
     const text = el("span");
     text.append(el("span", "clave__san", item.label), document.createTextNode(" · "), el("span", "clave__tit", item.title), document.createTextNode(` · ${item.side}`));
-    button.append(shape(item.marker, "lista"), text, el("span", "clave__eval", `Evaluación: ${item.evaluation}`));
+    button.append(shape(item.marker, "lista"), text, evaluationLine(item.evaluation));
     li.append(button);
     return li;
   }
@@ -510,11 +519,16 @@ export function createReviewScreen(options: ReviewScreenOptions): ReviewScreen {
     if (button !== null && button.getAttribute("aria-disabled") !== "true") step(button.dataset["paso"]);
   });
 
-  // Con el foco en los botones de paso: ← → Inicio y Fin (aria-keyshortcuts). No hay atajos globales.
+  // ← → Inicio y Fin (aria-keyshortcuts) funcionan con el foco en cualquier parte de la pantalla del repaso, salvo en
+  // campos de texto y listas desplegables, con un diálogo abierto o con una combinación de teclas (Alt, Ctrl, Cmd).
   const KEYS: Readonly<Record<string, string>> = { ArrowLeft: "anterior", ArrowRight: "siguiente", Home: "inicio", End: "final" };
-  steps.addEventListener("keydown", (event) => {
+  const scrollPanel = byId<HTMLElement>("repaso-panel");
+  document.addEventListener("keydown", (event) => {
     const action = KEYS[event.key];
-    if (action === undefined || event.altKey || event.ctrlKey || event.metaKey) return;
+    if (action === undefined || event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+    if (screen.hidden || document.querySelector("dialog[open]") !== null) return;
+    const target = event.target as Element | null;
+    if (target?.closest("input, textarea, select, [contenteditable], summary, a") != null || target === scrollPanel) return; // el panel con scroll conserva Inicio y Fin para desplazarse
     event.preventDefault();
     step(action);
   });
