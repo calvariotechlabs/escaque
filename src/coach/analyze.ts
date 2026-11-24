@@ -246,10 +246,10 @@ const MIN_GAIN = PIECE_VALUES.p;
 /** Pérdida mínima que el motor tiene que confirmar para dar esos dos avisos. */
 const MIN_LOSS = 80;
 /**
- * Una pieza solo «cuelga» si capturarla le vale al rival como mucho esto menos
- * que su mejor respuesta (H-07). Ganar un peón o más con la captura la deja
- * siempre cerca de la mejor; una captura que cae más está refutada (clavada,
- * contraataque) o no es la idea de la posición.
+ * Una pieza solo «cuelga» si capturarla le sale bien al rival según el motor
+ * (H-07): la captura queda a esto o menos de su mejor respuesta, o le deja al
+ * menos esto mejor que antes de la jugada (por si tiene algo aún mejor, como
+ * una horquilla). Si no, la captura está refutada (clavada, contraataque).
  */
 const CAPTURE_TOLERANCE_CP = 50;
 /** Cuántas capturas candidatas se comprueban con el motor, como mucho. */
@@ -373,7 +373,13 @@ export function analyzeMove(game: CoachGame, move: string, options: AnalyzeOptio
   let playedLine: { score: number; line: readonly string[]; replyScore: number | null } = isBest
     ? { score: beforeSearch.score, line: beforeSearch.pv, replyScore: null }
     : scoreLine(position, moveInfo.uci, replyFor(beforeSearch.depth), searchOptions);
-  const timeLimit = limits.timeMs === undefined ? {} : { timeMs: limits.timeMs };
+  // Un solo reloj para todo el análisis: las búsquedas extra solo usan lo que quede.
+  const start = clock();
+  const timeLeft = (): { timeMs?: number } | null => {
+    if (limits.timeMs === undefined) return {};
+    const left = limits.timeMs - (clock() - start);
+    return left > 0 ? { timeMs: left } : null;
+  };
 
   // Confirmación (RC-05): antes de llamar «Error» o «Error grave» a una jugada se
   // vuelve a mirar más hondo, si cabe en el presupuesto (posiciones sencillas o
@@ -383,8 +389,9 @@ export function analyzeMove(game: CoachGame, move: string, options: AnalyzeOptio
   // mide que ahí ir una media jugada más lejos no cambia los veredictos y
   // multiplica el tiempo por 3 o 4.
   const grave = (score: number): boolean => expected(toCp(beforeSearch.score)) - expected(toCp(score)) >= GRAVE_DROP;
-  if (!isBest && Math.abs(beforeSearch.score) <= MATE_BOUND && grave(playedLine.score)) {
-    const budget: DeepenBudget = { ...CONFIRM_DEEPEN, minDepth: beforeSearch.depth, ...timeLimit };
+  const confirmTime = timeLeft();
+  if (!isBest && Math.abs(beforeSearch.score) <= MATE_BOUND && grave(playedLine.score) && confirmTime !== null) {
+    const budget: DeepenBudget = { ...CONFIRM_DEEPEN, minDepth: beforeSearch.depth, ...confirmTime };
     const deeper = deepen(position, budget, searchOptions, beforeSearch);
     if (deeper.depth > beforeSearch.depth) {
       beforeSearch = deeper;
@@ -406,10 +413,14 @@ export function analyzeMove(game: CoachGame, move: string, options: AnalyzeOptio
   // se queda corta; se mira más hondo con su propio presupuesto. Contra un mate
   // no importa comparar a la misma profundidad: el mate es exacto, y la
   // búsqueda más honda de la jugada hecha es la más fiel.
-  if (!isBest && beforeScore > MATE_BOUND && playedLine.score <= MATE_BOUND) {
-    const budget: DeepenBudget = { ...MATE_DEEPEN, minDepth: replyLimits.maxDepth!, ...timeLimit };
+  // La respuesta a la misma profundidad que el resto: con ella se confirman las piezas colgando.
+  const sameDepthReply = playedLine.replyScore;
+  const mateTime = timeLeft();
+  if (!isBest && beforeScore > MATE_BOUND && playedLine.score <= MATE_BOUND && mateTime !== null) {
+    const budget: DeepenBudget = { ...MATE_DEEPEN, minDepth: replyLimits.maxDepth!, ...mateTime };
     const deeper = scoreLineDeep(position, moveInfo.uci, budget, searchOptions);
-    if (deeper !== null) playedLine = deeper;
+    // Si el reloj de seguridad la cortó antes de llegar tan lejos como la de antes, no sirve.
+    if (deeper !== null && deeper.depth >= replyLimits.maxDepth!) playedLine = deeper;
   }
   const playedScore = playedLine.score;
   const loss = Math.max(0, toCp(beforeScore) - toCp(playedScore));
@@ -419,9 +430,14 @@ export function analyzeMove(game: CoachGame, move: string, options: AnalyzeOptio
   if (mates.length > 0 && !playedMates) findings.push(missedMate(position, mates[0]!, moveInfo, color));
   if (loss >= MIN_LOSS && !playedMates) {
     // La captura de la pieza tiene que valerle al rival casi lo mismo que su mejor respuesta.
-    const reply = playedLine.replyScore;
-    const confirm = (captureUci: string): boolean =>
-      reply === null || toCp(scoreMove(position, captureUci, captureLimits, searchOptions)) >= toCp(reply) - CAPTURE_TOLERANCE_CP;
+    // Cuelga si capturarla le sale bien al rival: casi tan bien como su mejor respuesta, o
+    // claramente mejor de lo que tenía antes de la jugada (aunque tenga algo aún mejor, H-07).
+    const reply = sameDepthReply;
+    const confirm = (captureUci: string): boolean => {
+      if (reply === null) return true;
+      const capture = toCp(scoreMove(position, captureUci, captureLimits, searchOptions));
+      return capture >= toCp(reply) - CAPTURE_TOLERANCE_CP || capture >= -toCp(beforeScore) + CAPTURE_TOLERANCE_CP;
+    };
     const hanging = hangingPiece(position, moveInfo.uci, color, playedBalance, confirm);
     if (hanging !== null) findings.push(hanging);
 
@@ -787,12 +803,12 @@ function scoreLineDeep(
   uci: string,
   budget: DeepenBudget,
   options: SearchOptions,
-): { score: number; line: readonly string[]; replyScore: number } | null {
+): { score: number; line: readonly string[]; replyScore: number; depth: number } | null {
   position.makeMove(position.moveFromUci(uci)!);
   try {
     if (position.status().kind !== "ongoing" || budget.minDepth > budget.maxDepth) return null;
     const reply = deepen(position, budget, options);
-    return { score: fromReply(reply.score), line: [uci, ...reply.pv], replyScore: reply.score };
+    return { score: fromReply(reply.score), line: [uci, ...reply.pv], replyScore: reply.score, depth: reply.depth };
   } finally {
     position.unmakeMove();
   }
