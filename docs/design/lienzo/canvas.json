@@ -316,7 +316,7 @@
       "y": 8940,
       "w": 1280,
       "h": 1100,
-      "title": "Escritorio · primeros pasos: lección con «Cómo se mueve»",
+      "title": "Anterior · Escritorio · primeros pasos: lección con «Cómo se mueve»",
       "page": "escritorio",
       "expand": "fill"
     },
@@ -334,7 +334,7 @@
       "y": 11420,
       "w": 820,
       "h": 1760,
-      "title": "Tablet · primeros pasos: lección con «Cómo se mueve»",
+      "title": "Anterior · Tablet · primeros pasos: lección con «Cómo se mueve»",
       "page": "tablet"
     },
     "LeccionIniciacionMovil.dc.html": {
@@ -342,7 +342,7 @@
       "y": 15640,
       "w": 390,
       "h": 1820,
-      "title": "Móvil · primeros pasos: lección con «Cómo se mueve»",
+      "title": "Anterior · Móvil · primeros pasos: lección con «Cómo se mueve»",
       "page": "movil"
     },
     "IniciacionEstadosMovil.dc.html": {
@@ -443,7 +443,7 @@
       "y": 17680,
       "w": 1280,
       "h": 1180,
-      "title": "Escritorio · partida pulida",
+      "title": "Anterior · Escritorio · partida pulida",
       "page": "escritorio"
     },
     "PulidoTablet.dc.html": {
@@ -451,7 +451,7 @@
       "y": 19340,
       "w": 820,
       "h": 1560,
-      "title": "Tablet · partida pulida",
+      "title": "Anterior · Tablet · partida pulida",
       "page": "tablet"
     },
     "PulidoMovil.dc.html": {
@@ -459,7 +459,7 @@
       "y": 24410,
       "w": 390,
       "h": 1640,
-      "title": "Móvil · partida pulida",
+      "title": "Anterior · Móvil · partida pulida",
       "page": "movil"
     },
     "PulidoMovilHorizontal.dc.html": {
@@ -467,7 +467,7 @@
       "y": 24410,
       "w": 844,
       "h": 390,
-      "title": "Móvil · horizontal · partida pulida",
+      "title": "Anterior · Móvil · horizontal · partida pulida",
       "page": "movil"
     },
     "AnimacionEscritorio.dc.html": {
@@ -499,7 +499,7 @@
       "y": 21400,
       "w": 1280,
       "h": 1260,
-      "title": "Escritorio · capturas y ventaja",
+      "title": "Anterior · Escritorio · capturas y ventaja",
       "page": "escritorio"
     },
     "CapturasEstados.dc.html": {
@@ -507,7 +507,7 @@
       "y": 21400,
       "w": 1280,
       "h": 980,
-      "title": "Escritorio · capturas · estados",
+      "title": "Anterior · Escritorio · capturas · estados",
       "page": "escritorio"
     },
     "CapturasTablet.dc.html": {
@@ -515,7 +515,7 @@
       "y": 23400,
       "w": 820,
       "h": 1760,
-      "title": "Tablet · capturas y ventaja",
+      "title": "Anterior · Tablet · capturas y ventaja",
       "page": "tablet"
     },
     "CapturasMovil.dc.html": {
@@ -523,7 +523,7 @@
       "y": 28700,
       "w": 390,
       "h": 1840,
-      "title": "Móvil · capturas y ventaja",
+      "title": "Anterior · Móvil · capturas y ventaja",
       "page": "movil"
     },
     "CapturasMovilHorizontal.dc.html": {
@@ -531,7 +531,7 @@
       "y": 28700,
       "w": 844,
       "h": 390,
-      "title": "Móvil · horizontal · capturas y ventaja",
+      "title": "Anterior · Móvil · horizontal · capturas y ventaja",
       "page": "movil"
     },
     "CoachMejoradoEscritorio.dc.html": {
@@ -587,7 +587,7 @@
       "y": 28240,
       "w": 1280,
       "h": 1020,
-      "title": "Escritorio · inicio con aviso de instalar",
+      "title": "Anterior · Escritorio · inicio con aviso de instalar",
       "expand": "fill",
       "page": "escritorio"
     },
@@ -596,7 +596,7 @@
       "y": 28300,
       "w": 820,
       "h": 1020,
-      "title": "Tablet · inicio con aviso de instalar",
+      "title": "Anterior · Tablet · inicio con aviso de instalar",
       "page": "tablet"
     },
     "InicioInstalarMovil.dc.html": {
@@ -604,7 +604,7 @@
       "y": 33860,
       "w": 390,
       "h": 1180,
-      "title": "Móvil · inicio con aviso de instalar",
+      "title": "Anterior · Móvil · inicio con aviso de instalar",
       "page": "movil"
     },
     "OgImageCentrada.dc.html": {
@@ -620,7 +620,7 @@
       "y": 29900,
       "w": 1280,
       "h": 720,
-      "title": "Escritorio · inicio compacto",
+      "title": "Anterior · Escritorio · inicio compacto",
       "page": "escritorio"
     },
     "InicioTablet.dc.html": {
@@ -628,7 +628,7 @@
       "y": 30000,
       "w": 820,
       "h": 1180,
-      "title": "Tablet · inicio compacto",
+      "title": "Anterior · Tablet · inicio compacto",
       "page": "tablet"
     },
     "InicioMovil.dc.html": {
@@ -636,7 +636,7 @@
       "y": 35340,
       "w": 390,
       "h": 664,
-      "title": "Móvil · inicio compacto (pantalla visible)",
+      "title": "Anterior · Móvil · inicio compacto (pantalla visible)",
       "page": "movil"
     },
     "InicioMovilCompleto.dc.html": {
@@ -644,7 +644,7 @@
       "y": 35340,
       "w": 390,
       "h": 1100,
-      "title": "Móvil · inicio compacto (página entera)",
+      "title": "Anterior · Móvil · inicio compacto (página entera)",
       "page": "movil"
     },
     "InicioMovilHorizontal.dc.html": {
@@ -652,7 +652,7 @@
       "y": 35340,
       "w": 844,
       "h": 390,
-      "title": "Móvil horizontal · inicio compacto",
+      "title": "Anterior · Móvil horizontal · inicio compacto",
       "page": "movil"
     },
     "TablerosEscritorio.dc.html": {
@@ -765,7 +765,7 @@
       "y": 39860,
       "w": 1280,
       "h": 900,
-      "title": "Escritorio · pulido 2: velo de los diálogos (propuesta)",
+      "title": "Escritorio · pulido 2: velo de los diálogos (aprobado)",
       "page": "escritorio"
     },
     "PulidoDosRepaso.dc.html": {
@@ -773,7 +773,7 @@
       "y": 39860,
       "w": 1280,
       "h": 1000,
-      "title": "Escritorio · pulido 2: repaso con botones de paso (propuesta)",
+      "title": "Escritorio · pulido 2: repaso con botones de paso (aprobado)",
       "page": "escritorio"
     },
     "PulidoDosPartida.dc.html": {
@@ -781,7 +781,7 @@
       "y": 41000,
       "w": 1280,
       "h": 1040,
-      "title": "Escritorio · pulido 2: coach primero y selector al final (propuesta)",
+      "title": "Escritorio · pulido 2: coach primero y selector al final (aprobado)",
       "page": "escritorio"
     },
     "PulidoDosNotacion.dc.html": {
@@ -789,8 +789,64 @@
       "y": 41000,
       "w": 1280,
       "h": 680,
-      "title": "Escritorio · pulido 2: regla de notación (propuesta)",
+      "title": "Escritorio · pulido 2: regla de notación (aprobado)",
       "page": "escritorio"
+    },
+    "CierreRevisionEscritorio.dc.html": {
+      "x": 0,
+      "y": 42440,
+      "w": 1280,
+      "h": 2420,
+      "title": "Escritorio · cierre de la revisión 2: cabecera, aviso, capturas y resumen (propuesta, CAL-404)",
+      "page": "escritorio"
+    },
+    "PulidoDosTablet.dc.html": {
+      "x": 0,
+      "y": 35140,
+      "w": 820,
+      "h": 1760,
+      "title": "Tablet · pulido 2 y cierre: partida (propuesta, CAL-404)",
+      "page": "tablet"
+    },
+    "PulidoDosTabletRepaso.dc.html": {
+      "x": 900,
+      "y": 35140,
+      "w": 820,
+      "h": 2340,
+      "title": "Tablet · pulido 2 y cierre: repaso (propuesta, CAL-404)",
+      "page": "tablet"
+    },
+    "PulidoDosTabletDialogo.dc.html": {
+      "x": 1800,
+      "y": 35140,
+      "w": 820,
+      "h": 1180,
+      "title": "Tablet · pulido 2: diálogo con velo, tema oscuro (propuesta, CAL-404)",
+      "page": "tablet"
+    },
+    "PulidoDosMovil.dc.html": {
+      "x": 0,
+      "y": 41320,
+      "w": 390,
+      "h": 1440,
+      "title": "Móvil · pulido 2 y cierre: partida (propuesta, CAL-404)",
+      "page": "movil"
+    },
+    "PulidoDosMovilRepaso.dc.html": {
+      "x": 470,
+      "y": 41320,
+      "w": 390,
+      "h": 2100,
+      "title": "Móvil · pulido 2 y cierre: repaso (propuesta, CAL-404)",
+      "page": "movil"
+    },
+    "PulidoDosMovilDialogo.dc.html": {
+      "x": 940,
+      "y": 41320,
+      "w": 390,
+      "h": 844,
+      "title": "Móvil · pulido 2: diálogo con velo, tema oscuro (propuesta, CAL-404)",
+      "page": "movil"
     }
   },
   "order": [
@@ -888,7 +944,14 @@
     "PulidoDosDialogos.dc.html",
     "PulidoDosRepaso.dc.html",
     "PulidoDosPartida.dc.html",
-    "PulidoDosNotacion.dc.html"
+    "PulidoDosNotacion.dc.html",
+    "CierreRevisionEscritorio.dc.html",
+    "PulidoDosTablet.dc.html",
+    "PulidoDosTabletRepaso.dc.html",
+    "PulidoDosTabletDialogo.dc.html",
+    "PulidoDosMovil.dc.html",
+    "PulidoDosMovilRepaso.dc.html",
+    "PulidoDosMovilDialogo.dc.html"
   ],
   "notes": {
     "t_escritorio_0": {
@@ -1880,6 +1943,38 @@
       "text": "Inicio apaisado: la cabecera se queda en su sitio con 24 px de margen (la regla de posición absoluta solo era para la partida). «Tu color» tiene la columna más ancha (1,3 a 1) y los nombres no se parten.",
       "size": "s",
       "fill": "teal",
+      "page": "movil"
+    },
+    "t_escritorio_cierre": {
+      "x": 0,
+      "y": 42200,
+      "text": "Cierre de la revisión visual 2",
+      "kind": "title1",
+      "maxW": 2640,
+      "page": "escritorio"
+    },
+    "t_tablet_cierre": {
+      "x": 0,
+      "y": 34900,
+      "text": "Pulido 2 y cierre de la revisión",
+      "kind": "title1",
+      "maxW": 2620,
+      "page": "tablet"
+    },
+    "t_movil_cierre": {
+      "x": 0,
+      "y": 41080,
+      "text": "Pulido 2 y cierre de la revisión",
+      "kind": "title1",
+      "maxW": 1330,
+      "page": "movil"
+    },
+    "n_movil_cierre": {
+      "x": 1410,
+      "y": 41320,
+      "w": 420,
+      "text": "Partida: modo y nivel bajo el nombre, estado, tablero, Capturas plegado en una línea, coach, botones, jugadas y, al final, «Tablero». Repaso: botones de paso pegados al tablero, Capturas, jugada seleccionada, curva, errores clave, resumen (con escaque) y jugadas. Diálogos: velo oscuro también en tema oscuro. Móvil apaisado no cambia salvo Capturas plegado.",
+      "fill": "gray",
       "page": "movil"
     }
   },

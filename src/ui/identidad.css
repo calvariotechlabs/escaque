@@ -4,12 +4,14 @@
 
 /* Títulos: Space Grotesk en la tinta del logo, con el interletraje algo cerrado */
 .pagina__cabecera h1,.ajustes-pantalla__titulo,.lecc-titulo,.rep-cab__titulo,.resultado__titulo,.retro__titulo,.coach__titulo,.jugadas__titulo,.pistas__titulo,.capturas__titulo,.rep-sec__titulo,
-.grupo__leyenda,.grupo__titulo,.leccion__titulo,.objetivo__texto,.novato__titulo,.confirmacion__titulo,.pgn-dialogo__titulo,.coronacion__titulo,.rep-fallo__titulo{color:var(--marca);letter-spacing:-.01em}
+.grupo__leyenda,.grupo__titulo,.leccion__titulo,.objetivo__texto,.novato__titulo,.confirmacion__titulo,.resumen caption,.pgn-dialogo__titulo,.coronacion__titulo,.rep-fallo__titulo{color:var(--marca);letter-spacing:-.01em}
 .pagina__cabecera h1,.ajustes-pantalla__titulo,.lecc-titulo,.rep-cab__titulo{letter-spacing:-.02em}
 
 /* El escaque: cuadrado partido en diagonal (la casilla cruzada por la diagonal del alfil del logo). Firma de los títulos de panel. */
 .coach__titulo,.jugadas__titulo,.pistas__titulo,.capturas__titulo,.rep-sec__titulo{display:flex;align-items:center;gap:10px}
 .coach__titulo::before,.jugadas__titulo::before,.pistas__titulo::before,.capturas__titulo::before,.rep-sec__titulo::before{content:"";flex:none;width:10px;height:10px;box-sizing:border-box;border:1.5px solid var(--marca);background:linear-gradient(135deg,var(--marca) 50%,transparent 50%)}
+/* «Resumen por bando» es el caption de la tabla: conserva su display (el lector lo asocia a la tabla) y el escaque va en línea (CAL-404). */
+.resumen caption::before{content:"";display:inline-block;vertical-align:middle;margin:-3px 10px 0 0;width:10px;height:10px;box-sizing:border-box;border:1.5px solid var(--marca);background:linear-gradient(135deg,var(--marca) 50%,transparent 50%)}
 
 /* Turno: un escaque del color que juega (también en «Tu color» y en las capturas) */
 .estado__turno{width:18px;height:18px;box-sizing:border-box;border-radius:2px}
@@ -96,7 +98,7 @@
 @media (prefers-reduced-motion: reduce){.sello__confeti{display:none}}
 
 @media (forced-colors: active){
-  .coach__titulo::before,.jugadas__titulo::before,.pistas__titulo::before,.capturas__titulo::before,.rep-sec__titulo::before{border-color:CanvasText;background:CanvasText}
+  .coach__titulo::before,.jugadas__titulo::before,.pistas__titulo::before,.capturas__titulo::before,.rep-sec__titulo::before,.resumen caption::before{border-color:CanvasText;background:CanvasText}
   .estado--jaque,.estado--fin,.resultado,.retro--logro{border-color:CanvasText}
   .estado__toca{border:1px solid CanvasText}
   .estado__jaque{color:CanvasText}

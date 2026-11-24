@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Pulido 2: diálogo con velo en tablet (tema oscuro)</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/escaque/tokens.css">
+<link rel="stylesheet" href="ds/escaque/components/bundle.css">
+<link rel="stylesheet" href="lecciones.css"><link rel="stylesheet" href="coach.css"><link rel="stylesheet" href="repaso.css"><link rel="stylesheet" href="identidad.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;600;700&family=Space+Grotesk:wght@600&display=swap">
+<style>
+body{margin:0}
+.casilla img{position:relative;z-index:1;display:block;width:100%;height:100%}
+:root{--velo: rgba(23,26,33,.55)}
+[data-theme="dark"]{--velo: rgba(0,0,0,.62)}
+.nota{margin:0;font:400 14px/20px var(--font-sans);color:var(--ink-muted)}
+.etq{margin:0;font:600 12px/16px var(--font-sans);letter-spacing:.04em;text-transform:uppercase;color:var(--ink-muted)}
+.mono{font-family:var(--font-mono);font-weight:500}
+.panel{display:flex;flex-direction:column;gap:12px;padding:16px;background:var(--surface-raised);border:1px solid var(--line);border-radius:var(--radius-md)}
+.sub{margin:0;font:400 14px/20px var(--font-sans);color:var(--ink-muted);flex-basis:100%}
+.cap{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 16px;background:var(--surface-raised);border:1px solid var(--line);border-radius:var(--radius-md);font:400 14px/20px var(--font-sans)}
+.cap .id-h2{font-size:16px;line-height:24px}
+.cap__fila{display:grid;grid-template-columns:6.5em minmax(0,1fr) auto;align-items:center;column-gap:8px;min-height:32px}
+.cap__quien{display:inline-flex;align-items:center;gap:8px;font-weight:600}
+.muestra{width:16px;height:16px;box-sizing:border-box;border:1.5px solid var(--piece-outline-white);background:var(--piece-white-hi);border-radius:2px}
+.muestra--b{background:var(--piece-black-mid);border-color:var(--piece-outline-black)}
+.cap__fila img{width:28px;height:28px}
+.ventaja{font:600 14px/20px var(--font-sans);padding:0 8px;border:1.5px solid var(--ink);border-radius:999px}
+.resumen thead th{font-family:var(--font-sans)}
+.marco{border:1px dashed var(--line);border-radius:8px;padding:16px;display:flex;flex-direction:column;gap:12px}
+</style>
+</helmet>
+<div data-theme="dark" style="position:relative;width:820px;height:1180px;overflow:hidden;background:var(--surface);color:var(--ink);font-family:var(--font-sans)"><div style="box-sizing:border-box;padding:24px 60px;display:flex;flex-direction:column;gap:24px" aria-hidden="true"><header style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:4px 24px"><h1 class="id-marca" style="margin:0;display:flex;align-items:center;gap:12px;font:600 32px/36px var(--font-display)"><svg viewBox="0 0 64 64" width="36" height="36" aria-hidden="true" focusable="false" style="flex:none;display:block"><defs><clipPath id="cier3"><path d="M32 5 L43 17 C49 24 50 29 47 35 C45 39 41 41 39 42 H25 C20 40 17 37 16 32 C14 25 18 20 22 16 Z"/></clipPath></defs><rect width="64" height="64" rx="12" fill="#0b2a38"/><path d="M32 5 L43 17 C49 24 50 29 47 35 C45 39 41 41 39 42 V45 L47 45 L53 57 H11 L17 45 H25 V42 C20 40 17 37 16 32 C14 25 18 20 22 16 Z" fill="#f1f3f5"/><path d="M17 18 L21 14 L49 41 L44 46 Z" clip-path="url(#cier3)" fill="#0b6e8a"/></svg><span>Escaque</span></h1><nav class="lecc-nav" aria-label="Principal"><a class="lecc-enlace" href="#" aria-current="page">Jugar</a><a class="lecc-enlace" href="#">Lecciones</a><a class="enlace-gh" href="https://github.com/calvariotechlabs/escaque" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg><span class="enlace-gh__texto">GitHub</span><span class="oculto"> (se abre en una pestaña nueva)</span></a></nav><p class="sub">Contra Alfil Beta · nivel Fácil</p></header><p class="id-estado" role="status"><span class="id-turno" aria-hidden="true"></span><span style="flex:1"><strong>Juegan las blancas.</strong></span><span class="id-estado__toca">Te toca</span></p><section aria-label="Tablero" style=""><div class="tablero">
+<div class="tablero__rejilla" role="grid" aria-label="Tablero de ajedrez, visto desde las blancas">
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="8">
+<div class="tablero__fila" role="row">
+<sc-for list="{{r.row}}" as="c" hint-placeholder-count="8">
+<div class="{{c.cls}}" role="gridcell" data-square="{{c.n}}" data-marks="{{c.marks}}" aria-label="{{c.label}}"><sc-if value="{{c.has}}" hint-placeholder-val="{{ true }}"><img src="{{c.img}}" alt=""></sc-if></div>
+</sc-for>
+</div>
+</sc-for>
+</div>
+<div class="tablero__rangos" aria-hidden="true"><span>8</span><span>7</span><span>6</span><span>5</span><span>4</span><span>3</span><span>2</span><span>1</span></div>
+<div class="tablero__columnas" aria-hidden="true"><span>a</span><span>b</span><span>c</span><span>d</span><span>e</span><span>f</span><span>g</span><span>h</span></div>
+</div></section></div><div style="position:absolute;inset:0;background:var(--velo);display:flex;align-items:center;justify-content:center;padding:16px"><div role="alertdialog" aria-modal="true" aria-labelledby="dlg-t" aria-describedby="dlg-d" style="width:100%;max-width:420px;background:var(--surface-raised);border:1px solid var(--control-border);border-radius:8px;padding:24px;display:flex;flex-direction:column;gap:12px;box-sizing:border-box"><h2 id="dlg-t" style="margin:0;font:600 20px/28px var(--font-display);color:var(--marca)">¿Empezar una partida nueva?</h2><p class="nota" id="dlg-d">Se perderán las 4 jugadas de esta partida.</p><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><button class="boton" type="button">Seguir jugando</button><button class="boton boton--principal" type="button">Empezar</button></div></div></div></div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":820,"height":1180}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const IMG = {"wk": "/_blob/f755b0e3cde224439141427c2f79dfcc", "wq": "/_blob/e6db5db3ffcd79a147b06454e873bbb6", "wr": "/_blob/ccca3b7fa33574992239568f87fea94a", "wb": "/_blob/77d6825cc2acba00edb2116763773dbd", "wn": "/_blob/8c627fe6f9b20e3c70f41a0d92653372", "wp": "/_blob/751ba29078e9e60b8b5d0d7948fd281f", "bk": "/_blob/77c898d2513e9ba83ab5680730d01bda", "bq": "/_blob/5d4b4d17f82632fdf302ea2f666c3b78", "br": "/_blob/2958949152b961dd0b29733063618976", "bb": "/_blob/582ab6e66656de76eb46628bace09a68", "bn": "/_blob/b85f02c56127bec2806870270b615310", "bp": "/_blob/e571c7681346433a14159cb146cfb58c"};
+    const NAME = { p: 'peón', n: 'caballo', b: 'alfil', r: 'torre', q: 'dama', k: 'rey' };
+    const MARKS = {"b8": "last-move", "c6": "last-move"};
+    const FEN = 'r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R'.split('/');
+    const FILES = 'abcdefgh';
+    const rows = FEN.map((text, r) => {
+      const line = [];
+      for (const ch of text) {
+        if (ch >= '1' && ch <= '8') { for (let k = 0; k < Number(ch); k++) line.push(null); } else line.push(ch);
+      }
+      const rank = 8 - r;
+      return { row: line.map((p, c) => {
+        const n = FILES[c] + rank;
+        const side = p && p === p.toLowerCase() ? 'b' : 'w';
+        const t = p ? p.toLowerCase() : '';
+        const nombre = p ? NAME[t] + ' ' + (side === 'w' ? 'blanc' : 'negr') + (t === 'r' || t === 'q' ? 'a' : 'o') : 'vacía';
+        return { n, cls: 'casilla casilla--' + ((c + rank - 1) % 2 === 1 ? 'clara' : 'oscura'), marks: MARKS[n] || '', has: !!p, img: p ? IMG[side + t] : '', label: n + ', ' + nombre };
+      }) };
+    });
+    return { rows };
+  }
+}
+</script>
+</body>
+</html>
