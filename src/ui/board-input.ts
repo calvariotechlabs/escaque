@@ -131,7 +131,10 @@ export function attachBoardInput(host: BoardInputHost): void {
     const hadFocus = view.element.contains(document.activeElement);
     if (gesture !== null) {
       // Otro dedo mientras el primero sigue apoyado (aunque esté quieto): se ignora, y el arrastre sigue.
-      if (!abandonedBy(gesture, event)) return;
+      if (!abandonedBy(gesture, event)) {
+        event.preventDefault();
+        return;
+      }
       endGesture(gesture.pointerId, event.clientX, event.clientY, true);
     }
     if (event.button !== 0 || !enabled() || square === null) return;

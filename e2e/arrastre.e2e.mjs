@@ -267,6 +267,27 @@ describe("arrastre con el dedo", () => {
     assert.deepEqual(page.errors, []);
   });
 
+  test("si el navegador pierde el dedo que arrastra mientras otro sigue apoyado, el tablero se recupera a los 3 s", async () => {
+    const page = await phonePage();
+    await startTwoPlayers(page);
+    // Para el tablero es igual un dedo perdido que uno que lleva más de 3 s quieto: no sabe nada de él. (Las
+    // herramientas de Chrome solo saben levantar todos los dedos a la vez, así que aquí sigue apoyado.)
+    await touchDragStart(page, "e2", "e3");
+    await pause(3200);
+    const e3 = await center(page, "e3");
+    const d2 = await center(page, "d2");
+    await page.call("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ id: 0, x: e3.x, y: e3.y }, { id: 1, x: d2.x, y: d2.y }] });
+    await page.call("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
+    await pause(100);
+    const d4 = await center(page, "d4");
+    await page.call("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ id: 0, x: d4.x, y: d4.y }] });
+    await page.call("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
+    await pause(100);
+    assert.equal(await pieceOn(page, "d4"), true, "los toques siguientes juegan d4");
+    assert.equal(await pieceOn(page, "e2"), true, "el peón arrastrado vuelve a e2");
+    assert.deepEqual(page.errors, []);
+  });
+
   test("si el navegador pierde un dedo sin avisar, el toque siguiente no se pierde", async () => {
     const page = await phonePage();
     await startTwoPlayers(page);
