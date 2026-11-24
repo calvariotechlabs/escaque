@@ -13,6 +13,8 @@
     "clean": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\"",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "npm run clean && npm run build && node --test \"dist/tests/**/*.test.js\" \"tools/*.test.mjs\" \".claude/hooks/*.test.mjs\"",
+    "test:cobertura": "npm run clean && npm run build && node --test --experimental-test-coverage \"dist/tests/**/*.test.js\" \"tools/*.test.mjs\" \".claude/hooks/*.test.mjs\"",
+    "test:perf": "npm run clean && npm run build && node --test --test-concurrency=1 \"dist/tests/rendimiento/*.perf.js\"",
     "test:perft": "npm run clean && npm run build && node --test \"dist/tests/perft-full.js\"",
     "perft": "npm run build && node dist/tools/perft.js",
     "serve": "npm run build:site && node tools/serve.mjs",

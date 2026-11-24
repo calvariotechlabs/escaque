@@ -240,12 +240,9 @@ describe("entradas", () => {
     assert.deepEqual(moves, ["e2e4", "e7e5"]);
   });
 
-  it("con límites por defecto responde en poco tiempo", () => {
-    const start = performance.now();
+  it("con límites por defecto devuelve un informe (el tiempo se mide en tests/rendimiento)", () => {
     const report = analyzeMove({ fen: START_FEN, moves: ["e2e4", "e7e5", "g1f3", "b8c6"] }, "f3g5");
-    const elapsed = performance.now() - start;
     assert.ok(report.depth >= 1);
-    assert.ok(elapsed < 3000, `${elapsed.toFixed(0)} ms`);
   });
 });
 

@@ -338,3 +338,42 @@ export const REVIEW_TEXT = {
   failedText: `${ENGINE_NAME} no ha podido analizar las jugadas. Tu partida sigue guardada en este dispositivo.`,
   retry: "Reintentar",
 } as const;
+
+/**
+ * Control de la petición en curso al Worker del coach durante el repaso. Cada petición lleva su número y el
+ * informe de una que ya no vale (se cambió de partida, se ocultó la pantalla) se descarta: sin esto, el informe
+ * de la jugada N de la partida anterior se guardaba en la jugada N de la nueva (RC-06).
+ */
+export class AnalysisGuard {
+  private token = 0;
+  private active = false;
+
+  /** ¿Hay una petición en curso? */
+  get busy(): boolean {
+    return this.active;
+  }
+
+  /** Empieza una petición y devuelve su número. */
+  begin(): number {
+    this.active = true;
+    return ++this.token;
+  }
+
+  /** ¿Sigue valiendo la petición `token`? */
+  accepts(token: number): boolean {
+    return token === this.token;
+  }
+
+  /** Termina la petición `token` si sigue valiendo; devuelve si valía. */
+  finish(token: number): boolean {
+    if (token !== this.token) return false;
+    this.active = false;
+    return true;
+  }
+
+  /** Invalida lo que haya en curso (se cancela o cambia la partida). */
+  invalidate(): void {
+    this.token++;
+    this.active = false;
+  }
+}

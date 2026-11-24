@@ -18,6 +18,7 @@ import {
   nextToAnalyze,
   progressText,
   REVIEW_TEXT,
+  AnalysisGuard,
   reviewIntro,
   reviewMoves,
   spokenPrefix,
@@ -172,14 +173,12 @@ export function createReviewScreen(options: ReviewScreenOptions): ReviewScreen {
   let reports = new Map<number, CoachReport>();
   let selected = 1;
   let orientation: Color = "w";
-  /** Hay una petición en curso al Worker. */
-  let busy = false;
   /** La pantalla está a la vista y el análisis puede avanzar. */
   let visible = false;
   let stopped = false;
   let failed = false;
   /** Cada análisis lleva su número; la respuesta de uno que ya no vale se ignora. */
-  let token = 0;
+  const analysis = new AnalysisGuard();
   /** Lo que enseña ahora el panel del coach: así no se repinta (ni se vuelve a anunciar) sin cambios. */
   let panelKey = "";
   let key: ReviewItem[] = [];
@@ -193,14 +192,13 @@ export function createReviewScreen(options: ReviewScreenOptions): ReviewScreen {
   // --- Análisis --------------------------------------------------------------
 
   function stopWorker(): void {
-    token++;
-    busy = false;
+    analysis.invalidate();
     client?.cancel();
   }
 
   /** Pide el informe de la siguiente jugada que falte, si se puede. */
   function pump(): void {
-    if (!visible || busy || stopped || failed || game === null) return;
+    if (!visible || analysis.busy || stopped || failed || game === null) return;
     // Lo que ya revisó el coach durante la partida no se vuelve a pedir.
     let fromCache = false;
     for (;;) {
@@ -220,13 +218,11 @@ export function createReviewScreen(options: ReviewScreenOptions): ReviewScreen {
     }
     const ply = nextToAnalyze(moves, reports, selected)!;
     const move = moveAt(ply)!;
-    const current = ++token;
-    busy = true;
+    const current = analysis.begin();
     client ??= createCoachClient();
     client.analyze(move.job).then(
       (report) => {
-        if (current !== token) return;
-        busy = false;
+        if (!analysis.finish(current)) return;
         // Se olvida el informe más antiguo, no todos: los del coach de la partida siguen sirviendo.
         if (options.cache.size >= CACHE_LIMIT) options.cache.delete(options.cache.keys().next().value!);
         options.cache.set(reviewKey(move.job), report);
@@ -236,8 +232,7 @@ export function createReviewScreen(options: ReviewScreenOptions): ReviewScreen {
         pump();
       },
       (error: unknown) => {
-        if (current !== token || error instanceof EngineCancelledError) return;
-        busy = false;
+        if (error instanceof EngineCancelledError || !analysis.finish(current)) return;
         failed = true;
         render();
       },
@@ -575,6 +570,7 @@ export function createReviewScreen(options: ReviewScreenOptions): ReviewScreen {
       const nextKey = `${next.startFen}|${list.map((m) => m.job.move).join(" ")}`;
       if (nextKey !== gameKey) {
         gameKey = nextKey;
+        stopWorker(); // la petición en curso es de la partida anterior: su informe no puede caer en la nueva
         reports = new Map();
         selected = 1;
         stopped = false;

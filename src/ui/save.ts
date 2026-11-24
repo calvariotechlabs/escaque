@@ -2,7 +2,7 @@
 // Lo que se lee del almacenamiento no es de confianza: otra pestaña, una versión
 // vieja o el propio usuario pueden haberlo cambiado. Por eso no se acepta nada
 // que no se pueda volver a jugar de verdad con las reglas del núcleo.
-import type { Color, PromotionPiece } from "../core/index.js";
+import { PGN_MAX_PLIES, type Color, type PromotionPiece } from "../core/index.js";
 import { isLevel } from "../engine/levels.js";
 import { Game } from "./game.js";
 import { TWO_PLAYERS, type GameSetup } from "./settings.js";
@@ -10,8 +10,11 @@ import { TWO_PLAYERS, type GameSetup } from "./settings.js";
 export const STORAGE_KEY = "escaque:partida";
 /** Versión 2: añade modo, nivel y color. La 1 (solo dos jugadores) se sigue leyendo. */
 const VERSION = 2;
-/** Tope de jugadas y de tamaño: una partida real queda muy por debajo. */
-const MAX_MOVES = 5000;
+/**
+ * Tope de jugadas: el mismo que el importador de PGN y los Workers, para que una partida guardada siempre se pueda
+ * revisar (RC-06, H-20). El tamaño máximo del texto queda muy por encima de 1.200 jugadas.
+ */
+export const MAX_SAVED_MOVES = PGN_MAX_PLIES;
 const MAX_RAW_LENGTH = 100_000;
 const MAX_FEN_LENGTH = 100;
 const MOVE = /^[a-h][1-8][a-h][1-8][qrbn]?$/;
@@ -64,7 +67,7 @@ export function restoreGame(raw: unknown): RestoredGame | null {
     }
   }
   if (typeof fen !== "string" || fen.length > MAX_FEN_LENGTH) return null;
-  if (!Array.isArray(moves) || moves.length > MAX_MOVES) return null;
+  if (!Array.isArray(moves) || moves.length > MAX_SAVED_MOVES) return null;
   if (typeof ply !== "number" || !Number.isInteger(ply) || ply < 0 || ply > moves.length) return null;
   if (orientation !== "w" && orientation !== "b") return null;
 

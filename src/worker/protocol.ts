@@ -10,14 +10,17 @@
 // El Worker valida cada mensaje: tipos, longitudes, nivel y legalidad de las
 // jugadas. Nunca lanza: un mensaje mal formado recibe una respuesta de error,
 // y los errores no repiten textos largos recibidos.
-import { Position } from "../core/index.js";
+import { PGN_MAX_PLIES, Position } from "../core/index.js";
 import { chooseMove, isLevel } from "../engine/index.js";
 import type { ChooseOptions, Level } from "../engine/index.js";
 
 /** Una FEN válida no pasa de ~90 caracteres. */
 const MAX_FEN_LENGTH = 100;
-/** Ninguna partida real llega a 1000 medias jugadas. */
-export const MAX_MOVES = 1000;
+/**
+ * Medias jugadas que acepta el Worker: las mismas que el importador de PGN. Una partida cargada de fuera cabe
+ * entera en el motor y en el repaso; con límites distintos se podía importar y luego no poder revisar (H-20).
+ */
+export const MAX_MOVES = PGN_MAX_PLIES;
 const UCI = /^[a-h][1-8][a-h][1-8][qrbn]?$/;
 
 export interface SearchRequest {

@@ -1,8 +1,8 @@
 // Puente entre la interfaz y el motor: mensajes que entran al Worker y cliente que los envía.
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { START_FEN } from "../src/core/index.js";
-import { handleRequest, EngineClient, EngineCancelledError } from "../src/worker/index.js";
+import { PGN_MAX_PLIES, START_FEN, parsePgn, writePgn } from "../src/core/index.js";
+import { handleAnalyze, handleRequest, MAX_MOVES, EngineClient, EngineCancelledError } from "../src/worker/index.js";
 import type { EngineResponse, WorkerLike } from "../src/worker/index.js";
 
 const request = (overrides: Record<string, unknown> = {}): Record<string, unknown> => ({
@@ -167,5 +167,69 @@ describe("EngineClient", () => {
     client.think({ fen: START_FEN, moves: [], level: "medio" }).catch(() => {});
     assert.equal(workers.length, 2);
     client.dispose();
+  });
+});
+
+describe("carreras del cliente del motor (RC-06)", () => {
+  it("la respuesta tardía de un Worker ya cancelado no resuelve la petición nueva", async () => {
+    const { client, workers } = clientWithFakes();
+    const first = client.think({ fen: START_FEN, moves: [], level: "dificil" });
+    const staleHandler = workers[0]!.onmessage!;
+    const staleId = workers[0]!.lastId();
+    const second = client.think({ fen: START_FEN, moves: ["e2e4"], level: "dificil" });
+    await assert.rejects(first, EngineCancelledError);
+    staleHandler({ data: result(staleId, "a2a3") }); // llega con el Worker viejo ya detenido
+    workers[1]!.reply(result(workers[1]!.lastId(), "c7c5"));
+    assert.equal((await second).best, "c7c5");
+  });
+
+  it("una respuesta repetida no resuelve dos veces ni afecta a la siguiente petición", async () => {
+    const { client, workers } = clientWithFakes();
+    const first = client.think({ fen: START_FEN, moves: [], level: "medio" });
+    const worker = workers[0]!;
+    const id = worker.lastId();
+    worker.reply(result(id, "d2d4"));
+    worker.reply(result(id, "a2a3"));
+    assert.equal((await first).best, "d2d4");
+    const second = client.think({ fen: START_FEN, moves: ["d2d4"], level: "medio" });
+    worker.reply(result(id, "h2h3")); // eco del id anterior
+    worker.reply(result(worker.lastId(), "d7d5"));
+    assert.equal((await second).best, "d7d5");
+  });
+});
+
+describe("límite de medias jugadas (RC-06, H-20)", () => {
+  /** Partida legal de `plies` medias jugadas: los caballos van y vienen sin que nadie dé mate. */
+  const shuffle = (plies: number): string[] => {
+    const cycle = ["g1f3", "g8f6", "f3g1", "f6g8"];
+    return Array.from({ length: plies }, (_, i) => cycle[i % 4]!);
+  };
+
+  it("el Worker admite exactamente lo que admite el importador de PGN", () => {
+    assert.equal(MAX_MOVES, PGN_MAX_PLIES);
+  });
+
+  it("acepta una partida de 1.001 a 1.200 medias jugadas (antes se rechazaba pasadas 1.000)", () => {
+    for (const plies of [1001, PGN_MAX_PLIES]) {
+      const response = handleRequest(request({ level: "facil", moves: shuffle(plies) }));
+      assert.notEqual(response.type === "error" ? response.message : "", "Lista de jugadas no válida", `${plies} medias jugadas`);
+    }
+  });
+
+  it("rechaza una media jugada de más", () => {
+    assert.match(errorOf(handleRequest(request({ moves: shuffle(PGN_MAX_PLIES + 1) }))), /Lista de jugadas/);
+  });
+
+  it("una partida importada de 1.200 medias jugadas llega entera al Worker del motor y al del coach", () => {
+    const uci = shuffle(PGN_MAX_PLIES);
+    const game = parsePgn(writePgn({ startFen: START_FEN, moves: uci, result: "*" }));
+    assert.equal(game.moves.length, PGN_MAX_PLIES);
+    const notMoveList = (r: { type: string; message?: string }): string => (r.type === "error" ? (r.message ?? "") : "");
+    assert.notEqual(notMoveList(handleRequest(request({ level: "facil", moves: game.moves }))), "Lista de jugadas no válida");
+    const coach = handleAnalyze(
+      { type: "analyze", id: 1, fen: START_FEN, moves: game.moves.slice(0, -1), move: game.moves.at(-1)! },
+      { limits: { maxDepth: 1 } },
+    );
+    assert.notEqual(notMoveList(coach), "Lista de jugadas no válida");
   });
 });
