@@ -1,0 +1,88 @@
+
+### H-01 2.g4  (143 ms, depth 4)
+ jugada=g4 best=Nc3 loss=9935 verdict=Error grave
+ summary: Hay una jugada mucho mejor y la partida cambia de rumbo.
+ before: −0,7 a favor de las negras | after: Mate en 1 para las negras
+ why: No hay un motivo táctico: Alfil Beta la prefiere por cómo quedan las piezas (−0,7 frente a mate en 1 de las negras).
+ line: 2. Cc3 Cc6 3. e4 Cf6
+
+### H-02 2.Cf3  (121 ms, depth 4)
+ jugada=Nf3 best=Nc3 loss=0 verdict=Mejor jugada
+ summary: Es la jugada que elige Alfil Beta.
+ before: 0,0, igualdad | after: 0,0, igualdad
+ why: 
+ line: 2. Cc3 Cc6 3. Cf3 Cf6
+
+### H-06 6.Cxf7  (264 ms, depth 4)
+ jugada=Nxf7 best=Nc3 loss=187 verdict=Error grave
+ summary: Cxf7 deja el caballo sin protección.
+ before: −0,4 a favor de las negras | after: −2,2 a favor de las negras
+ why: No hay un motivo táctico: Alfil Beta la prefiere por cómo quedan las piezas (−0,4 frente a −2,2).
+ line: 6. Cc3 Dxg5 7. Cxd5 Dxg2
+ finding[pieza-colgando]: Tu caballo de f7 está atacado por el rey negro de e8 y no lo defiende ninguna pieza.
+
+### H-14 10...Da5  (413 ms, depth 4)
+ jugada=Qa5 best=Qa5 loss=0 verdict=Mejor jugada
+ summary: Es la jugada que elige Alfil Beta.
+ before: −1,3 a favor de las negras | after: −1,3 a favor de las negras
+ why: 
+ line: 10… Da5 11. Tb1 Ca6 12. d4
+
+### H-02b 12.dxe5  (3462 ms, depth 4)
+ jugada=dxe5 best=dxe5 loss=0 verdict=Mejor jugada
+ summary: dxe5 gana un peón.
+ before: −0,2 a favor de las negras | after: −0,2 a favor de las negras
+ why: 
+ line: 12. dxe5 Ac7 13. Tb1 Ca6
+
+### H-07 13.O-O  (1308 ms, depth 4)
+ jugada=O-O best=Bd2 loss=102 verdict=Imprecisión
+ summary: O-O deja el peón en peligro.
+ before: +1,2 a favor de las blancas | after: +0,2 a favor de las blancas
+ why: Ad2 gana dos peones. Si las negras responden 13… Axe5, 14. Cxd5 se lleva el caballo.
+ line: 13. Ad2 Axe5 14. Cxd5 cxd5
+ finding[pieza-colgando]: Tu peón de e5 está atacado por el alfil negro de c7 y no está bien defendido: hay más piezas atacándolo que defendiéndolo.
+
+### H-05 32.Tc8+  (249 ms, depth 4)
+ jugada=Rc8+ best=Rc2 loss=519 verdict=Buena jugada
+ summary: Tc8+ deja la torre sin protección.
+ before: −19,5 a favor de las negras | after: −24,7 a favor de las negras
+ why: Tc2 pone a salvo el alfil de b2, que estaba atacado por la dama de e2.
+ line: 32. Tc2 Dxc2 33. Txd5 Axg3+
+ finding[pieza-colgando]: Tu torre de c8 está atacada por la torre negra de a8 y no la defiende ninguna pieza.
+
+### H-03 4.Dg5  (224 ms, depth 4)
+ jugada=Qg5 best=Nc3 loss=922 verdict=Error grave
+ summary: Dg5 deja la dama sin protección.
+ before: −0,5 a favor de las negras | after: −9,7 a favor de las negras
+ why: No hay un motivo táctico: Alfil Beta la prefiere por cómo quedan las piezas (−0,5 frente a −9,7).
+ line: 4. Cc3 Cf6 5. Df3 d6
+ finding[pieza-colgando]: Tu dama de g5 está atacada por la dama negra de e7 y no la defiende ninguna pieza.
+
+### H-08 13.Dd5+  (256 ms, depth 4)
+ jugada=Qd5+ best=Qd3+ loss=603 verdict=Error grave
+ summary: Hay una jugada mucho mejor y la partida cambia de rumbo.
+ before: +2,2 a favor de las blancas | after: −3,9 a favor de las negras
+ why: Dd3+ gana una torre.
+ line: 13. Dd3+ Re7 14. Cd5+ Rf7
+
+### H-04 40.gxf5  (3 ms, depth 2)
+ jugada=gxf5 best=gxf5 loss=0 verdict=Mejor jugada
+ summary: gxf5 gana una pieza.
+ before: Mate en 1 para las negras | after: Mate en 1 para las negras
+ why: 
+ line: 40. gxf5 Tf4#
+
+### H-09 16.Ab5+  (215 ms, depth 4)
+ jugada=Bb5+ best=Qa5 loss=5 verdict=Buena jugada
+ summary: Ab5+ pone a salvo la dama de c7, que estaba atacada por el alfil de d6.
+ before: −4,9 a favor de las negras | after: −4,9 a favor de las negras
+ why: Da5 pone a salvo la dama de c7, que estaba atacada por el alfil de d6.
+ line: 16. Da5 Dxf2 17. Db5+ Rf8
+
+### H-10 12...Df6  (820 ms, depth 4)
+ jugada=Qf6 best=c6 loss=539 verdict=Error grave
+ summary: Hay una jugada mucho mejor y la partida cambia de rumbo.
+ before: −4,3 a favor de las negras | after: +1,1 a favor de las blancas
+ why: No hay un motivo táctico: Alfil Beta la prefiere por cómo quedan las piezas (−4,3 frente a +1,1).
+ line: 12… c6 13. Re2 Df6 14. d3
