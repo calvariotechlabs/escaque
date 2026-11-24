@@ -1,4 +1,4 @@
-// Calidad del análisis del coach (RC-05 de la Release Candidate, bloque B3, CAL-408).
+// Calidad del análisis del coach (RC-05 de la Release Candidate, bloque B3, issue #62).
 //
 // Cada prueba cubre un defecto confirmado de las auditorías o del banco de
 // posiciones (bench/), con el análisis sin reloj para que sea determinista.
