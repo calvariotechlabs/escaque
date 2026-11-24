@@ -884,7 +884,11 @@
     "IdentidadMovilHorizontal.dc.html",
     "LeccionTableroEscritorio.dc.html",
     "LeccionTableroMovil.dc.html",
-    "InicioMovilHorizontalAjuste.dc.html"
+    "InicioMovilHorizontalAjuste.dc.html",
+    "PulidoDosDialogos.dc.html",
+    "PulidoDosRepaso.dc.html",
+    "PulidoDosPartida.dc.html",
+    "PulidoDosNotacion.dc.html"
   ],
   "notes": {
     "t_escritorio_0": {
