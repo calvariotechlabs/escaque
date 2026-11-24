@@ -4,6 +4,7 @@
 import type { BoardView } from "./board.js";
 import type { Interaction, Outcome } from "./interaction.js";
 import { chipPlacement, liftedTransform, liftsPiece } from "./drag-lift.js";
+import { abandonedBy } from "./pointer-gesture.js";
 
 export interface BoardInputHost {
   readonly view: BoardView;
@@ -25,12 +26,6 @@ export interface BoardInputHost {
 
 /** Distancia en píxeles a partir de la cual un gesto es un arrastre y no un clic. */
 const DRAG_THRESHOLD = 4;
-
-/**
- * Milisegundos sin noticias de un gesto a partir de los cuales se da por abandonado. Safari en iOS puede dejar
- * un toque sin pointerup ni pointercancel; sin este límite el tablero ignoraría todos los toques siguientes.
- */
-const ABANDONED_MS = 500;
 
 interface Gesture {
   readonly pointerId: number;
@@ -130,21 +125,12 @@ export function attachBoardInput(host: BoardInputHost): void {
     chip.style.transform = flip ? "translateX(-100%)" : "";
   }
 
-  /** ¿El gesto abierto está abandonado, a la vista de un `pointerdown` nuevo? */
-  function abandonedBy(open: Gesture, event: PointerEvent): boolean {
-    return (
-      event.pointerId === open.pointerId || // el mismo puntero vuelve a pulsar: el gesto anterior ya terminó
-      event.pointerType !== open.pointerType || // nadie arrastra con el dedo y pulsa con el ratón a la vez
-      event.timeStamp - open.lastSeen >= ABANDONED_MS // el dedo lleva rato sin moverse: el navegador lo perdió
-    );
-  }
-
   view.element.addEventListener("pointerdown", (event) => {
     // Se lee todo antes de cancelar nada: cancelar repinta y devuelve el foco al tablero.
     const square = squareAt(event.target);
     const hadFocus = view.element.contains(document.activeElement);
     if (gesture !== null) {
-      // Otro dedo mientras el primero sigue arrastrando: se ignora, y el arrastre sigue.
+      // Otro dedo mientras el primero sigue apoyado (aunque esté quieto): se ignora, y el arrastre sigue.
       if (!abandonedBy(gesture, event)) return;
       endGesture(gesture.pointerId, event.clientX, event.clientY, true);
     }
