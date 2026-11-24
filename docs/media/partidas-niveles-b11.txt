@@ -1,0 +1,57 @@
+
+> escaque@0.1.0 match
+> npm run build && node dist/tools/match.js 10
+
+
+> escaque@0.1.0 build
+> tsc -p tsconfig.json
+
+  Difícil contra azar #1 (blancas): 1-0 por checkmate en 21 medias jugadas
+  Difícil contra azar #2 (negras): 0-1 por checkmate en 48 medias jugadas
+  Difícil contra azar #3 (blancas): 1-0 por checkmate en 23 medias jugadas
+  Difícil contra azar #4 (negras): 0-1 por checkmate en 34 medias jugadas
+  Difícil contra azar #5 (blancas): 1-0 por checkmate en 21 medias jugadas
+  Difícil contra azar #6 (negras): 0-1 por checkmate en 38 medias jugadas
+  Difícil contra azar #7 (blancas): 1-0 por checkmate en 33 medias jugadas
+  Difícil contra azar #8 (negras): 0-1 por checkmate en 36 medias jugadas
+  Difícil contra azar #9 (blancas): 1-0 por checkmate en 27 medias jugadas
+  Difícil contra azar #10 (negras): 0-1 por checkmate en 24 medias jugadas
+Difícil contra azar: +10 =0 -0 de 10
+
+  Difícil contra Fácil #1 (blancas): 1-0 por checkmate en 43 medias jugadas
+  Difícil contra Fácil #2 (negras): 0-1 por checkmate en 58 medias jugadas
+  Difícil contra Fácil #3 (blancas): 1-0 por checkmate en 35 medias jugadas
+  Difícil contra Fácil #4 (negras): 0-1 por checkmate en 42 medias jugadas
+  Difícil contra Fácil #5 (blancas): 1-0 por checkmate en 15 medias jugadas
+  Difícil contra Fácil #6 (negras): 0-1 por checkmate en 40 medias jugadas
+  Difícil contra Fácil #7 (blancas): 1-0 por checkmate en 7 medias jugadas
+  Difícil contra Fácil #8 (negras): 0-1 por checkmate en 46 medias jugadas
+  Difícil contra Fácil #9 (blancas): 1-0 por checkmate en 47 medias jugadas
+  Difícil contra Fácil #10 (negras): 0-1 por checkmate en 28 medias jugadas
+Difícil contra Fácil: +10 =0 -0 de 10
+
+  Difícil contra Medio #1 (blancas): 1-0 por checkmate en 49 medias jugadas
+  Difícil contra Medio #2 (negras): 0-1 por checkmate en 104 medias jugadas
+  Difícil contra Medio #3 (blancas): 1-0 por checkmate en 85 medias jugadas
+  Difícil contra Medio #4 (negras): 1/2-1/2 por threefold-repetition en 88 medias jugadas
+  Difícil contra Medio #5 (blancas): 1-0 por checkmate en 75 medias jugadas
+  Difícil contra Medio #6 (negras): 0-1 por checkmate en 88 medias jugadas
+  Difícil contra Medio #7 (blancas): 1-0 por checkmate en 61 medias jugadas
+  Difícil contra Medio #8 (negras): 0-1 por checkmate en 70 medias jugadas
+  Difícil contra Medio #9 (blancas): 1-0 por checkmate en 107 medias jugadas
+  Difícil contra Medio #10 (negras): 0-1 por checkmate en 106 medias jugadas
+Difícil contra Medio: +9 =1 -0 de 10
+
+  Medio contra Fácil #1 (blancas): 1-0 por checkmate en 101 medias jugadas
+  Medio contra Fácil #2 (negras): 0-1 por checkmate en 50 medias jugadas
+  Medio contra Fácil #3 (blancas): 1-0 por checkmate en 79 medias jugadas
+  Medio contra Fácil #4 (negras): 0-1 por checkmate en 88 medias jugadas
+  Medio contra Fácil #5 (blancas): 1-0 por checkmate en 71 medias jugadas
+  Medio contra Fácil #6 (negras): 0-1 por checkmate en 54 medias jugadas
+  Medio contra Fácil #7 (blancas): 1-0 por checkmate en 37 medias jugadas
+  Medio contra Fácil #8 (negras): 0-1 por checkmate en 62 medias jugadas
+  Medio contra Fácil #9 (blancas): 1-0 por checkmate en 41 medias jugadas
+  Medio contra Fácil #10 (negras): 0-1 por checkmate en 28 medias jugadas
+Medio contra Fácil: +10 =0 -0 de 10
+
+Difícil: 757 jugadas, media 821 ms, máximo 937 ms

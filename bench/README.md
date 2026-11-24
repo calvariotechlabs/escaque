@@ -107,6 +107,22 @@ Para cada jugada elegida:
 
 Diferencia de la evaluación de Alfil Beta entre profundidad 4 (la del coach) y 5 en cada posición. Se marcan las que cambian un peón o más (hallazgo H-11).
 
+## Duelo entre versiones del motor
+
+El banco mide jugadas sueltas; para saber si un cambio del motor lo hace más fuerte hace falta jugar partidas. `tools/duelo.mjs` enfrenta dos `dist/` compilados de Escaque (por ejemplo, el de la rama y el de main en un worktree aparte):
+
+```bash
+node tools/duelo.mjs --a dist --b ../main/dist --partidas 100 --procesos 4 --nivel dificil --salida resultado.json
+node tools/duelo.mjs --a dist --b ../main/dist --partidas 20 --ms 100   # prueba rápida: 100 ms por jugada
+```
+
+- Las partidas salen de `bench/aperturas.json` (50 aperturas escritas a mano y comprobadas como legales). Cada apertura se juega dos veces, una con cada color, así que ninguna versión gana por las aperturas.
+- Cada jugador usa su propio núcleo y su propia tabla de transposición, vaciada al empezar cada partida. Las partidas acaban en mate, tablas por las reglas o un tope de jugadas.
+- Da el marcador, el porcentaje de puntos con su intervalo de confianza del 95 %, la diferencia de Elo **entre las dos versiones** y la probabilidad de que A sea más fuerte (LOS), además del tiempo por jugada de cada una.
+- Con el nivel Difícil el reloj es real: los procesos no deben compartir el equipo con otro trabajo pesado, porque afecta a la profundidad que alcanza cada lado.
+
+Resultado de B11 (issue #63): `bench/resultados/duelo-b11-dificil.json`, +96 =1 −3 contra main.
+
 ## Reproducibilidad
 
 - El informe trae una **huella** (FNV-1a de 32 bits) de todo lo determinista: jugadas de Fácil y de profundidad 5, estabilidad e informes completos del coach (veredicto, mejor jugada y textos). Deja fuera los tiempos y los niveles Medio y Difícil, que dependen del reloj. Dos ejecuciones del mismo commit dan la misma huella; si cambia, ha cambiado el comportamiento.

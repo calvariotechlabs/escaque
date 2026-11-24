@@ -1,7 +1,7 @@
 {
   "generado": {
     "fecha": "2026-11-24",
-    "commit": "b93990f3f1f4"
+    "commit": "4f448ef5c8a9"
   },
   "dependencias": {
     "enEjecucion": 0,
@@ -10,8 +10,8 @@
     ]
   },
   "pruebas": {
-    "total": 1119,
-    "suites": 204,
+    "total": 1167,
+    "suites": 209,
     "fallan": 0
   },
   "lecciones": {
@@ -24,37 +24,37 @@
   },
   "sitio": {
     "ficheros": 92,
-    "bytes": 797337,
-    "gzipJsCssHtmlBytes": 184046
+    "bytes": 825924,
+    "gzipJsCssHtmlBytes": 191403
   },
   "banco": {
-    "etiqueta": "despues-b3",
+    "etiqueta": "despues-b11",
     "fecha": "2026-11-24",
-    "commit": "7ab25d970e05",
+    "commit": "0b549a2dc35d",
     "posiciones": 82,
     "referencia": "Stockfish 17.1, 8000000 nodos por posición",
     "dificil": {
-      "coincide": 46,
-      "equivalente": 67,
-      "erroresMas2Peones": 4,
-      "erroresMas2PeonesTacticas": 4,
+      "coincide": 49,
+      "equivalente": 70,
+      "erroresMas2Peones": 3,
+      "erroresMas2PeonesTacticas": 3,
       "matesMantenidos": 18,
       "matesDisponibles": 18,
       "msMedia": 749,
-      "msMax": 907
+      "msMax": 905
     },
     "coach": {
       "analisis": 152,
-      "veredictoIgual": 99,
+      "veredictoIgual": 97,
       "gravesDetectados": 20,
       "gravesReferencia": 23,
-      "falsosPositivos": 5,
+      "falsosPositivos": 3,
       "equivalentes": 123,
       "erroresNoVistos": 3,
-      "informesConViolaciones": 0,
-      "msMedia": 290,
-      "msP95": 1046,
-      "msMax": 3781
+      "informesConViolaciones": 1,
+      "msMedia": 119,
+      "msP95": 537,
+      "msMax": 828
     }
   },
   "registrado": {
@@ -67,7 +67,7 @@
     "perft": {
       "posicion": "inicial, profundidad 5",
       "nodos": 4865609,
-      "nodosPorSegundo": 5284763,
+      "nodosPorSegundo": 12999708,
       "node": "v22.23.5",
       "nucleos": 4,
       "comando": "npm run metrics -- --rendimiento",

@@ -6,6 +6,9 @@ import { MATE_SCORE, scoreMoves, search } from "../src/engine/index.js";
 import { LESSONS, PASS, checkLessonMove, lessonById, passTurn } from "../src/lessons/index.js";
 import type { Lesson, Step } from "../src/lessons/index.js";
 
+/** Dos respuestas del rival que el motor separa por menos de esto valen lo mismo. */
+const EQUIVALENT_CP = 15;
+
 const SQUARE = /^[a-h][1-8]$/;
 /** Frase completa: empieza en mayúscula (o signo de apertura) y acaba en punto. */
 const SENTENCE = /^[¿¡A-ZÁÉÍÓÚÑ].*\.$/s;
@@ -200,7 +203,16 @@ for (const lesson of LESSONS) {
             const best = Math.max(...scores.map((s) => s.score));
             assert.equal(scores.find((s) => s.uci === reply)?.score, best, `${reply} aguanta lo máximo tras ${uci}`);
           } else {
-            assert.equal(search(position, { maxDepth: 4 }).best, reply, `${reply} es la elección del motor tras ${uci}`);
+            // La primera opción del motor, o una que valga lo mismo a esa profundidad: tras
+            // Cc7+, Rd7 y Re7 pierden la dama igual (Stockfish: +5,37 y +5,41), y desde B11 la
+            // movilidad las deja a menos de 0,1 peones; el desempate no es parte de la lección.
+            const best = search(position, { maxDepth: 4 });
+            if (best.best !== reply) {
+              const scores = scoreMoves(position, 4);
+              const top = Math.max(...scores.map((s) => s.score));
+              const mine = scores.find((s) => s.uci === reply)?.score ?? -Infinity;
+              assert.ok(top - mine <= EQUIVALENT_CP, `${reply} es la elección del motor tras ${uci} (o vale lo mismo): ${mine} frente a ${top}`);
+            }
           }
         }
       });
