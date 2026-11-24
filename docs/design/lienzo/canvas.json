@@ -2007,7 +2007,7 @@
       "x": 0,
       "y": 44470,
       "w": 560,
-      "text": "Propuesta CAL-405: en móvil apaisado, si «Escaque» y la navegación no caben juntos en la columna derecha (menos de unos 330 px, por ejemplo 720×450 o 667×375), la navegación baja a una segunda línea bajo el nombre, alineada a la izquierda con el texto de «Jugar» pegado al borde de la columna. El tablero no cambia. A partir de unos 330 px de columna la cabecera sigue en una sola fila, como en 844×390.",
+      "text": "Propuesta CAL-405: en móvil apaisado, si «Escaque» y la navegación no caben juntos en la columna derecha (menos de unos 330 px, por ejemplo 720×450 o 667×375), la navegación baja a una segunda línea bajo el nombre, alineada a la izquierda con el texto de «Jugar» pegado al borde de la columna. El tablero no cambia. A partir de unos 330 px de columna la cabecera sigue en una sola fila, como en 844×390. Botones (CAL-407): en ese mismo caso los cuatro botones de la partida van en dos columnas de dos filas (Nueva partida y Deshacer jugada arriba; Rehacer jugada y Girar tablero debajo) en lugar de cuatro en una fila, donde «Deshacer» y «Rehacer» se cortaban. En el repaso, los botones de paso también van a dos columnas (Inicio y Anterior, Siguiente y Final, y debajo los dos de error clave).",
       "fill": "gray",
       "page": "movil"
     }

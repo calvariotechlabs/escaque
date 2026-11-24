@@ -161,3 +161,10 @@
   .repaso__coach{padding:var(--space-3);gap:var(--space-3)}
   .curva__lienzo .marca{width:16px;height:16px;margin:-8px 0 0 -8px}
 }
+
+/* Móvil apaisado estrecho (CAL-407, mismo caso que --cab-alto en page.css): seis botones de paso no caben en filas de cuatro en unos 230 px;
+   van de dos en dos: Inicio y Anterior, Siguiente y Final, y debajo los dos de error clave. */
+@media (orientation:landscape) and (max-height:500px) and (max-width:calc(100vh + 376px)){
+  .paso{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .paso__doble{grid-column:auto}
+}
