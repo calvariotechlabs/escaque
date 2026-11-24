@@ -8,7 +8,7 @@
 
 App web para aprender ajedrez con motor propio (**Alfil Beta**), escrita desde cero en TypeScript sin dependencias en ejecución: ni librerías de ajedrez, ni frameworks de interfaz. TypeScript solo se usa para compilar.
 
-**Qué hay dentro:** reglas completas verificadas con perft, un motor con tres niveles que corre en un Web Worker, un coach que explica por qué una jugada fue mala, seis lecciones guiadas, repaso de la partida con curva de evaluación, importación y exportación de PGN, y PWA. Todo accesible con teclado y lector de pantalla. [Cifras](#cifras), [fuerza del motor](#fuerza-del-motor), [decisiones técnicas](#decisiones-técnicas) y [qué aprendí](#qué-aprendí-y-qué-haría-distinto) más abajo.
+**Qué hay dentro:** reglas completas verificadas con perft, un motor con tres niveles que corre en un Web Worker, un coach que explica por qué una jugada fue mala, seis lecciones guiadas, repaso de la partida con curva de evaluación, importación y exportación de PGN, y PWA. Todo accesible con teclado y lector de pantalla. [Cifras](#cifras), [fuerza del motor](#fuerza-del-motor), [decisiones técnicas](#decisiones-técnicas), [qué aprendí](#qué-aprendí-y-qué-haría-distinto) y [auditorías externas](#auditorías-externas) más abajo.
 
 ## Estado
 
@@ -78,6 +78,17 @@ El diseño y las decisiones técnicas (arquitectura, tablero 0x88, estrategia de
 - **CI** (`.github/workflows/ci.yml`, GitHub Actions, permisos solo de lectura, sin secretos). En cada pull request y en cada push a `main`: tipos con `tsc` estricto, `npm test`, montaje del sitio (`npm run build:site`), perft a profundidad completa (`npm run test:perft`) pruebas de accesibilidad de extremo a extremo (`npm run test:e2e`) y comprobación de que `dependencies` sigue vacío. Las pruebas de navegador no usan Playwright ni Puppeteer: `tools/cdp.mjs` es un cliente mínimo del protocolo de Chrome (unas 130 líneas, con el `WebSocket` y `fetch` de Node 22) que maneja el Chrome que ya trae el ejecutor de GitHub, con teclado real (`Input.dispatchKeyEvent`).
 - **Despliegue.** Vercel publica `site/` desde el repositorio como web estática (`vercel.json`: región `fra1`, cabeceras de seguridad, sin funciones). Las vistas previas están protegidas con Vercel Authentication, hay Bot Protection en modo desafío con excepción para iconos y manifest, y un tope de gasto en el equipo.
 - **Qué no hace la CI:** no despliega. Cada fusión a `main` la despliega Vercel; la CI solo dice si el código está sano.
+
+## Auditorías externas
+
+El 24 de noviembre de 2026 Escaque pasó dos auditorías independientes, hechas por ChatGPT y por Claude en conversaciones distintas de las que lo programaron. Las dos jugaron partidas reales en producción, revisaron el código del commit `5e9e946` y contrastaron jugadas con Stockfish. Ninguna cambió nada del repositorio.
+
+| Auditoría | Valoración | Informe |
+|---|---|---|
+| ChatGPT | 9/10 como portfolio, 5/10 el coach | [PDF, 11 páginas](docs/auditorias/auditoria-chatgpt-2026-11-24.pdf) |
+| Claude | 8,0/10 global, 5,0/10 el coach | [Copia del informe](docs/auditorias/auditoria-claude-2026-11-24.md) |
+
+Coinciden en que reglas, arquitectura, pruebas y seguridad son sólidas y en que el coach a veces se contradice: dice «Mejor jugada» y recomienda otra, o explica como «posicional» un mate que acabas de recibir. Los hallazgos se reprodujeron, se agruparon por causa raíz y se convirtieron en el plan de la Release Candidate: [consolidación y plan](docs/auditorias/consolidacion-rc.md). Los informes se guardan tal como se entregaron, como evidencia; las correcciones se documentan aparte.
 
 ## Qué aprendí y qué haría distinto
 
