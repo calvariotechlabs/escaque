@@ -1,8 +1,9 @@
 // Guardado de la partida en el dispositivo: formato, validación de lo leído y restauración.
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
+import { PGN_MAX_PLIES } from "../src/core/index.js";
 import { Game } from "../src/ui/game.js";
-import { createAutosave, loadFromStorage, restoreGame, saveToStorage, serializeGame, STORAGE_KEY } from "../src/ui/save.js";
+import { MAX_SAVED_MOVES, createAutosave, loadFromStorage, restoreGame, saveToStorage, serializeGame, STORAGE_KEY } from "../src/ui/save.js";
 import type { KeyValueStore } from "../src/ui/save.js";
 
 function playAll(game: Game, moves: string[]): void {
@@ -223,5 +224,20 @@ describe("guardado: ajustes de la partida (versión 2)", () => {
     const first = store.data.get(STORAGE_KEY);
     autosave(game, "w", { mode: "maquina", level: "facil", player: "w" });
     assert.notEqual(store.data.get(STORAGE_KEY), first);
+  });
+});
+
+describe("guardado: límite de jugadas (RC-06, H-20)", () => {
+  const withMoves = (count: number): string => {
+    const base = JSON.parse(serializeGame(new Game(), "w")) as Record<string, unknown>;
+    const cycle = ["g1f3", "g8f6", "f3g1", "f6g8"];
+    base["moves"] = Array.from({ length: count }, (_, i) => cycle[i % 4]);
+    base["ply"] = count;
+    return JSON.stringify(base);
+  };
+
+  it("el límite es el del PGN y los Workers, y una partida guardada con una jugada de más se rechaza", () => {
+    assert.equal(MAX_SAVED_MOVES, PGN_MAX_PLIES);
+    assert.equal(restoreGame(withMoves(PGN_MAX_PLIES + 1)), null);
   });
 });

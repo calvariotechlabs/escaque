@@ -44,7 +44,7 @@ describe("rendimiento (reloj real)", () => {
     }
   });
 
-  it("Medio no pasa de 0,5 s (el tiempo, mejor de 3 intentos como en Difícil)", () => {
+  it("Medio responde en menos de 0,6 s (presupuesto de 0,5 s más margen; mejor de 3 intentos como en Difícil)", () => {
     for (const fen of MIDDLEGAMES) {
       const times: number[] = [];
       for (let attempt = 0; attempt < 3; attempt++) {
