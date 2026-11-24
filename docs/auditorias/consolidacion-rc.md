@@ -5,6 +5,7 @@
 - Tarea: CAL-408
 - Fuentes: [auditoría de ChatGPT](auditoria-chatgpt-2026-11-24.pdf) (11 páginas) y [auditoría de Claude](auditoria-claude-2026-11-24.md) ([original](https://claude.ai/artifact/7MJRot4Q9t4PvwxriCp1bE)). Se conservan sin cambios como evidencia.
 - Alcance de esta fase: análisis, reproducción y plan. No se ha cambiado código.
+- Decisión de Sergio (24-nov, 12:33 Madrid): plan aprobado **incluyendo afinar el motor** (RC-12). Los errores de entrada (RC-10) quedan fuera de la RC.
 
 ## 1. Resumen
 
@@ -37,11 +38,11 @@ Leyenda de estado: **Reproducido** (lo he visto en esta revisión), **Confirmado
 | H-10 | Error táctico del rival explicado como posicional (12…Df6, que permite Dd3+ y Cd5+) | Mencionado | — | Misma causa que H-01 | Reproducido | P0 |
 | H-11 | Evaluaciones distintas de la misma posición en dos búsquedas seguidas (+1,1 y +2,2) | Mencionado | — | Única | Pendiente de medir (ver nota 2) | P1 |
 | H-12 | El coach analiza menos que el rival y su resultado depende del dispositivo | — | Causa de ESC-01 | Complementaria de H-06 | Confirmado en código y medido: profundidad 4 fija; en 12.dxe5 tardó 3,7 s en Node, por encima del tope de 3 s | P1 |
-| H-13 | El coach no nombra el ahogado cuando es la causa del error | — | ESC-09 (baja) | Única | Pendiente de reproducir | P2 |
-| H-14 | Alfil Beta comete errores de 3-4 peones en posiciones abiertas (10…Da5) | Lo insinúa | ESC-05 (media) | Duplicada | Reproducido. Stockfish: −3,58 frente a +0,80 de 10…Ca6 | Decisión de Sergio (ver 6) |
-| H-15 | Difícil es determinista: la misma línea gana siempre | — | ESC-11 (baja) | Única | Confirmado en código (`marginCp: 0`); es una decisión de diseño | Decisión de Sergio |
-| H-16 | Una jugada ilegal no muestra ningún mensaje | — | ESC-07 (baja) | Única | Confirmado en código (`deselect()`) | P2 |
-| H-17 | El PGN en notación española se rechaza con un mensaje engañoso | — | ESC-08 (baja) | Única | Reproducido: «La jugada 2. Cf3 no es legal en esa posición.» | P2 |
+| H-13 | El coach no nombra el ahogado cuando es la causa del error | — | ESC-09 (baja) | Única | Pendiente de reproducir | P2, después de la RC |
+| H-14 | Alfil Beta comete errores de 3-4 peones en posiciones abiertas (10…Da5) | Lo insinúa | ESC-05 (media) | Duplicada | Reproducido. Stockfish: −3,58 frente a +0,80 de 10…Ca6 | P1 (RC-12, aprobado) |
+| H-15 | Difícil es determinista: la misma línea gana siempre | — | ESC-11 (baja) | Única | Confirmado en código (`marginCp: 0`); es una decisión de diseño | P1 (RC-12, aprobado) |
+| H-16 | Una jugada ilegal no muestra ningún mensaje | — | ESC-07 (baja) | Única | Confirmado en código (`deselect()`) | P2, después de la RC |
+| H-17 | El PGN en notación española se rechaza con un mensaje engañoso | — | ESC-08 (baja) | Única | Reproducido: «La jugada 2. Cf3 no es legal en esa posición.» | P2, después de la RC |
 | H-18 | README desfasado: 894 tests, 150 suites, 64 ficheros, «seis lecciones», coach «como mucho 0,6 s» | E (baja) | ESC-10 (baja) | Duplicada | Confirmado (README líneas 11, 15, 24, 35 y 197). Medido hoy: 1.045 tests en 183 suites, 90 ficheros en `site/` (ChatGPT contó 89), 15 lecciones (9 de primeros pasos y 6 tácticas), 3 s | P2 |
 | H-19 | Tres aserciones de tiempo fallan al medir cobertura | Sí | — | Única | Reproducido 2 de 3 (ver nota 3) | P1 |
 | H-20 | Límites distintos: el PGN admite 1.200 medias jugadas y los Workers 1.000 | Lo señala como riesgo | — | Única | Confirmado en código (`PGN_MAX_PLIES = 1200`, `MAX_MOVES = 1000`). Una partida importada de más de 1.000 medias jugadas no se podría repasar | P2 |
@@ -176,15 +177,23 @@ Cada defecto confirmado termina con una prueba de regresión con la posición ex
 - Qué: `npm run metrics` genera las cifras (tests, suites, lecciones, dependencias en ejecución, tamaño del sitio, resultados del banco) en un JSON fechado con el commit; una prueba de CI falla si el README no coincide. Limitaciones conocidas y capacidades verificadas en el README.
 - Dependencias: al final, cuando ya no cambien las cifras.
 
-**RC-10 · Errores de entrada** (H-16, H-17, H-13). Opcional para la RC (ver decisiones).
+**RC-10 · Errores de entrada** (H-16, H-17, H-13). Fuera de la RC (decisión del 24-nov); queda en el backlog para después.
 - Mensaje breve en la línea de estado ante una jugada ilegal; aceptar SAN española al importar PGN o explicar qué se espera; nombrar el ahogado en el coach.
 
 **RC-11 · Informe de la RC y protocolo de revalidación** (puntos 11 y 12 del encargo)
 - Informe de cambios, antes y después del banco, evidencias de regresión, limitaciones, preparación de la RC, protocolo para la auditoría independiente y registro de decisiones para el caso de estudio.
 
+### P1 · Motor (aprobado por Sergio el 24-nov)
+
+**RC-12 · Afinar Alfil Beta** (H-14, H-15)
+- Qué, por orden y cada paso medido en el banco (RC-04) y con partidas entre versiones: seguridad del rey y estructura de peones en la evaluación; después, las mejoras de búsqueda que más rindan en tiempo fijo (killers, historial, jugada nula, ventanas de aspiración); por último, variedad acotada en las primeras jugadas de Difícil (azar entre jugadas casi iguales o un libro mínimo propio, sin datos de terceros).
+- Punto de parada fijado antes de empezar, como pide el proyecto: Difícil sigue respondiendo en menos de 1 s; no repite 10…Da5 ni errores de más de 2 peones en las posiciones tácticas del banco; gana a la versión actual en un match de al menos 100 partidas con aperturas variadas, con su intervalo de confianza. Sin Elo absoluto.
+- Mejoras en `evaluate.ts` benefician también al coach, que usa la misma evaluación (ayuda con H-06).
+- Criterios de aceptación: perft y pruebas en verde; los niveles mantienen su orden de fuerza (Fácil < Medio < Difícil); medición antes y después publicada en el banco.
+- Dependencias: RC-04 (banco y «antes»).
+
 ### Fuera de la RC salvo que lo pidas
 
-- H-14 y H-15: mejorar la evaluación del motor (seguridad del rey, estructura de peones) o dar variedad a Difícil. Es afinar el motor, y la regla del proyecto dice que no se afina sin que lo pidas. Propuesta: documentarlo como limitación conocida.
 - H-23: coach compacto («veredicto + una frase + ver más»). Es un rediseño del panel.
 
 ## 6. Plan de ejecución
@@ -195,19 +204,20 @@ Máximo dos hilos a la vez. Cada bloque con su tarea en Linear (subtarea de CAL-
 |---|---|---|---|---|---|
 | 1 | B1 · Coherencia del coach | RC-01, RC-02, RC-03 (sin la confirmación profunda) | Opus | No: reutiliza los estados visuales actuales del panel; solo cambian textos | B2 |
 | 1 | B2 · Banco de posiciones | RC-04 y medición del «antes» | Opus | No | B1 |
-| 2 | B3 · Calidad del análisis | RC-05 y confirmación de RC-03 | Opus | No | B4 |
-| 2 | B4 · Pruebas y regresión | RC-06 | Sonnet | No | B3 |
-| 3 | B5 · Marca: diseño | RC-07, parte de lienzo | Sonnet | Es el diseño | B6 |
-| 3 | B6 · Validación integral | RC-08 | Sonnet | No | B5 |
-| 4 | B7 · Marca: código | RC-07, parte de código, tras tu OK al diseño | Sonnet | Sí (B5) | B8 |
-| 4 | B8 · Errores de entrada (si lo apruebas) | RC-10 | Sonnet | Solo si el mensaje de jugada ilegal necesita un estado visual nuevo | B7 |
+| 2 | B3 · Calidad del análisis | RC-05 y confirmación de RC-03 | Opus | No | B11 |
+| 2 | B11 · Motor | RC-12 | Opus | No | B3 |
+| 3 | B4 · Pruebas y regresión | RC-06 | Sonnet | No | B5 |
+| 3 | B5 · Marca: diseño | RC-07, parte de lienzo | Sonnet | Es el diseño | B4 |
+| 4 | B6 · Validación integral | RC-08 | Sonnet | No | B7 |
+| 4 | B7 · Marca: código | RC-07, parte de código, tras tu OK al diseño | Sonnet | Sí (B5) | B6 |
 | 5 | B9 · Documentación viva | RC-09 | Sonnet | No | B10 |
 | 5 | B10 · Informe de la RC | RC-11 | Opus | No | B9 |
+| — | B8 · Errores de entrada | RC-10 | Sonnet | — | No aprobado para la RC; queda para después |
 | 6 | Auditoría independiente | Desde conversaciones que no hayan implementado nada | — | — | — |
 
-Por qué este orden: B1 y B2 no tocan los mismos ficheros y B2 tiene que medir el «antes» antes de que B1 cambie el coach. B3 necesita las dos cosas. El diseño de la marca espera a la ola 3 porque necesita tu revisión y no bloquea nada técnico.
+Por qué este orden: B1 y B2 no tocan los mismos ficheros y B2 tiene que medir el «antes» antes de que B1 cambie el coach. B3 y B11 necesitan el banco; van juntas porque tocan módulos distintos (coach y motor), pero B3 mide sus cambios con el motor congelado en una etiqueta y B11 vuelve a pasar el banco del coach al terminar. El diseño de la marca espera a la ola 3 porque necesita tu revisión y no bloquea nada técnico.
 
-Skills por bloque: B1 y B3, `superpowers:systematic-debugging`, `superpowers:test-driven-development` y `superpowers:verification-before-completion`; B2, `engineering:testing-strategy`; B4, `engineering:testing-strategy`; B5 y B7, `impeccable:impeccable` o `design:design-critique` y `design:accessibility-review`; B6, `superpowers:verification-before-completion`; B9, `engineering:documentation`. Todas las PR: `code-review` y `security-review` sobre la diff.
+Skills por bloque: B1, B3 y B11, `superpowers:systematic-debugging`, `superpowers:test-driven-development` y `superpowers:verification-before-completion`; B2, `engineering:testing-strategy`; B4, `engineering:testing-strategy`; B5 y B7, `impeccable:impeccable` o `design:design-critique` y `design:accessibility-review`; B6, `superpowers:verification-before-completion`; B9, `engineering:documentation`. Todas las PR: `code-review` y `security-review` sobre la diff.
 
 Riesgos: (1) más profundidad en el coach cuesta tiempo en móviles lentos; se mitiga con tope adaptativo y medición en el banco. (2) Los textos nuevos del coach pueden pedir un estado visual que hoy no existe (por ejemplo, «equivalente»); si pasa, el hilo para y se diseña primero. (3) Las pruebas de coherencia pueden destapar más casos de los vistos; se tratan con la misma jerarquía, no caso a caso.
 
@@ -216,7 +226,7 @@ Riesgos: (1) más profundidad en el coach cuesta tiempo en móviles lentos; se m
 | Criterio del encargo | Cómo se comprueba |
 |---|---|
 | Sin defectos P0 abiertos | RC-01 a RC-03 fusionadas; invariantes en verde en el banco |
-| P1 resueltos o con excepción aprobada | RC-04 a RC-06 fusionadas o con tu excepción escrita |
+| P1 resueltos o con excepción aprobada | RC-04 a RC-06 y RC-12 fusionadas o con tu excepción escrita |
 | Regresiones cubiertas | Una prueba por cada H reproducido (tabla de la sección 3) |
 | Banco reproducible | Dos ejecuciones con el mismo resultado; metodología escrita |
 | El coach no se contradice | Cero violaciones de invariantes en el banco |
