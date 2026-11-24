@@ -7,7 +7,7 @@
 
 ## 1. Veredicto en una línea
 
-La RC cumple la Definition of Done del plan salvo tres puntos abiertos que dependen de Sergio o de una fusión pendiente: la excepción de H-10, la documentación viva (PR #77, sin fusionar) y las pruebas en dispositivo físico. Los defectos P0 del entrenador están cerrados: **0 de 152 informes con contradicción de las invariantes del propio coach** (antes, 39 de 152 con la regla externa) y una sola contradicción de medida en el banco (apartado 4.3).
+La RC cumple la Definition of Done del plan salvo dos puntos abiertos que dependen de una fusión pendiente o de una persona: la documentación viva (PR #77, sin fusionar) y las pruebas en dispositivo físico. Los defectos P0 del entrenador están cerrados: **0 de 152 informes con contradicción de las invariantes del propio coach** (antes, 39 de 152 con la regla externa) y una sola contradicción de medida en el banco (apartado 4.3).
 
 ## 2. Qué se hizo, bloque a bloque
 
@@ -65,7 +65,7 @@ Lectura honesta: el coach ya no se contradice y da menos falsos positivos, pero 
 | Criterio | Cómo se comprueba | Estado |
 |---|---|---|
 | Sin defectos P0 abiertos | RC-01 a RC-03 fusionadas (#59, #64); invariantes en verde | **Cumplido** (4.3 explica la contradicción de medida que queda) |
-| P1 resueltos o con excepción aprobada | RC-04 a RC-06 y RC-12 fusionadas; excepciones escritas | **Cumplido con una excepción pendiente** (H-10) |
+| P1 resueltos o con excepción aprobada | RC-04 a RC-06 y RC-12 fusionadas; excepciones escritas | **Cumplido** con tres excepciones aprobadas (apartado 5) |
 | Regresiones cubiertas: una prueba por cada H reproducido | Tabla 4.1 | **Cumplido** salvo lo que está fuera de la RC |
 | Banco reproducible | Dos ejecuciones del mismo commit dan la misma huella; metodología en `bench/README.md` | **Cumplido** (apartado 8) |
 | El coach no se contradice | Cero violaciones en el banco | **Casi**: 0 de `checkInvariants`; 1 contradicción de la regla externa (4.3) |
@@ -106,13 +106,13 @@ Alfil Beta falla en tres posiciones de las auditorías en el nivel Difícil. Las
 |---|---|---|---|---|
 | H-14 | 10…Da5 | −485 cp | No la ve ni a profundidad 9 | **Excepción aprobada** por Sergio (24-nov). Prueba `todo` en `tests/engine-tacticas.test.ts` |
 | H-02b | 12.dxe5 | −204 cp (antes −398) | No la ve ni a profundidad 9 | **Excepción aprobada** por Sergio. Prueba `todo` |
-| H-10 | 12…Dh4 | −569 cp | Acierta en cuanto llega a profundidad 7; en 0,9 s unas veces llega y otras no. Con presupuesto fijo de nodos la prueba pasa | **Pendiente de decisión de Sergio** (opciones en el apartado 10) |
+| H-10 | 12…Dh4 | −569 cp | Acierta en cuanto llega a profundidad 7; en 0,9 s unas veces llega y otras no. Con presupuesto fijo de nodos la prueba pasa | **Excepción aprobada** por Sergio el 24-nov (consta en la issue #63), con la redacción «según cuánto llegue a mirar en 0,9 s» |
 
 **Dato nuevo de esta verificación:** en una ejecución de Difícil en otro equipo, H-02b y H-10 salieron bien y solo falló H-14. Confirma que Difícil depende del reloj y de la máquina; los 3 fallos de la tabla 3.2 son el peor caso medido, no un valor fijo.
 
 Qué se arregló por el camino: gana-arca-noe y pierde-arca-noe dejaron de fallar; H-02b mejoró de −398 a −204 cp. Los sacrificios correctos (6.Cxf7, sacrificio griego, Axf7+ del Traxler) siguen llamándose «Error grave» en 3 casos: el texto ya avisa de que puede ser un sacrificio con compensación que el coach no ve (B1 y B11), y capar el veredicto bajaría la detección de los sacrificios incorrectos.
 
-**Nota de coherencia a corregir:** el README de `main` (sección del punto de parada de B11) dice que las tres excepciones están «aprobadas por Sergio el 24-nov-2026». Según el registro del proyecto, H-14 y H-02b lo están y H-10 **no**. Cuando Sergio decida H-10, hay que ajustar esa frase (en la rama de #77, que ya reescribe esa parte del README, o en una PR aparte).
+Las tres excepciones constan como aprobadas (la de H-10, el 24-nov a las 16:35 UTC, en la issue #63) y coinciden con lo que dice el README de `main`.
 
 ## 6. Lo que solo puede comprobar una persona
 
@@ -156,12 +156,11 @@ Se rehicieron en un clon limpio de `main` (`7e38bba`), Node de la sesión, sin d
 - **Fuera de la RC por decisión de Sergio:** H-13 (el coach no nombra el ahogado), H-16 (una jugada ilegal no muestra mensaje), H-17 (el PGN en notación española se rechaza con un mensaje engañoso), H-23 (panel del coach compacto), H-24 (medir el repaso de partidas largas con el banco), H-25 (aviso legal y de privacidad) y H-26 (separar tiempo de motor y tiempo hasta ver la respuesta).
 - **Sin validar en dispositivo físico ni con lector de pantalla real** (apartado 6).
 
-## 10. Decisiones que necesito de Sergio
+## 10. Decisiones y pasos que quedan
 
-1. **H-10.** Opciones: (a) aprobar la excepción como las otras dos, con la redacción «según cuánto llegue a mirar en 0,9 s»; (b) subir el tiempo de Difícil (rompe el punto de parada de 1 s); (c) pedir una PR más para que el motor llegue a profundidad 7 en 0,9 s en esa posición (más afinado, que el proyecto fija como «no seguir sin que se pida»). Recomendación: (a).
-2. **Contradicción de medida de H-08** (4.3): aceptarla como límite del banco o ampliar su ventana.
-3. **Fusionar #77** (después de actualizarla contra `main` y regenerar las cifras), para poder dar por cerrada la documentación viva.
-4. **Fusionar esta PR** cuando las tres anteriores estén decididas, para que el informe quede fijado en el commit de la RC.
+1. **Contradicción de medida de H-08** (4.3): se trata como límite del banco, no como defecto del coach (indicación de la coordinación).
+2. **Fusionar #77** tras actualizarla contra `main` y regenerar las cifras; si cambian, este informe se ajusta.
+3. **Fusionar esta PR** con el OK de Sergio, para fijar el informe en el commit de la RC.
 
 ## 11. Registro de decisiones para el caso de estudio
 
@@ -197,7 +196,7 @@ Objetivo: que quien audite **no haya implementado nada** y trabaje contra produc
 **Criterios de aceptación:**
 
 - Ningún defecto P0 nuevo (el coach no se contradice en partidas libres).
-- Los 11 casos originales no reproducen, salvo las excepciones del apartado 5 (H-14, H-02b, H-10 si se aprueba).
+- Los 11 casos originales no reproducen, salvo las excepciones del apartado 5 (H-14, H-02b, H-10).
 - La huella del banco coincide, y las pruebas y la CI pasan.
 - Las cabeceras de producción coinciden con `vercel.json` y no hay `noindex` en el dominio propio.
 - Todo lo que reporten se clasifica con la misma leyenda de la matriz (reproducido, confirmado en código, pendiente de validación, recomendación).
