@@ -7,7 +7,7 @@
 
 ## 1. Veredicto en una línea
 
-La RC cumple la Definition of Done del plan salvo dos puntos abiertos que dependen de una fusión pendiente o de una persona: la documentación viva (PR #77, sin fusionar) y las pruebas en dispositivo físico. Los defectos P0 del entrenador están cerrados: **0 de 152 informes con contradicción de las invariantes del propio coach** (antes, 39 de 152 con la regla externa) y una sola contradicción de medida en el banco (apartado 4.3).
+La RC cumple la Definition of Done del plan salvo un punto abierto que depende de una persona: las pruebas en dispositivo físico, con lector de pantalla y de las cabeceras de producción (apartado 6). Los defectos P0 del entrenador están cerrados: **0 de 152 informes con contradicción de las invariantes del propio coach** (antes, 39 de 152 con la regla externa) y una sola contradicción de medida en el banco (apartado 4.3).
 
 ## 2. Qué se hizo, bloque a bloque
 
@@ -21,7 +21,7 @@ La RC cumple la Definition of Done del plan salvo dos puntos abiertos que depend
 | B7 · Marca: código | Firma, pie, «Acerca de», metadatos y JSON-LD; nombre legal «Calvario TechLabs» en el ©, firma visible «CalvarioTechLabs» | [#67](https://github.com/calvariotechlabs/escaque/pull/67) | Fusionada | Pruebas unitarias, de CSP/metadatos y e2e |
 | B6 · Validación integral (RC-08) | Validación en Chrome real con las cabeceras de `vercel.json`: CSP, privacidad, PWA, sin conexión, recuperación, PGN, móvil, teclado, rendimiento | [#76](https://github.com/calvariotechlabs/escaque/pull/76) · [#72](https://github.com/calvariotechlabs/escaque/issues/72) | **Fusionada** (15:35 UTC) | [b6-validacion-integral.md](b6-validacion-integral.md): sin defectos funcionales ni de seguridad; un hallazgo de texto (F-01, aviso de versión) corregido |
 | B11 · Motor (RC-12) | PVS, jugada nula, asesinas, historial, LMR, aspiración, `maxNodes`; evaluación con seguridad del rey, estructura de peones, movilidad, pareja de alfiles y torres; coach ajustado al motor nuevo | [#78](https://github.com/calvariotechlabs/escaque/pull/78) · [#63](https://github.com/calvariotechlabs/escaque/issues/63) | Fusionada (16:32 UTC) | Duelo +96 =1 −3, banco `despues-b11`, tres excepciones (apartado 5) |
-| B9 · Documentación viva (RC-09) | `npm run metrics` y `metrics:check` en la CI: el README no puede desfasarse de las cifras reales; «Capacidades verificadas» y «Limitaciones conocidas» | [#77](https://github.com/calvariotechlabs/escaque/pull/77) · [#73](https://github.com/calvariotechlabs/escaque/issues/73) | **Abierta, esperando OK de Sergio** | Ver apartado 7 |
+| B9 · Documentación viva (RC-09) | `npm run metrics` y `metrics:check` en la CI: el README no puede desfasarse de las cifras reales; «Capacidades verificadas» y «Limitaciones conocidas» | [#77](https://github.com/calvariotechlabs/escaque/pull/77) · [#73](https://github.com/calvariotechlabs/escaque/issues/73) | Fusionada (16:44 UTC) | Ver apartado 7 |
 | B8 · Errores de entrada (RC-10) | — | — | Fuera de la RC por decisión de Sergio | H-16 y H-17 quedan para después |
 
 ## 3. Antes y después
@@ -72,8 +72,8 @@ Lectura honesta: el coach ya no se contradice y da menos falsos positivos, pero 
 | Pipeline completa en verde | CI: tipos y tests, perft completo, rendimiento, e2e y cero dependencias | **Cumplido**: `main` en `7e38bba` con los 5 trabajos de la CI en verde (apartado 8) |
 | Sin degradaciones inaceptables | Tiempos del banco y de Difícil antes y después | **Cumplido**: el coach pasa de máximo 3,6 s a 0,8 s; Difícil se queda en 0,9 s |
 | Principios de arquitectura | `dependencies: {}`, sin backend, Workers | **Cumplido**: B6 midió 0 peticiones a otros orígenes y 0 cookies |
-| Documentación real | Prueba de cifras del README (RC-09) | **Pendiente de la fusión de #77** (apartado 7) |
-| Limitaciones documentadas | Sección del README y de este informe | Apartado 9 de este informe; la del README llega con #77 |
+| Documentación real | Prueba de cifras del README (RC-09) | **Cumplido** con #77 fusionada: `npm run metrics:check` pasa en `main` (apartado 7) |
+| Limitaciones documentadas | Sección del README y de este informe | Apartado 9 de este informe y sección «Limitaciones conocidas» del README (#77) |
 
 ### 4.1 Regresión por hallazgo
 
@@ -85,7 +85,7 @@ Lectura honesta: el coach ya no se contradice y da menos falsos positivos, pero 
 | H-12 (el coach mira menos que el rival) | B3 midió que más profundidad no ayuda; el coach sigue en profundidad 4 y 3 s; B11 lo hace 3 a 5 veces más rápido |
 | H-14 y H-02b (errores del motor) | `tests/engine-tacticas.test.ts` como `todo` (excepción, apartado 5) |
 | H-15 (Difícil determinista) | Sin cambio: decisión de diseño (`marginCp: 0` en Difícil) |
-| H-18 (README desfasado) | **PR #77** (pendiente) |
+| H-18 (README desfasado) | **PR #77** (fusionada): cifras generadas y comprobadas por la CI |
 | H-19 y H-20 (reloj con cobertura, límites de PGN) | B4: `tests/rendimiento/reloj.perf.ts`, `PGN_MAX_PLIES` |
 | H-21 y H-22 (cabeceras, PWA, dispositivos) | B6: parte automatizada ejecutada; el resto, apartado 6 |
 | H-13, H-16, H-17, H-23, H-24, H-25, H-26 | Fuera de la RC o recomendaciones (apartado 9) |
@@ -126,14 +126,13 @@ Las tres excepciones constan como aprobadas (la de H-10, el 24-nov a las 16:35 U
 | Texto del aviso de versión en Claude Design | Sergio o un hilo con acceso | El aviso ahora dice «Al actualizar se recarga la página y tu partida se conserva.» (F-01). `docs/design` ya está actualizado, pero el lienzo y el Design System vivos de Claude Design no son accesibles desde el entorno de los hilos |
 | Firma en la imagen Open Graph | Sergio | Pregunta abierta desde B5, sin responder |
 
-## 7. Qué depende de que se fusione #77
+## 7. Documentación viva (#77)
 
-Esta PR **no** da por buenas las cifras del README: describe lo medido aquí. Dependen de #77 (y de regenerar después de B11):
+La PR #77 (B9) se fusionó a las 16:44 UTC, después de actualizarla contra `main` con B11 dentro y regenerar sus cifras con el banco `despues-b11`. Comprobado en `main` tras su fusión: `npm test` da **1.167 pruebas (1.165 pasan, 2 `todo`)** y `npm run metrics:check` responde «Cifras al día: 1167 pruebas, 15 lecciones, 92 ficheros en el sitio».
 
-1. **#77 se escribió antes de fusionar B11** (su base es `b93990f`). Sus números (1.119 pruebas, sitio de 92 ficheros y 779 KB) ya no son los de `main`: yo medí **1.152 pruebas en 206 suites** (1.150 pasan, 2 `todo`). El propio texto de #77 lo prevé: tras B11 hay que ejecutar `npm run metrics -- --banco despues-b11` y revisar «Fuerza del motor», «Qué haría distinto» y «Limitaciones».
-2. #77 reescribe partes del README que B11 también tocó; puede haber conflicto al fusionar. Conviene actualizar su rama contra `main` antes del OK, no después.
-3. `npm run metrics:check` pasa a ser un paso de la CI: tras fusionarla, cualquier PR que añada pruebas, lecciones o ficheros exigirá regenerar las cifras.
-4. Hasta entonces, H-18 sigue abierta y el criterio «Documentación real» de la tabla 4 queda pendiente.
+- Las cifras del apartado 8 (1.152 pruebas) son las medidas **antes** de fusionar #77, sobre `7e38bba`; la diferencia con las 1.167 actuales son las pruebas que añadió #77 (`tools/metricas.test.mjs`). El resto de cifras del informe (banco, duelo, coach) no cambian.
+- `npm run metrics:check` es ya un paso de la CI: cualquier PR que añada pruebas, lecciones o ficheros exigirá regenerar las cifras con `npm run metrics`.
+- H-18 (README desfasado) queda cerrada.
 
 ## 8. Cómo se midió para este informe
 
@@ -160,7 +159,7 @@ Se rehicieron en un clon limpio de `main` (`7e38bba`), Node de la sesión, sin d
 ## 10. Decisiones y pasos que quedan
 
 1. **H-08** (4.3): defecto real que queda como limitación conocida. Si Sergio prefiere corregirlo antes de la RC, es un bloque nuevo (la frase de «gana la dama» debe salir de la línea mostrada).
-2. **Fusionar #77**: según su hilo ya está sin conflicto con `main` y con 1.167 pruebas y el banco `despues-b11`. Yo medí 1.152 en `main`; la diferencia habrá que comprobarla cuando se fusione.
+2. #77 ya está fusionada (apartado 7).
 3. **Fusionar esta PR** con el OK de Sergio, para fijar el informe en el commit de la RC.
 
 ## 11. Registro de decisiones para el caso de estudio
