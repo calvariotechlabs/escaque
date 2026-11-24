@@ -134,3 +134,11 @@
   .ajustes-pantalla__titulo{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
   .ajustes{row-gap:var(--space-2)}
 }
+/* Móvil apaisado estrecho (hasta 700 px): con círculo y nombre no caben tres segmentos por columna. Se quita el círculo (como en el selector
+   de tablero: el borde grueso de la opción elegida dice cuál es), «Tu color» y «Modo» tienen la columna ancha y los nombres no se parten (CAL-403). */
+@media (orientation:landscape) and (max-height:500px) and (max-width:700px){
+  .ajustes{grid-template-columns:minmax(0,1.75fr) minmax(0,1fr);column-gap:var(--space-4)}
+  .grupo--segmentos .opcion__tarjeta::before{display:none}
+  .grupo--segmentos .opcion__tarjeta,.grupo--color .opcion__tarjeta{gap:6px;padding:0 var(--space-2)}
+  .grupo--segmentos .opcion__entrada:checked + .opcion__tarjeta,.grupo--color .opcion__entrada:checked + .opcion__tarjeta{padding:0 calc(var(--space-2) - 1.5px)}
+}
