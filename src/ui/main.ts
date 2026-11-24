@@ -64,7 +64,7 @@ import { dismissBeginner, isBeginnerDismissed, showBeginnerNotice } from "./less
 import { LESSONS_TITLE } from "./lessons-text.js";
 import { parseRoute, type Route } from "./routes.js";
 import { createCapturesView, placeCapturesInLandscape } from "./captures-view.js";
-import { bindScrollRegion, onCompactLandscapeChange } from "./scroll-region.js";
+import { bindScrollRegion, COMPACT_LANDSCAPE, onCompactLandscapeChange } from "./scroll-region.js";
 
 function byId<T extends HTMLElement>(id: string): T {
   const el = document.getElementById(id);
@@ -82,6 +82,9 @@ const colorGroup = byId<HTMLFieldSetElement>("grupo-color");
 const headingSub = byId<HTMLParagraphElement>("cabecera-sub");
 const linkPlay = byId<HTMLAnchorElement>("enlace-jugar");
 const linkLessons = byId<HTMLAnchorElement>("enlace-lecciones");
+const linkAbout = byId<HTMLAnchorElement>("enlace-acerca");
+const aboutScreen = byId<HTMLElement>("pantalla-acerca");
+const footer = byId<HTMLElement>("pie");
 const headingLong = byId<HTMLSpanElement>("cabecera-largo");
 const headingShort = byId<HTMLSpanElement>("cabecera-corto");
 const thinkingBar = byId<HTMLSpanElement>("pensando");
@@ -787,6 +790,7 @@ let route: Route = parseRoute(location.hash);
 /** ¿Se están enseñando las lecciones? Así se sabe cuándo se vuelve de ellas. */
 let onLessons = false;
 const BASE_TITLE = document.title;
+const ABOUT_TITLE = "Acerca de";
 
 function showScreen(screen: "ajustes" | "partida" | "repaso"): void {
   playScreen = screen;
@@ -803,9 +807,13 @@ function applyRoute(moveFocus: boolean): void {
   // El subtítulo describe la partida en curso: no vale para una partida cargada.
   headingSub.hidden = !(onPlay && playScreen !== "ajustes" && !(playScreen === "repaso" && imported !== null));
   if (!onPlay || playScreen !== "repaso") review.hide();
+  const onAbout = route.kind === "acerca";
+  aboutScreen.hidden = !onAbout;
   linkPlay.removeAttribute("aria-current");
   linkLessons.removeAttribute("aria-current");
-  (onPlay ? linkPlay : linkLessons).setAttribute("aria-current", "page");
+  linkAbout.removeAttribute("aria-current");
+  if (onAbout) linkAbout.setAttribute("aria-current", "page");
+  else (onPlay ? linkPlay : linkLessons).setAttribute("aria-current", "page");
   if (onPlay) {
     lessonsScreen.hide();
     syncBeginnerNotice();
@@ -820,6 +828,7 @@ function applyRoute(moveFocus: boolean): void {
       else review.open(game, ui.orientation);
     }
     onLessons = false;
+    placeFooter();
     return;
   }
   onLessons = true;
@@ -835,9 +844,30 @@ function applyRoute(moveFocus: boolean): void {
   hintsGame = null; // al volver, las pistas empiezan de cero
   hintToken++;
   hintClient?.cancel();
+  if (onAbout) {
+    lessonsScreen.hide();
+    document.title = `${ABOUT_TITLE} · Escaque`;
+    if (moveFocus) byId<HTMLElement>("titulo-acerca").focus();
+    placeFooter();
+    return;
+  }
   const shown = route.kind === "leccion" ? lessonsScreen.showLesson(route.id, moveFocus) : lessonsScreen.showList(moveFocus);
   document.title = shown === null || route.kind !== "leccion" ? `${LESSONS_TITLE} · Escaque` : `${shown} · ${LESSONS_TITLE} · Escaque`;
+  placeFooter();
 }
+
+/**
+ * El pie va al final de la página. Solo en móvil apaisado, en las pantallas con tablero, la página no se desplaza:
+ * el pie pasa al final del panel con scroll (que ya es una región con nombre) para que se pueda alcanzar.
+ */
+function placeFooter(): void {
+  const panelId = !gameScreen.hidden ? "partida-panel" : !byId<HTMLElement>("pantalla-leccion").hidden ? "leccion-panel" : !reviewScreenRoot.hidden ? "repaso-panel" : null;
+  const inRegion = window.matchMedia(COMPACT_LANDSCAPE).matches && panelId !== null;
+  footer.classList.toggle("pie--region", inRegion);
+  if (inRegion) byId<HTMLElement>(panelId).append(footer);
+  else if (footer.parentElement !== document.body) document.body.insertBefore(footer, document.querySelector("body > dialog"));
+}
+onCompactLandscapeChange(placeFooter);
 
 function checkedValue(name: string): string | undefined {
   return settingsForm.querySelector<HTMLInputElement>(`input[name="${name}"]:checked`)?.value;

@@ -8,6 +8,12 @@ describe("rutas", () => {
     for (const hash of ["", "#", "#/", "#/jugar", "#/otra", "#lecciones-no", "#/jugar/lecciones"]) assert.deepEqual(parseRoute(hash), { kind: "jugar" }, hash);
   });
 
+  it("«Acerca de»", () => {
+    assert.deepEqual(parseRoute("#/acerca"), { kind: "acerca" });
+    assert.deepEqual(parseRoute("#acerca"), { kind: "acerca" });
+    for (const hash of ["#/acerca/otra", "#/acerca-de", "#/Acerca"]) assert.deepEqual(parseRoute(hash), { kind: "jugar" }, hash);
+  });
+
   it("la lista de lecciones", () => {
     assert.deepEqual(parseRoute("#/lecciones"), { kind: "lecciones" });
     assert.deepEqual(parseRoute("#lecciones"), { kind: "lecciones" });
