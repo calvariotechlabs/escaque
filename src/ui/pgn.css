@@ -33,8 +33,8 @@
 /* Móvil apaisado: al final de la región con scroll, después de las jugadas. */
 @media (orientation:landscape) and (max-height:500px){
   /* Repite la rejilla de page.css, que la regla de escritorio de arriba pisaría en un móvil ancho. */
-  .partida{grid-template-rows:44px auto auto minmax(0,1fr);grid-template-areas:"tablero titulo" "tablero avisos" "tablero estado" "tablero panel"}
-  .partida:has(.avisos:empty){grid-template-rows:44px auto minmax(0,1fr);grid-template-areas:"tablero titulo" "tablero estado" "tablero panel"}
+  .partida{grid-template-rows:var(--cab-alto) auto auto minmax(0,1fr);grid-template-areas:"tablero titulo" "tablero avisos" "tablero estado" "tablero panel"}
+  .partida:has(.avisos:empty){grid-template-rows:var(--cab-alto) auto minmax(0,1fr);grid-template-areas:"tablero titulo" "tablero estado" "tablero panel"}
   .partida__pgn{order:1}
   .partida__pgn .boton{padding:4px 6px;font-size:13px;line-height:16px}
 }

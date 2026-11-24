@@ -68,7 +68,7 @@ body{margin:0;background:var(--surface);color:var(--ink);font:400 16px/24px var(
    (lienzo «Móvil · horizontal · partida con coach»). El título va en la columna del panel, el estado queda fijo
    y coach, botones y jugadas comparten una región con scroll propio; los botones se quedan arriba de esa región. */
 @media (orientation:landscape) and (max-height:500px){
-  :root{--tablero-ancho:calc(100dvh - 2 * var(--space-4))}
+  :root{--tablero-ancho:calc(100dvh - 2 * var(--space-4));--cab-alto:44px}
   .pagina__cabecera,.partida{max-width:none;margin:0}
   .pagina__cabecera{position:absolute;top:max(var(--space-4),env(safe-area-inset-top,0px));left:calc(max(var(--space-6),env(safe-area-inset-left,0px)) + var(--tablero-ancho) + var(--space-6));right:max(var(--space-6),env(safe-area-inset-right,0px));padding:0;box-sizing:border-box}
   .pagina__cabecera h1{font-size:20px;line-height:24px}
@@ -80,12 +80,15 @@ body{margin:0;background:var(--surface);color:var(--ink);font:400 16px/24px var(
   .solo-movil{display:inline}
   /* El subtítulo se pisaba con el estado: la cabecera queda en una sola fila y el nivel va en el estado (CAL-390).
      El subtítulo sigue en el árbol de accesibilidad, solo sin verse. */
-  .pagina__cabecera{flex-wrap:nowrap}
+  /* La navegación baja a una segunda línea cuando no cabe junto al nombre (CAL-405, lienzo «Navegación en apaisado estrecho»):
+     con space-between una línea con un solo elemento lo deja a la izquierda, y el margen negativo alinea el texto de «Jugar» con el logo. */
+  .pagina__cabecera{flex-wrap:wrap;row-gap:0}
+  .pagina__cabecera .lecc-nav{margin-left:calc(-1 * var(--space-3))}
   #cabecera-sub{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
   .estado__sub{display:block}
   .partida__estado .estado{padding:var(--space-2) var(--space-3)}
-  .partida{box-sizing:border-box;height:100dvh;padding:max(var(--space-4),env(safe-area-inset-top,0px)) max(var(--space-6),env(safe-area-inset-right,0px)) max(var(--space-4),env(safe-area-inset-bottom,0px)) max(var(--space-6),env(safe-area-inset-left,0px));grid-template-columns:var(--tablero-ancho) minmax(0,1fr);grid-template-rows:44px auto auto minmax(0,1fr);grid-template-areas:"tablero titulo" "tablero avisos" "tablero estado" "tablero panel";gap:var(--space-2) var(--space-6)}
-  .partida:has(.avisos:empty){grid-template-rows:44px auto minmax(0,1fr);grid-template-areas:"tablero titulo" "tablero estado" "tablero panel"}
+  .partida{box-sizing:border-box;height:100dvh;padding:max(var(--space-4),env(safe-area-inset-top,0px)) max(var(--space-6),env(safe-area-inset-right,0px)) max(var(--space-4),env(safe-area-inset-bottom,0px)) max(var(--space-6),env(safe-area-inset-left,0px));grid-template-columns:var(--tablero-ancho) minmax(0,1fr);grid-template-rows:var(--cab-alto) auto auto minmax(0,1fr);grid-template-areas:"tablero titulo" "tablero avisos" "tablero estado" "tablero panel";gap:var(--space-2) var(--space-6)}
+  .partida:has(.avisos:empty){grid-template-rows:var(--cab-alto) auto minmax(0,1fr);grid-template-areas:"tablero titulo" "tablero estado" "tablero panel"}
   .pagina__cabecera ~ .partida::before{content:"";grid-area:titulo}
   .partida .tablero{width:100%}
   .partida__avisos{grid-area:avisos}
@@ -107,6 +110,13 @@ body{margin:0;background:var(--surface);color:var(--ink);font:400 16px/24px var(
   .aviso{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:0 var(--space-3);padding:var(--space-2) var(--space-3)}
   .aviso__titulo,.aviso__texto{grid-column:1}
   .aviso__acciones{grid-column:2;grid-row:1 / span 2;flex-direction:column}
+}
+
+/* Móvil apaisado estrecho (CAL-405): la columna derecha mide el ancho menos el alto menos 40 px y, por debajo de unos 330 px, la navegación
+   baja a una segunda línea (arriba), así que la fila del título necesita sitio para las dos. Se reserva con unos píxeles de margen:
+   si sobran, la fila es algo más alta de lo necesario, nunca se pisa con el estado. */
+@media (orientation:landscape) and (max-height:500px) and (max-width:calc(100vh + 376px)){
+  :root{--cab-alto:68px}
 }
 
 /* Los botones responden al toque sin esperar al doble toque de zoom. */
