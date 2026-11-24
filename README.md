@@ -1,5 +1,7 @@
 # Escaque
 
+*Escaque, by CalvarioTechLabs.* Producto diseñado y programado por [CalvarioTechLabs](https://calvariotechlabs.com/).
+
 **[Jugar ahora: escaque.calvariotechlabs.com](https://escaque.calvariotechlabs.com)** (sin registro, sin instalar nada; se puede instalar como app y juega sin conexión).
 
 ![Una partida contra Alfil Beta con el coach avisando de un error, y el repaso de la partida con su curva de evaluación](docs/media/escaque.gif)
@@ -232,4 +234,8 @@ npm run perft -- 2 "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQ
 
 ## Licencia
 
-MIT.
+MIT. © 2026 Calvario TechLabs.
+
+## Marca y firma
+
+Escaque es la marca del producto; **CalvarioTechLabs** es su creadora. La firma «by CalvarioTechLabs» aparece junto al nombre en la cabecera (solo desde 720×500 px), en el pie de todas las pantallas (con enlace a <https://calvariotechlabs.com/>) y en la pantalla «Acerca de Escaque» (`#/acerca`). Los metadatos (`author`, JSON-LD `WebApplication` con la creadora) están en `index.html`. Diseño en `docs/design/firma/` y en el lienzo (`docs/design/lienzo/`). La imagen Open Graph (`og-image.png`) va sin firma.

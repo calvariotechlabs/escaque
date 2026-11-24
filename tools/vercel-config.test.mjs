@@ -80,7 +80,8 @@ test("el sitio publicado no tiene código en línea que la CSP bloquearía", () 
     assert.ok(!/<style[\s>]/i.test(html), "index.html lleva <style> en línea");
     assert.ok(!/\sstyle\s*=/i.test(html), "index.html lleva atributos style");
     assert.ok(!/\son[a-z]+\s*=/i.test(html), "index.html lleva manejadores on…=");
-    for (const [, tag] of html.matchAll(/<script\b([^>]*)>/gi)) assert.match(tag, /\ssrc="/, "script en línea");
+    // Un bloque JSON-LD es un dato, no código: la CSP no lo ejecuta ni lo bloquea. Cualquier otro script ha de ser un módulo con src.
+    for (const [, tag] of html.matchAll(/<script\b([^>]*)>/gi)) if (!/type="application\/ld\+json"/.test(tag)) assert.match(tag, /\ssrc="/, "script en línea");
     assert.ok(!/javascript:/i.test(html));
     const walk = (dir) => readdirSync(dir).flatMap((f) => (statSync(join(dir, f)).isDirectory() ? walk(join(dir, f)) : [join(dir, f)]));
     for (const file of walk(join(tmp, "dist")).concat(join(tmp, "sw.js"))) {
@@ -92,4 +93,17 @@ test("el sitio publicado no tiene código en línea que la CSP bloquearía", () 
   } finally {
     rmSync(tmp, { recursive: true, force: true });
   }
+});
+
+test("los metadatos de marca de index.html: JSON-LD válido con la creadora y © con el nombre legal", () => {
+  const html = readFileSync(join(root, "index.html"), "utf8");
+  const blocks = [...html.matchAll(/<script type="application\/ld\+json">([^<]+)<\/script>/g)];
+  assert.equal(blocks.length, 1, "un único bloque JSON-LD");
+  const data = JSON.parse(blocks[0][1]);
+  assert.equal(data["@type"], "WebApplication");
+  assert.equal(data.name, "Escaque");
+  assert.deepEqual(data.creator, { "@type": "Organization", name: "Calvario TechLabs", url: "https://calvariotechlabs.com/" });
+  assert.match(html, /<meta name="author" content="Calvario TechLabs">/);
+  assert.match(html, /© 2026 Calvario TechLabs/);
+  assert.match(html, /<meta property="og:image" content="https:\/\/escaque\.calvariotechlabs\.com\/og-image\.png">/, "la imagen OG sigue siendo la de siempre, sin firma, hasta que Sergio decida");
 });
