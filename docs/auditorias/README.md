@@ -7,6 +7,8 @@ Evidencia histórica de las dos auditorías del 24 de noviembre de 2026, hechas 
 | [auditoria-chatgpt-2026-11-24.pdf](auditoria-chatgpt-2026-11-24.pdf) | Auditoría de ChatGPT, 11 páginas, tal como se entregó |
 | [auditoria-claude-2026-11-24.md](auditoria-claude-2026-11-24.md) | Auditoría de Claude, copia textual del documento original (sin las capturas) |
 | [consolidacion-rc.md](consolidacion-rc.md) | Matriz consolidada, causas raíz, backlog y plan de la Release Candidate (CAL-408) |
+| [b3-calidad-analisis.md](b3-calidad-analisis.md) · [b6-validacion-integral.md](b6-validacion-integral.md) | Informes de los bloques B3 y B6 |
+| [informe-rc.md](informe-rc.md) | Informe final de la RC: bloques, cifras antes y después, excepciones, pendientes y protocolo de la auditoría independiente (B10) |
 | [reproduccion/](reproduccion/) | Scripts y salidas con los que se reprodujeron los casos del coach |
 
 ## Cómo repetir la reproducción
