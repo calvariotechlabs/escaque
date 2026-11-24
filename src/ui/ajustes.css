@@ -68,8 +68,16 @@
 .grupo--color .opcion__entrada:checked + .opcion__tarjeta .estado__turno{box-shadow:0 0 0 2px var(--surface-raised),0 0 0 4px var(--accent)}
 @media (forced-colors:active){.grupo--color .opcion__entrada:checked + .opcion__tarjeta .estado__turno{outline:2px solid Highlight;outline-offset:2px}}
 
-/* Botón: barra que se queda abajo mientras el formulario es más alto que la pantalla (móvil). */
-.ajustes__acciones{position:sticky;bottom:0;z-index:2;margin:0 calc(-1 * max(var(--space-4),env(safe-area-inset-right,0px))) 0 calc(-1 * max(var(--space-4),env(safe-area-inset-left,0px)));padding:var(--space-3) max(var(--space-4),env(safe-area-inset-right,0px)) max(var(--space-3),env(safe-area-inset-bottom,0px)) max(var(--space-4),env(safe-area-inset-left,0px));background:var(--surface);border-top:1px solid var(--line)}
+/* Botón: barra que se queda pegada abajo mientras el formulario es más alto que la pantalla, en cualquier ancho (CAL-399).
+   En reposo no se nota (sin relleno ni línea): el fondo y la línea de separación van en ::before y solo se ven cuando la barra está pegada
+   (consulta de estado de desplazamiento; sin ella, siempre visibles). Así no queda una franja flotando a mitad de página en pantallas altas. */
+.ajustes__acciones{--barra-pie:max(var(--space-3),env(safe-area-inset-bottom,0px));position:sticky;bottom:var(--barra-pie);z-index:2;container-type:scroll-state}
+.ajustes__acciones::before{content:"";position:absolute;z-index:-1;pointer-events:none;inset:calc(-1 * var(--space-3)) 0 calc(-1 * var(--barra-pie));background:var(--surface);border-top:1px solid var(--line);opacity:0}
+@container scroll-state(stuck: bottom){.ajustes__acciones::before{opacity:1}}
+@supports not (container-type:scroll-state){.ajustes__acciones::before{opacity:1}}
+@media (max-width:599px){
+  .ajustes__acciones::before{left:calc(-1 * max(var(--space-4),env(safe-area-inset-left,0px)));right:calc(-1 * max(var(--space-4),env(safe-area-inset-right,0px)))}
+}
 
 /* Móviles estrechos (320 px): tres columnas con menos relleno para que quepan «Difícil» y «Blancas». */
 @media (max-width:359px){
@@ -78,7 +86,6 @@
 }
 @media (min-width:600px){
   .grupo--segmentos{--ayuda-min:20px}
-  .ajustes__acciones{position:static;margin:0;padding:0;border-top:0;background:none}
 }
 @media (min-width:600px) and (max-width:859px){.ajustes-pantalla{max-width:732px;grid-template-columns:minmax(0,1fr)}}
 @media (min-width:860px){
@@ -116,7 +123,14 @@
   .grupo--modo{grid-area:modo}
   #grupo-nivel{grid-area:nivel}
   #grupo-color{grid-area:color}
-  .ajustes__acciones{grid-area:acciones;position:static;align-self:end;margin:0;padding:0;border:0;background:none}
+  .ajustes__acciones{grid-area:acciones;position:static;align-self:end}
+  .ajustes__acciones::before{display:none}
   .grupo--segmentos{--ayuda-min:20px}
   .grupo--segmentos .opcion__tarjeta{min-height:44px}
+}
+/* Móvil apaisado muy bajo (hasta 380 px de alto, p. ej. 640×360): sin el título visible y con menos separación, para que el botón siga a la vista (CAL-399). */
+@media (orientation:landscape) and (max-height:380px){
+  .ajustes-pantalla{padding-top:0;row-gap:var(--space-2)}
+  .ajustes-pantalla__titulo{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+  .ajustes{row-gap:var(--space-2)}
 }
