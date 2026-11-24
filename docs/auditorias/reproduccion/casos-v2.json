@@ -1,0 +1,3 @@
+[{"id":"N-1","label":"2.g4 control","pgn":"1. f3 Cc6 2. g4 e6 3. a3 Dh4#","ply":2},
+ {"id":"N-2","label":"6.d4 principal","pgn":"1. e4 d5 2. Cf3 dxe4 3. Cg5 Dd5 4. Ac4 Dxg5 5. O-O Ah3 6. d4 Dxg2#","ply":10},
+ {"id":"N-3","label":"4.Ac4 principal","pgn":"1. e4 d5 2. Cf3 dxe4 3. Cg5 Dd5 4. Ac4 Dxg5 5. O-O Ah3 6. d4 Dxg2#","ply":6}]

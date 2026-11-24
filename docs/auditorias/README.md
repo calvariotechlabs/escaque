@@ -1,6 +1,6 @@
 # Auditorías externas de Escaque
 
-Evidencia histórica de las dos auditorías del 24 de noviembre de 2026, hechas sobre el commit `5e9e946` y sin cambiar nada del repositorio. No se editan: cualquier corrección va en la consolidación o en documentos nuevos.
+Evidencia histórica de las auditorías del 24 de noviembre de 2026: las dos primeras sobre el commit `5e9e946` y la independiente de la RC (v2) sobre `3050eb0`, todas sin cambiar nada del repositorio. No se editan: cualquier corrección va en la consolidación o en documentos nuevos.
 
 | Fichero | Qué es |
 |---|---|
@@ -9,6 +9,8 @@ Evidencia histórica de las dos auditorías del 24 de noviembre de 2026, hechas 
 | [consolidacion-rc.md](consolidacion-rc.md) | Matriz consolidada, causas raíz, backlog y plan de la Release Candidate (CAL-408) |
 | [b3-calidad-analisis.md](b3-calidad-analisis.md) · [b6-validacion-integral.md](b6-validacion-integral.md) | Informes de los bloques B3 y B6 |
 | [informe-rc.md](informe-rc.md) | Informe final de la RC: bloques, cifras antes y después, excepciones, pendientes y protocolo de la auditoría independiente (B10) |
+| [auditoria-v2-2026-11-24.pdf](auditoria-v2-2026-11-24.pdf) | Auditoría independiente de la RC (segunda auditoría), 9 páginas, tal como se entregó |
+| [contraste-auditoria-v2.md](contraste-auditoria-v2.md) | Contraste de la auditoría v2: hallazgo a hallazgo, veredicto de la RC y backlog (#85) |
 | [reproduccion/](reproduccion/) | Scripts y salidas con los que se reprodujeron los casos del coach |
 
 ## Cómo repetir la reproducción
