@@ -145,13 +145,12 @@ export function createLessonsScreen(deps: LessonsDeps): LessonsScreen {
   const hintButton = byId<HTMLButtonElement>("leccion-pedir-pista");
   const restartButton = byId<HTMLButtonElement>("leccion-reiniciar");
   const announcer = byId<HTMLElement>("leccion-anuncio");
-  const goalSection = byId<HTMLElement>("leccion-objetivo").closest("section")!;
 
   // En móvil apaisado la columna derecha no cabe entera: «Cómo se mueve» pasa a la región con scroll,
-  // tras la retroalimentación; en el resto, va sobre el objetivo, como en el lienzo.
+  // tras la retroalimentación; en el resto, va tras el objetivo (CAL-403: el tablero va primero y esta tarjeta, debajo).
   const placeHowItMoves = (compact: boolean): void => {
     if (compact) feedback.after(howBox);
-    else goalSection.before(howBox);
+    else counter.after(howBox);
   };
   placeHowItMoves(window.matchMedia(COMPACT_LANDSCAPE).matches);
   onCompactLandscapeChange(placeHowItMoves);
