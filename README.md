@@ -35,8 +35,8 @@ Todas medidas, no estimadas. Las de velocidad salen de un contenedor cloud de 4 
 | Tests | **894** en 150 suites con `node --test`, unos 5 s (más 109 tests de perft a profundidad completa, unos 10 s) |
 | Perft | 21 posiciones de referencia, todas exactas: la inicial (20 / 400 / 8.902 / 197.281), Kiwipete (48 / 2.039 / 97.862), las posiciones 3 a 6 de la Chess Programming Wiki y las «trampa» de Sedlak (al paso ilegal, enroques que dan jaque, coronaciones que ahogan). `npm run perft` llega más lejos: 119.060.324 nodos desde la inicial a profundidad 6 y 193.690.690 en Kiwipete a profundidad 5 |
 | Velocidad de perft | Entre 5,9 y 6,5 millones de nodos por segundo en este contenedor: la inicial a profundidad 6 (119.060.324 nodos) en 18,8 s y Kiwipete a profundidad 5 (193.690.690) en 30 s |
-| Alfil Beta, nivel Difícil | Responde en 831 ms de media y 910 ms como máximo (158 jugadas medidas en esta pasada, contenedor de 4 núcleos); la pasada completa del punto de parada (más abajo) dio 818 ms y 909 ms. Gana 20 de 20 al azar, a Fácil y a Medio; Medio gana 20 de 20 a Fácil (detalle en [Fuerza del motor](#fuerza-del-motor)) |
-| Tabla de transposición | A la misma profundidad, Alfil Beta visita un **97 % menos de nodos** con la tabla que sin ella en las cinco posiciones de `npm run bench` (1,45 millones frente a 57,5 millones) y tarda 7,9 s en vez de 126 s. Va del −31 % en Kiwipete al −99,9 % en el final de peones Fine 70 (detalle más abajo) |
+| Alfil Beta, nivel Difícil | Responde en 840 ms de media y 939 ms como máximo (4.945 jugadas del duelo de B11, contenedor de 4 núcleos con 4 partidas a la vez). Gana 10 de 10 al azar y a Fácil, y +9 =1 −0 a Medio. Contra la versión anterior a B11: +96 =1 −3 en 100 partidas (detalle en [Fuerza del motor](#fuerza-del-motor)) |
+| Tabla de transposición | Con el motor anterior a B11, a la misma profundidad, Alfil Beta visitaba un **97 % menos de nodos** con la tabla que sin ella en las cinco posiciones de `npm run bench` (1,45 millones frente a 57,5 millones) y tardaba 7,9 s en vez de 126 s; con el de B11, −80 % y 0,7 s (detalle más abajo). Va del −31 % en Kiwipete al −99,9 % en el final de peones Fine 70 (detalle más abajo) |
 | Sitio publicado | 64 ficheros, 516 KB en disco; JS + CSS + HTML suman unos 75 KB comprimidos con gzip |
 | Accesibilidad | **5 pruebas de extremo a extremo** en Chrome real, en la CI: se juega una partida entera solo con teclado, hay rejilla ARIA de 64 casillas etiquetadas y todo control tiene nombre, cada jugada se anuncia en SAN española («Negras: Dh4#. Dama de d8 a h4. Jaque mate.») y el repaso de la partida se maneja con ← → Inicio y Fin |
 | Lighthouse 12.8.2 (sitio servido en local, Chrome 153) | Escritorio: rendimiento **99**, accesibilidad **100**, buenas prácticas **100**, SEO 91 (FCP 0,5 s, LCP 0,8 s, TBT 0 ms, CLS 0). Móvil con la ralentización simulada de Lighthouse: rendimiento **86**, accesibilidad **100**, buenas prácticas **100**, SEO 91 (FCP 2,0 s, LCP 3,9 s, TBT 0 ms, CLS 0). El SEO pierde 9 puntos por no tener `robots.txt`; es a propósito, no busca público. Se mide a mano con `npx lighthouse@12.8.2`, no es una dependencia ni corre en la CI |
@@ -55,7 +55,15 @@ Todas medidas, no estimadas. Las de velocidad salen de un contenedor cloud de 4 
 
 Con 20 victorias de 20, la estadística solo da una cota: con un 95 % de confianza cada nivel puntúa al menos un 86 % contra el de abajo, lo que equivale a **más de 300 puntos Elo de diferencia entre niveles contiguos** (sin techo, porque no hubo ni una tabla). En esta pasada Difícil pensó 845 ms de media y 909 ms como máximo (1.870 jugadas; la tabla de Cifras usa otra pasada más corta, de ahí la pequeña diferencia), a profundidad 5 en la apertura y más de 10 en finales de peones.
 
-Para situarlo sin números inventados: Alfil Beta no usa poda por jugada nula, reducciones de jugadas tardías ni libro de aperturas; es un motor clásico de búsqueda con evaluación de material y tablas por casilla, pensado para enseñar, no para competir. La escala absoluta queda pendiente de medirla contra un motor externo con fuerza limitada (por ejemplo Stockfish con `UCI_Elo`), fuera del repositorio y solo como medición, para no romper el principio de cero dependencias.
+**Versión nueva contra la anterior (B11, issue #63).** Tras afinar la búsqueda y la evaluación, la versión nueva jugó 100 partidas en Difícil contra la de main antes del cambio, con 50 aperturas variadas (`bench/aperturas.json`), cada una con los dos colores, en 4 procesos (`node tools/duelo.mjs`, 36 minutos; resultado completo en [`bench/resultados/duelo-b11-dificil.json`](bench/resultados/duelo-b11-dificil.json)):
+
+| Enfrentamiento | Resultado | Puntos de la nueva (IC 95 %) | Elo relativo (IC 95 %) |
+| --- | --- | --- | --- |
+| Difícil nueva contra Difícil anterior | +96 =1 −3 | 96,5 % (93,0 % a 100 %) | +576 (+450 a +1.388) |
+
+El Elo es solo entre estas dos versiones, con este reloj y este equipo: dice que el cambio la hace mucho más fuerte, no cuánto juega contra personas o contra otros motores. Las dos pensaron lo mismo (840 y 858 ms de media, 939 y 933 ms como máximo).
+
+Para situarlo sin números inventados: Alfil Beta no tiene libro de aperturas ni evaluación ajustada con partidas; es un motor clásico de búsqueda alfa-beta con las podas y reducciones habituales, pensado para enseñar, no para competir. La escala absoluta queda pendiente de medirla contra un motor externo con fuerza limitada (por ejemplo Stockfish con `UCI_Elo`), fuera del repositorio y solo como medición, para no romper el principio de cero dependencias.
 
 ## Cómo se hizo
 
@@ -176,6 +184,8 @@ Todo en `src/engine`, sin dependencias ni DOM: funciona igual en Node y en el na
   | Total |  | 57.498.739 | 10.008.018 (-83 %) | 1.452.200 (-97 %) | 126.482 ms | 7.945 ms | — | — |
 
   Se ven dos efectos. En el medio juego casi todo lo pone el orden de jugadas: probar primero la mejor jugada de la iteración anterior ya ahorra entre el 17 % (Kiwipete, llena de capturas) y el 88 %. En los finales manda no repetir trabajo: los reyes llegan a la misma casilla por muchos órdenes de jugadas, y los cortes con la puntuación guardada bajan el final de torres del −84 % al −97 % y Fine 70 del −83 % al −99,9 %. Cada nodo cuesta algo más con la tabla (entre un 1 % más rápido y un 11 % más lento por nodo en las cuatro primeras posiciones; Fine 70 con tabla dura solo una décima de segundo y su cifra es poco fiable), pero se visitan tantos menos que la búsqueda total es 16 veces más rápida. Con la tabla, la búsqueda a profundidad fija no es idéntica, porque los cortes traen información de búsquedas más profundas, así que la jugada elegida puede variar: en Fine 70 a profundidad 16 elige Rb2 con tabla y Rb1 sin ella.
+
+  Esa tabla es del motor anterior a B11. Con la búsqueda nueva (PVS, asesinas, historial, LMR y jugada nula) las mismas cinco búsquedas a las mismas profundidades necesitan 269.775 nodos con tabla y 1,33 millones sin ella (−80 %), y tardan 0,7 s en vez de 7,9 s. El ahorro de la tabla baja porque el orden de jugadas ya no depende solo de ella; donde más sigue pesando es en los finales (Fine 70: −98 %).
 - **Evaluación.** Material (P 100, C 320, A 330, T 500, D 900) más tablas de valor por casilla. El rey tiene una tabla para el medio juego y otra para el final, y se mezclan según el material que queda. Desde B11 suma, también mezclado por fase: seguridad del rey (escudo de peones, columnas abiertas o semiabiertas junto al rey, ataques a la zona del rey contados por pieza y descontando defensores, y rey fuera de su enroque con la dama rival en el tablero); estructura de peones (doblados, aislados y pasados según la fila); movilidad de las piezas; pareja de alfiles; y torres en columna abierta o semiabierta. Es simétrica: cambiar los colores no cambia la valoración, y hay un test que lo comprueba.
 - **Niveles** (`chooseMove`):
 
@@ -197,6 +207,17 @@ Todo en `src/engine`, sin dependencias ni DOM: funciona igual en Node y en el na
 | Difícil gana 20 de 20 a un jugador al azar | +20 =0 −0 |
 | Difícil gana a Fácil | +10 =0 −0 |
 | Medio gana a Fácil | +10 =0 −0 |
+
+**Segundo punto de parada (B11, issue #63).** Fijado antes de afinar el motor en la Release Candidate:
+
+| Criterio | Resultado |
+| --- | --- |
+| Difícil sigue respondiendo en menos de 1 s | Duelo: 840 ms de media y 939 ms como máximo en 4.945 jugadas; `npm run match -- 10`: 821 ms y 937 ms en 757 jugadas; banco: 906 ms como máximo |
+| Ningún error de más de 2 peones en las posiciones tácticas del banco (`npm run bench:posiciones`) | De 4 (después de B3) a 3, y las tres son la limitación conocida de abajo: gana-arca-noe y pierde-arca-noe ya no fallan |
+| Gana a la versión anterior en al menos 100 partidas con aperturas variadas, con intervalo de confianza | +96 =1 −3, 96,5 % de los puntos (IC 95 %: 93,0 % a 100 %) |
+| Los niveles siguen ordenados | Difícil contra azar +10 =0 −0, contra Fácil +10 =0 −0, contra Medio +9 =1 −0; Medio contra Fácil +10 =0 −0 ([registro](docs/media/partidas-niveles-b11.txt)) |
+
+**Limitación conocida (excepción aprobada por Sergio el 24-nov-2026).** Tres posiciones de las auditorías siguen fallando en Difícil: 10…Da5 (H-14), 12.dxe5 (H-02b) y, según cuánto llegue a mirar en 0,9 s, 12…Dh4 (H-10). Las tres son ataques a un rey expuesto que se ven varias jugadas después: por ejemplo, tras 12…Dh4 Stockfish juega Dd5+ y Te1. Alfil Beta acierta H-10 en cuanto llega a profundidad 7, pero en 0,9 s unas veces llega y otras no. Las dos primeras no las ve ni a profundidad 9. H-14 y H-02b están en `tests/engine-tacticas.test.ts` como pruebas pendientes (`todo`), para que se vea cuándo se arreglan. H-10 tiene allí una prueba con un presupuesto fijo de nodos, que llega a profundidad 7 y pasa.
 
 Las cifras de las partidas salen de `npm run match` (Node 22, un hilo, colores alternos). Profundidad típica en 0,9 s: 5 en la apertura, 4 en medios juegos tácticos como Kiwipete y más de 10 en finales de peones, con unos 120.000 a 500.000 nodos por segundo.
 

@@ -599,7 +599,8 @@ function decide(input: DecisionInput): Decision {
   //   (si las dos ganan lo mismo, no es la razón de preferirla);
   // - lo que gana el rival tras la jugada cuenta si la evaluación cae al menos eso (si cae
   //   mucho menos, hay compensación que el coach no sabe nombrar, o la línea no es fiable).
-  const materialEdge = lineGain(position, bestLine) - lineGain(position, playedLine);
+  const bestGain = lineGain(position, bestLine);
+  const materialEdge = bestGain - lineGain(position, playedLine);
   const bestExplains =
     bestMotive !== null &&
     bestMotive.kind !== "posicional" &&
@@ -627,7 +628,8 @@ function decide(input: DecisionInput): Decision {
     const difference = `${short(before)} frente a ${short(after)}`;
     if (allowsMate && refutes !== null) [why, source] = [refutes.text, "mate"];
     else if (lostAlready) [why, source] = [`Con ${bestSan} el mate tardaba más: ${lower(before.text)} frente a ${lower(after.text)}.`, "mate"];
-    else if (bestExplains) [why, source] = [sameMotive(bestMotive!, best, playedMotive, move, verdict === "buena" ? null : difference) ?? bestMotive!.text, "best"];
+    // Si lo que gana el rival tras la jugada pesa más que lo que gana la mejor, el motivo es la refutación.
+    else if (bestExplains && !(refutes !== null && refutes.net > bestGain)) [why, source] = [sameMotive(bestMotive!, best, playedMotive, move, verdict === "buena" ? null : difference) ?? bestMotive!.text, "best"];
     else if (refutes !== null) [why, source] = [refutes.text, "refutation"];
     else if (findings.length > 0) why = `Mira los avisos: ahí está lo que pierde ${san}. Con ${bestSan}, ${difference}.`;
     else if (quiet) [why, source] = [`Alfil Beta la prefiere por cómo quedan las piezas: en las líneas que ha mirado nadie gana material (${difference}).`, "posicional"];
