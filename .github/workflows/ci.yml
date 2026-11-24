@@ -36,6 +36,8 @@ jobs:
         run: npm run test:cobertura
       - name: Montar el sitio (lo que publica Vercel)
         run: npm run build:site
+      - name: Cifras del README al día (docs/metricas.json)
+        run: npm run metrics:check
 
   rendimiento:
     name: Rendimiento (reloj real)

@@ -1,0 +1,77 @@
+{
+  "generado": {
+    "fecha": "2026-11-24",
+    "commit": "b93990f3f1f4"
+  },
+  "dependencias": {
+    "enEjecucion": 0,
+    "desarrollo": [
+      "typescript"
+    ]
+  },
+  "pruebas": {
+    "total": 1119,
+    "suites": 204,
+    "fallan": 0
+  },
+  "lecciones": {
+    "total": 15,
+    "primerosPasos": 9,
+    "tacticas": 6
+  },
+  "perft": {
+    "posiciones": 21
+  },
+  "sitio": {
+    "ficheros": 92,
+    "bytes": 797337,
+    "gzipJsCssHtmlBytes": 184046
+  },
+  "banco": {
+    "etiqueta": "despues-b3",
+    "fecha": "2026-11-24",
+    "commit": "7ab25d970e05",
+    "posiciones": 82,
+    "referencia": "Stockfish 17.1, 8000000 nodos por posición",
+    "dificil": {
+      "coincide": 46,
+      "equivalente": 67,
+      "erroresMas2Peones": 4,
+      "erroresMas2PeonesTacticas": 4,
+      "matesMantenidos": 18,
+      "matesDisponibles": 18,
+      "msMedia": 749,
+      "msMax": 907
+    },
+    "coach": {
+      "analisis": 152,
+      "veredictoIgual": 99,
+      "gravesDetectados": 20,
+      "gravesReferencia": 23,
+      "falsosPositivos": 5,
+      "equivalentes": 123,
+      "erroresNoVistos": 3,
+      "informesConViolaciones": 0,
+      "msMedia": 290,
+      "msP95": 1046,
+      "msMax": 3781
+    }
+  },
+  "registrado": {
+    "e2e": {
+      "pruebas": 97,
+      "ficheros": 14,
+      "fecha": "2026-11-24",
+      "comando": "npm run metrics -- --e2e"
+    },
+    "perft": {
+      "posicion": "inicial, profundidad 5",
+      "nodos": 4865609,
+      "nodosPorSegundo": 5284763,
+      "node": "v22.23.5",
+      "nucleos": 4,
+      "comando": "npm run metrics -- --rendimiento",
+      "fecha": "2026-11-24"
+    }
+  }
+}
