@@ -105,6 +105,17 @@ describe("isReport()", () => {
     const { move: _move, ...withoutMove } = mate;
     assert.equal(isReport({ ...report, findings: [{ ...withoutMove, capture: { uci: "d1f7", san: "Qxf7#" } }] }), false);
   });
+  it("exige la alternativa, la categoría y las líneas que decide el coach (RC-01)", () => {
+    assert.ok(isReport({ ...report, alternative: null }));
+    assert.ok(isReport({ ...report, alternative: { uci: "g1f3", san: "Nf3" } }));
+    const { alternative: _a, ...withoutAlternative } = report;
+    assert.equal(isReport(withoutAlternative), false);
+    assert.equal(isReport({ ...report, alternative: "Nf3" }), false);
+    assert.equal(isReport({ ...report, category: "otra" }), false);
+    assert.equal(isReport({ ...report, lines: { best: "e2e4", played: [] } }), false);
+    assert.equal(isReport({ ...report, lines: { best: [3], played: [] } }), false);
+    assert.equal(isReport({ ...report, lines: { best: new Array(65).fill("e2e4"), played: [] } }), false);
+  });
 });
 
 describe("CoachClient", () => {

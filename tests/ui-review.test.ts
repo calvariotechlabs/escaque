@@ -37,15 +37,18 @@ function report(color: "w" | "b", verdict: Verdict, before: number, after: numbe
     color,
     move: { uci: "e2e4", san },
     best: { uci: "e2e4", san },
+    alternative: verdict === "mejor" ? null : { uci: "d2d4", san: "d4" },
     before: evaluation(before),
     after: evaluation(after),
     loss: 0,
     verdict,
+    category: verdict === "mejor" ? "correcta" : "posicional",
     title,
     summary: "Resumen.",
     findings: [],
     why: "",
     line: "",
+    lines: { best: ["e2e4"], played: ["e2e4"] },
     depth: 4,
   };
 }

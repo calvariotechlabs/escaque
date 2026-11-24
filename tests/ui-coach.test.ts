@@ -116,7 +116,9 @@ describe("reportView", () => {
     const g = new Game();
     const ok = analyzeMove({ fen: g.startFen, moves: [] }, "e2e4", { limits: { maxDepth: 3 } });
     const view = reportView(ok, "1. e4");
-    assert.equal(view.best === null, ok.best.uci === ok.move.uci);
+    // Desde RC-01 la decide el coach: sin alternativa si es su primera opción o vale lo mismo (H-02).
+    assert.equal(view.best === null, ok.alternative === null);
+    assert.equal(ok.alternative === null, ok.verdict === "mejor");
     assert.notEqual(view.severity, "grave");
   });
 });
