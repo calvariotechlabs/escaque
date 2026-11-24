@@ -8,7 +8,7 @@
 // (tools/stockfish-ref.mjs). Metodología y significado de cada cifra: bench/README.md.
 import { Position, createRandom } from "../src/core/index.js";
 import type { Color } from "../src/core/index.js";
-import { COACH_LIMITS, analyzeMove } from "../src/coach/index.js";
+import { COACH_LIMITS, analyzeMove, checkInvariants } from "../src/coach/index.js";
 import { MATE_SCORE, TranspositionTable, chooseMove, search } from "../src/engine/index.js";
 import type { Level, SearchResult } from "../src/engine/index.js";
 import {
@@ -137,12 +137,10 @@ function ejecutar(lista: readonly PosicionBanco[]): void {
 
   // Estabilidad: misma posición a profundidad 4 (la del coach) y 5.
   proc.stderr.write("Estabilidad de la evaluación (profundidad 4 frente a 5)…\n");
-  const lineas = new Map<string, readonly string[]>();
   const estabilidad: { id: string; prof4: number; prof5: number; diferencia: number }[] = [];
   for (const p of lista) {
     const r4 = search(Position.fromFen(p.fen), { maxDepth: COACH_LIMITS.maxDepth }, { table: new TranspositionTable() });
     const r5 = search(Position.fromFen(p.fen), { maxDepth: 5 }, { table: new TranspositionTable() });
-    lineas.set(p.id, r4.pv);
     const a = motorCp(r4.score);
     const b = motorCp(r5.score);
     estabilidad.push({ id: p.id, prof4: a, prof5: b, diferencia: Math.abs(a - b) });
@@ -175,9 +173,13 @@ function ejecutar(lista: readonly PosicionBanco[]): void {
         mejorCoach: informe.best.uci,
         mateAntes: hayMate ? informe.before.mate?.winner === color : null,
         mateDespues: q.matePermitido ? informe.after.mate?.winner === rival : null,
-        violaciones: invariantes(p.fen, informe, lineas.get(p.id)!),
+        violaciones: [
+          ...invariantes(p.fen, informe, informe.lines.best),
+          ...checkInvariants(informe, { fen: p.fen }).map((detalle) => ({ regla: "invariante-del-coach" as const, detalle })),
+        ],
         texto: [`${informe.title}. ${informe.summary}`, informe.why, ...informe.findings.map((f) => `[${f.title}] ${f.message}`)].filter(Boolean).join(" | "),
         ms: Math.round(ms),
+        profundidad: informe.depth,
       });
     }
   }
@@ -259,6 +261,11 @@ function markdown(
   l.push(`| Mate permitido visto después de la jugada | ${pct(coach.matesPermitidosVistos, coach.matesPermitidos)} |`);
   l.push(`| Informes con alguna contradicción | ${pct(coach.informesConViolaciones, coach.analisis)} |`);
   l.push(`| Tiempo por análisis (media · p95 · máximo) | ${coach.msMedia} · ${coach.msP95} · ${coach.msMax} ms |`);
+  const profundidades = filasCoach.map((f) => f.profundidad ?? 0);
+  if (profundidades.length > 0) {
+    const media = profundidades.reduce((a, b) => a + b, 0) / profundidades.length;
+    l.push(`| Profundidad de la búsqueda de antes (media · mínimo · máximo) | ${media.toFixed(1)} · ${Math.min(...profundidades)} · ${Math.max(...profundidades)} |`);
+  }
   l.push("");
   l.push("Contradicciones por regla:", "");
   for (const [regla, n] of Object.entries(coach.violaciones)) l.push(`- ${regla}: ${n}`);

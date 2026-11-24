@@ -29,7 +29,7 @@
 import { Position, moveToUci } from "../core/index.js";
 import type { Color, Move, PieceType, Square } from "../core/index.js";
 import { MATE_SCORE, PIECE_VALUES, TranspositionTable, search } from "../engine/index.js";
-import type { SearchLimits, SearchOptions } from "../engine/index.js";
+import type { SearchLimits, SearchOptions, SearchResult } from "../engine/index.js";
 import { capturedValue, cheapestCapture, exchangeGain, moveBalance } from "./exchange.js";
 import { explainMove, hintForPosition, lineCaptures, lineGain, lineText, refutationOf } from "./explain.js";
 import type { Hint, Motive } from "./explain.js";
@@ -210,6 +210,33 @@ export class CoachError extends Error {
  */
 export const COACH_LIMITS: Readonly<Required<SearchLimits>> = Object.freeze({ maxDepth: 4, timeMs: 3000 });
 
+/**
+ * Presupuesto de la búsqueda extra de la jugada hecha cuando había mate (RC-05).
+ * Se cuenta en nodos, no en milisegundos, para que el resultado sea el mismo en
+ * cualquier equipo: unos 0,5 s en un portátil normal en el peor caso.
+ */
+interface DeepenBudget {
+  /** Profundidad que siempre se completa (salvo que salte el reloj). */
+  readonly minDepth: number;
+  readonly maxDepth: number;
+  /** Nodos que puede gastar, contando la estimación de la siguiente profundidad. */
+  readonly nodes: number;
+  /** Tope de reloj real en milisegundos (red de seguridad); sin él, es determinista. */
+  readonly timeMs?: number;
+}
+
+/** Hasta dónde se mira la jugada hecha cuando la mejor daba mate. */
+const MATE_DEEPEN = { maxDepth: 12, nodes: 150_000 } as const;
+/** Hasta dónde se confirma un «Error» o «Error grave» (ver `analyzeMove`). */
+const CONFIRM_DEEPEN = { maxDepth: 12, nodes: 150_000 } as const;
+
+/**
+ * Cuánto crece una búsqueda al ir una media jugada más lejos (medido en el
+ * banco de posiciones con Alfil Beta: entre 2,5 y 6, mediana cerca de 4).
+ * Sirve para no empezar una profundidad que no cabe en el presupuesto.
+ */
+const GROWTH = 5;
+
 /** Puntuaciones por encima (en valor absoluto) son mates. Igual que en el motor. */
 const MATE_BOUND = MATE_SCORE - 1_000;
 /** Un mate cuenta como esta ventaja al calcular la pérdida. */
@@ -218,14 +245,23 @@ const MATE_CP = 10_000;
 const MIN_GAIN = PIECE_VALUES.p;
 /** Pérdida mínima que el motor tiene que confirmar para dar esos dos avisos. */
 const MIN_LOSS = 80;
+/**
+ * Una pieza solo «cuelga» si capturarla le vale al rival como mucho esto menos
+ * que su mejor respuesta (H-07). Ganar un peón o más con la captura la deja
+ * siempre cerca de la mejor; una captura que cae más está refutada (clavada,
+ * contraataque) o no es la idea de la posición.
+ */
+const CAPTURE_TOLERANCE_CP = 50;
 /** Cuántas capturas candidatas se comprueban con el motor, como mucho. */
 const MAX_CAPTURE_CHECKS = 2;
 /** Pendiente de la curva logística (la que usan los analizadores habituales). */
 const SLOPE = 0.00368208;
 /** Caídas de puntos esperados que marcan cada veredicto. */
+/** Caída a partir de la cual el veredicto es «Error» (o peor): se confirma más hondo. */
+const GRAVE_DROP = 0.1;
 const THRESHOLDS: readonly (readonly [number, Verdict])[] = [
   [0.15, "error-grave"],
-  [0.1, "error"],
+  [GRAVE_DROP, "error"],
   [0.05, "imprecision"],
 ];
 
@@ -327,16 +363,54 @@ export function analyzeMove(game: CoachGame, move: string, options: AnalyzeOptio
   const playedBalance = moveBalance(position, position.moveFromUci(moveInfo.uci)!);
 
   // Antes: la mejor jugada y su puntuación.
-  const beforeSearch = search(position, options.limits ?? COACH_LIMITS, searchOptions);
-  const bestUci = beforeSearch.best!;
-  const beforeScore = beforeSearch.score;
+  const limits = options.limits ?? COACH_LIMITS;
+  const clock = options.now ?? (() => performance.now());
+  let beforeSearch = search(position, limits, searchOptions);
+  let isBest = beforeSearch.best === moveInfo.uci;
   // La jugada hecha (y las capturas a comprobar) se miran una media jugada menos,
   // sin reloj: así todas llegan igual de lejos que la búsqueda de antes.
-  const replyLimits: SearchLimits = { maxDepth: Math.max(1, beforeSearch.depth - 1) };
+  const replyFor = (depth: number): SearchLimits => ({ maxDepth: Math.max(1, depth - 1) });
+  let playedLine: { score: number; line: readonly string[]; replyScore: number | null } = isBest
+    ? { score: beforeSearch.score, line: beforeSearch.pv, replyScore: null }
+    : scoreLine(position, moveInfo.uci, replyFor(beforeSearch.depth), searchOptions);
+  const timeLimit = limits.timeMs === undefined ? {} : { timeMs: limits.timeMs };
 
-  // Después: la puntuación de la jugada hecha.
-  const isBest = bestUci === moveInfo.uci;
-  const playedLine = isBest ? { score: beforeScore, line: beforeSearch.pv, replyScore: null } : scoreLine(position, moveInfo.uci, replyLimits, searchOptions);
+  // Confirmación (RC-05): antes de llamar «Error» o «Error grave» a una jugada se
+  // vuelve a mirar más hondo, si cabe en el presupuesto (posiciones sencillas o
+  // forzadas, como los finales). Si la búsqueda más honda completa más
+  // profundidad, manda ella, con la jugada hecha a esa misma profundidad. En
+  // posiciones cargadas no cabe y se queda como estaba: el banco de posiciones
+  // mide que ahí ir una media jugada más lejos no cambia los veredictos y
+  // multiplica el tiempo por 3 o 4.
+  const grave = (score: number): boolean => expected(toCp(beforeSearch.score)) - expected(toCp(score)) >= GRAVE_DROP;
+  if (!isBest && Math.abs(beforeSearch.score) <= MATE_BOUND && grave(playedLine.score)) {
+    const budget: DeepenBudget = { ...CONFIRM_DEEPEN, minDepth: beforeSearch.depth, ...timeLimit };
+    const deeper = deepen(position, budget, searchOptions, beforeSearch);
+    if (deeper.depth > beforeSearch.depth) {
+      beforeSearch = deeper;
+      isBest = deeper.best === moveInfo.uci;
+      playedLine = isBest
+        ? { score: deeper.score, line: deeper.pv, replyScore: null }
+        : scoreLine(position, moveInfo.uci, replyFor(deeper.depth), searchOptions);
+    }
+  }
+  const bestUci = beforeSearch.best!;
+  const beforeScore = beforeSearch.score;
+  const replyLimits = replyFor(beforeSearch.depth);
+  // La captura de una pieza colgando se mira desde la posición de después: una media jugada menos.
+  const captureLimits: SearchLimits = { maxDepth: Math.max(1, beforeSearch.depth - 2) };
+
+  // Había mate y, a esta profundidad, la jugada hecha no lo mantiene: puede ser
+  // un mate más largo que queda más allá (Cf7+ en Philidor, coronar torre).
+  // La búsqueda de antes se para al ver el mate, así que la de la jugada hecha
+  // se queda corta; se mira más hondo con su propio presupuesto. Contra un mate
+  // no importa comparar a la misma profundidad: el mate es exacto, y la
+  // búsqueda más honda de la jugada hecha es la más fiel.
+  if (!isBest && beforeScore > MATE_BOUND && playedLine.score <= MATE_BOUND) {
+    const budget: DeepenBudget = { ...MATE_DEEPEN, minDepth: replyLimits.maxDepth!, ...timeLimit };
+    const deeper = scoreLineDeep(position, moveInfo.uci, budget, searchOptions);
+    if (deeper !== null) playedLine = deeper;
+  }
   const playedScore = playedLine.score;
   const loss = Math.max(0, toCp(beforeScore) - toCp(playedScore));
   const drop = isBest ? 0 : expected(toCp(beforeScore)) - expected(toCp(playedScore));
@@ -344,7 +418,11 @@ export function analyzeMove(game: CoachGame, move: string, options: AnalyzeOptio
   const findings: Finding[] = [];
   if (mates.length > 0 && !playedMates) findings.push(missedMate(position, mates[0]!, moveInfo, color));
   if (loss >= MIN_LOSS && !playedMates) {
-    const hanging = hangingPiece(position, moveInfo.uci, color, playedBalance);
+    // La captura de la pieza tiene que valerle al rival casi lo mismo que su mejor respuesta.
+    const reply = playedLine.replyScore;
+    const confirm = (captureUci: string): boolean =>
+      reply === null || toCp(scoreMove(position, captureUci, captureLimits, searchOptions)) >= toCp(reply) - CAPTURE_TOLERANCE_CP;
+    const hanging = hangingPiece(position, moveInfo.uci, color, playedBalance, confirm);
     if (hanging !== null) findings.push(hanging);
 
     // Captura que ganaba más que la jugada hecha y que el motor confirma.
@@ -366,8 +444,6 @@ export function analyzeMove(game: CoachGame, move: string, options: AnalyzeOptio
   // Con reloj (en la interfaz), completar líneas tiene su propio tope; sin reloj
   // (pruebas, banco), el resultado es determinista.
   const extendDepth = Math.max(1, beforeSearch.depth - 1);
-  const limits = options.limits ?? COACH_LIMITS;
-  const clock = options.now ?? (() => performance.now());
   const deadline = limits.timeMs === undefined ? null : clock() + Math.min(limits.timeMs, EXTEND_BUDGET_MS);
   const extend = (line: readonly string[], plies: number): string[] => extendLine(position, line, plies, extendDepth, searchOptions, deadline, clock);
 
@@ -674,6 +750,54 @@ function extendLine(
   return out;
 }
 
+/**
+ * Profundización con presupuesto de nodos (ver `DeepenBudget`). Cada
+ * profundidad es una búsqueda completa que reutiliza la tabla de las
+ * anteriores. Se para al encontrar un mate dentro de lo buscado, al llegar a
+ * `maxDepth`, cuando la siguiente profundidad (estimada) no cabe en el
+ * presupuesto o cuando salta el reloj de seguridad. Deja `position` como estaba.
+ */
+function deepen(position: Position, budget: DeepenBudget, options: SearchOptions, known: SearchResult | null = null): SearchResult {
+  const clock = options.now ?? (() => performance.now());
+  const deadline = budget.timeMs === undefined ? null : clock() + budget.timeMs;
+  let result: SearchResult | null = known;
+  // Nodos de la última profundidad completada: con ellos se estima la siguiente.
+  let last = known?.nodes ?? 0;
+  let spent = 0;
+  for (let depth = (known?.depth ?? 0) + 1; depth <= budget.maxDepth; depth++) {
+    if (result !== null && depth > budget.minDepth && spent + last * GROWTH > budget.nodes) break;
+    if (result !== null && Math.abs(result.score) > MATE_BOUND && MATE_SCORE - Math.abs(result.score) < depth) break;
+    const left = deadline === null ? null : deadline - clock();
+    if (result !== null && left !== null && left <= 0) break;
+    const next = search(position, left === null || result === null ? { maxDepth: depth } : { maxDepth: depth, timeMs: left }, options);
+    if (result !== null && next.depth < depth) break; // el reloj cortó esta profundidad: vale la anterior
+    result = next;
+    last = next.nodes;
+    spent += next.nodes;
+  }
+  return result!;
+}
+
+/**
+ * Como `scoreLine`, pero la respuesta se busca con `deepen` y el presupuesto
+ * dado. `null` si la jugada acaba la partida. Deja `position` como estaba.
+ */
+function scoreLineDeep(
+  position: Position,
+  uci: string,
+  budget: DeepenBudget,
+  options: SearchOptions,
+): { score: number; line: readonly string[]; replyScore: number } | null {
+  position.makeMove(position.moveFromUci(uci)!);
+  try {
+    if (position.status().kind !== "ongoing" || budget.minDepth > budget.maxDepth) return null;
+    const reply = deepen(position, budget, options);
+    return { score: fromReply(reply.score), line: [uci, ...reply.pv], replyScore: reply.score };
+  } finally {
+    position.unmakeMove();
+  }
+}
+
 /** Puntuación (para quien mueve en `position`) de hacer `uci`. Deja `position` como estaba. */
 function scoreMove(position: Position, uci: string, limits: SearchLimits, options: SearchOptions): number {
   return scoreLine(position, uci, limits, options).score;
@@ -789,22 +913,27 @@ function winningCaptures(position: Position): CaptureFinding[] {
  * Tras jugar `uci`, ¿qué pieza propia puede ganar el rival? La de más
  * ganancia; a igual ganancia, la que se acaba de mover. Para la pieza que se
  * acaba de mover cuenta el balance de la jugada (`playedBalance`): si capturó
- * algo, un cambio igualado no es una pieza colgando. Deja `position` como estaba.
+ * algo, un cambio igualado no es una pieza colgando. El intercambio estático
+ * no ve clavadas ni amenazas; por eso cada candidata se confirma con el motor
+ * (`confirm`, con la jugada hecha en `position`): si capturarla sale mal al
+ * rival, no cuelga (H-07: 13.O-O y …Axe5). Deja `position` como estaba.
  */
-function hangingPiece(position: Position, uci: string, color: Color, playedBalance: number): Finding | null {
+function hangingPiece(position: Position, uci: string, color: Color, playedBalance: number, confirm: (captureUci: string) => boolean): Finding | null {
   const move = position.moveFromUci(uci)!;
+  const to = move.to;
   position.makeMove(move);
   try {
     if (position.status().kind !== "ongoing") return null;
-    let best: { square: Square; gain: number } | null = null;
+    const candidates: { square: Square; gain: number }[] = [];
     for (let square = 0; square < 120; square++) {
       if (square & 0x88) continue;
       const piece = position.pieceAt(square);
       if (piece === null || piece.color !== color || piece.type === "k") continue;
-      const gain = square === move.to ? Math.min(exchangeGain(position, square), -playedBalance) : exchangeGain(position, square);
-      if (gain < MIN_GAIN) continue;
-      if (best === null || gain > best.gain || (gain === best.gain && square === move.to)) best = { square, gain };
+      const gain = square === to ? Math.min(exchangeGain(position, square), -playedBalance) : exchangeGain(position, square);
+      if (gain >= MIN_GAIN) candidates.push({ square, gain });
     }
+    candidates.sort((a, b) => b.gain - a.gain || (b.square === to ? 1 : 0) - (a.square === to ? 1 : 0));
+    const best = candidates.find((c) => confirm(moveToUci(cheapestCapture(position, c.square)!))) ?? null;
     if (best === null) return null;
 
     const piece = position.pieceAt(best.square)!.type;

@@ -144,8 +144,10 @@ describe("invariantes()", () => {
   });
 
   it("1. «Mejor jugada» con otra jugada como mejor", () => {
-    const v = invariantes(INICIAL, informe({ move: { uci: "g1f3", san: "Nf3" } }), ["e2e4"]);
+    const v = invariantes(INICIAL, informe({ move: { uci: "g1f3", san: "Nf3" }, alternative: { uci: "e2e4", san: "e4" } }), ["e2e4"]);
     assert.deepEqual(v.map((x) => x.regla), ["mejor-con-otra-mejor"]);
+    // Equivalente a la mejor (B1): «Mejor jugada» sin otra debajo no es contradicción.
+    assert.deepEqual(invariantes(INICIAL, informe({ move: { uci: "g1f3", san: "Nf3" } }), ["e2e4"]), []);
   });
 
   it("2. aviso táctico y «no hay un motivo táctico»", () => {
