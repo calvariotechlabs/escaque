@@ -11,7 +11,7 @@ test("sin nada que decir no hay aviso", () => {
 test("cada aviso lleva el texto del diseño", () => {
   const update = pickNotice(state({ updateReady: true }));
   assert.equal(update?.title, "Hay una versión nueva.");
-  assert.equal(update?.text, "Al actualizar se reinicia la partida en curso.");
+  assert.equal(update?.text, "Al actualizar se recarga la página y tu partida se conserva.");
   assert.deepEqual(update?.buttons.map((b) => b.label), ["Actualizar ahora", "Más tarde"]);
   const offline = pickNotice(state({ offline: true }));
   assert.equal(offline?.title, "Sin conexión.");
