@@ -110,12 +110,12 @@ describe("panel de capturas de extremo a extremo", () => {
     page = await browser.newPage();
   });
 
-  test("sin jugadas no hay capturas y el panel no es una región viva", async () => {
+  test("sin jugadas el panel queda plegado en una línea y no es una región viva", async () => {
     await startTwoPlayers(page);
-    assert.deepEqual(await rows(page), [
-      { quien: "Blancas", piezas: 0, ventaja: null, lector: "Blancas no han capturado nada." },
-      { quien: "Negras", piezas: 0, ventaja: null, lector: "Negras no han capturado nada." },
-    ]);
+    assert.deepEqual(await rows(page), []);
+    const vacio = await page.eval(`({ texto: document.getElementById('capturas').textContent.trim(), alto: document.getElementById('capturas').getBoundingClientRect().height })`);
+    assert.equal(vacio.texto.replace(/\s+/g, " "), "Capturas Ninguna todavía");
+    assert.ok(vacio.alto < 64, `plegado en una línea (${vacio.alto} px)`);
     const live = await page.eval(`Boolean(document.getElementById('capturas').closest('[aria-live], [role=status], [role=alert]')) || Boolean(document.getElementById('capturas').querySelector('[aria-live], [role=status], [role=alert]'))`);
     assert.equal(live, false);
   });
@@ -139,6 +139,7 @@ describe("panel de capturas de extremo a extremo", () => {
 
   test("deshacer la captura vuelve a dejar el panel vacío", async () => {
     await page.eval(`document.getElementById('deshacer').click()`);
-    assert.deepEqual((await rows(page)).map((fila) => fila.piezas), [0, 0]);
+    assert.deepEqual(await rows(page), [], "sin capturas vuelve a plegarse");
+    assert.match(await page.eval(`document.getElementById('capturas').textContent`), /Ninguna todavía/);
   });
 });

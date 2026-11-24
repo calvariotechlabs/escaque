@@ -7,7 +7,8 @@ body{margin:0;background:var(--surface);color:var(--ink);font:400 16px/24px var(
 .pagina__cabecera h1.cabecera-marca{display:flex;align-items:center;gap:var(--space-2)}
 .cabecera-marca__logo{flex:none;display:block;width:24px;height:24px}
 @media (max-width:599px){.pagina__cabecera{column-gap:var(--space-2)}} /* con el logo, título y navegación solo caben en una fila de 390 px con el hueco de 8 px */
-.pagina__cabecera p{margin:0;font:400 14px/20px var(--font-sans);color:var(--ink-muted)}
+.pagina__cabecera p{margin:0;font:400 14px/20px var(--font-sans);color:var(--ink-muted);flex-basis:100%}
+/* El subtítulo (modo y nivel) va en su propia línea bajo el nombre en todas las pantallas: la navegación queda siempre a la derecha (CAL-404). */
 
 /* Subtítulo: corto en móvil y largo en escritorio, como en el lienzo. */
 .solo-escritorio{display:none}
@@ -97,6 +98,7 @@ body{margin:0;background:var(--surface);color:var(--ink);font:400 16px/24px var(
   .partida__controles{order:-1;position:sticky;top:0;z-index:1;grid-template-columns:repeat(4,minmax(0,1fr));padding-bottom:var(--space-2);background:var(--surface)}
   .partida__controles .boton,.partida__controles .boton--principal,.partida__ancho{grid-column:auto;padding:4px 6px;font-size:13px;line-height:16px}
   .partida__panel > .capturas{padding:var(--space-2) var(--space-3);gap:var(--space-1)}
+  .partida__panel > .capturas:has(.capturas__vacio){column-gap:var(--space-3)}
   .partida__jugadas{padding:var(--space-2) var(--space-4)}
   .partida__jugadas .jugadas__titulo{font-size:16px;line-height:24px;margin-bottom:var(--space-1)}
   /* El aviso se compacta: texto a la izquierda y botones a la derecha, para dejar sitio al panel. */

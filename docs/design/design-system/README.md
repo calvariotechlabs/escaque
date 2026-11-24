@@ -54,13 +54,13 @@ Escaque no usa iconos en la interfaz: los botones llevan solo texto. Las únicas
 
 - `Lessons` agrupa la lista de lecciones (tarjetas con estado), el progreso (seis segmentos), el objetivo, las pistas y la retroalimentación. Las lecciones son entre 5 y 6, de orden libre; el progreso se guarda en este dispositivo.
 - El estado de una lección (sin empezar, en curso, completada) y el resultado de una jugada (acierto, fallo) se distinguen por icono, borde y palabra, nunca solo por color. La retroalimentación es la única región `role="status"`; tras acertar, el foco pasa a «Siguiente lección».
-- La cabecera de la web lleva la navegación principal («Jugar» y «Lecciones») con `aria-current="page"` en la actual.
+- La cabecera de la web lleva la navegación principal («Jugar» y «Lecciones») con `aria-current="page"` en la actual. La navegación va siempre a la derecha, en el mismo sitio en todas las pantallas; el subtítulo de la partida (modo y nivel) va en su propia línea debajo del nombre (CAL-404). En móvil apaisado el nivel va en el estado.
 - Los textos de cada lección (objetivo, pistas, explicación y motivos de fallo) vienen de los datos de la lección: frases completas, de tú y con punto final.
 
 ## Identidad
 
 - **Tinta de marca.** Los títulos van en `marca`, el azul petróleo del fondo del logo, con el interletraje algo cerrado. `accent` sigue siendo solo para acciones.
-- **El escaque.** Un cuadrado de 10 px partido en diagonal en `marca` (la casilla que cruza la diagonal del alfil del logo) va delante de los títulos de panel: Coach, Jugadas, Pistas, Capturas y las secciones del repaso. La muestra de turno es un escaque de 18 px del color que juega.
+- **El escaque.** Un cuadrado de 10 px partido en diagonal en `marca` (la casilla que cruza la diagonal del alfil del logo) va delante de los títulos de panel: Coach, Jugadas, Pistas, Capturas, las secciones del repaso y «Resumen por bando» (el título de su tabla, CAL-404). Sin ninguna captura, el panel Capturas se pliega a una línea: «Capturas · Ninguna todavía». La muestra de turno es un escaque de 18 px del color que juega.
 - **Jaque.** El estado lleva borde de 2 px en `peligro`, fondo `peligro-suave` y la etiqueta «Jaque» con un rombo. Si te toca, el texto dice qué hacer: «Juegan las blancas: sal del jaque.». «Te toca» va en una etiqueta `accent` aparte, solo contra la máquina.
 - **Fin de partida.** En dos jugadores, «Jaque mate.» o «Tablas.» en `title` con la causa debajo. Contra la máquina, `GameResult` lleva un antetítulo (Victoria, Derrota o Empate) y el sello.
 - **Sello y logro.** El sello es el logo; al ganar o superar una lección su diagonal pasa a `logro-vivo` (latón), con borde `logro`, antetítulo en `logro` y fondo con degradado desde `logro-suave`. El latón se reserva para logros.

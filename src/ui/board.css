@@ -101,6 +101,9 @@
 .capturas__grupo .pieza + .pieza{margin-left:-11px}
 .capturas__nada{color:var(--ink-muted)}
 .capturas__ventaja{font:600 14px/20px var(--font-sans);font-variant-numeric:tabular-nums;padding:0 var(--space-2);border:1.5px solid var(--ink);border-radius:999px}
+.capturas__vacio{margin:0;color:var(--ink-muted)}
+/* Sin capturas el panel se pliega a una línea: título y «Ninguna todavía» (CAL-404, lámina «Cierre de la revisión visual 2»). */
+.capturas:has(.capturas__vacio){flex-direction:row;flex-wrap:wrap;align-items:center;column-gap:var(--space-3);row-gap:0}
 .capturas__nota{margin:0;color:var(--ink-muted);font-size:13px;line-height:16px}
 /* Flechas sobre el tablero (CAL-394, lienzo «Coach mejorado»): misma celda que la rejilla, encima de las piezas y sin recibir clics. */
 .tablero__flechas{grid-column:2;grid-row:1;width:100%;height:100%;pointer-events:none;z-index:2;overflow:visible}

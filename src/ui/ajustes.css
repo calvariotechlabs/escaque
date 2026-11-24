@@ -89,9 +89,10 @@
 }
 @media (min-width:600px) and (max-width:859px){.ajustes-pantalla{max-width:732px;grid-template-columns:minmax(0,1fr)}}
 @media (min-width:860px){
-  .ajustes-pantalla{grid-template-columns:minmax(0,520px) minmax(0,400px);grid-template-areas:"form vista" "form novato" "form instalar";grid-template-rows:auto auto 1fr;column-gap:48px;row-gap:var(--space-4);padding-top:var(--space-6)}
+  .ajustes-pantalla{grid-template-columns:minmax(0,520px) minmax(0,360px);grid-template-areas:"form vista" "form novato" "form instalar";grid-template-rows:auto auto 1fr;column-gap:48px;row-gap:var(--space-4);padding-top:var(--space-6)}
   .ajustes-pantalla__form{grid-area:form}
-  .ajustes-pantalla__vista{display:block;grid-area:vista;max-width:360px}
+  .ajustes-pantalla__vista{display:block;grid-area:vista}
+  /* Tablero de muestra, aviso de principiante y aviso de instalar comparten los dos bordes: la columna mide lo que el tablero (CAL-404). */
   .ajustes-pantalla__novato{grid-area:novato}
   .ajustes-pantalla__instalar{grid-area:instalar}
   .ajustes-pantalla__titulo{margin-bottom:var(--space-6)}

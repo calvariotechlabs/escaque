@@ -98,11 +98,9 @@ describe("capturesMarkup", () => {
     assert.ok(html.includes('<span class="capturas__ventaja" aria-hidden="true">+2</span>'));
   });
 
-  it("sin capturas pone «Ninguna» y no añade nota", () => {
+  it("sin capturas queda plegado en una línea: «Ninguna todavía», sin filas ni nota (CAL-404)", () => {
     const html = capturesMarkup(captureSummary([]), "w");
-    assert.equal((html.match(/Ninguna/g) ?? []).length, 2);
-    assert.ok(!html.includes("capturas__ventaja"));
-    assert.ok(!html.includes("capturas__nota"));
+    assert.equal(html, '<p class="capturas__vacio">Ninguna todavía</p>');
   });
 
   it("con capturas e igualdad lo dice en una nota", () => {
@@ -120,7 +118,7 @@ describe("capturesMarkup", () => {
 
 describe("capturesMarkup y lectores de pantalla", () => {
   it("el nombre visible del bando no se lee dos veces: lo dice el texto oculto de la fila", () => {
-    const html = capturesMarkup(captureSummary([]), "w");
+    const html = capturesMarkup(captureSummary([move("w", "p")]), "w");
     assert.equal((html.match(/class="capturas__quien" aria-hidden="true"/g) ?? []).length, 2);
   });
 });
