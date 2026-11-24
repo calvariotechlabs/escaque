@@ -145,3 +145,18 @@ describe("pistas", () => {
     assert.throws(() => hintFor({ fen: "6k1/5ppp/8/8/8/8/8/R5K1 w - - 0 1", moves: ["a1a8"] }, LIMITS), CoachError);
   });
 });
+
+describe("el coach no depende de la velocidad de la máquina", () => {
+  it("con los límites por defecto, un equipo unas 10 veces más lento da la misma explicación", () => {
+    // Reloj simulado: cada consulta avanza 65 ms (en un equipo normal, el análisis completo consulta
+    // el reloj unas 40 veces en ~0,3 s, es decir, ~7 ms por consulta). Sin tiempos reales: no es intermitente.
+    let ticks = 0;
+    const slow = (): number => ticks++ * 65;
+    const slowReport = analyzeMove({ fen: START_FEN, moves: LEGAL }, "h2h3", { now: slow });
+    const reference = analyzeMove({ fen: START_FEN, moves: LEGAL }, "h2h3", DEPTH4);
+    assert.equal(slowReport.depth, 4);
+    assert.equal(slowReport.line, reference.line);
+    assert.equal(slowReport.verdict, reference.verdict);
+    assert.match(slowReport.why, /Cxe5 gana un peón/);
+  });
+});

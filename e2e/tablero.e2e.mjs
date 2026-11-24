@@ -78,7 +78,7 @@ describe("tablero a elegir de extremo a extremo (CAL-397)", () => {
     await page.eval(`document.getElementById('tablero-nogal').click()`);
     assert.equal(await darkSquare(page), "rgb(162, 105, 61)");
     assert.equal(await page.eval(`document.documentElement.dataset.tablero`), "nogal");
-    await page.eval(`setTimeout(() => location.reload(), 0)`);
+    await page.reload();
     await page.waitFor(`document.documentElement.dataset.tablero === 'nogal' && document.getElementById('tablero-nogal').checked`, { what: "Nogal recordado" });
     assert.equal(await darkSquare(page), "rgb(162, 105, 61)");
   });
@@ -90,7 +90,7 @@ describe("tablero a elegir de extremo a extremo (CAL-397)", () => {
 
   test("un valor guardado que no es válido vuelve a Bosque", async () => {
     await page.eval(`localStorage.setItem('escaque:tablero', 'x<y')`);
-    await page.eval(`setTimeout(() => location.reload(), 0)`);
+    await page.reload();
     await page.waitFor(`document.getElementById('tablero-bosque')?.checked === true`, { what: "Bosque por defecto" });
     assert.equal(await page.eval(`document.documentElement.hasAttribute('data-tablero')`), false);
   });

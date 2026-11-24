@@ -167,8 +167,16 @@ export class CoachError extends Error {
   override name = "CoachError";
 }
 
-/** Profundidad 4, y como mucho 0,6 s en la búsqueda de la posición de antes. */
-export const COACH_LIMITS: Readonly<Required<SearchLimits>> = Object.freeze({ maxDepth: 4, timeMs: 600 });
+/**
+ * Profundidad 4, y como mucho 3 s en la búsqueda de la posición de antes.
+ *
+ * La profundidad es lo que fija el veredicto; el reloj es solo una red de seguridad para
+ * dispositivos lentísimos. Con un tope ajustado (antes 0,6 s) el mismo análisis dependía de
+ * la máquina: un ejecutor de CI cargado se quedaba en profundidad 2-3, no veía Cxe5 en la
+ * trampa de Légal y no daba alternativa. El análisis corre en un Worker, así que esperar no
+ * bloquea la interfaz; en un equipo normal tarda unos 0,3 s.
+ */
+export const COACH_LIMITS: Readonly<Required<SearchLimits>> = Object.freeze({ maxDepth: 4, timeMs: 3000 });
 
 /** Puntuaciones por encima (en valor absoluto) son mates. Igual que en el motor. */
 const MATE_BOUND = MATE_SCORE - 1_000;

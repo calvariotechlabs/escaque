@@ -83,20 +83,33 @@ export async function launchBrowser({ width = 1280, height = 800 } = {}) {
     await call("Runtime.enable");
     await call("Emulation.setDeviceMetricsOverride", { width, height, deviceScaleFactor: 1, mobile: false });
 
+    /** Promesa que se cumple con el próximo `load` de esta pestaña (se pide ANTES de navegar). */
+    const nextLoad = () =>
+      new Promise((resolve) => {
+        const l = (msg) => {
+          if (msg.sessionId === sessionId && msg.method === "Page.loadEventFired") {
+            listeners.delete(l);
+            resolve();
+          }
+        };
+        listeners.add(l);
+      });
+
     const page = {
       errors,
       call,
       async goto(url) {
-        const loaded = new Promise((resolve) => {
-          const l = (msg) => {
-            if (msg.sessionId === sessionId && msg.method === "Page.loadEventFired") {
-              listeners.delete(l);
-              resolve();
-            }
-          };
-          listeners.add(l);
-        });
+        const loaded = nextLoad();
         await call("Page.navigate", { url });
+        await loaded;
+      },
+      /**
+       * Recarga la página y espera a que la nueva termine de cargar. Es lo que hay que usar en vez de
+       * `location.reload()` + `waitFor`: la condición podía cumplirse en la página vieja, antes de recargar.
+       */
+      async reload() {
+        const loaded = nextLoad();
+        await call("Page.reload");
         await loaded;
       },
       /** Evalúa una expresión en la página y devuelve su valor (admite promesas). */
