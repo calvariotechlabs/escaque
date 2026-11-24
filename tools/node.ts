@@ -4,6 +4,8 @@
 
 export interface NodeFs {
   readFileSync(path: string, encoding: "utf8"): string;
+  writeFileSync(path: string, data: string): void;
+  mkdirSync(path: string, options: { recursive: true }): unknown;
 }
 
 export interface NodeProcess {
