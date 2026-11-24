@@ -245,13 +245,35 @@ describe("arrastre con el dedo", () => {
     assert.deepEqual(page.errors, []);
   });
 
-  test("si el navegador no cierra un toque, otro toque un rato después tampoco se pierde", async () => {
+  test("un segundo dedo que roza el tablero con el primero quieto más de medio segundo no corta el arrastre", async () => {
     const page = await phonePage();
     await startTwoPlayers(page);
-    await touchDragStart(page, "e2", "e3"); // el primer dedo se queda sin pointerup ni pointercancel
-    await pause(700);
-    // Para el navegador el primer dedo sigue apoyado; el segundo toca d2. (Las herramientas de Chrome solo
-    // saben levantar todos los dedos a la vez, así que al levantar llega también el pointerup del primero.)
+    await touchDragStart(page, "e2", "e3");
+    await pause(700); // el dedo que arrastra se queda quieto
+    const e3 = await center(page, "e3");
+    const thumb = await center(page, "a7");
+    const b = await center(page, "e4");
+    await page.call("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ id: 0, x: e3.x, y: e3.y }, { id: 1, x: thumb.x, y: thumb.y }] });
+    assert.equal(
+      await page.eval(`document.querySelectorAll('#tablero .pieza--elevada:not(.pieza--origen)').length`),
+      1,
+      "la pieza sigue levantada tras el roce",
+    );
+    await page.call("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [{ id: 0, x: b.x, y: b.y }, { id: 1, x: thumb.x, y: thumb.y }] });
+    await page.call("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
+    await pause(100);
+    assert.equal(await pieceOn(page, "e4"), true, "el peón llega a e4");
+    assert.equal(await pieceOn(page, "e2"), false);
+    assert.deepEqual(page.errors, []);
+  });
+
+  test("si el navegador pierde el dedo que arrastra mientras otro sigue apoyado, el tablero se recupera a los 3 s", async () => {
+    const page = await phonePage();
+    await startTwoPlayers(page);
+    // Para el tablero es igual un dedo perdido que uno que lleva más de 3 s quieto: no sabe nada de él. (Las
+    // herramientas de Chrome solo saben levantar todos los dedos a la vez, así que aquí sigue apoyado.)
+    await touchDragStart(page, "e2", "e3");
+    await pause(3200);
     const e3 = await center(page, "e3");
     const d2 = await center(page, "d2");
     await page.call("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ id: 0, x: e3.x, y: e3.y }, { id: 1, x: d2.x, y: d2.y }] });
@@ -263,6 +285,36 @@ describe("arrastre con el dedo", () => {
     await pause(100);
     assert.equal(await pieceOn(page, "d4"), true, "los toques siguientes juegan d4");
     assert.equal(await pieceOn(page, "e2"), true, "el peón arrastrado vuelve a e2");
+    assert.deepEqual(page.errors, []);
+  });
+
+  test("si el navegador pierde un dedo sin avisar, el toque siguiente no se pierde", async () => {
+    const page = await phonePage();
+    await startTwoPlayers(page);
+    await touchDragStart(page, "e2", "e3");
+    // Simula Safari en iOS: el navegador da el dedo por levantado, pero el tablero no recibe ni pointerup,
+    // ni pointercancel ni lostpointercapture.
+    await page.eval(`(() => {
+      const swallow = (e) => e.stopImmediatePropagation();
+      for (const type of ["pointerup", "pointercancel", "lostpointercapture"]) window.addEventListener(type, swallow, { capture: true });
+      window.__restore = () => { for (const type of ["pointerup", "pointercancel", "lostpointercapture"]) window.removeEventListener(type, swallow, { capture: true }); };
+    })()`);
+    await page.call("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
+    await page.eval(`window.__restore()`);
+    const d2 = await center(page, "d2");
+    const d4 = await center(page, "d4");
+    for (const sq of [d2, d4]) {
+      await page.call("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ id: 0, x: sq.x, y: sq.y }] });
+      await page.call("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
+      await pause(100);
+    }
+    assert.equal(await pieceOn(page, "d4"), true, "los toques siguientes juegan d4");
+    assert.equal(await pieceOn(page, "e2"), true, "el peón arrastrado vuelve a e2");
+    assert.equal(
+      await page.eval(`document.querySelectorAll('#tablero .pieza--origen, #tablero .pieza--elevada, #tablero .arrastre__etiqueta').length`),
+      0,
+      "no queda rastro del arrastre perdido",
+    );
     assert.deepEqual(page.errors, []);
   });
 });
