@@ -1300,7 +1300,7 @@
       "x": 0,
       "y": 7570,
       "w": 390,
-      "text": "Un aviso a la vez, encima del estado. Sin conexión lleva borde discontinuo y versión nueva borde sólido en el color de acento, así que no depende solo del color. Al actualizar se reinicia la partida en curso: por eso se avisa antes.",
+      "text": "Un aviso a la vez, encima del estado. Sin conexión lleva borde discontinuo y versión nueva borde sólido en el color de acento, así que no depende solo del color. Al actualizar se recarga la página y tu partida se conserva: aun así se avisa antes.",
       "fill": "gray",
       "page": "movil"
     },
