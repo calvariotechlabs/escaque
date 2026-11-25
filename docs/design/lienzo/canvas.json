@@ -1007,6 +1007,22 @@
       "h": 630,
       "title": "Imagen de vista previa · con la firma «by Calvario TechLabs» (propuesta)",
       "page": "escritorio"
+    },
+    "ErroresEntradaEscritorio.dc.html": {
+      "x": 0,
+      "y": 50700,
+      "w": 1280,
+      "h": 2200,
+      "page": "escritorio",
+      "title": "Escritorio · errores de entrada: jugada no válida, PGN en español y ahogado en el coach (propuesta, issue #75)"
+    },
+    "ErroresEntradaMovil.dc.html": {
+      "x": 0,
+      "y": 49940,
+      "w": 390,
+      "h": 1400,
+      "page": "movil",
+      "title": "Móvil · errores de entrada (propuesta, issue #75)"
     }
   },
   "order": [
@@ -1131,7 +1147,9 @@
     "CoachRefutacionTablet.dc.html",
     "CoachRefutacionMovil.dc.html",
     "CoachRefutacionMovilHorizontal.dc.html",
-    "OgImageFirma.dc.html"
+    "OgImageFirma.dc.html",
+    "ErroresEntradaEscritorio.dc.html",
+    "ErroresEntradaMovil.dc.html"
   ],
   "notes": {
     "t_escritorio_0": {
@@ -2252,6 +2270,22 @@
       "text": "Firma en la imagen al compartir (issue #96)\n\n• «by» en IBM Plex Sans 400 y «Calvario TechLabs» en 600, 28 px sobre 1200 px de ancho (≈ 14 px a 600 px de ancho, como en la cabecera). Color ink-muted #97a1b3 (7,2 : 1 sobre #0f1218) y el nombre más claro #c3cad6 (11,4 : 1). Texto, no logotipo.\n• Va al pie de la columna central, bajo la etiqueta «Sin cuentas · funciona sin conexión» y un filete de 48 px. La columna es el cuadrado de 630 px que Teams enseña al recortar: la firma cabe entera (ancho ≈ 275 px).\n• El resto no cambia (icono, Escaque, lema, etiqueta, piezas); el bloque central sube 38 px para dejar sitio a la firma.\n• La firma de la imagen es la misma que en la cabecera y el pie de la app: «Calvario TechLabs» con espacio.",
       "fill": "green",
       "size": "s"
+    },
+    "t_errores_escritorio": {
+      "x": 0,
+      "y": 50440,
+      "text": "Errores de entrada (issue #75)",
+      "kind": "title1",
+      "maxW": 1280,
+      "page": "escritorio"
+    },
+    "t_errores_movil": {
+      "x": 0,
+      "y": 49680,
+      "text": "Errores de entrada (issue #75)",
+      "kind": "title1",
+      "maxW": 1280,
+      "page": "movil"
     }
   },
   "designSystems": [
