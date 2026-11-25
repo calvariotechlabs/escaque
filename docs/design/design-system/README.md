@@ -11,7 +11,7 @@ Escaque es una app web para aprender ajedrez con motor propio (Alfil Beta). Es u
 ## Fundamentos visuales
 
 - **Color.** Página en `surface`; paneles en `surface-raised`; texto en `ink`, secundario en `ink-muted`. La única acción de color es `accent`, con `on-accent` encima. Los bordes de controles usan `control-border`; `line` solo separa paneles.
-- **Tablero.** Dos tableros a elegir (CAL-397): Bosque, el de siempre, y Nogal (`data-tablero="nogal"`, valores en `boardThemes` de `tokens.json`). Casillas en `square-light` y `square-dark`, iguales en tema claro y oscuro. No se redondean ni llevan sombra. Las coordenadas van fuera, en la tipografía `coord` y `ink-muted`.
+- **Tablero.** Dos tableros a elegir (CAL-397), guardados en el dispositivo: Bosque, el de siempre (`square-light`, `square-dark`), y Nogal (los tokens `*-nogal`, con `data-tablero="nogal"` en `<html>`). Casillas iguales en tema claro y oscuro. No se redondean ni llevan sombra. Las coordenadas van fuera, en la tipografía `coord` y `ink-muted`.
 - **Piezas.** Estilo de volumen con degradado lateral (luz a la izquierda, sombra a la derecha) y contorno oscuro de 1 unidad sobre un viewBox de 45×45. Blancas: `piece-white-hi`, `piece-white-mid`, `piece-white-lo`, contorno `piece-outline-white`. Negras: `piece-black-hi`, `piece-black-mid`, `piece-black-lo`, contorno `piece-outline-black`.
 - **Marcas.** El significado va en la forma y el color solo refuerza: seleccionada = relleno `mark-selected` más anillo `board-ink`; destino = punto `board-ink` con halo `board-halo`; captura = anillo `board-ink` con halo alrededor de la pieza; última jugada = relleno `mark-last-move` con borde (origen discontinuo, destino continuo); jaque = resplandor `mark-check` bajo el rey con anillo doble. El foco de teclado es un anillo sólido de 3 px en `board-ink` con un halo claro dentro. Las flechas del coach usan `arrow-best` y `arrow-yours` con borde blanco, iguales con la interfaz clara y oscura.
 - **Tipografía.** Títulos en `display` (Space Grotesk), texto en `body` y `body-sm` (IBM Plex Sans), IBM Plex Mono (`notation`) solo para una jugada suelta (`Cxb5`, `14. Th2`), una coordenada (`e4`) o una cifra de evaluación (`+0,7`); las frases y los rótulos, también «Mate en 1», van en IBM Plex Sans. Las cuatro fuentes (Space Grotesk 600, Plex Sans 400 y 600, Plex Mono 500, subconjunto latino en woff2) están en `fonts/` y la app las sirve desde su propio dominio (`public/fonts/` del repositorio; licencia SIL OFL en `assets/Fuentes/OFL.txt` del Design System y en `public/fonts/OFL.txt`), con `font-display: swap` y sin CDN.
@@ -49,6 +49,12 @@ Escaque no usa iconos en la interfaz: los botones llevan solo texto. Las únicas
 - Lleva veredicto («Error grave.», «Imprecisión.», «Buena jugada.»), mejor jugada, caída de la evaluación en peones (barras de antes y después) y avisos: pieza colgando, mate en 1 que se escapó y captura gratis no vista.
 - La gravedad no depende del color: icono (triángulo, círculo discontinuo, círculo con marca), borde y palabra. Solo el veredicto es `role="status"`; el coach nunca roba el foco. «Ver en el tablero» activa marcas de casilla de siempre y pasa a «Quitar del tablero».
 - Habla de «las blancas» y «las negras», para servir también en dos jugadores.
+- Si la jugada ahoga al rival, la frase del veredicto lo dice («De6 ahoga al rey negro: la partida acaba en tablas.») y el «Por qué» explica qué es el ahogado (issue #75).
+
+## Errores de entrada
+
+- **Jugada no válida.** Si la pieza elegida no puede ir a la casilla pulsada o soltada, `GameStatus` añade una línea `estado__aviso` bajo su texto, con un círculo tachado decorativo en `ink-muted` y el texto en `ink`: «Ese caballo no puede ir a d5.», «Con esa jugada tu rey quedaría en jaque.», «Con esa jugada tu rey seguiría en jaque.» o «Ahora no puedes enrocar por ese lado.». Se anuncia una vez y se quita con la siguiente acción en el tablero. No sale al cambiar de pieza ni al soltar fuera del tablero.
+- **PGN.** Al cargar una partida se aceptan las letras de pieza en español (C, A, T, D, R) y en inglés (N, B, R, Q, K); la ayuda del diálogo lo dice.
 
 ## Lecciones guiadas
 

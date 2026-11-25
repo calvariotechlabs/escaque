@@ -1,7 +1,7 @@
 {
   "generado": {
     "fecha": "2026-11-25",
-    "commit": "141ce1fa9c9f"
+    "commit": "b548b087e194"
   },
   "dependencias": {
     "enEjecucion": 0,
@@ -10,8 +10,8 @@
     ]
   },
   "pruebas": {
-    "total": 1189,
-    "suites": 217,
+    "total": 1209,
+    "suites": 221,
     "fallan": 0
   },
   "lecciones": {
@@ -24,24 +24,24 @@
   },
   "sitio": {
     "ficheros": 92,
-    "bytes": 837563,
-    "gzipJsCssHtmlBytes": 194790
+    "bytes": 852278,
+    "gzipJsCssHtmlBytes": 197379
   },
   "banco": {
-    "etiqueta": "despues-87",
+    "etiqueta": "despues-75",
     "fecha": "2026-11-25",
-    "commit": "141ce1fa9c9f",
+    "commit": "b548b087e194",
     "posiciones": 82,
     "referencia": "Stockfish 17.1, 8000000 nodos por posición",
     "dificil": {
       "coincide": 50,
-      "equivalente": 71,
-      "erroresMas2Peones": 1,
-      "erroresMas2PeonesTacticas": 1,
+      "equivalente": 70,
+      "erroresMas2Peones": 2,
+      "erroresMas2PeonesTacticas": 2,
       "matesMantenidos": 18,
       "matesDisponibles": 18,
       "msMedia": 748,
-      "msMax": 904
+      "msMax": 905
     },
     "coach": {
       "analisis": 152,
@@ -52,15 +52,15 @@
       "equivalentes": 123,
       "erroresNoVistos": 3,
       "informesConViolaciones": 0,
-      "msMedia": 85,
-      "msP95": 370,
-      "msMax": 588
+      "msMedia": 108,
+      "msP95": 505,
+      "msMax": 910
     }
   },
   "registrado": {
     "e2e": {
-      "pruebas": 100,
-      "ficheros": 15,
+      "pruebas": 102,
+      "ficheros": 16,
       "fecha": "2026-11-25",
       "comando": "npm run metrics -- --e2e"
     },

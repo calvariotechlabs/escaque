@@ -415,6 +415,16 @@ export class Position implements PerftTarget<Move> {
   }
 
   /**
+   * ¿Puede la pieza de `from` ir a `to` según cómo se mueve, sin mirar si deja
+   * a su rey en jaque? Sirve para explicar por qué una jugada no es legal: si
+   * es pseudolegal y no legal, deja (o mantiene) al rey en jaque. Los enroques
+   * solo cuentan si el rey no está en jaque ni pasa por casillas atacadas.
+   */
+  isPseudoLegal(from: Square, to: Square): boolean {
+    return this.pseudoLegalMoves().some((move) => move.from === from && move.to === to);
+  }
+
+  /**
    * Copia el tablero en `out` (128 casillas, en el orden 0x88 de `Square`) con
    * un código por casilla: 0 vacía; si no, el tipo (1 peón, 2 caballo, 3 alfil,
    * 4 torre, 5 dama, 6 rey) más 8 si la pieza es negra. Es la forma rápida de

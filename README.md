@@ -34,18 +34,18 @@ Las cifras de la primera tabla **las genera `npm run metrics`** a partir del pro
 
 <!-- metricas:inicio (generado por `npm run metrics`; no editar a mano) -->
 
-Generado el 2026-11-25 sobre el commit `141ce1fa9c9f` con `npm run metrics` (datos en [`docs/metricas.json`](docs/metricas.json)).
+Generado el 2026-11-25 sobre el commit `b548b087e194` con `npm run metrics` (datos en [`docs/metricas.json`](docs/metricas.json)).
 
 | Qué | Cifra | Cómo se comprueba |
 | --- | --- | --- |
 | Dependencias en ejecución | **0** (la única devDependency es typescript, solo para compilar) | CI (trabajo `dependencias`) y `tools/metricas.test.mjs` |
-| Pruebas funcionales | **1.189** pruebas en 217 suites (`node --test`, sin las de reloj ni el perft completo) | `npm test`; `npm run metrics:check` en la CI |
+| Pruebas funcionales | **1.209** pruebas en 221 suites (`node --test`, sin las de reloj ni el perft completo) | `npm test`; `npm run metrics:check` en la CI |
 | Lecciones guiadas | **15**: 9 de primeros pasos y 6 de tácticas | Datos en `src/lessons`; `npm run metrics:check` |
 | Posiciones de referencia de perft | **21**, todas exactas (la inicial, Kiwipete, las posiciones 3 a 6 de la Chess Programming Wiki y las «trampa» de Sedlak) | `npm run test:perft` en la CI |
-| Sitio publicado | 92 ficheros, 818 KB en disco; JS + CSS + HTML suman 190 KB comprimidos con gzip (cada fichero por separado) | `npm run metrics:check` (margen del 5 %) |
-| Banco de 82 posiciones (`despues-87`) | Alfil Beta Difícil: mejor jugada de la referencia en 50 de 82 y equivalente (a menos de 30 cp) en 71; 1 errores de más de 2 peones en tácticas; mantiene 18 de 18 mates. Coach: veredicto igual al de la referencia en 97 de 152 informes (64 %), detecta 20 de 23 errores graves, 3 falsos positivos en 123 jugadas equivalentes y 0 informes con contradicciones | `bench/resultados/despues-87.json` (2026-11-25, commit `141ce1fa9c9f`); metodología en `bench/README.md` |
-| Tiempo del banco (depende del equipo) | Difícil: 748 ms de media y 904 ms como máximo. Coach: 85 ms de media, 370 ms el percentil 95 y 588 ms como máximo | Registrado en el mismo fichero; no lo vuelve a medir la CI |
-| Pruebas de extremo a extremo | **100** en 15 ficheros, con Chrome real (teclado, ARIA, SAN, arrastre, PGN, instalación) | CI (trabajo `accesibilidad`) en cada PR; el recuento se registra con `npm run metrics -- --e2e` (2026-11-25) |
+| Sitio publicado | 92 ficheros, 832 KB en disco; JS + CSS + HTML suman 193 KB comprimidos con gzip (cada fichero por separado) | `npm run metrics:check` (margen del 5 %) |
+| Banco de 82 posiciones (`despues-75`) | Alfil Beta Difícil: mejor jugada de la referencia en 50 de 82 y equivalente (a menos de 30 cp) en 70; 2 errores de más de 2 peones en tácticas; mantiene 18 de 18 mates. Coach: veredicto igual al de la referencia en 97 de 152 informes (64 %), detecta 20 de 23 errores graves, 3 falsos positivos en 123 jugadas equivalentes y 0 informes con contradicciones | `bench/resultados/despues-75.json` (2026-11-25, commit `b548b087e194`); metodología en `bench/README.md` |
+| Tiempo del banco (depende del equipo) | Difícil: 748 ms de media y 905 ms como máximo. Coach: 108 ms de media, 505 ms el percentil 95 y 910 ms como máximo | Registrado en el mismo fichero; no lo vuelve a medir la CI |
+| Pruebas de extremo a extremo | **102** en 16 ficheros, con Chrome real (teclado, ARIA, SAN, arrastre, PGN, instalación) | CI (trabajo `accesibilidad`) en cada PR; el recuento se registra con `npm run metrics -- --e2e` (2026-11-25) |
 | Velocidad de perft (depende del equipo) | 13,0 millones de nodos por segundo (inicial, profundidad 5: 4.865.609 nodos; Node v22.23.5, 4 núcleos) | Registrado con `npm run metrics -- --rendimiento` (2026-11-24); no lo comprueba la CI |
 
 <!-- metricas:fin -->
@@ -134,7 +134,7 @@ Lo que sigue distingue lo que se **ha ejecutado** (con su evidencia) de lo que *
 | Instalación como PWA y funcionamiento sin conexión | Criterios de instalabilidad de Chrome sin errores; recarga sin red que restaura la partida; se sigue jugando y la máquina responde sin red |
 | Actualización del service worker | Con una versión nueva se avisa, «Actualizar ahora» recarga, borra la caché vieja y la partida en curso se conserva |
 | Recuperación de partidas | Recarga a medias, datos guardados corruptos (seis casos) y `localStorage` bloqueado: arranca limpio y sin errores |
-| PGN | Exportar e importar sin pérdidas, PGN con jugada ilegal y PGN de 12.000 medias jugadas con mensajes claros |
+| PGN | Exportar e importar sin pérdidas, con las piezas en inglés (N, B, R, Q, K) o en español (C, A, T, D, R); PGN con jugada ilegal y PGN de 12.000 medias jugadas con mensajes claros |
 | Teclado | Partida entera con teclado, foco visible, diálogos modales con foco atrapado y devuelto |
 | Pantallas | Sin desbordes en 8 tamaños (móvil vertical y apaisado, tablet, escritorio) y a 200 % de zoom; respeta `prefers-reduced-motion` |
 | Privacidad | Cero peticiones a otros orígenes, cero cookies, `localStorage` solo con claves `escaque:`; no hay backend, cuentas ni analítica |
@@ -168,7 +168,7 @@ Sergio confirmó que hizo a mano lo que la automatización no puede ver:
 
 Queda fuera de esa lista el cortafuegos de Vercel: sus reglas no se pueden leer por API y no se enviaron peticiones de prueba al sitio real.
 
-**Fuera de alcance:** multijugador en línea, cuentas, backend y la mejora de los mensajes de error de entrada (bloque B8, no aprobado para la RC).
+**Fuera de alcance:** multijugador en línea, cuentas y backend.
 
 ## Qué aprendí y qué haría distinto
 

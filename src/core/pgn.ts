@@ -151,12 +151,10 @@ export function parsePgn(text: string): PgnGame {
   const tags = reader.readTags();
   const fenTag = tags.find(([name]) => name === "FEN");
   const startFen = fenTag === undefined ? START_FEN : fenTag[1].trim();
-  const position = loadFen(startFen, "La cabecera FEN no es válida");
+  loadFen(startFen, "La cabecera FEN no es válida");
 
-  const moves: string[] = [];
+  const tokens: string[] = [];
   let result: PgnResult | null = null;
-  let number = fullmoveOf(position);
-  let white = position.toFen().split(" ")[1] === "w";
   for (;;) {
     const token = reader.nextMoveToken();
     if (token === null) break;
@@ -164,17 +162,10 @@ export function parsePgn(text: string): PgnGame {
       result = token as PgnResult;
       break;
     }
-    if (moves.length >= PGN_MAX_PLIES) throw new PgnError("La partida tiene demasiadas jugadas.");
-    const move = position.moveFromSan(token);
-    if (move === null) {
-      const shown = token.length > 20 ? `${token.slice(0, 20)}…` : token;
-      throw new PgnError(`La jugada ${number}${white ? "." : "..."} ${shown} no es legal en esa posición.`);
-    }
-    moves.push(moveToUci(move));
-    position.makeMove(move);
-    if (!white) number++;
-    white = !white;
+    if (tokens.length >= PGN_MAX_PLIES) throw new PgnError("La partida tiene demasiadas jugadas.");
+    tokens.push(token);
   }
+  const moves = readMoves(startFen, tokens);
 
   if (tags.length === 0 && moves.length === 0 && result === null) {
     throw new PgnError("El texto no contiene ninguna partida en PGN.");
@@ -184,6 +175,62 @@ export function parsePgn(text: string): PgnGame {
     result = tagged !== undefined && RESULTS.has(tagged) ? (tagged as PgnResult) : "*";
   }
   return { tags, startFen, moves, result };
+}
+
+/**
+ * Las jugadas de la partida en UCI. Se aceptan las letras de pieza en inglés
+ * (N, B, R, Q, K) y en español (C, A, T, D, R). La «R» es la torre en inglés y
+ * el rey en español, así que el idioma se decide para toda la partida: si
+ * alguna jugada usa C, A, T o D (letras que solo existen en español) se lee en
+ * español; si no, en inglés y, si así alguna jugada no es legal, se prueba en
+ * español. Si no vale ninguna de las dos lecturas, el error es el de la que
+ * llegó más lejos (en un empate, la inglesa), con la jugada tal como se escribió.
+ */
+function readMoves(startFen: string, tokens: readonly string[]): string[] {
+  const readings = tokens.some(isSpanishOnly) ? [true] : [false, true];
+  let failed: { readonly error: PgnError; readonly at: number } | null = null;
+  for (const spanish of readings) {
+    const reading = playTokens(startFen, tokens, spanish);
+    if (!("error" in reading)) return reading.moves;
+    if (failed === null || reading.at > failed.at) failed = reading;
+  }
+  throw failed!.error;
+}
+
+/** Juega las jugadas leídas en un idioma; si una no es legal, devuelve el error y cuántas se jugaron antes. */
+function playTokens(
+  startFen: string,
+  tokens: readonly string[],
+  spanish: boolean,
+): { readonly moves: string[] } | { readonly error: PgnError; readonly at: number } {
+  const position = loadFen(startFen, "La cabecera FEN no es válida");
+  const moves: string[] = [];
+  let number = fullmoveOf(position);
+  let white = position.turn === "w";
+  for (const token of tokens) {
+    const move = position.moveFromSan(spanish ? fromSpanish(token) : token);
+    if (move === null) {
+      const shown = token.length > 20 ? `${token.slice(0, 20)}…` : token;
+      return { error: new PgnError(`La jugada ${number}${white ? "." : "..."} ${shown} no es legal en esa posición.`), at: moves.length };
+    }
+    moves.push(moveToUci(move));
+    position.makeMove(move);
+    if (!white) number++;
+    white = !white;
+  }
+  return { moves };
+}
+
+/** Letras de pieza en español → inglés. */
+const SPANISH_PIECES: Readonly<Record<string, string>> = { C: "N", A: "B", T: "R", D: "Q", R: "K" };
+/** Letra de pieza al principio, o pieza de coronación (con «=» o pegada a la fila 1 u 8). */
+const SPANISH_LETTER = /^[CATDR]|(?<==)[CATD]|(?<=[a-h][18])[CATD]/g;
+/** ¿Usa la jugada C, A, T o D, que solo existen como letras de pieza en español? */
+const isSpanishOnly = (token: string): boolean => /^[CATD]|=[CATD]|[a-h][18][CATD]/.test(token);
+
+/** «Cf3» → «Nf3», «Rf1» → «Kf1», «e8=D» → «e8=Q». */
+function fromSpanish(token: string): string {
+  return token.replace(SPANISH_LETTER, (letter) => SPANISH_PIECES[letter]!);
 }
 
 function loadFen(fen: string, message: string): Position {

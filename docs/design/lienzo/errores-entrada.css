@@ -1,0 +1,11 @@
+/* B8 · Errores de entrada (issue #75). Aviso de jugada no válida dentro del estado de la partida.
+   Va en una línea propia bajo el texto del estado, con un icono decorativo; se quita con la siguiente acción. */
+.estado__aviso{display:flex;align-items:flex-start;gap:6px;margin:4px 0 0;font:400 14px/20px var(--font-sans);color:var(--ink)}
+.estado__aviso:empty{display:none}
+.estado__aviso svg{flex:none;width:16px;height:16px;margin-top:2px;color:var(--ink-muted)}
+/* Marcos de lámina: solo para el lienzo. */
+.ee-col{display:flex;flex-direction:column;gap:12px;min-width:0}
+.ee-tit{margin:0;font:600 14px/20px var(--font-sans);color:var(--ink)}
+.ee-nota{margin:0;font:400 12px/16px var(--font-sans);color:var(--ink-muted)}
+.ee-lista{margin:0;padding:0 0 0 18px;display:flex;flex-direction:column;gap:8px;font:400 14px/20px var(--font-sans);color:var(--ink)}
+@media (forced-colors:active){.estado__aviso svg{color:CanvasText}}

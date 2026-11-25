@@ -2,7 +2,9 @@
 // o tecla, y qué casillas se marcan. La capa DOM solo traduce eventos a estas llamadas y pinta el
 // resultado; así toda la lógica se prueba en Node.
 import type { Color, PromotionPiece } from "../core/index.js";
+import type { PieceType } from "../core/index.js";
 import type { Game, MoveRecord } from "./game.js";
+import type { IllegalReason } from "./notation.js";
 
 /** Marcas que el tablero sabe pintar en una casilla. */
 export type Mark = "selected" | "target" | "capture" | "last-move-from" | "last-move-to" | "check";
@@ -13,6 +15,8 @@ export type Outcome =
   | { readonly kind: "focus"; readonly square: string }
   | { readonly kind: "selected"; readonly square: string }
   | { readonly kind: "deselected" }
+  /** La pieza elegida no puede ir a esa casilla: se quita la selección y se explica por qué (issue #75). */
+  | { readonly kind: "illegal"; readonly from: string; readonly to: string; readonly reason: IllegalReason; readonly piece: PieceType }
   | { readonly kind: "promotion"; readonly from: string; readonly to: string }
   | { readonly kind: "moved"; readonly record: MoveRecord }
   | { readonly kind: "undone"; readonly record: MoveRecord }
@@ -90,7 +94,7 @@ export class Interaction {
       if (this.game.targets(this.selected).includes(square)) return this.moveTo(this.selected, square);
     }
     if (this.canSelect(square)) return this.select(square);
-    return this.selected !== null ? this.deselect() : NONE;
+    return this.selected !== null ? this.reject(this.selected, square) : NONE;
   }
 
   /** Empieza a arrastrar desde `square`. Devuelve si la pieza se puede arrastrar. */
@@ -106,7 +110,7 @@ export class Interaction {
     if (from === null || this.pendingPromotion !== null) return NONE;
     if (square === from) return this.select(from);
     if (square !== null && this.game.targets(from).includes(square)) return this.moveTo(from, square);
-    return this.deselect();
+    return square === null ? this.deselect() : this.reject(from, square);
   }
 
   /** Elige la pieza de la coronación pendiente. */
@@ -216,6 +220,16 @@ export class Interaction {
   private deselect(): Outcome {
     this.selected = null;
     return DESELECTED;
+  }
+
+  /** Quita la selección tras intentar `from`→`to`, con el motivo si la jugada no es legal. */
+  private reject(from: string, to: string): Outcome {
+    // Pulsar o soltar sobre una pieza propia (sin jugadas, si no se habría elegido) solo quita la selección.
+    if (this.game.pieceAt(to)?.color === this.game.turn) return this.deselect();
+    const reason = this.game.illegalReason(from, to);
+    const piece = this.game.pieceAt(from);
+    this.selected = null;
+    return reason === null || piece === null ? DESELECTED : { kind: "illegal", from, to, reason, piece: piece.type };
   }
 
   private moveTo(from: string, to: string): Outcome {

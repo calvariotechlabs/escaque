@@ -22,7 +22,7 @@
 | B6 · Validación integral (RC-08) | Validación en Chrome real con las cabeceras de `vercel.json`: CSP, privacidad, PWA, sin conexión, recuperación, PGN, móvil, teclado, rendimiento | [#76](https://github.com/calvariotechlabs/escaque/pull/76) · [#72](https://github.com/calvariotechlabs/escaque/issues/72) | **Fusionada** (15:35 UTC) | [b6-validacion-integral.md](b6-validacion-integral.md): sin defectos funcionales ni de seguridad; un hallazgo de texto (F-01, aviso de versión) corregido |
 | B11 · Motor (RC-12) | PVS, jugada nula, asesinas, historial, LMR, aspiración, `maxNodes`; evaluación con seguridad del rey, estructura de peones, movilidad, pareja de alfiles y torres; coach ajustado al motor nuevo | [#78](https://github.com/calvariotechlabs/escaque/pull/78) · [#63](https://github.com/calvariotechlabs/escaque/issues/63) | Fusionada (16:32 UTC) | Duelo +96 =1 −3, banco `despues-b11`, tres excepciones (apartado 5) |
 | B9 · Documentación viva (RC-09) | `npm run metrics` y `metrics:check` en la CI: el README no puede desfasarse de las cifras reales; «Capacidades verificadas» y «Limitaciones conocidas» | [#77](https://github.com/calvariotechlabs/escaque/pull/77) · [#73](https://github.com/calvariotechlabs/escaque/issues/73) | Fusionada (16:44 UTC) | Ver apartado 7 |
-| B8 · Errores de entrada (RC-10) | — | — | Fuera de la RC por decisión de Sergio | H-16 y H-17 quedan para después |
+| B8 · Errores de entrada (RC-10) | Aviso en el estado ante una jugada no válida (H-16), PGN con las piezas en español (H-17) y el coach nombra el ahogado (H-13) | [#102](https://github.com/calvariotechlabs/escaque/pull/102) (diseño) · PR de código · [#75](https://github.com/calvariotechlabs/escaque/issues/75) | Hecho después de la RC (25-nov) | `tests/errores-entrada.test.ts`, `e2e/errores-entrada.e2e.mjs` y banco `despues-75` |
 
 ## 3. Antes y después
 
@@ -88,7 +88,8 @@ Lectura honesta: el coach ya no se contradice y da menos falsos positivos, pero 
 | H-18 (README desfasado) | **PR #77** (fusionada): cifras generadas y comprobadas por la CI |
 | H-19 y H-20 (reloj con cobertura, límites de PGN) | B4: `tests/rendimiento/reloj.perf.ts`, `PGN_MAX_PLIES` |
 | H-21 y H-22 (cabeceras, PWA, dispositivos) | B6: parte automatizada ejecutada; el resto, apartado 6 |
-| H-13, H-16, H-17, H-23, H-24, H-25, H-26 | Fuera de la RC o recomendaciones (apartado 9) |
+| H-13, H-16, H-17 | B8, después de la RC (issue #75): ver la fila B8 del apartado 2 |
+| H-23, H-24, H-25, H-26 | Fuera de la RC o recomendaciones (apartado 9) |
 
 ### 4.2 Lo que ejecutó B6 en Chrome real
 
@@ -151,6 +152,8 @@ Se rehicieron en un clon limpio de `main` (`7e38bba`), Node de la sesión, sin d
 | `npm run bench:posiciones` | Huella determinista `a9712a34`, **idéntica** a la de `despues-b11` (Fácil, profundidad 5, estabilidad e informes del coach reproducen). Coach: 1/152 contradicciones, 3/123 falsos positivos, 20/23 errores graves, 71 · 316 · 453 ms por análisis en este equipo (más rápido que el 119 · 537 · 828 ms de la tabla 3.1: los tiempos dependen del equipo). Difícil, que depende del reloj: 1 error de más de 2 peones en tácticas (solo H-14), 748 ms de media y 903 ms de máximo |
 | CI de la PR #78 y de `main` tras fusionarla (`7e38bba`) | PR: 6 de 6 en verde. `main`: 5 de 5 en verde (tipos, tests y cobertura, perft completo, rendimiento con reloj real, cero dependencias, accesibilidad e2e) |
 
+**Después de la RC: B8 (25-nov, issue #75).** La huella del banco pasa de `a9712a34` a `89b8d0d1` (`bench/resultados/despues-75`). Fácil, profundidad 5 y estabilidad no cambian; de los 152 informes del coach cambia uno solo, el esperado: en la posición donde c8=D ahoga al rey negro, el coach decía «c8=D deja escapar un mate en 4 para las blancas.» y ahora dice «c8=D ahoga al rey negro: la partida acaba en tablas.», con el ahogado explicado en el «Por qué». Siguen 0 informes con contradicciones.
+
 ## 9. Limitaciones conocidas
 
 - **El coach ve lo que ve Alfil Beta a profundidad 4 y en 3 s.** No detecta 3 de 23 errores graves del banco, y puede llamar «Error grave» a un sacrificio correcto con compensación lejana (3 casos).
@@ -158,7 +161,7 @@ Se rehicieron en un clon limpio de `main` (`7e38bba`), Node de la sesión, sin d
 - **Alfil Beta no es un rival fuerte.** No hay Elo (82 posiciones elegidas a mano no dan validez estadística; ver `bench/README.md`). Las cifras comparan versiones del mismo código.
 - **La referencia de Stockfish no es una verdad**: en finales que necesitan tablas puede discrepar.
 - **El banco tiene 4 a 12 posiciones por categoría**: una diferencia de una o dos posiciones puede ser ruido de Difícil.
-- **Fuera de la RC por decisión de Sergio:** H-13 (el coach no nombra el ahogado), H-16 (una jugada ilegal no muestra mensaje), H-17 (el PGN en notación española se rechaza con un mensaje engañoso), H-23 (panel del coach compacto), H-24 (medir el repaso de partidas largas con el banco), H-25 (aviso legal y de privacidad) y H-26 (separar tiempo de motor y tiempo hasta ver la respuesta).
+- **Fuera de la RC por decisión de Sergio:** H-23 (panel del coach compacto), H-24 (medir el repaso de partidas largas con el banco), H-25 (aviso legal y de privacidad) y H-26 (separar tiempo de motor y tiempo hasta ver la respuesta).
 - Validación en dispositivo físico, con lector de pantalla real y de las cabeceras de producción: hecha el 25-nov (apartado 6).
 
 ## 10. Decisiones y pasos que quedan
@@ -166,7 +169,7 @@ Se rehicieron en un clon limpio de `main` (`7e38bba`), Node de la sesión, sin d
 1. **H-08** (4.3): corregida y fusionada ([#84](https://github.com/calvariotechlabs/escaque/pull/84), issue [#83](https://github.com/calvariotechlabs/escaque/issues/83)).
 2. #77 fusionada (apartado 7).
 3. Este informe se fusionó en [#79](https://github.com/calvariotechlabs/escaque/pull/79) y [#80](https://github.com/calvariotechlabs/escaque/pull/80). Después se fusionaron la auditoría v2 y su contraste (#86, #90), el arreglo de las dos líneas del coach (#88, #91, issue #87), la corrección «Calvario TechLabs» (#93, #95), la firma en la imagen Open Graph (#98) y el arreglo de `metrics:check` con Node 24 (#99).
-4. Sin pasos pendientes para la RC. Fuera de ella quedan los puntos del apartado 9 (B8 y los H-13, H-16, H-17, H-23 a H-26).
+4. Sin pasos pendientes para la RC. Fuera de ella quedan los puntos del apartado 9 (H-23 a H-26). B8 (H-13, H-16 y H-17) se hizo después, el 25-nov (issue #75): ver la nota del banco en el apartado 8.
 
 ## 11. Registro de decisiones para el caso de estudio
 

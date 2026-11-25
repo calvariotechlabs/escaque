@@ -3,7 +3,7 @@
 // Sin DOM: se prueba en Node.
 import { Position, START_FEN } from "../core/index.js";
 import type { Color, GameStatus, Move, PieceType, PromotionPiece, Square } from "../core/index.js";
-import { sanToSpanish, type Piece, type PlayedMove } from "./notation.js";
+import { sanToSpanish, type IllegalReason, type Piece, type PlayedMove } from "./notation.js";
 
 /** Jugada hecha en la partida, con lo necesario para anunciarla y listarla. */
 export interface MoveRecord extends PlayedMove {
@@ -164,6 +164,26 @@ export class Game {
       if (move.from === origin) found.add(squareName(move.to));
     }
     return [...found].sort();
+  }
+
+  /** Motivo por el que `from`→`to` no es legal, o `null` si lo es (o no hay pieza del bando que mueve en `from`). */
+  illegalReason(from: string, to: string): IllegalReason | null {
+    const origin = toSquare(from);
+    const destination = toSquare(to);
+    const piece = this.pieceAt(from);
+    if (origin < 0 || destination < 0 || piece === null || piece.color !== this.turn || this.isOver) return null;
+    if (this.findMove(from, to).length > 0) return null;
+    if (piece.type === "k" && from[1] === to[1] && Math.abs(origin - destination) === 2 && this.canCastleTowards(to)) return "enroque";
+    if (!this.position.isPseudoLegal(origin, destination)) return "no-llega";
+    return this.inCheck ? "sigue-en-jaque" : "deja-en-jaque";
+  }
+
+  /** ¿Conserva el bando que mueve el derecho a enrocar hacia `to` (g1, c1, g8 o c8)? */
+  private canCastleTowards(to: string): boolean {
+    const rights = this.currentFen.split(" ")[2] ?? "-";
+    const letter = to[0] === "g" ? "k" : to[0] === "c" ? "q" : "";
+    if (letter === "") return false;
+    return rights.includes(this.turn === "w" ? letter.toUpperCase() : letter);
   }
 
   /** ¿Es `from`→`to` una coronación legal? Entonces `play` necesita la pieza. */

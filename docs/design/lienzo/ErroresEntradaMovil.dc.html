@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Errores de entrada (móvil)</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/escaque/tokens.css">
+<link rel="stylesheet" href="ds/escaque/components/bundle.css">
+<link rel="stylesheet" href="lecciones.css">
+<link rel="stylesheet" href="identidad.css">
+<link rel="stylesheet" href="coach.css">
+<link rel="stylesheet" href="pgn.css">
+<link rel="stylesheet" href="errores-entrada.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;600;700&family=Space+Grotesk:wght@600&display=swap">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width: 390px; box-sizing: border-box; padding: 16px; background: var(--surface); color: var(--ink); font-family: var(--font-sans); display:flex; flex-direction:column; gap:12px">
+<p class="ee-tit">Estado con aviso, a 390 px</p><p class="estado" role="status" style=""><span class="estado__turno estado__turno--b" aria-hidden="true"></span><span class="estado__cuerpo"><strong>Juegan las negras.</strong><span class="estado__aviso"><svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="8" cy="8" r="6.2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M3.8 12.2 12.2 3.8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span>Ese caballo no puede ir a d5.</span></span></span></p>
+<p class="estado estado--jaque" role="status" style=""><span class="estado__turno estado__turno--w" aria-hidden="true"></span><span class="estado__jaque"><svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 1.5 14.5 8 8 14.5 1.5 8Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M8 4.8v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="8" cy="11.2" r="1" fill="currentColor"/></svg>Jaque<span class="oculto">.</span></span><span class="estado__cuerpo"><strong>Juegan las blancas.</strong><span class="estado__aviso"><svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="8" cy="8" r="6.2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M3.8 12.2 12.2 3.8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span>Con esa jugada tu rey seguiría en jaque.</span></span></span></p>
+<p class="ee-tit">Coach: ahogado</p><section class="coach" aria-labelledby="ee-m1" style=""><header class="coach__cab"><h2 class="coach__titulo" id="ee-m1">Coach</h2></header><p class="coach__veredicto coach__veredicto--grave" role="status"><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M10 2 18.5 17.5H1.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M10 7.5v5M10 14.6v.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span><strong>Error grave.</strong>De6 ahoga al rey negro: la partida acaba en tablas.</span></p><div class="coach__alternativa"><p class="coach__mejor">Mejor jugada: <span class="coach__san">De8+</span></p><p class="coach__porque"><strong>Por qué: </strong>Las negras no están en jaque y no pueden mover ninguna pieza: eso es ahogado, y vale tablas. Con De8+, +19,9 frente a 0,0.</p><p class="coach__linea">Línea de Alfil Beta: <span class="coach__san">10. De8+ Rf5 11. Ad3+ Re6 12. Axh7 T6xh7 13. Dxf8</span></p><button class="boton" type="button" aria-label="Ver en el tablero: mejor jugada, De8+">Ver en el tablero</button></div><div><h3 class="coach__sub">Evaluación</h3><dl class="coach__eval"><dt>Antes</dt><dd><span class="coach__valor">+19,9</span> a favor de las blancas<div class="coach__barra" aria-hidden="true"><span style="width: 99%"></span></div></dd><dt>Después</dt><dd><span class="coach__valor">0,0</span> igualdad<div class="coach__barra" aria-hidden="true"><span style="width: 50%"></span></div></dd></dl></div></section>
+<p class="ee-tit">Ayuda del PGN</p><p class="pgn-dialogo__texto" style="margin:0">Solo se lee la primera partida. Las piezas pueden ir en español (C, A, T, D, R) o en inglés (N, B, R, Q, K). Los comentarios y las variantes se ignoran.</p>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1400}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

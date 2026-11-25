@@ -46,10 +46,11 @@ describe("clic", () => {
     assert.deepEqual(ui.click("b1"), { kind: "selected", square: "b1" });
   });
 
-  it("clic en casilla no válida con selección la quita", () => {
+  it("clic en casilla no válida con selección la quita y dice por qué (issue #75)", () => {
     const { ui } = setup();
     ui.click("g1");
-    assert.deepEqual(ui.click("g5"), { kind: "deselected" });
+    assert.deepEqual(ui.click("g5"), { kind: "illegal", from: "g1", to: "g5", reason: "no-llega", piece: "n" });
+    assert.equal(ui.selected, null);
   });
 
   it("no selecciona piezas del rival ni casillas vacías, ni piezas sin jugadas", () => {
@@ -93,12 +94,12 @@ describe("arrastre", () => {
     assert.equal(ui.click("f3").kind, "moved");
   });
 
-  it("soltar fuera o en casilla no válida cancela", () => {
+  it("soltar fuera o en casilla no válida cancela (en casilla no válida, con el motivo)", () => {
     const { ui } = setup();
     ui.dragStart("g1");
     assert.deepEqual(ui.drop(null), { kind: "deselected" });
     ui.dragStart("g1");
-    assert.deepEqual(ui.drop("g4"), { kind: "deselected" });
+    assert.deepEqual(ui.drop("g4"), { kind: "illegal", from: "g1", to: "g4", reason: "no-llega", piece: "n" });
     assert.equal(ui.selected, null);
   });
 
