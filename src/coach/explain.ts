@@ -54,7 +54,7 @@ const LINE_PLIES = 4;
  */
 const MATERIAL_PLIES = 12;
 /** Un mate en contra se escribe entero hasta esta distancia; más largo, sin línea. */
-const MATE_LINE_MOVES = 5;
+export const MATE_LINE_MOVES = 5;
 
 const KNIGHT = [-33, -31, -18, -14, 14, 18, 31, 33];
 const KING = [-17, -16, -15, -1, 1, 15, 16, 17];
@@ -117,6 +117,15 @@ function numbered(position: Position, move: Move): string {
  * Deja `position` como estaba.
  */
 export function lineText(position: Position, line: readonly string[], plies = LINE_PLIES): string {
+  return lineMoves(position, line, plies).join(" ");
+}
+
+/**
+ * La misma línea que `lineText`, una media jugada por elemento: «5. Cxe5»,
+ * «dxe5», «6. Dxg4». La primera y las de las blancas llevan su número.
+ * Deja `position` como estaba.
+ */
+export function lineMoves(position: Position, line: readonly string[], plies = LINE_PLIES): string[] {
   const parts: string[] = [];
   let played = 0;
   try {
@@ -131,7 +140,7 @@ export function lineText(position: Position, line: readonly string[], plies = LI
   } finally {
     for (let i = 0; i < played; i++) position.unmakeMove();
   }
-  return parts.join(" ");
+  return parts;
 }
 
 /**
@@ -143,6 +152,16 @@ export function lineText(position: Position, line: readonly string[], plies = LI
  * Deja `position` como estaba.
  */
 export function shownPlies(position: Position, line: readonly string[]): number {
+  return materialPlies(position, line, LINE_PLIES);
+}
+
+/**
+ * Medias jugadas hasta la última captura o coronación de la línea dentro de
+ * las que cuentan para el material, y como mínimo `min`. Nunca más de las que
+ * son legales: `lineText` también se para en la primera que no lo es.
+ * Deja `position` como estaba.
+ */
+export function materialPlies(position: Position, line: readonly string[], min: number): number {
   let last = 0;
   let played = 0;
   try {
@@ -157,8 +176,7 @@ export function shownPlies(position: Position, line: readonly string[]): number 
   } finally {
     for (let i = 0; i < played; i++) position.unmakeMove();
   }
-  // Nunca más de las que son legales: `lineText` también se para en la primera que no lo es.
-  return Math.min(Math.max(LINE_PLIES, last), played);
+  return Math.min(Math.max(min, last), played);
 }
 
 /** Material que gana quien mueve en `position` siguiendo la línea (capturas y coronaciones). Deja `position` como estaba. */
@@ -466,6 +484,13 @@ export interface Refutation {
   readonly sacrifice: boolean;
   /** Material que gana el rival en la línea, contando desde la jugada hecha (0 en un mate). */
   readonly net: number;
+  /**
+   * Medias jugadas de la línea (desde la jugada hecha) que demuestran el texto:
+   * hasta el mate si se escribe entero, o hasta la última captura que cuenta el
+   * material. Al menos 2: la jugada hecha y la respuesta clave. 0 si el texto no
+   * nombra la respuesta (un mate de más de `MATE_LINE_MOVES` jugadas se cuenta sin línea).
+   */
+  readonly plies: number;
 }
 
 /**
@@ -493,7 +518,7 @@ export function refutationOf(position: Position, uci: string, line: readonly str
       // La línea entera hasta el mate (2 × N − 1 medias jugadas); si es muy larga, solo la distancia.
       const text =
         moves <= MATE_LINE_MOVES ? `Tras ${san}, ${head}: ${lineText(position, line.slice(1), 2 * moves - 1)}.` : `Tras ${san}, ${head}.`;
-      return { kind: "mate", text, sacrifice, net: 0 };
+      return { kind: "mate", text, sacrifice, net: 0, plies: moves <= MATE_LINE_MOVES ? 2 * moves : 0 };
     }
     const motive = explainMove(position, line[1]!, line.slice(1), replyScore);
     if (motive.kind !== "horquilla" && motive.kind !== "clavada" && motive.kind !== "material") return null;
@@ -504,16 +529,18 @@ export function refutationOf(position: Position, uci: string, line: readonly str
     position.unmakeMove();
     let net: number;
     let won: string;
+    let plies: number;
     try {
       net = -lineGain(position, line);
       won = gainText(lineCaptures(position, line), opponent, net);
+      plies = materialPlies(position, line, 2);
     } finally {
       position.makeMove(move);
     }
     if (net < MIN_GAIN) return null;
-    if (motive.kind === "material") return { kind: "material", text: `Tras ${san}, ${side(opponent)} responden ${replyText} y ganan ${won}.`, sacrifice, net };
+    if (motive.kind === "material") return { kind: "material", text: `Tras ${san}, ${side(opponent)} responden ${replyText} y ganan ${won}.`, sacrifice, net, plies };
     const rest = motive.text.startsWith(`${replySan} `) ? motive.text.slice(replySan.length + 1) : motive.text;
-    return { kind: motive.kind, text: `Tras ${san}, ${side(opponent)} tienen ${replyText}: ${rest}`, sacrifice, net };
+    return { kind: motive.kind, text: `Tras ${san}, ${side(opponent)} tienen ${replyText}: ${rest}`, sacrifice, net, plies };
   } finally {
     position.unmakeMove();
   }

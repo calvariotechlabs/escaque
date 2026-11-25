@@ -50,6 +50,7 @@ function report(color: "w" | "b", verdict: Verdict, before: number, after: numbe
     why: "",
     line: "",
     lines: { best: ["e2e4"], played: ["e2e4"] },
+    refutationLine: null,
     depth: 4,
   };
 }

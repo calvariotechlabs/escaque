@@ -31,7 +31,8 @@ import type { Color, Move, PieceType, Square } from "../core/index.js";
 import { MATE_SCORE, PIECE_VALUES, TranspositionTable, search } from "../engine/index.js";
 import type { SearchLimits, SearchOptions, SearchResult } from "../engine/index.js";
 import { capturedValue, cheapestCapture, exchangeGain, moveBalance } from "./exchange.js";
-import { explainMove, hintForPosition, lineCaptures, lineGain, lineText, refutationOf, shownPlies } from "./explain.js";
+import { MATE_LINE_MOVES, explainMove, hintForPosition, lineCaptures, lineGain, lineMoves, lineText, refutationOf, shownPlies } from "./explain.js";
+import type { Refutation } from "./explain.js";
 import type { Hint, Motive } from "./explain.js";
 import {
   agree,
@@ -174,8 +175,24 @@ export interface CoachReport {
   readonly line: string;
   /** Líneas del motor en UCI desde la posición de antes: la de su primera opción y la de la jugada hecha. */
   readonly lines: { readonly best: readonly string[]; readonly played: readonly string[] };
+  /**
+   * Línea de la jugada hecha cuando el «por qué» cuenta la respuesta del rival
+   * (`why` empieza por «Tras …», issue #87): de la jugada hecha hasta el mate o
+   * la última captura que cuenta el texto, en SAN española con números
+   * («4. Dg5», «Dxg5»), y `key`, el índice de la respuesta clave (la que nombra
+   * el «por qué»: siempre 1). `null` si el «por qué» no habla de ella.
+   */
+  readonly refutationLine: RefutationLine | null;
   /** Profundidad de la búsqueda usada. */
   readonly depth: number;
+}
+
+/** Línea de la jugada hecha que enseña el panel junto a la de la mejor (issue #87). */
+export interface RefutationLine {
+  /** Medias jugadas en SAN española; la primera y las de las blancas llevan su número: «12… Df6», «13. Dd3+», «Re7». */
+  readonly moves: readonly string[];
+  /** Índice en `moves` de la respuesta clave del rival. */
+  readonly key: number;
 }
 
 export interface AnalyzeOptions {
@@ -511,6 +528,10 @@ export function analyzeMove(game: CoachGame, move: string, options: AnalyzeOptio
     why: decision.why,
     line: lineText(position, shownLine, shownPlies(position, shownLine)),
     lines: decision.lines,
+    refutationLine:
+      decision.refutation === null || decision.refutation.plies === 0
+        ? null
+        : { moves: lineMoves(position, decision.lines.played, decision.refutation.plies), key: 1 },
     depth: beforeSearch.depth,
   };
 }
@@ -549,6 +570,8 @@ interface Decision {
   readonly why: string;
   /** Las líneas en que se apoyan los textos. */
   readonly lines: { readonly best: readonly string[]; readonly played: readonly string[] };
+  /** La respuesta del rival si el «por qué» la cuenta (su texto es `why`); `null` si no. */
+  readonly refutation: Refutation | null;
 }
 
 const RANK: readonly Verdict[] = ["mejor", "buena", "imprecision", "error", "error-grave"];
@@ -589,7 +612,10 @@ function decide(input: DecisionInput): Decision {
   // 2. Motivos comprobados en las líneas del motor (completadas si hay que explicar otra jugada;
   //    las dos igual de largas, para comparar su material; la respuesta del rival queda con seis).
   const bestLine = alternative === null ? [...input.bestLine] : input.extend(input.bestLine, EVIDENCE_PLIES + 1);
-  const playedLine = alternative === null ? [...input.playedLine] : isBest ? bestLine : input.extend(input.playedLine, EVIDENCE_PLIES + 1);
+  // Si el rival tiene mate, la línea llega hasta el mate (hasta 10 medias jugadas): el «por qué» la escribe entera (issue #87).
+  const replyMate = input.replyScore !== null && isMateFor(input.replyScore) ? 2 * Math.ceil((MATE_SCORE - input.replyScore) / 2) : 0;
+  const playedPlies = Math.max(EVIDENCE_PLIES + 1, Math.min(replyMate, 2 * MATE_LINE_MOVES));
+  const playedLine = alternative === null ? [...input.playedLine] : isBest ? bestLine : input.extend(input.playedLine, playedPlies);
   const bestMotive = alternative === null ? null : explainMove(position, best.uci, bestLine, beforeScore);
   const refutation =
     alternative === null || input.replyScore === null ? null : refutationOf(position, move.uci, playedLine, input.replyScore);
@@ -626,13 +652,15 @@ function decide(input: DecisionInput): Decision {
   // 3. «Por qué» (solo si se enseña otra jugada) y de dónde sale.
   let why = "";
   let source: "mate" | "best" | "refutation" | "posicional" | "ninguno" = "ninguno";
+  // La respuesta del rival que cuenta el «por qué», para enseñar su línea (issue #87).
+  let told: Refutation | null = null;
   if (alternative !== null) {
     const difference = `${short(before)} frente a ${short(after)}`;
-    if (allowsMate && refutes !== null) [why, source] = [refutes.text, "mate"];
+    if (allowsMate && refutes !== null) [why, source, told] = [refutes.text, "mate", refutes];
     else if (lostAlready) [why, source] = [`Con ${bestSan} el mate tardaba más: ${lower(before.text)} frente a ${lower(after.text)}.`, "mate"];
     // Si lo que gana el rival tras la jugada pesa más que lo que gana la mejor, el motivo es la refutación.
     else if (bestExplains && !(refutes !== null && refutes.net > bestGain)) [why, source] = [sameMotive(bestMotive!, best, playedMotive, move, verdict === "buena" ? null : difference) ?? bestMotive!.text, "best"];
-    else if (refutes !== null) [why, source] = [refutes.text, "refutation"];
+    else if (refutes !== null) [why, source, told] = [refutes.text, "refutation", refutes];
     else if (findings.length > 0) why = `Mira los avisos: ahí está lo que pierde ${san}. Con ${bestSan}, ${difference}.`;
     else if (quiet) [why, source] = [`Alfil Beta la prefiere por cómo quedan las piezas: en las líneas que ha mirado nadie gana material (${difference}).`, "posicional"];
     else if (verdict === "buena") why = `Alfil Beta la prefiere por poco (${difference}) y no encuentra un motivo concreto que explicarte.`;
@@ -688,7 +716,7 @@ function decide(input: DecisionInput): Decision {
         : `Había una jugada mejor (la valoración baja ${pawns(loss)} peones), pero con la partida tan decidida cambia poco.`;
   } else summary = `${LOSS_HEAD[verdict]}: la valoración baja ${pawns(loss)} peones.`;
 
-  return { verdict, category, alternative, summary, why, lines: { best: bestLine, played: playedLine } };
+  return { verdict, category, alternative, summary, why, lines: { best: bestLine, played: playedLine }, refutation: told };
 }
 
 /**

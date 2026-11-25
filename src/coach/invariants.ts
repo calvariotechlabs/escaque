@@ -8,7 +8,7 @@
 import { Position } from "../core/index.js";
 import type { PieceType } from "../core/index.js";
 import type { CoachGame, CoachReport } from "./analyze.js";
-import { lineCaptures, shownPlies } from "./explain.js";
+import { lineCaptures, materialPlies, shownPlies } from "./explain.js";
 import { pawns } from "./text.js";
 
 /** Misma tolerancia que el veredicto «mejor» para jugadas equivalentes. */
@@ -76,6 +76,23 @@ export function checkInvariants(report: CoachReport, game: CoachGame): string[] 
     if (inPanel < needed) out.push(`la línea del panel enseña ${inPanel} medias jugadas y el material se cuenta en ${needed}`);
   }
 
+  // 4c. Si el «por qué» cuenta la respuesta del rival, el panel enseña la línea de tu jugada
+  //     hasta lo que cuenta el texto, con esa respuesta como respuesta clave (issue #87).
+  //     Un mate largo se cuenta sin línea («Tras X, las negras tienen mate en 7.»): no nombra respuesta.
+  const tellsReply = report.alternative !== null && /^Tras \S+, /.test(report.why) && !/ mate en \d+\.$/.test(report.why);
+  const own = report.refutationLine;
+  if (tellsReply && own === null) out.push("el «por qué» cuenta la respuesta del rival y falta la línea de tu jugada");
+  if (!tellsReply && own !== null) out.push("hay línea de tu jugada y el «por qué» no cuenta la respuesta del rival");
+  if (tellsReply && own !== null) {
+    const reply = own.moves[own.key];
+    if (own.key !== 1 || reply === undefined || !report.why.includes(reply)) out.push(`la respuesta clave (${reply ?? "ninguna"}) no es la segunda media jugada que nombra el «por qué»`);
+    const mate = /mate en (\d+):/.exec(report.why);
+    // Un mate se escribe entero en el texto (2 × N medias jugadas desde la tuya, o las que tenga la línea).
+    const needed =
+      position === null ? 0 : mate !== null ? Math.min(2 * Number(mate[1]), legalPlies(position, report.lines.played)) : materialPlies(position, report.lines.played, 2);
+    if (own.moves.length < needed) out.push(`la línea de tu jugada enseña ${own.moves.length} medias jugadas y el texto cuenta ${needed}`);
+  }
+
   if (/nadie gana material/.test(shown) && captured.size > 0) out.push("dice que nadie gana material y las líneas capturan");
 
   // 5. Los números del texto son los del panel.
@@ -101,6 +118,22 @@ export function checkInvariants(report: CoachReport, game: CoachGame): string[] 
   if (!report.summary.endsWith(".")) out.push("la frase del veredicto no acaba en punto");
   if (report.why !== "" && !report.why.endsWith(".")) out.push("el «por qué» no acaba en punto");
   return out;
+}
+
+/** Medias jugadas legales seguidas al principio de `line`. Deja `position` como estaba. */
+function legalPlies(position: Position, line: readonly string[]): number {
+  let played = 0;
+  try {
+    for (const uci of line) {
+      const move = position.moveFromUci(uci);
+      if (move === null) break;
+      position.makeMove(move);
+      played++;
+    }
+  } finally {
+    for (let i = 0; i < played; i++) position.unmakeMove();
+  }
+  return played;
 }
 
 /** La posición de antes de la jugada; `null` (y lo anota en `out`) si la FEN o una jugada no son válidas. */

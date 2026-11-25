@@ -5,6 +5,6 @@ export { analyzeMove, hintFor, toEvaluation, CoachError, COACH_LIMITS } from "./
 export { explainMove, lineText, refutationOf } from "./explain.js";
 export { checkInvariants } from "./invariants.js";
 export type { Hint, Motive, MotiveKind, Refutation } from "./explain.js";
-export type { AnalyzeOptions, Category, CoachGame, CoachReport, Evaluation, Finding, MoveInfo, SquareMark, Verdict } from "./analyze.js";
+export type { AnalyzeOptions, Category, CoachGame, CoachReport, Evaluation, Finding, MoveInfo, RefutationLine, SquareMark, Verdict } from "./analyze.js";
 export { exchangeGain, moveBalance } from "./exchange.js";
 export { spanishSan } from "./text.js";

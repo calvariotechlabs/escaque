@@ -66,3 +66,29 @@
 .coach__pistas-nota{margin:0;color:var(--ink-muted)}
 @media (min-width:600px) and (max-width:859px) and (min-height:501px){.coach__pistas{grid-column:1 / -1}}
 @media (forced-colors: active){.coach__alternativa,.coach__pistas-lista li{border-color:CanvasText}}
+/* Las dos líneas (issue #87, lienzo «Coach · las dos líneas», docs/design/lienzo/coach-refutacion.css). */
+.coach__lineas{display:flex;flex-direction:column;gap:var(--space-2);align-self:stretch;min-width:0}
+.coach__lineas .coach__sub{margin:0}
+/* Una columna en un panel estrecho; dos cuando caben (≈ 17 rem cada una), sin consultas de ancho. */
+.lineas{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,17rem),1fr));gap:var(--space-3) var(--space-4);align-items:start}
+.linea{display:flex;flex-direction:column;gap:2px;min-width:0;padding-top:var(--space-2);border-top:1px solid var(--line)}
+.linea__nombre{display:flex;align-items:center;gap:var(--space-2);font:400 13px/20px var(--font-sans);color:var(--ink-muted)}
+.linea__marca{flex:none;width:28px;height:12px;overflow:visible}
+/* Las marcas son las de la leyenda del tablero (board.css: .leyenda-flechas). */
+.linea__marca .flecha--mejor{stroke:var(--accent);stroke-width:3}
+.linea__marca .flecha-punta--mejor{fill:var(--accent)}
+.linea__marca .flecha--tuya{stroke:var(--ink);opacity:.7;stroke-width:2;stroke-dasharray:3 2.5}
+.linea__marca .flecha-punta--tuya{stroke:var(--ink);opacity:.7;stroke-width:1.4}
+/* Número y jugada pegados (espacio duro): una jugada no se parte entre dos renglones. */
+.linea__jugadas{display:block;overflow-wrap:anywhere}
+/* Una línea son varias jugadas: va en Sans, como en el lienzo (regla PulidoDosNotacion: Mono solo para una jugada suelta). */
+.coach__san.linea__jugadas{font:600 15px/24px var(--font-sans);font-variant-numeric:tabular-nums}
+/* La respuesta clave: subrayado grueso. La forma, no el color, la distingue (WCAG 1.4.1). */
+.linea__clave{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:4px}
+.linea__nota{margin:0;color:var(--ink-muted);font:400 12px/16px var(--font-sans)}
+@media (forced-colors: active){
+  .linea{border-top-color:CanvasText}
+  .linea__clave{text-decoration-color:CanvasText}
+  .linea__marca .flecha--mejor,.linea__marca .flecha--tuya,.linea__marca .flecha-punta--tuya{stroke:CanvasText;opacity:1}
+  .linea__marca .flecha-punta--mejor{fill:CanvasText}
+}

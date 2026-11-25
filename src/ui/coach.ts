@@ -3,7 +3,7 @@
 // pinta está en coach-panel.ts; el cálculo, en el Worker del coach.
 import { Position } from "../core/index.js";
 import type { Color } from "../core/index.js";
-import type { CoachReport, Evaluation, Finding, Hint, SquareMark, Verdict } from "../coach/index.js";
+import type { CoachReport, Evaluation, Finding, Hint, RefutationLine, SquareMark, Verdict } from "../coach/index.js";
 import type { Game } from "./game.js";
 import { historyUci } from "./machine.js";
 import type { Mark } from "./board.js";
@@ -71,8 +71,13 @@ export interface ReportView {
   readonly best: string | null;
   /** Por qué es mejor (CAL-394); vacío si no hay alternativa. */
   readonly why: string;
-  /** Línea de Alfil Beta: «5. Cxe5 dxe5 6. Dxg4 Cf6». */
+  /** Línea de Alfil Beta: «5. Cxe5 dxe5 6. Dxg4 Cf6». La de la mejor jugada si hay alternativa. */
   readonly line: string;
+  /**
+   * Línea de tu jugada, con la respuesta clave del rival (issue #87): solo cuando el
+   * «Por qué» cuenta esa respuesta. Con ella el panel enseña las dos líneas; si es `null`, una.
+   */
+  readonly playedLine: RefutationLine | null;
   /** Flecha de la mejor jugada (en la posición de antes); `null` si es la que se hizo. */
   readonly bestArrow: SquareMove | null;
   /** Flecha de la jugada hecha. */
@@ -143,6 +148,7 @@ export function reportView(report: CoachReport, label: string): ReportView {
     best: report.alternative === null ? null : sanToSpanish(report.alternative.san),
     why: report.alternative === null ? "" : report.why,
     line: report.line,
+    playedLine: report.alternative === null ? null : (report.refutationLine ?? null),
     bestArrow: report.alternative === null ? null : squaresOf(report.alternative.uci),
     playedArrow: squaresOf(report.move.uci),
     before: evaluationView(report.before),
@@ -177,6 +183,12 @@ export const COACH_TEXT = {
   bestPrefix: "Mejor jugada: ",
   whyPrefix: "Por qué: ",
   linePrefix: "Línea de Alfil Beta: ",
+  // Las dos líneas (issue #87)
+  linesTitle: "Líneas de Alfil Beta",
+  playedLineName: "Línea de tu jugada",
+  bestLineName: "Línea de la mejor jugada",
+  keyReply: " (respuesta clave)",
+  linesNote: "Subrayada: la respuesta clave del rival, la que explica el «Por qué».",
   returnToGame: "Volver a la partida",
   hintsTitle: "Pista para tu jugada",
   hintIntro: "Una idea para la jugada que te toca, sin decirte cuál es.",
@@ -188,6 +200,11 @@ export const COACH_TEXT = {
   previousMove: "Tu jugada: ",
   reviewedMove: "Jugada revisada: ",
 } as const;
+
+/** Pega cada número de jugada a su jugada con un espacio duro («12…\u00a0Df6»): una jugada no se parte entre dos renglones. */
+export function glueNumbers(line: string): string {
+  return line.replace(/(\d+[.…]) /g, "$1\u00a0");
+}
 
 /** Suma a las marcas del tablero las del aviso activo, sin repetir. */
 export function withCoachMarks(base: ReadonlyMap<string, readonly Mark[]>, extra: readonly SquareMark[]): Map<string, Mark[]> {
