@@ -54,7 +54,7 @@ function git(...args) {
 function contarPruebas() {
   const r = spawnSync(
     process.execPath,
-    ["--test", "dist/tests/**/*.test.js", "tools/*.test.mjs", ".claude/hooks/*.test.mjs"],
+    ["--test", "--test-reporter=tap", "dist/tests/**/*.test.js", "tools/*.test.mjs", ".claude/hooks/*.test.mjs"],
     { cwd: ROOT, encoding: "utf8", maxBuffer: 256 * 1024 * 1024, env: { ...process.env, METRICAS_GENERANDO: "1" } },
   );
   const salida = `${r.stdout}\n${r.stderr}`;
@@ -67,7 +67,7 @@ function contarPruebas() {
 /** Cuenta las pruebas de Chrome real (necesita Chrome; devuelve null si no se pidió). */
 function contarE2e() {
   const ficheros = readdirSync(join(ROOT, "e2e")).filter((f) => f.endsWith(".e2e.mjs"));
-  const r = spawnSync(process.execPath, ["--test", "--test-concurrency=1", ...ficheros.map((f) => join("e2e", f))], {
+  const r = spawnSync(process.execPath, ["--test", "--test-reporter=tap", "--test-concurrency=1", ...ficheros.map((f) => join("e2e", f))], {
     cwd: ROOT,
     encoding: "utf8",
     maxBuffer: 256 * 1024 * 1024,
