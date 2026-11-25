@@ -16,7 +16,7 @@ App web para aprender ajedrez con motor propio (**Alfil Beta**), escrita desde c
 
 Los seis hitos están hechos, más el repaso de la partida y el PGN. Alfil Beta juega con tres niveles en un Web Worker, el coach explica los errores y hay 15 lecciones guiadas. La web se instala como app (PWA) y se publica como sitio estático en Vercel. La demo está detrás de un desafío anti-bots de Vercel: la primera visita puede tardar un instante.
 
-**Release Candidate (24 de noviembre de 2026).** Tras las dos [auditorías externas](#auditorías-externas) se está cerrando una primera versión estable: coach coherente (B1), banco de posiciones contra Stockfish (B2), análisis del coach (B3), pruebas de regresión (B4), firma de CalvarioTechLabs (B5, B7), validación integral (B6) y esta documentación viva (B9). La afinación del motor (B11, #78) ya está fusionada; el informe de la RC (B10) va en su propia PR. Lo que todavía no está resuelto está en [limitaciones conocidas](#capacidades-verificadas-y-limitaciones-conocidas).
+**Release Candidate (24 de noviembre de 2026).** Tras las dos [auditorías externas](#auditorías-externas) se está cerrando una primera versión estable: coach coherente (B1), banco de posiciones contra Stockfish (B2), análisis del coach (B3), pruebas de regresión (B4), firma de CalvarioTechLabs (B5, B7), validación integral (B6) y esta documentación viva (B9). La afinación del motor (B11, #78) y el [informe de la RC](docs/auditorias/informe-rc.md) (B10) ya están fusionados, y la RC pasó una [auditoría independiente](#auditorías-externas) el mismo día. Lo que todavía no está resuelto está en [limitaciones conocidas](#capacidades-verificadas-y-limitaciones-conocidas).
 
 | Hito | Descripción | Estado |
 | --- | --- | --- |
@@ -116,8 +116,11 @@ El 24 de noviembre de 2026 Escaque pasó dos auditorías independientes, hechas 
 |---|---|---|
 | ChatGPT | 9/10 como portfolio, 5/10 el coach | [PDF, 11 páginas](docs/auditorias/auditoria-chatgpt-2026-11-24.pdf) |
 | Claude | 8,0/10 global, 5,0/10 el coach | [Copia del informe](docs/auditorias/auditoria-claude-2026-11-24.md) |
+| Independiente de la RC (v2, commit `3050eb0`) | 9/10 como portfolio, 7,5/10 el coach (antes 5) | [PDF, 9 páginas](docs/auditorias/auditoria-v2-2026-11-24.pdf) · [contraste hallazgo a hallazgo](docs/auditorias/contraste-auditoria-v2.md) |
 
-Coinciden en que reglas, arquitectura, pruebas y seguridad son sólidas y en que el coach a veces se contradice: dice «Mejor jugada» y recomienda otra, o explica como «posicional» un mate que acabas de recibir. Los hallazgos se reprodujeron, se agruparon por causa raíz y se convirtieron en el plan de la Release Candidate: [consolidación y plan](docs/auditorias/consolidacion-rc.md). Los informes se guardan tal como se entregaron, como evidencia; las correcciones se documentan aparte.
+Coinciden en que reglas, arquitectura, pruebas y seguridad son sólidas y en que el coach a veces se contradice: dice «Mejor jugada» y recomienda otra, o explica como «posicional» un mate que acabas de recibir. Los hallazgos se reprodujeron, se agruparon por causa raíz y se convirtieron en el plan de la Release Candidate: [consolidación y plan](docs/auditorias/consolidacion-rc.md). El resultado está en el [informe de la RC](docs/auditorias/informe-rc.md). Los informes se guardan tal como se entregaron, como evidencia, y las correcciones se documentan aparte.
+
+Después, una auditoría independiente repitió los casos sobre la RC. Confirmó que los fallos del coach estaban corregidos en producción y no encontró nada que bloqueara la publicación. Cada hallazgo se reprodujo en el [contraste](docs/auditorias/contraste-auditoria-v2.md): uno ya estaba resuelto (H-08) y otro se arregla antes de cerrar la RC (la línea de la refutación, #87).
 
 ## Capacidades verificadas y limitaciones conocidas
 
