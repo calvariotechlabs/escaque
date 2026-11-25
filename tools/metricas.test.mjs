@@ -59,6 +59,7 @@ describe("cifras del README", () => {
     assert.equal(metricas.lecciones.tacticas, LESSONS.filter((l) => l.group === "tacticas").length);
     const { PERFT_POSITIONS } = await import(pathToFileURL(join(ROOT, "dist/tests/perft-positions.js")).href);
     assert.equal(metricas.perft.posiciones, PERFT_POSITIONS.length);
+    assert.equal(metricas.perft.comprobaciones, PERFT_POSITIONS.reduce((t, r) => t + r.full, 0));
   });
 
   prueba("las cifras del banco registradas son las del fichero de resultados que citan", () => {

@@ -103,7 +103,8 @@ async function contarLecciones() {
 
 async function contarPerft() {
   const { PERFT_POSITIONS } = await import(pathToFileURL(join(ROOT, "dist", "tests", "perft-positions.js")).href);
-  return PERFT_POSITIONS.length;
+  // `comprobaciones`: las del perft completo (`npm run test:perft`), una por posición y profundidad.
+  return { posiciones: PERFT_POSITIONS.length, comprobaciones: PERFT_POSITIONS.reduce((t, r) => t + r.full, 0) };
 }
 
 /** Cifras del banco de posiciones, leídas del resultado guardado (no se vuelve a ejecutar). */
@@ -176,7 +177,7 @@ export async function medir({ previo, e2e = false, rendimiento = false, banco } 
     },
     pruebas: { total: pruebas.pruebas, suites: pruebas.suites, fallan: pruebas.fallan },
     lecciones: await contarLecciones(),
-    perft: { posiciones: await contarPerft() },
+    perft: await contarPerft(),
     sitio: medirSitio(),
     banco: resumenBanco(banco ?? previo?.banco?.etiqueta ?? BANCO_POR_DEFECTO),
     registrado: {
@@ -208,6 +209,7 @@ export function renderizarBloque(m) {
       "Datos en `src/lessons`; `npm run metrics:check`",
     ],
     ["Posiciones de referencia de perft", `**${m.perft.posiciones}**, todas exactas (la inicial, Kiwipete, las posiciones 3 a 6 de la Chess Programming Wiki y las «trampa» de Sedlak)`, "`npm run test:perft` en la CI"],
+    ["Comprobaciones de perft", `**${m.perft.comprobaciones}** cifras de nodos exactas (una por posición y profundidad) en el perft completo, que no entra en las ${n(m.pruebas.total)} pruebas funcionales`, "`npm run test:perft` en la CI"],
     [
       "Sitio publicado",
       `${n(m.sitio.ficheros)} ficheros, ${kb(m.sitio.bytes)} en disco; JS + CSS + HTML suman ${kb(m.sitio.gzipJsCssHtmlBytes)} comprimidos con gzip (cada fichero por separado)`,
@@ -219,8 +221,8 @@ export function renderizarBloque(m) {
       `\`bench/resultados/${b.etiqueta}.json\` (${b.fecha}, commit \`${b.commit}\`); metodología en \`bench/README.md\``,
     ],
     [
-      "Tiempo del banco (depende del equipo)",
-      `Difícil: ${n(b.dificil.msMedia)} ms de media y ${n(b.dificil.msMax)} ms como máximo. Coach: ${n(b.coach.msMedia)} ms de media, ${n(b.coach.msP95)} ms el percentil 95 y ${n(b.coach.msMax)} ms como máximo`,
+      "Tiempo del banco, por análisis o jugada (depende del equipo)",
+      `Difícil (una jugada): ${n(b.dificil.msMedia)} ms de media y ${n(b.dificil.msMax)} ms la más lenta. Coach (un análisis completo de una jugada): ${n(b.coach.msMedia)} ms de media, ${n(b.coach.msP95)} ms el percentil 95 y ${n(b.coach.msMax)} ms el más lento`,
       "Registrado en el mismo fichero; no lo vuelve a medir la CI",
     ],
   ];
@@ -265,7 +267,7 @@ export function comparar(ahora, guardado) {
   exacto("dependencias", ahora.dependencias, guardado.dependencias);
   exacto("pruebas", ahora.pruebas, guardado.pruebas);
   exacto("lecciones", ahora.lecciones, guardado.lecciones);
-  exacto("perft.posiciones", ahora.perft, guardado.perft);
+  exacto("perft", ahora.perft, guardado.perft);
   exacto("sitio.ficheros", ahora.sitio.ficheros, guardado.sitio.ficheros);
   exacto("banco", ahora.banco, guardado.banco);
   for (const campo of ["bytes", "gzipJsCssHtmlBytes"]) {

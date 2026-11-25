@@ -1,7 +1,7 @@
 {
   "generado": {
     "fecha": "2026-11-25",
-    "commit": "b548b087e194"
+    "commit": "49ec83788444"
   },
   "dependencias": {
     "enEjecucion": 0,
@@ -20,7 +20,8 @@
     "tacticas": 6
   },
   "perft": {
-    "posiciones": 21
+    "posiciones": 21,
+    "comprobaciones": 109
   },
   "sitio": {
     "ficheros": 92,
