@@ -1,6 +1,6 @@
 # Escaque
 
-*Escaque, by CalvarioTechLabs.* Producto diseñado y programado por [CalvarioTechLabs](https://calvariotechlabs.com/).
+*Escaque, by Calvario TechLabs.* Producto diseñado y programado por [Calvario TechLabs](https://calvariotechlabs.com/).
 
 **[Jugar ahora: escaque.calvariotechlabs.com](https://escaque.calvariotechlabs.com)** (sin registro, sin instalar nada; se puede instalar como app y juega sin conexión).
 
@@ -16,7 +16,7 @@ App web para aprender ajedrez con motor propio (**Alfil Beta**), escrita desde c
 
 Los seis hitos están hechos, más el repaso de la partida y el PGN. Alfil Beta juega con tres niveles en un Web Worker, el coach explica los errores y hay 15 lecciones guiadas. La web se instala como app (PWA) y se publica como sitio estático en Vercel. La demo está detrás de un desafío anti-bots de Vercel: la primera visita puede tardar un instante.
 
-**Release Candidate (24 de noviembre de 2026).** Tras las dos [auditorías externas](#auditorías-externas) se está cerrando una primera versión estable: coach coherente (B1), banco de posiciones contra Stockfish (B2), análisis del coach (B3), pruebas de regresión (B4), firma de CalvarioTechLabs (B5, B7), validación integral (B6) y esta documentación viva (B9). La afinación del motor (B11, #78) y el [informe de la RC](docs/auditorias/informe-rc.md) (B10) ya están fusionados, y la RC pasó una [auditoría independiente](#auditorías-externas) el mismo día. Lo que todavía no está resuelto está en [limitaciones conocidas](#capacidades-verificadas-y-limitaciones-conocidas).
+**Release Candidate (24 de noviembre de 2026).** Tras las dos [auditorías externas](#auditorías-externas) se está cerrando una primera versión estable: coach coherente (B1), banco de posiciones contra Stockfish (B2), análisis del coach (B3), pruebas de regresión (B4), firma de Calvario TechLabs (B5, B7), validación integral (B6) y esta documentación viva (B9). La afinación del motor (B11, #78) y el [informe de la RC](docs/auditorias/informe-rc.md) (B10) ya están fusionados, y la RC pasó una [auditoría independiente](#auditorías-externas) el mismo día. Lo que todavía no está resuelto está en [limitaciones conocidas](#capacidades-verificadas-y-limitaciones-conocidas).
 
 | Hito | Descripción | Estado |
 | --- | --- | --- |
@@ -52,7 +52,7 @@ Generado el 2026-11-25 sobre el commit `141ce1fa9c9f` con `npm run metrics` (dat
 
 ### Mediciones puntuales
 
-Medidas a mano en un contenedor cloud de 4 núcleos con Node 22 durante el hito 6, **antes** de la firma de CalvarioTechLabs; las del motor se midieron al cerrar B11. No las comprueba ninguna prueba: léelas como una fotografía con fecha, no como una garantía. En un portátil moderno salen mejor, así que son un suelo, no un techo.
+Medidas a mano en un contenedor cloud de 4 núcleos con Node 22 durante el hito 6, **antes** de la firma de Calvario TechLabs; las del motor se midieron al cerrar B11. No las comprueba ninguna prueba: léelas como una fotografía con fecha, no como una garantía. En un portátil moderno salen mejor, así que son un suelo, no un techo.
 
 | Qué | Cifra |
 | --- | --- |
@@ -333,4 +333,4 @@ MIT. © 2026 Calvario TechLabs.
 
 ## Marca y firma
 
-Escaque es la marca del producto; **CalvarioTechLabs** es su creadora. La firma «by CalvarioTechLabs» aparece junto al nombre en la cabecera (solo desde 720×500 px), en el pie de todas las pantallas (con enlace a <https://calvariotechlabs.com/>) y en la pantalla «Acerca de Escaque» (`#/acerca`). Los metadatos (`author`, JSON-LD `WebApplication` con la creadora) están en `index.html`. Diseño en `docs/design/firma/` y en el lienzo (`docs/design/lienzo/`). La imagen Open Graph (`og-image.png`) va sin firma.
+Escaque es la marca del producto; **Calvario TechLabs** es su creadora. La firma «by Calvario TechLabs» aparece junto al nombre en la cabecera (solo desde 720×500 px), en el pie de todas las pantallas (con enlace a <https://calvariotechlabs.com/>) y en la pantalla «Acerca de Escaque» (`#/acerca`). Los metadatos (`author`, JSON-LD `WebApplication` con la creadora) están en `index.html`. Diseño en `docs/design/firma/` y en el lienzo (`docs/design/lienzo/`). La imagen Open Graph (`og-image.png`) va sin firma.

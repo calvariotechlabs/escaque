@@ -1,4 +1,4 @@
-// Prueba de extremo a extremo de la firma «by CalvarioTechLabs» (B7): firma de la cabecera (solo desde 720×500), pie en todas las pantallas,
+// Prueba de extremo a extremo de la firma «by Calvario TechLabs» (B7): firma de la cabecera (solo desde 720×500), pie en todas las pantallas,
 // pantalla «Acerca de» (#/acerca), enlaces externos seguros, aria-current, foco y pie dentro de la región con scroll en móvil apaisado. Chrome real.
 import { after, before, describe, test } from "node:test";
 import assert from "node:assert/strict";
@@ -65,7 +65,7 @@ const pie = `(() => {
   return { visible: r.width > 0 && r.height > 0, texto: f.querySelector('.pie__legal').textContent, a, ancho: document.documentElement.scrollWidth, ventana: innerWidth, padre: f.parentElement.id || f.parentElement.tagName };
 })()`;
 
-describe("firma de CalvarioTechLabs y «Acerca de» (B7)", () => {
+describe("firma de Calvario TechLabs y «Acerca de» (B7)", () => {
   let page;
   before(async () => {
     page = await browser.newPage();
@@ -78,7 +78,7 @@ describe("firma de CalvarioTechLabs y «Acerca de» (B7)", () => {
     await viewport(page, 1280, 800, false);
     await freshStart(page, "firma-esc");
     assert.equal(await page.eval(firmaVisible), true);
-    assert.equal(await page.eval(`document.querySelector('.cab-izq .firma').textContent.replace(/\\s+/g, ' ').trim()`), "by CalvarioTechLabs");
+    assert.equal(await page.eval(`document.querySelector('.cab-izq .firma').textContent.replace(/\\s+/g, ' ').trim()`), "by Calvario TechLabs");
     assert.equal(await page.eval(`document.querySelectorAll('.cab-izq a').length`), 0, "la firma de la cabecera no es un enlace");
     assert.equal(await page.eval(`document.querySelector('.cab-izq .firma [lang=en]').textContent`), "by");
     assert.equal(await page.eval(`document.querySelector('.cab-izq h1').textContent.trim()`), "Escaque", "el h1 sigue siendo solo «Escaque»");
@@ -88,7 +88,7 @@ describe("firma de CalvarioTechLabs y «Acerca de» (B7)", () => {
     }
   });
 
-  test("el pie está en ajustes, partida, lecciones y lección, con el enlace a CalvarioTechLabs bien marcado", async () => {
+  test("el pie está en ajustes, partida, lecciones y lección, con el enlace a Calvario TechLabs bien marcado", async () => {
     await viewport(page, 1280, 800, false);
     await freshStart(page, "firma-pie");
     const comprobar = async (donde) => {
