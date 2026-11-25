@@ -598,6 +598,8 @@ function decide(input: DecisionInput): Decision {
   const allowsMate = isMateAgainst(playedScore) && !lostAlready;
   const hadMate = isMateFor(beforeScore);
   const keepsMate = isMateFor(playedScore);
+  const rival = opposite(color);
+  const stalemates = stalematesRival(position, move.uci);
 
   // 1. Veredicto. Los mates se comparan por distancia, no con la curva.
   let verdict: Verdict;
@@ -656,7 +658,9 @@ function decide(input: DecisionInput): Decision {
   let told: Refutation | null = null;
   if (alternative !== null) {
     const difference = `${short(before)} frente a ${short(after)}`;
-    if (allowsMate && refutes !== null) [why, source, told] = [refutes.text, "mate", refutes];
+    // Ahogar al rival acaba la partida en tablas: es la explicación, por encima de cualquier otra (H-13).
+    if (stalemates) why = `${capitalize(side(rival))} no están en jaque y no pueden mover ninguna pieza: eso es ahogado, y vale tablas. Con ${bestSan}, ${difference}.`;
+    else if (allowsMate && refutes !== null) [why, source, told] = [refutes.text, "mate", refutes];
     else if (lostAlready) [why, source] = [`Con ${bestSan} el mate tardaba más: ${lower(before.text)} frente a ${lower(after.text)}.`, "mate"];
     // Si lo que gana el rival tras la jugada pesa más que lo que gana la mejor, el motivo es la refutación.
     else if (bestExplains && !(refutes !== null && refutes.net > bestGain)) [why, source] = [sameMotive(bestMotive!, best, playedMotive, move, verdict === "buena" ? null : difference) ?? bestMotive!.text, "best"];
@@ -689,6 +693,7 @@ function decide(input: DecisionInput): Decision {
   // 5. Frase del veredicto.
   let summary: string;
   if (playedMates) summary = "Da jaque mate.";
+  else if (stalemates) summary = `${san} ahoga al rey ${rival === "w" ? "blanco" : "negro"}: la partida acaba en tablas.`;
   else if (allowsMate) summary = `${san} permite mate en ${after.mate!.moves}.`;
   else if (lostAlready) {
     summary =
@@ -735,6 +740,19 @@ function sameMotive(bestMotive: Motive, best: MoveInfo, playedMotive: Motive, mo
   const head = `${bestSan} también ${rest.replace(/\.$/, "")}`;
   return difference === null ? `${head}, y Alfil Beta la prefiere por poco.` : `${head}, pero Alfil Beta la valora mejor (${difference}).`;
 }
+
+/** ¿Deja la jugada `uci` al rival sin jugadas y sin jaque? Deja `position` como estaba. */
+function stalematesRival(position: Position, uci: string): boolean {
+  const move = position.moveFromUci(uci);
+  if (move === null) return false;
+  position.makeMove(move);
+  const stalemate = position.status().kind === "stalemate";
+  position.unmakeMove();
+  return stalemate;
+}
+
+/** «las negras» → «Las negras». */
+const capitalize = (text: string): string => text.charAt(0).toUpperCase() + text.slice(1);
 
 /** «Mate en 1 para las negras» → «mate en 1 para las negras». */
 const lower = (text: string): string => text.charAt(0).toLowerCase() + text.slice(1);

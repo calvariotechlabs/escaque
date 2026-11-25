@@ -32,6 +32,34 @@ export function sanToSpanish(san: string): string {
     .replace(/=([NBRQ])/, (_, letter: string) => `=${SPANISH_LETTER[letter]!}`);
 }
 
+/**
+ * Aviso del estado cuando la pieza elegida no puede ir a `to` (issue #75):
+ * «Ese caballo no puede ir a d5.», «Con esa jugada tu rey quedaría en jaque.»…
+ */
+export function illegalMoveMessage(reason: IllegalReason, piece: PieceType, to: string): string {
+  switch (reason) {
+    case "enroque":
+      return "Ahora no puedes enrocar por ese lado.";
+    case "sigue-en-jaque":
+      return "Con esa jugada tu rey seguiría en jaque.";
+    case "deja-en-jaque":
+      return "Con esa jugada tu rey quedaría en jaque.";
+    case "no-llega": {
+      const { name, feminine } = NAMES[piece];
+      return `${feminine ? "Esa" : "Ese"} ${name} no puede ir a ${to}.`;
+    }
+  }
+}
+
+/**
+ * Por qué una jugada de la persona no vale (`Game.illegalReason`), del motivo más concreto al más general:
+ * - `enroque`: el rey va dos casillas hacia una torre con derecho a enrocar, pero ahora no se puede;
+ * - `sigue-en-jaque`: el rey está en jaque y la jugada no lo evita;
+ * - `deja-en-jaque`: la pieza llega, pero deja a su rey en jaque (clavada o rey a una casilla atacada);
+ * - `no-llega`: la pieza no se mueve así.
+ */
+export type IllegalReason = "enroque" | "sigue-en-jaque" | "deja-en-jaque" | "no-llega";
+
 /** Datos de una jugada ya hecha, suficientes para anunciarla. */
 export interface PlayedMove {
   readonly color: Color;

@@ -93,6 +93,10 @@ export function checkInvariants(report: CoachReport, game: CoachGame): string[] 
     if (own.moves.length < needed) out.push(`la línea de tu jugada enseña ${own.moves.length} medias jugadas y el texto cuenta ${needed}`);
   }
 
+  if (position !== null && stalemates(position, report.move.uci) && !/\bahoga\b/.test(report.summary)) {
+    out.push("la jugada ahoga al rival y la frase del veredicto no dice ahogado");
+  }
+
   if (/nadie gana material/.test(shown) && captured.size > 0) out.push("dice que nadie gana material y las líneas capturan");
 
   // 5. Los números del texto son los del panel.
@@ -118,6 +122,16 @@ export function checkInvariants(report: CoachReport, game: CoachGame): string[] 
   if (!report.summary.endsWith(".")) out.push("la frase del veredicto no acaba en punto");
   if (report.why !== "" && !report.why.endsWith(".")) out.push("el «por qué» no acaba en punto");
   return out;
+}
+
+/** ¿Deja la jugada `uci` al rival ahogado? Deja `position` como estaba. */
+function stalemates(position: Position, uci: string): boolean {
+  const move = position.moveFromUci(uci);
+  if (move === null) return false;
+  position.makeMove(move);
+  const result = position.status().kind === "stalemate";
+  position.unmakeMove();
+  return result;
 }
 
 /** Medias jugadas legales seguidas al principio de `line`. Deja `position` como estaba. */

@@ -18,6 +18,7 @@ import {
   resultMessage,
   sanToSpanish,
   statusMessage,
+  illegalMoveMessage,
 } from "./notation.js";
 import { applyBoardTheme, isBoardTheme, loadBoardTheme, saveBoardTheme } from "./board-theme.js";
 import { createPromotionDialog } from "./promotion.js";
@@ -98,6 +99,8 @@ const statusBox = byId<HTMLParagraphElement>("estado");
 const statusTurn = byId<HTMLSpanElement>("estado-turno");
 const statusText = byId<HTMLElement>("estado-texto");
 const statusExtra = byId<HTMLSpanElement>("estado-extra");
+const statusNotice = byId<HTMLSpanElement>("estado-aviso");
+const statusNoticeText = byId<HTMLSpanElement>("estado-aviso-texto");
 const statusCause = byId<HTMLSpanElement>("estado-causa");
 const statusCheck = byId<HTMLSpanElement>("estado-jaque");
 const statusYourTurn = byId<HTMLSpanElement>("estado-toca");
@@ -194,6 +197,8 @@ const THINKING_DELAY_MS = 300;
 let thinkingVisible = false;
 let thinkingTimer: ReturnType<typeof setTimeout> | null = null;
 let machineFailed = false;
+/** Aviso de la última jugada no válida (issue #75): vale para esa partida y esa posición, y se quita con la siguiente acción. */
+let illegalNotice: { readonly text: string; readonly game: Game; readonly ply: number } | null = null;
 
 // El coach: revisa en su propio Worker la última jugada de la persona (o la última, en partida a dos).
 let coachClient: ReturnType<typeof createCoachClient> | null = null;
@@ -540,6 +545,9 @@ function renderStatus(): void {
   if (ui.pendingPromotion !== null) statusExtra.textContent = " Elige la pieza para coronar.";
   else if (machineFailed) statusExtra.textContent = ` ${ENGINE_NAME} no ha podido elegir jugada. Prueba con «Deshacer jugada» o empieza otra partida.`;
   else statusExtra.textContent = "";
+  const notice = illegalNotice !== null && illegalNotice.game === game && illegalNotice.ply === game.ply ? illegalNotice.text : "";
+  statusNoticeText.textContent = notice;
+  statusNotice.hidden = notice === "";
   statusBox.classList.toggle("estado--fin", game.isOver);
   statusBox.classList.toggle("estado--jaque", parts.check);
   statusBox.classList.toggle("estado--pensando", thinkingVisible);
@@ -681,6 +689,10 @@ function maybeThink(): void {
 // --- Resultados --------------------------------------------------------------
 
 function handle(outcome: Outcome): void {
+  if (outcome.kind !== "focus" && outcome.kind !== "none") {
+    illegalNotice =
+      outcome.kind === "illegal" ? { text: illegalMoveMessage(outcome.reason, outcome.piece, outcome.to), game, ply: game.ply } : null;
+  }
   switch (outcome.kind) {
     case "focus":
       // Solo se mueve el foco: no hace falta repintar nada más.
@@ -705,6 +717,13 @@ function handle(outcome: Outcome): void {
       render();
       openPromotion();
       return;
+    case "illegal": {
+      // El aviso del estado no se lee (aria-hidden): lo anuncia la región de anuncios, en los dos modos.
+      // Si es el mismo texto que ya había, cambia un espacio al final para que se vuelva a leer.
+      const text = illegalNotice!.text;
+      announce(announcer.textContent === text ? `${text}\u00a0` : text);
+      break;
+    }
     default:
       break;
   }
