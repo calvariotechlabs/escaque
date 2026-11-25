@@ -1,13 +1,13 @@
 # Escaque · Informe de la Release Candidate (B10, RC-11)
 
-- Fecha: 24 de noviembre de 2026
+- Fecha: 24 de noviembre de 2026. **RC cerrada el 25 de noviembre de 2026** (apartados 1, 6 y 10 actualizados ese día; el resto describe el estado del 24-nov)
 - Código descrito: `main` en `7e38bba` (incluye B1 a B7 y B11). Partida: `5e9e946`, el commit que revisaron las dos auditorías.
 - Issue: [#74](https://github.com/calvariotechlabs/escaque/issues/74) · Plan: [consolidacion-rc.md](consolidacion-rc.md)
 - Qué es este documento: el balance de la RC (qué se hizo, con qué evidencia, con qué cifras antes y después), las excepciones que quedan, lo que solo puede comprobar una persona y el protocolo para la auditoría independiente final. Las cifras de los apartados 3, 4 y 6 se han **vuelto a medir** al escribirlo (apartado 8); las demás vienen de los informes de cada bloque, enlazados.
 
 ## 1. Veredicto en una línea
 
-La RC cumple la Definition of Done del plan salvo un punto abierto que depende de una persona: las pruebas en dispositivo físico, con lector de pantalla y de las cabeceras de producción (apartado 6). Los defectos P0 del entrenador están cerrados: **0 de 152 informes con contradicción de las invariantes del propio coach** (antes, 39 de 152 con la regla externa) y, desde la corrección de H-08 ([#83](https://github.com/calvariotechlabs/escaque/issues/83)), **0 de 152 también con la regla externa del banco** (apartado 4.3).
+**RC cerrada el 25 de noviembre de 2026.** Cumple la Definition of Done del plan. El único punto que dependía de una persona, las pruebas en móvil real, con lector de pantalla y de las cabeceras de producción, lo hizo Sergio ese día (apartado 6). Los defectos P0 del entrenador están cerrados: **0 de 152 informes con contradicción de las invariantes del propio coach** (antes, 39 de 152 con la regla externa) y, desde la corrección de H-08 ([#83](https://github.com/calvariotechlabs/escaque/issues/83)), **0 de 152 también con la regla externa del banco** (apartado 4.3).
 
 ## 2. Qué se hizo, bloque a bloque
 
@@ -120,15 +120,17 @@ Las tres excepciones constan como aprobadas (la de H-10, el 24-nov a las 16:35 U
 
 ## 6. Lo que solo puede comprobar una persona
 
-| Pendiente | Quién | Qué comprobar |
-|---|---|---|
-| Probar en un móvil real | Sergio | iPhone (Safari, «Añadir a pantalla de inicio») y Android (Chrome): aviso o botón de instalar, icono (también el maskable), pantalla completa, **modo avión tras abrir una vez**, jugar contra la máquina, aviso «Sin conexión», y que sale «Hay una versión nueva» tras la siguiente fusión |
-| Lector de pantalla | Sergio | TalkBack y VoiceOver: anuncio de jugadas («Blancas: e4. Peón de e2 a e4.»), nombre de casillas, diálogo de PGN y avisos. B6 solo pudo comprobar el árbol de accesibilidad y la región `aria-live` |
-| Uso a una mano | Sergio | Alcance del pulgar a «Empezar partida», «Deshacer» y arrastrar piezas, en vertical y apaisado |
-| Cabeceras en producción | Sergio, desde su navegador | https://escaque.calvariotechlabs.com/ → Chrome, pestaña Red, cabeceras de la respuesta del documento. La Protección contra bots de Vercel devuelve 429 a cualquier cliente de un centro de datos, así que ningún hilo ha podido medirlas en HTML ni JS. Solo se vieron en `/manifest.webmanifest` y son las esperadas |
-| `x-robots-tag: noindex` | Sergio, en la misma medición | Salió en el alias `*.vercel.app` (normal); debe **no** salir en `escaque.calvariotechlabs.com` |
-| Texto del aviso de versión en Claude Design | Sergio o un hilo con acceso | El aviso ahora dice «Al actualizar se recarga la página y tu partida se conserva.» (F-01). `docs/design` ya está actualizado, pero el lienzo y el Design System vivos de Claude Design no son accesibles desde el entorno de los hilos |
-| Firma en la imagen Open Graph | Sergio | Pregunta abierta desde B5, sin responder |
+Sergio confirmó el **25 de noviembre de 2026** que hizo estas comprobaciones: las pruebas en un móvil real, con lector de pantalla, y la revisión de las cabeceras en producción. Las pruebas de móvil, lector y cabeceras no dejaron informe aparte: consta su confirmación en el hilo del proyecto.
+
+| Comprobación | Quién | Qué comprobar | Estado |
+|---|---|---|---|
+| Probar en un móvil real | Sergio | iPhone (Safari, «Añadir a pantalla de inicio») y Android (Chrome): aviso o botón de instalar, icono (también el maskable), pantalla completa, **modo avión tras abrir una vez**, jugar contra la máquina, aviso «Sin conexión», y que sale «Hay una versión nueva» tras la siguiente fusión | **Hecha** (25-nov) |
+| Lector de pantalla | Sergio | Anuncio de jugadas, nombre de casillas, diálogo de PGN y avisos. B6 solo pudo comprobar el árbol de accesibilidad y la región `aria-live` | **Hecha** (25-nov) |
+| Uso a una mano | Sergio | Alcance del pulgar a «Empezar partida», «Deshacer» y arrastrar piezas, en vertical y apaisado | **Hecha** (25-nov), con la prueba del móvil real |
+| Cabeceras en producción | Sergio, desde su navegador | https://escaque.calvariotechlabs.com/ → cabeceras de la respuesta del documento (la Protección contra bots de Vercel devuelve 429 a los centros de datos, así que ningún hilo pudo medirlas) | **Hecha** (25-nov) |
+| `x-robots-tag: noindex` | Sergio, en la misma medición | Debe **no** salir en `escaque.calvariotechlabs.com` | **Hecha** (25-nov), en la misma revisión de cabeceras |
+| Texto del aviso de versión en Claude Design | Un hilo con acceso | «Al actualizar se recarga la página y tu partida se conserva.» (F-01) | **Hecha**: lámina «Avisos» y componente Notice actualizados (#81, #82) |
+| Firma en la imagen Open Graph | Sergio | Pregunta abierta desde B5 | **Hecha**: firma añadida en #98 (issue #96) |
 
 ## 7. Documentación viva (#77)
 
@@ -157,13 +159,14 @@ Se rehicieron en un clon limpio de `main` (`7e38bba`), Node de la sesión, sin d
 - **La referencia de Stockfish no es una verdad**: en finales que necesitan tablas puede discrepar.
 - **El banco tiene 4 a 12 posiciones por categoría**: una diferencia de una o dos posiciones puede ser ruido de Difícil.
 - **Fuera de la RC por decisión de Sergio:** H-13 (el coach no nombra el ahogado), H-16 (una jugada ilegal no muestra mensaje), H-17 (el PGN en notación española se rechaza con un mensaje engañoso), H-23 (panel del coach compacto), H-24 (medir el repaso de partidas largas con el banco), H-25 (aviso legal y de privacidad) y H-26 (separar tiempo de motor y tiempo hasta ver la respuesta).
-- **Sin validar en dispositivo físico ni con lector de pantalla real** (apartado 6).
+- Validación en dispositivo físico, con lector de pantalla real y de las cabeceras de producción: hecha el 25-nov (apartado 6).
 
 ## 10. Decisiones y pasos que quedan
 
-1. **H-08** (4.3): corregida en [#83](https://github.com/calvariotechlabs/escaque/issues/83), pendiente de fusionar con el OK de Sergio.
-2. #77 ya está fusionada (apartado 7).
-3. **Fusionar esta PR** con el OK de Sergio, para fijar el informe en el commit de la RC.
+1. **H-08** (4.3): corregida y fusionada ([#84](https://github.com/calvariotechlabs/escaque/pull/84), issue [#83](https://github.com/calvariotechlabs/escaque/issues/83)).
+2. #77 fusionada (apartado 7).
+3. Este informe se fusionó en [#79](https://github.com/calvariotechlabs/escaque/pull/79) y [#80](https://github.com/calvariotechlabs/escaque/pull/80). Después se fusionaron la auditoría v2 y su contraste (#86, #90), el arreglo de las dos líneas del coach (#88, #91, issue #87), la corrección «Calvario TechLabs» (#93, #95), la firma en la imagen Open Graph (#98) y el arreglo de `metrics:check` con Node 24 (#99).
+4. Sin pasos pendientes para la RC. Fuera de ella quedan los puntos del apartado 9 (B8 y los H-13, H-16, H-17, H-23 a H-26).
 
 ## 11. Registro de decisiones para el caso de estudio
 
