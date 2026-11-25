@@ -10,13 +10,13 @@
 
 App web para aprender ajedrez con motor propio (**Alfil Beta**), escrita desde cero en TypeScript sin dependencias en ejecución: ni librerías de ajedrez, ni frameworks de interfaz. TypeScript solo se usa para compilar.
 
-**Qué hay dentro:** reglas completas verificadas con perft, un motor con tres niveles que corre en un Web Worker, un coach que explica por qué una jugada fue mala, 15 lecciones guiadas, repaso de la partida con curva de evaluación, importación y exportación de PGN, y PWA. Se juega entero con teclado y todo lleva etiquetas para lectores de pantalla (probado en el árbol de accesibilidad; falta probarlo con un lector real). [Cifras](#cifras), [fuerza del motor](#fuerza-del-motor), [decisiones técnicas](#decisiones-técnicas), [auditorías externas](#auditorías-externas), [capacidades verificadas y limitaciones conocidas](#capacidades-verificadas-y-limitaciones-conocidas) y [qué aprendí](#qué-aprendí-y-qué-haría-distinto) más abajo.
+**Qué hay dentro:** reglas completas verificadas con perft, un motor con tres niveles que corre en un Web Worker, un coach que explica por qué una jugada fue mala, 15 lecciones guiadas, repaso de la partida con curva de evaluación, importación y exportación de PGN, y PWA. Se juega entero con teclado y todo lleva etiquetas para lectores de pantalla (probado en el árbol de accesibilidad y, el 25 de noviembre de 2026, con un lector de pantalla real en un móvil). [Cifras](#cifras), [fuerza del motor](#fuerza-del-motor), [decisiones técnicas](#decisiones-técnicas), [auditorías externas](#auditorías-externas), [capacidades verificadas y limitaciones conocidas](#capacidades-verificadas-y-limitaciones-conocidas) y [qué aprendí](#qué-aprendí-y-qué-haría-distinto) más abajo.
 
 ## Estado
 
 Los seis hitos están hechos, más el repaso de la partida y el PGN. Alfil Beta juega con tres niveles en un Web Worker, el coach explica los errores y hay 15 lecciones guiadas. La web se instala como app (PWA) y se publica como sitio estático en Vercel. La demo está detrás de un desafío anti-bots de Vercel: la primera visita puede tardar un instante.
 
-**Release Candidate (24 de noviembre de 2026).** Tras las dos [auditorías externas](#auditorías-externas) se está cerrando una primera versión estable: coach coherente (B1), banco de posiciones contra Stockfish (B2), análisis del coach (B3), pruebas de regresión (B4), firma de Calvario TechLabs (B5, B7), validación integral (B6) y esta documentación viva (B9). La afinación del motor (B11, #78) y el [informe de la RC](docs/auditorias/informe-rc.md) (B10) ya están fusionados, y la RC pasó una [auditoría independiente](#auditorías-externas) el mismo día. Lo que todavía no está resuelto está en [limitaciones conocidas](#capacidades-verificadas-y-limitaciones-conocidas).
+**Release Candidate (cerrada el 25 de noviembre de 2026).** Tras las dos [auditorías externas](#auditorías-externas) se cerró una primera versión estable: coach coherente (B1), banco de posiciones contra Stockfish (B2), análisis del coach (B3), pruebas de regresión (B4), firma de Calvario TechLabs (B5, B7), validación integral (B6) y esta documentación viva (B9). La afinación del motor (B11, #78) y el [informe de la RC](docs/auditorias/informe-rc.md) (B10) ya están fusionados, y la RC pasó una [auditoría independiente](#auditorías-externas) el 24 de noviembre. El 25 de noviembre se fusionaron sus últimos arreglos y quedaron hechas las comprobaciones manuales en un móvil real, con lector de pantalla y con las cabeceras de producción. Lo que no está resuelto está en [limitaciones conocidas](#capacidades-verificadas-y-limitaciones-conocidas).
 
 | Hito | Descripción | Estado |
 | --- | --- | --- |
@@ -92,7 +92,7 @@ El diseño y las decisiones técnicas (arquitectura, tablero 0x88, estrategia de
 
 ## Decisiones técnicas
 
-- **Cero dependencias.** El proyecto es una demostración de oficio: reglas, motor, interfaz, service worker y servidor de desarrollo son propios. Coste: más código; beneficio: nada que actualizar ni auditar, y el sitio publicado pesa unos 75 KB comprimidos.
+- **Cero dependencias.** El proyecto es una demostración de oficio: reglas, motor, interfaz, service worker y servidor de desarrollo son propios. Coste: más código; beneficio: nada que actualizar ni auditar, y el sitio publicado pesa 190 KB comprimidos con gzip (la tabla de [Cifras](#cifras) tiene el detalle).
 - **Tablero 0x88, no bitboards.** En JavaScript un bitboard de 64 bits obliga a `BigInt`, que es lento. Con 0x88 la comprobación de «fuera del tablero» es una máscara y las tablas se indexan sin conversiones.
 - **Legalidad por aplicar y deshacer.** Se generan todas las jugadas posibles, se aplica cada una y se descarta la que deja al rey en jaque. Es lo más simple de razonar y lo valida el perft contra cifras publicadas.
 - **Una sola clave Zobrist** (64 bits en dos mitades de 32, generador propio) para la triple repetición, las repeticiones dentro de la búsqueda y la tabla de transposición.
@@ -156,17 +156,17 @@ Lo que sigue distingue lo que se **ha ejecutado** (con su evidencia) de lo que *
 - Un peón que el rival puede tomar al paso no se marca como pieza colgando.
 - El coach es un comparador de evaluaciones con detectores tácticos, no un profesor: cuando no tiene evidencia suficiente para un motivo concreto, lo dice.
 
-**Validación pendiente de una persona o de un dispositivo físico**
+**Validación hecha por una persona en dispositivos reales (25 de noviembre de 2026)**
 
-| Prueba | Dispositivo | Qué comprobar |
+Sergio confirmó que hizo a mano lo que la automatización no puede ver:
+
+| Prueba | Dispositivo | Resultado |
 | --- | --- | --- |
-| Instalar | Android (Chrome) e iPhone (Safari) | Aviso o menú de instalación, icono (también el maskable) y apertura a pantalla completa |
-| Sin conexión real | Los mismos, en modo avión | Que abre, que se puede jugar contra la máquina y que sale «Sin conexión» |
-| Actualización | App instalada en el móvil, tras una fusión a `main` | Que sale «Hay una versión nueva» |
-| Uso a una mano | Móvil vertical y apaisado | Alcance de «Empezar partida», «Deshacer» y arrastrar con el pulgar |
-| Lector de pantalla | TalkBack (Android) y VoiceOver (iPhone y Mac) | Que anuncia jugadas, casillas, el diálogo de PGN y los avisos; solo se ha comprobado el árbol de accesibilidad y la región `aria-live` |
-| Cabeceras en producción | Navegador de una persona | La Protección contra bots de Vercel responde 429 a los centros de datos, así que las cabeceras de las páginas HTML de `escaque.calvariotechlabs.com` no se han medido; hay que mirar también que no salga `x-robots-tag: noindex` |
-| Cortafuegos de Vercel | Panel de Vercel | Las reglas no se pueden leer por API; no se enviaron peticiones de prueba al sitio real |
+| Instalar, sin conexión real, actualización y uso a una mano | Móvil real | Hecha |
+| Lector de pantalla | Móvil real | Hecha |
+| Cabeceras en producción | Navegador de una persona, sobre `escaque.calvariotechlabs.com` | Revisadas |
+
+Queda fuera de esa lista el cortafuegos de Vercel: sus reglas no se pueden leer por API y no se enviaron peticiones de prueba al sitio real.
 
 **Fuera de alcance:** multijugador en línea, cuentas, backend y la mejora de los mensajes de error de entrada (bloque B8, no aprobado para la RC).
 
@@ -183,7 +183,7 @@ Lo que sigue distingue lo que se **ha ejecutado** (con su evidencia) de lo que *
 
 **Qué haría distinto**
 
-- **Probar con tecnologías de asistencia reales desde el principio.** La accesibilidad está pensada (teclado, ARIA, jugadas en notación algebraica) y probada en el código, pero todavía no con un lector de pantalla real en un móvil Android. Lo haría desde el primer tablero, no al final.
+- **Probar con tecnologías de asistencia reales desde el principio.** La accesibilidad está pensada (teclado, ARIA, jugadas en notación algebraica) y probada en el código y, al final, con un lector de pantalla real en un móvil. Lo haría desde el primer tablero, no al final.
 - **Calibrar el motor contra una referencia externa desde el principio.** Los niveles se midieron entre sí y contra un jugador al azar, lo que dice cuál es más fuerte pero no cuánto. El banco contra Stockfish llegó con la Release Candidate, tras las auditorías; desde el hito 3 habría orientado mejor el ajuste de los niveles.
 - **Mejorar el motor con ideas que no entraron.** B11 añadió poda por jugada nula, LMR, jugadas asesinas, historial, ventanas de aspiración y una evaluación con seguridad del rey. Quedan fuera un libro de aperturas, la evaluación afinada con partidas (tuning) y una búsqueda que vea los ataques largos al rey: dos posiciones tácticas del banco siguen fallando por eso (ver el punto de parada).
 - **Medir el rendimiento en el navegador, no solo en Node.** Las cifras de velocidad salen de un contenedor; el repaso tarda unos 8 s en el navegador y no lo medí en móviles de gama baja.
