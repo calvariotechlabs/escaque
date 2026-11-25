@@ -869,7 +869,7 @@
       "y": 45340,
       "w": 1280,
       "h": 2200,
-      "title": "Escritorio · firma «by CalvarioTechLabs»: marca, reglas, contraste y textos (B5, propuesta)",
+      "title": "Escritorio · firma «by Calvario TechLabs»: marca, reglas, contraste y textos (B5, propuesta)",
       "page": "escritorio"
     },
     "FirmaPartidaEscritorio.dc.html": {
@@ -2167,7 +2167,7 @@
     "t_firma_e": {
       "x": 0,
       "y": 45060,
-      "text": "Firma «by CalvarioTechLabs» (B5)",
+      "text": "Firma «by Calvario TechLabs» (B5)",
       "page": "escritorio",
       "kind": "title1",
       "maxW": 4000
@@ -2175,7 +2175,7 @@
     "t_firma_t": {
       "x": 0,
       "y": 37680,
-      "text": "Firma «by CalvarioTechLabs» (B5)",
+      "text": "Firma «by Calvario TechLabs» (B5)",
       "page": "tablet",
       "kind": "title1",
       "maxW": 1720
@@ -2183,7 +2183,7 @@
     "t_firma_m": {
       "x": 0,
       "y": 44590,
-      "text": "Firma «by CalvarioTechLabs» (B5)",
+      "text": "Firma «by Calvario TechLabs» (B5)",
       "page": "movil",
       "kind": "title1",
       "maxW": 1768
@@ -2191,7 +2191,7 @@
     "n_firma_e": {
       "x": 0,
       "y": 45170,
-      "text": "Propuesta pendiente de aprobar (issue #65). La firma sale en la cabecera (tablet y escritorio), en un pie nuevo en todas las pantallas y en la pantalla nueva «Acerca de». Escaque sigue siendo la marca; CalvarioTechLabs, la creadora. Móvil: sin firma en la cabecera por falta de sitio; solo en el pie.",
+      "text": "Propuesta pendiente de aprobar (issue #65). La firma sale en la cabecera (tablet y escritorio), en un pie nuevo en todas las pantallas y en la pantalla nueva «Acerca de». Escaque sigue siendo la marca; Calvario TechLabs, la creadora. Móvil: sin firma en la cabecera por falta de sitio; solo en el pie.",
       "page": "escritorio",
       "w": 520,
       "fill": "gray"
@@ -2199,7 +2199,7 @@
     "n_firma_t": {
       "x": 0,
       "y": 37790,
-      "text": "Propuesta pendiente de aprobar (issue #65). La firma sale en la cabecera (tablet y escritorio), en un pie nuevo en todas las pantallas y en la pantalla nueva «Acerca de». Escaque sigue siendo la marca; CalvarioTechLabs, la creadora. Móvil: sin firma en la cabecera por falta de sitio; solo en el pie.",
+      "text": "Propuesta pendiente de aprobar (issue #65). La firma sale en la cabecera (tablet y escritorio), en un pie nuevo en todas las pantallas y en la pantalla nueva «Acerca de». Escaque sigue siendo la marca; Calvario TechLabs, la creadora. Móvil: sin firma en la cabecera por falta de sitio; solo en el pie.",
       "page": "tablet",
       "w": 520,
       "fill": "gray"
@@ -2207,7 +2207,7 @@
     "n_firma_m": {
       "x": 0,
       "y": 44700,
-      "text": "Propuesta pendiente de aprobar (issue #65). La firma sale en la cabecera (tablet y escritorio), en un pie nuevo en todas las pantallas y en la pantalla nueva «Acerca de». Escaque sigue siendo la marca; CalvarioTechLabs, la creadora. Móvil: sin firma en la cabecera por falta de sitio; solo en el pie.",
+      "text": "Propuesta pendiente de aprobar (issue #65). La firma sale en la cabecera (tablet y escritorio), en un pie nuevo en todas las pantallas y en la pantalla nueva «Acerca de». Escaque sigue siendo la marca; Calvario TechLabs, la creadora. Móvil: sin firma en la cabecera por falta de sitio; solo en el pie.",
       "page": "movil",
       "w": 520,
       "fill": "gray"
