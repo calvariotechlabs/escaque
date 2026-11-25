@@ -5,7 +5,7 @@
 // estado se reescribe el contenido de esa misma región, que no se destruye.
 import { emptyState } from "./brand.js";
 import type { SquareMark } from "../coach/index.js";
-import { COACH_TEXT, type EvaluationView, type FindingView, type HintsView, type ReportView } from "./coach.js";
+import { COACH_TEXT, glueNumbers, type EvaluationView, type FindingView, type HintsView, type ReportView } from "./coach.js";
 
 const SVG = (inner: string): string =>
   `<svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">${inner}</svg>`;
@@ -14,6 +14,9 @@ const ICON_GRAVE = SVG(`<path d="M10 2 18.5 17.5H1.5Z" ${STROKE} stroke-linejoin
 const ICON_DUDOSA = SVG(`<circle cx="10" cy="10" r="8" ${STROKE} stroke-dasharray="3 2.4"/><path d="M10 6v4.5M10 13.2v.4" ${STROKE} stroke-linecap="round"/>`);
 const ICON_BUENA = SVG(`<circle cx="10" cy="10" r="8" ${STROKE}/><path d="m6 10.3 2.8 2.8L14.2 7.5" ${STROKE} stroke-linecap="round" stroke-linejoin="round"/>`);
 const ICON_MATE = SVG(`<path d="M7 3h6M10 3v3M6 17h8M7.5 17l.8-7a3 3 0 1 1 3.4 0l.8 7" ${STROKE} stroke-linecap="round" stroke-linejoin="round"/>`);
+// Marcas de las dos líneas (issue #87): la forma de la flecha de cada jugada, como en la leyenda del tablero.
+const MARK_PLAYED = `<svg class="linea__marca" viewBox="0 0 28 12" aria-hidden="true" focusable="false"><path class="flecha flecha--tuya" d="M2 6H20"/><path class="flecha-punta--tuya" d="M19.5 2.5 25.5 6l-6 3.5Z"/></svg>`;
+const MARK_BEST = `<svg class="linea__marca" viewBox="0 0 28 12" aria-hidden="true" focusable="false"><path class="flecha flecha--mejor" d="M2 6H20"/><path class="flecha-punta--mejor" d="M19 1.5 26 6l-7 4.5Z"/></svg>`;
 const SEVERITY_ICON = { grave: ICON_GRAVE, dudosa: ICON_DUDOSA, buena: ICON_BUENA } as const;
 const FINDING_ICON = { "mate-en-1": ICON_MATE, "pieza-colgando": ICON_GRAVE, "captura-gratis": ICON_DUDOSA } as const;
 
@@ -102,6 +105,46 @@ function evaluationRows(label: string, evaluation: EvaluationView): [HTMLElement
   bar.append(fill);
   detail.append(el("span", evaluation.value.startsWith("Mate") ? "coach__valor coach__valor--frase" : "coach__valor", evaluation.value), document.createTextNode(evaluation.rest), bar);
   return [term, detail];
+}
+
+/** Una línea de la lista: la marca de su flecha, su nombre y las jugadas. */
+function lineItem(kind: "tuya" | "mejor", mark: string, name: string, moves: Node[]): HTMLLIElement {
+  const item = el("li", `linea linea--${kind}`);
+  const label = el("span", "linea__nombre");
+  const icon = el("span");
+  icon.innerHTML = mark; // marcado fijo, sin datos
+  label.append(icon.firstElementChild!, document.createTextNode(name));
+  const text = el("span", "coach__san linea__jugadas");
+  text.append(...moves);
+  item.append(label, text);
+  return item;
+}
+
+/**
+ * «Líneas de Alfil Beta» (issue #87): la de tu jugada, con la respuesta clave subrayada
+ * y nombrada para el lector de pantalla, y debajo la de la mejor jugada. Solo texto: sin controles.
+ */
+function twoLines(view: ReportView, id: string, sub: "h3" | "h4"): HTMLElement {
+  const played = view.playedLine!;
+  const box = el("div", "coach__lineas");
+  const title = el(sub, "coach__sub", COACH_TEXT.linesTitle);
+  title.id = id;
+  const list = el("ul", "lineas");
+  list.setAttribute("role", "list"); // con list-style:none, Safari quita la semántica de lista
+  list.setAttribute("aria-labelledby", id);
+  const moves: Node[] = [];
+  played.moves.forEach((move, i) => {
+    if (i > 0) moves.push(document.createTextNode(" "));
+    if (i === played.key) {
+      const key = el("span", "linea__clave", glueNumbers(move));
+      key.append(el("span", "oculto", COACH_TEXT.keyReply));
+      moves.push(key);
+    } else moves.push(document.createTextNode(glueNumbers(move)));
+  });
+  list.append(lineItem("tuya", MARK_PLAYED, COACH_TEXT.playedLineName, moves));
+  if (view.line !== "") list.append(lineItem("mejor", MARK_BEST, COACH_TEXT.bestLineName, [document.createTextNode(glueNumbers(view.line))]));
+  box.append(title, list, el("p", "linea__nota", COACH_TEXT.linesNote));
+  return box;
 }
 
 export function createCoachPanel(onMarks: (marks: readonly SquareMark[]) => void, options: CoachPanelOptions = {}): CoachPanel {
@@ -288,7 +331,8 @@ export function createCoachPanel(onMarks: (marks: readonly SquareMark[]) => void
           why.append(el("strong", undefined, COACH_TEXT.whyPrefix), ...textWithSan(view.why, view.best?.replace(/[+#]$/, "") ?? null));
           block.append(why);
         }
-        if (view.line !== "") {
+        if (view.playedLine !== null) block.append(twoLines(view, `${prefix}-lineas`, sub));
+        else if (view.line !== "") {
           const line = el("p", "coach__linea");
           line.append(document.createTextNode(COACH_TEXT.linePrefix), el("span", "coach__san", view.line));
           block.append(line);

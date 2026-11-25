@@ -37,6 +37,16 @@ const MAX_LINE = 64;
 const SQUARE = /^[a-h][1-8]$/;
 
 const isMove = (v: unknown): boolean => isObject(v) && isText(v["uci"]) && isText(v["san"]);
+/** Línea de tu jugada (issue #87): `null`, o jugadas en texto con la respuesta clave dentro. */
+const isRefutationLine = (v: unknown): boolean =>
+  v === null ||
+  (isObject(v) &&
+    Array.isArray(v["moves"]) &&
+    v["moves"].length <= MAX_LINE &&
+    v["moves"].every(isText) &&
+    Number.isInteger(v["key"]) &&
+    (v["key"] as number) >= 0 &&
+    (v["key"] as number) < v["moves"].length);
 const isLine = (v: unknown): boolean => Array.isArray(v) && v.length <= MAX_LINE && v.every((m) => typeof m === "string" && UCI.test(m));
 
 function isEvaluation(v: unknown): boolean {
@@ -76,6 +86,7 @@ export function isReport(v: unknown): v is CoachReport {
     isText(v["summary"]) &&
     isText(v["why"]) &&
     isText(v["line"]) &&
+    isRefutationLine(v["refutationLine"]) &&
     Array.isArray(v["findings"]) &&
     v["findings"].length <= 3 &&
     v["findings"].every(isFinding)

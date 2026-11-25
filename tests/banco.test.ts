@@ -132,6 +132,7 @@ function informe(cambios: Partial<CoachReport>): CoachReport {
     why: "",
     line: "1. e4",
     lines: { best: ["e2e4"], played: ["e2e4"] },
+    refutationLine: null,
     depth: 4,
     ...cambios,
   };
@@ -188,6 +189,25 @@ describe("invariantes()", () => {
     const corta = invariantes(INICIAL, informe({ move: { uci: "d2d4", san: "d4" }, verdict: "error", why: "e4 gana un peón.", line: "1. e4 d5 2. Cf3 Cc6" }), linea);
     assert.deepEqual(corta.map((x) => x.regla), ["pieza-no-capturada"]);
     const entera = invariantes(INICIAL, informe({ move: { uci: "d2d4", san: "d4" }, verdict: "error", why: "e4 gana un peón.", line: "1. e4 d5 2. Cf3 Cc6 3. exd5" }), linea);
+    assert.deepEqual(entera, []);
+  });
+});
+
+describe("invariantes(): línea de tu jugada (issue #87)", () => {
+  // 1.e4 d5 2.Cf3 Cc6 3.exd5: tras 1.e4 las negras «responden» y las blancas capturan en la quinta.
+  const jugada = ["e2e4", "d7d5", "g1f3", "b8c6", "e4d5"];
+  const base = { move: { uci: "e2e4", san: "e4" }, alternative: { uci: "d2d4", san: "d4" }, verdict: "error" as const, lines: { best: ["d2d4"], played: jugada } };
+
+  it("«Tras X, …» sin la línea de tu jugada es una violación", () => {
+    const v = invariantes(INICIAL, informe({ ...base, why: "Tras e4, las negras responden 1… d5 y ganan un peón." }), ["d2d4"]);
+    assert.deepEqual(v.map((x) => x.regla), ["refutacion-sin-linea"]);
+  });
+
+  it("la línea de tu jugada tiene que llegar a la última captura", () => {
+    const why = "Tras e4, las negras responden 1… d5 y ganan un peón.";
+    const corta = invariantes(INICIAL, informe({ ...base, why, refutationLine: { moves: ["1. e4", "d5"], key: 1 } }), ["d2d4"]);
+    assert.deepEqual(corta.map((x) => x.regla), ["refutacion-sin-linea"]);
+    const entera = invariantes(INICIAL, informe({ ...base, why, refutationLine: { moves: ["1. e4", "d5", "2. Cf3", "Cc6", "3. exd5"], key: 1 } }), ["d2d4"]);
     assert.deepEqual(entera, []);
   });
 });

@@ -240,6 +240,7 @@ export type Regla =
   | "mate-en-contra-con-elogio"
   | "pieza-no-capturada"
   | "veredicto-contra-evaluacion"
+  | "refutacion-sin-linea"
   | "invariante-del-coach";
 
 export interface Violacion {
@@ -271,6 +272,8 @@ const contrario = (c: Color): Color => (c === "w" ? "b" : "w");
  * 3. Tras la jugada hay mate en contra y el texto elogia material o dice que la diferencia es pequeña.
  * 4. El texto dice «X gana una torre» y en la parte de la línea que se ve no se captura ninguna torre.
  * 5. El veredicto es «Mejor» o «Buena» y la jugada permite un mate que antes no había.
+ * 6. El «por qué» cuenta la respuesta del rival («Tras X, …») y el panel no enseña la línea de
+ *    tu jugada hasta la última captura de esa línea (issue #87).
  *
  * Desde B3 el banco suma además las violaciones de `checkInvariants` del propio coach
  * (regla «invariante-del-coach», ver `tools/banco.ts`).
@@ -309,7 +312,29 @@ export function invariantes(fen: string, informe: CoachReport, lineaPanel: reado
   if ((informe.verdict === "mejor" || informe.verdict === "buena") && informe.after.mate?.winner === rival && !mateAntesEnContra) {
     v.push({ regla: "veredicto-contra-evaluacion", detalle: `«${informe.title}» y ${informe.after.text}` });
   }
+  // «Tras X, las negras responden …»: la línea de tu jugada tiene que verse hasta su última captura (o el mate).
+  // Un mate largo se cuenta sin línea («… tienen mate en 7.»): no hay respuesta que enseñar.
+  if (informe.alternative !== null && /^Tras \S+, /.test(informe.why) && !/ mate en \d+\.$/.test(informe.why)) {
+    const propia = informe.refutationLine?.moves.length ?? 0;
+    const mate = /mate en (\d+):/.exec(informe.why);
+    const necesarias = Math.max(2, mate !== null ? Math.min(2 * Number(mate[1]), informe.lines.played.length) : ultimaCaptura(fen, informe.lines.played));
+    if (propia < necesarias) v.push({ regla: "refutacion-sin-linea", detalle: `«${informe.why}» y la línea de tu jugada enseña ${propia} de ${necesarias} medias jugadas` });
+  }
   return v;
+}
+
+/** Media jugada (1 = la primera) de la última captura o coronación en las 12 primeras de `linea`; 0 si no hay. */
+function ultimaCaptura(fen: string, linea: readonly string[]): number {
+  const pos = Position.fromFen(fen);
+  let ultima = 0;
+  for (const [i, uci] of linea.slice(0, 12).entries()) {
+    const move = pos.moveFromUci(uci);
+    if (move === null) break;
+    const alPaso = pos.pieceAt(move.to) === null && pos.pieceAt(move.from)?.type === "p" && (move.from & 7) !== (move.to & 7);
+    if (pos.pieceAt(move.to) !== null || alPaso || move.promotion !== null) ultima = i + 1;
+    pos.makeMove(move);
+  }
+  return ultima;
 }
 
 /** Medias jugadas que enseña la línea del panel («13. Dd3+ Re7 14. Cd5+ Re8» son 4): cuenta las jugadas, no los números. */
@@ -445,7 +470,7 @@ export function resumirCoach(filas: readonly ResultadoCoach[], refs: Readonly<Re
   const equivalentes = filas.filter((f) => f.referencia.equivalente);
   const falsos = equivalentes.filter((f) => esError(f.veredicto));
   const noVistos = filas.filter((f) => esError(f.referencia.veredicto) && (f.veredicto === "mejor" || f.veredicto === "buena"));
-  const violaciones = { "mejor-con-otra-mejor": 0, "aviso-y-sin-motivo": 0, "mate-en-contra-con-elogio": 0, "pieza-no-capturada": 0, "veredicto-contra-evaluacion": 0, "invariante-del-coach": 0 } as Record<Regla, number>;
+  const violaciones = { "mejor-con-otra-mejor": 0, "aviso-y-sin-motivo": 0, "mate-en-contra-con-elogio": 0, "pieza-no-capturada": 0, "veredicto-contra-evaluacion": 0, "refutacion-sin-linea": 0, "invariante-del-coach": 0 } as Record<Regla, number>;
   for (const f of filas) for (const x of f.violaciones) violaciones[x.regla]++;
   const conMate = filas.filter((f) => f.mateAntes !== null);
   const permitidos = filas.filter((f) => f.mateDespues !== null);

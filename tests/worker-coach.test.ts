@@ -118,6 +118,21 @@ describe("isReport()", () => {
   });
 });
 
+describe("isReport() y la línea de tu jugada (issue #87)", () => {
+  it("acepta la línea de tu jugada nula o bien formada y rechaza las demás", () => {
+    assert.ok(isReport({ ...report, refutationLine: null }));
+    assert.ok(isReport({ ...report, refutationLine: { moves: ["4. Dg5", "Dxg5"], key: 1 } }));
+    assert.equal(isReport({ ...report, refutationLine: { moves: "x", key: 1 } }), false);
+    assert.equal(isReport({ ...report, refutationLine: { key: 1 } }), false);
+    assert.equal(isReport({ ...report, refutationLine: { moves: ["4. Dg5", 3], key: 1 } }), false);
+    assert.equal(isReport({ ...report, refutationLine: { moves: ["4. Dg5", "Dxg5"], key: 2 } }), false);
+    assert.equal(isReport({ ...report, refutationLine: { moves: ["4. Dg5", "Dxg5"], key: 0.5 } }), false);
+    assert.equal(isReport({ ...report, refutationLine: { moves: new Array(65).fill("e4"), key: 1 } }), false);
+    const { refutationLine: _r, ...without } = { ...report, refutationLine: null };
+    assert.equal(isReport(without), false);
+  });
+});
+
 describe("CoachClient", () => {
   it("cancel() sin petición en curso no detiene el Worker", () => {
     const { client, workers } = clientWithFakes();
