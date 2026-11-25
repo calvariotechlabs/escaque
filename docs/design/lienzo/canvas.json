@@ -959,6 +959,46 @@
       "h": 390,
       "title": "Móvil apaisado · Acerca de Escaque (oscuro)",
       "page": "movil"
+    },
+    "CoachRefutacionEscritorio.dc.html": {
+      "x": 0,
+      "y": 48040,
+      "w": 1280,
+      "h": 1640,
+      "page": "escritorio",
+      "title": "Escritorio · coach: las dos líneas, tu jugada y la mejor (propuesta, issue #87)"
+    },
+    "CoachRefutacionEstados.dc.html": {
+      "x": 1360,
+      "y": 48040,
+      "w": 1280,
+      "h": 2300,
+      "page": "escritorio",
+      "title": "Escritorio · coach: las dos líneas, estados y reglas (propuesta, issue #87)"
+    },
+    "CoachRefutacionTablet.dc.html": {
+      "x": 0,
+      "y": 39640,
+      "w": 820,
+      "h": 1760,
+      "page": "tablet",
+      "title": "Tablet · coach: las dos líneas en dos columnas (propuesta, issue #87)"
+    },
+    "CoachRefutacionMovil.dc.html": {
+      "x": 0,
+      "y": 47380,
+      "w": 390,
+      "h": 2200,
+      "page": "movil",
+      "title": "Móvil · coach: las dos líneas (propuesta, issue #87)"
+    },
+    "CoachRefutacionMovilHorizontal.dc.html": {
+      "x": 470,
+      "y": 47380,
+      "w": 844,
+      "h": 390,
+      "page": "movil",
+      "title": "Móvil · horizontal · coach: las dos líneas, panel desplazado (propuesta, issue #87)"
     }
   },
   "order": [
@@ -1077,7 +1117,12 @@
     "FirmaInicioMovil.dc.html",
     "AcercaMovil.dc.html",
     "FirmaPartidaMovilHorizontal.dc.html",
-    "AcercaMovilHorizontal.dc.html"
+    "AcercaMovilHorizontal.dc.html",
+    "CoachRefutacionEscritorio.dc.html",
+    "CoachRefutacionEstados.dc.html",
+    "CoachRefutacionTablet.dc.html",
+    "CoachRefutacionMovil.dc.html",
+    "CoachRefutacionMovilHorizontal.dc.html"
   ],
   "notes": {
     "t_escritorio_0": {
@@ -2166,6 +2211,30 @@
       "page": "movil",
       "w": 520,
       "fill": "gray"
+    },
+    "t_refut_escritorio": {
+      "x": 0,
+      "y": 47800,
+      "text": "Coach: las dos líneas (issue #87)",
+      "kind": "title1",
+      "maxW": 2640,
+      "page": "escritorio"
+    },
+    "t_refut_tablet": {
+      "x": 0,
+      "y": 39400,
+      "text": "Coach: las dos líneas (issue #87)",
+      "kind": "title1",
+      "maxW": 820,
+      "page": "tablet"
+    },
+    "t_refut_movil": {
+      "x": 0,
+      "y": 47140,
+      "text": "Coach: las dos líneas (issue #87)",
+      "kind": "title1",
+      "maxW": 1314,
+      "page": "movil"
     }
   },
   "designSystems": [
