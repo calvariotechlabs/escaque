@@ -174,7 +174,7 @@ function ejecutar(lista: readonly PosicionBanco[]): void {
         mateAntes: hayMate ? informe.before.mate?.winner === color : null,
         mateDespues: q.matePermitido ? informe.after.mate?.winner === rival : null,
         violaciones: [
-          ...invariantes(p.fen, informe, informe.lines.best),
+          ...invariantes(p.fen, informe, informe.alternative === null ? informe.lines.played : informe.lines.best),
           ...checkInvariants(informe, { fen: p.fen }).map((detalle) => ({ regla: "invariante-del-coach" as const, detalle })),
         ],
         texto: [`${informe.title}. ${informe.summary}`, informe.why, ...informe.findings.map((f) => `[${f.title}] ${f.message}`)].filter(Boolean).join(" | "),

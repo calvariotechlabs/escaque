@@ -7,6 +7,7 @@ import {
   calidad,
   capturasDe,
   invariantes,
+  jugadasMostradas,
   resumirCoach,
   resumirMotor,
   semilla,
@@ -174,10 +175,28 @@ describe("invariantes()", () => {
   it("4. «gana una torre» exige que la línea capture una torre", () => {
     // 1.e4 d5 2.exd5: las blancas capturan un peón, no una torre.
     const linea = ["e2e4", "d7d5", "e4d5"];
-    const mal = invariantes(INICIAL, informe({ move: { uci: "d2d4", san: "d4" }, verdict: "error", why: "e4 gana una torre." }), linea);
+    const enPanel = "1. e4 d5 2. exd5";
+    const mal = invariantes(INICIAL, informe({ move: { uci: "d2d4", san: "d4" }, verdict: "error", why: "e4 gana una torre.", line: enPanel }), linea);
     assert.deepEqual(mal.map((x) => x.regla), ["pieza-no-capturada"]);
-    const bien = invariantes(INICIAL, informe({ move: { uci: "d2d4", san: "d4" }, verdict: "error", why: "e4 gana un peón." }), linea);
+    const bien = invariantes(INICIAL, informe({ move: { uci: "d2d4", san: "d4" }, verdict: "error", why: "e4 gana un peón.", line: enPanel }), linea);
     assert.deepEqual(bien, []);
+  });
+
+  it("4. la pieza tiene que capturarse en la parte de la línea que enseña el panel (H-08)", () => {
+    // 1.e4 d5 2.Cf3 Cc6 3.exd5: el peón cae en la quinta media jugada.
+    const linea = ["e2e4", "d7d5", "g1f3", "b8c6", "e4d5"];
+    const corta = invariantes(INICIAL, informe({ move: { uci: "d2d4", san: "d4" }, verdict: "error", why: "e4 gana un peón.", line: "1. e4 d5 2. Cf3 Cc6" }), linea);
+    assert.deepEqual(corta.map((x) => x.regla), ["pieza-no-capturada"]);
+    const entera = invariantes(INICIAL, informe({ move: { uci: "d2d4", san: "d4" }, verdict: "error", why: "e4 gana un peón.", line: "1. e4 d5 2. Cf3 Cc6 3. exd5" }), linea);
+    assert.deepEqual(entera, []);
+  });
+});
+
+describe("jugadasMostradas()", () => {
+  it("cuenta las medias jugadas de la línea del panel, sin los números", () => {
+    assert.equal(jugadasMostradas("13. Dd3+ Re7 14. Cd5+ Re8"), 4);
+    assert.equal(jugadasMostradas("13… Re7 14. Cd5+"), 2);
+    assert.equal(jugadasMostradas(""), 0);
   });
 });
 

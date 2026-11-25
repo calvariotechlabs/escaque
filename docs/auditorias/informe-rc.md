@@ -7,7 +7,7 @@
 
 ## 1. Veredicto en una línea
 
-La RC cumple la Definition of Done del plan salvo un punto abierto que depende de una persona: las pruebas en dispositivo físico, con lector de pantalla y de las cabeceras de producción (apartado 6). Los defectos P0 del entrenador están cerrados: **0 de 152 informes con contradicción de las invariantes del propio coach** (antes, 39 de 152 con la regla externa) y una sola contradicción de medida en el banco (apartado 4.3).
+La RC cumple la Definition of Done del plan salvo un punto abierto que depende de una persona: las pruebas en dispositivo físico, con lector de pantalla y de las cabeceras de producción (apartado 6). Los defectos P0 del entrenador están cerrados: **0 de 152 informes con contradicción de las invariantes del propio coach** (antes, 39 de 152 con la regla externa) y, desde la corrección de H-08 ([#83](https://github.com/calvariotechlabs/escaque/issues/83)), **0 de 152 también con la regla externa del banco** (apartado 4.3).
 
 ## 2. Qué se hizo, bloque a bloque
 
@@ -28,16 +28,16 @@ La RC cumple la Definition of Done del plan salvo un punto abierto que depende d
 
 ### 3.1 Coach (banco de 82 posiciones, 152 informes, profundidad 4)
 
-| Métrica | antes (`5e9e946`, `antes-b1`) | después de B3 | después de B11 (`main`) |
-|---|---|---|---|
-| Informes con alguna contradicción | 39/152 (26 %) | 0/152 | **1/152 (1 %)** |
-| Falsos positivos (jugada equivalente llamada Error) | 7/123 (6 %) | 5/123 (4 %) | **3/123 (2 %)** |
-| Errores graves detectados | 20/23 (87 %) | 20/23 (87 %) | 20/23 (87 %) |
-| Errores llamados «Mejor» o «Buena» | 3 | 3 | 3 |
-| Veredicto igual al de la referencia | 91/152 (60 %) | 99/152 (65 %) | 97/152 (64 %) |
-| Mejor jugada equivalente a la de Stockfish | 68/82 (83 %) | 68/82 (83 %) | 67/82 (82 %) |
-| Mate a favor visto / mate permitido visto | 20/20 · 4/4 | 20/20 · 4/4 | 20/20 · 4/4 |
-| Tiempo por análisis (media · p95 · máximo) | 190 · 715 · 3.592 ms | 290 · 1.046 · 3.781 ms | **119 · 537 · 828 ms** |
+| Métrica | antes (`5e9e946`, `antes-b1`) | después de B3 | después de B11 | después de H-08 (`despues-h08`) |
+|---|---|---|---|---|
+| Informes con alguna contradicción | 39/152 (26 %) | 0/152 | 1/152 (1 %) | **0/152** |
+| Falsos positivos (jugada equivalente llamada Error) | 7/123 (6 %) | 5/123 (4 %) | **3/123 (2 %)** | 3/123 (2 %) |
+| Errores graves detectados | 20/23 (87 %) | 20/23 (87 %) | 20/23 (87 %) | 20/23 (87 %) |
+| Errores llamados «Mejor» o «Buena» | 3 | 3 | 3 | 3 |
+| Veredicto igual al de la referencia | 91/152 (60 %) | 99/152 (65 %) | 97/152 (64 %) | 97/152 (64 %) |
+| Mejor jugada equivalente a la de Stockfish | 68/82 (83 %) | 68/82 (83 %) | 67/82 (82 %) | 67/82 (82 %) |
+| Mate a favor visto / mate permitido visto | 20/20 · 4/4 | 20/20 · 4/4 | 20/20 · 4/4 | 20/20 · 4/4 |
+| Tiempo por análisis (media · p95 · máximo) | 190 · 715 · 3.592 ms | 290 · 1.046 · 3.781 ms | **119 · 537 · 828 ms** | 104 · 456 · 650 ms (otro equipo) |
 
 Lectura honesta: el coach ya no se contradice y da menos falsos positivos, pero **no ve más errores graves** (20/23 en las tres columnas) y el veredicto coincide con Stockfish en el 64 % de los informes. Los tres errores no vistos siguen siendo los mismos (Cxe5 del Blackburne-Shilling, Dxd4 del arca de Noé, 10…Da5 de H-14); dependen de que el motor vea la refutación. El tiempo máximo bajó de 3,6 s a 0,8 s gracias a la velocidad del motor nuevo, no a un cambio del coach.
 
@@ -64,11 +64,11 @@ Lectura honesta: el coach ya no se contradice y da menos falsos positivos, pero 
 
 | Criterio | Cómo se comprueba | Estado |
 |---|---|---|
-| Sin defectos P0 abiertos | RC-01 a RC-03 fusionadas (#59, #64); invariantes en verde | **Cumplido** (4.3 explica la contradicción de medida que queda) |
+| Sin defectos P0 abiertos | RC-01 a RC-03 fusionadas (#59, #64); invariantes en verde | **Cumplido** con #83 fusionada (4.3: H-08 corregida) |
 | P1 resueltos o con excepción aprobada | RC-04 a RC-06 y RC-12 fusionadas; excepciones escritas | **Cumplido** con tres excepciones aprobadas (apartado 5) |
 | Regresiones cubiertas: una prueba por cada H reproducido | Tabla 4.1 | **Cumplido** salvo lo que está fuera de la RC |
 | Banco reproducible | Dos ejecuciones del mismo commit dan la misma huella; metodología en `bench/README.md` | **Cumplido** (apartado 8) |
-| El coach no se contradice | Cero violaciones en el banco | **Casi**: 0 de `checkInvariants`; 1 contradicción de la regla externa (4.3) |
+| El coach no se contradice | Cero violaciones en el banco | **Cumplido** con #83 fusionada: 0 de `checkInvariants` y 0 de la regla externa del banco (`despues-h08`, 4.3) |
 | Pipeline completa en verde | CI: tipos y tests, perft completo, rendimiento, e2e y cero dependencias | **Cumplido**: `main` en `7e38bba` con los 5 trabajos de la CI en verde (apartado 8) |
 | Sin degradaciones inaceptables | Tiempos del banco y de Difícil antes y después | **Cumplido**: el coach pasa de máximo 3,6 s a 0,8 s; Difícil se queda en 0,9 s |
 | Principios de arquitectura | `dependencies: {}`, sin backend, Workers | **Cumplido**: B6 midió 0 peticiones a otros orígenes y 0 cookies |
@@ -94,9 +94,13 @@ Lectura honesta: el coach ya no se contradice y da menos falsos positivos, pero 
 
 `npm test` 1.093/1.093 y e2e 97/97 en su momento; CSP sin violaciones en cuatro rutas; 0 peticiones a otros orígenes y 0 cookies; criterios de instalabilidad de Chrome sin errores; recarga sin red que restaura la partida y máquina Difícil sin conexión; seis casos de datos guardados corruptos que arrancan limpios; actualización del service worker conservando la partida; PGN de ida y vuelta y con errores; 40 combinaciones de tamaño sin desborde; zoom 200 %; primer pintado de 164 ms con CPU 4 veces más lenta. Detalle en [b6-validacion-integral.md](b6-validacion-integral.md).
 
-### 4.3 La contradicción que queda
+### 4.3 La contradicción de H-08 (corregida)
 
-`auditoria-h-08 Qd3+`: el informe dice «gana la dama» y la línea que enseña solo captura un peón. Es la regla `pieza-no-capturada` del banco, que mira **8 medias jugadas**; la captura de la dama puede llegar después. No la detecta `checkInvariants` (0 violaciones). Según el hilo de B9, **es un defecto real y no solo de medida**: el texto dice «gana la dama» y la línea mostrada solo captura un peón. Queda como **limitación conocida** (B9 la recoge en el README, PR #77) y no se corrige en la RC. Por eso el criterio «el coach no se contradice» se da por cumplido con esta excepción: 1 informe de 152.
+`auditoria-h-08 Qd3+`: el informe decía «Dd3+ gana la dama y un peón a cambio de un caballo» y el panel enseñaba «13. Dd3+ Re7 14. Cd5+ Re8», que no captura nada. **Causa raíz**: tres horizontes distintos para la misma línea. El texto cuenta el material en 12 medias jugadas (`MATERIAL_PLIES`), el panel enseñaba 4 (`LINE_PLIES`) y la regla `pieza-no-capturada` del banco miraba 8; la dama cae en la novena (17. Cxf6+). `checkInvariants` no lo veía porque comprueba la línea entera del motor, no la parte visible.
+
+**Corrección** ([#83](https://github.com/calvariotechlabs/escaque/issues/83)): el panel enseña la línea hasta la última captura que cuenta el texto (`shownPlies`; 4 medias jugadas si no hay capturas más tarde, como antes). `checkInvariants` comprueba ahora que la línea del panel llega hasta esa captura, y la regla del banco mira exactamente las medias jugadas que enseña el panel, no 8 fijas (más estricta en las líneas cortas). Prueba de regresión en `tests/coach-coherencia.test.ts` y `tests/banco.test.ts`. Las columnas anteriores de la tabla 3.1 se midieron con la regla de 8 medias jugadas; `despues-h08` usa la nueva. Banco `despues-h08`: 0/152 contradicciones, mismos falsos positivos (3/123) y misma detección (20/23). Efecto visible: 33 de las 118 jugadas marcadas del banco enseñan una línea más larga (hasta 11 medias jugadas).
+
+**Lo que no cubre**: cuando el «por qué» describe la respuesta del rival a la jugada hecha («Tras d3, las negras responden 4… Cxh5 y ganan la dama»), el texto nombra la jugada pero el panel enseña la línea de la mejor jugada, no la de la jugada hecha. No es una contradicción (la regla del banco no la cuenta), pero esa captura no se ve en la línea. Son 20 de 268 informes en el banco y las dos partidas de las auditorías. Enseñar también esa línea es un cambio de interfaz que necesita diseño; queda propuesto a Sergio.
 
 ## 5. Excepciones documentadas del motor
 
@@ -148,7 +152,6 @@ Se rehicieron en un clon limpio de `main` (`7e38bba`), Node de la sesión, sin d
 ## 9. Limitaciones conocidas
 
 - **El coach ve lo que ve Alfil Beta a profundidad 4 y en 3 s.** No detecta 3 de 23 errores graves del banco, y puede llamar «Error grave» a un sacrificio correcto con compensación lejana (3 casos).
-- **Una contradicción residual en el coach** (H-08, `auditoria-h-08 Qd3+`): dice «gana la dama» y la línea mostrada solo captura un peón.
 - **Difícil es determinista** (H-15): la misma línea gana siempre. Decisión de diseño, no se ha tocado.
 - **Alfil Beta no es un rival fuerte.** No hay Elo (82 posiciones elegidas a mano no dan validez estadística; ver `bench/README.md`). Las cifras comparan versiones del mismo código.
 - **La referencia de Stockfish no es una verdad**: en finales que necesitan tablas puede discrepar.
@@ -158,7 +161,7 @@ Se rehicieron en un clon limpio de `main` (`7e38bba`), Node de la sesión, sin d
 
 ## 10. Decisiones y pasos que quedan
 
-1. **H-08** (4.3): defecto real que queda como limitación conocida. Si Sergio prefiere corregirlo antes de la RC, es un bloque nuevo (la frase de «gana la dama» debe salir de la línea mostrada).
+1. **H-08** (4.3): corregida en [#83](https://github.com/calvariotechlabs/escaque/issues/83), pendiente de fusionar con el OK de Sergio.
 2. #77 ya está fusionada (apartado 7).
 3. **Fusionar esta PR** con el OK de Sergio, para fijar el informe en el commit de la RC.
 

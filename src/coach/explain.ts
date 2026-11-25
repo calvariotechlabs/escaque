@@ -113,7 +113,7 @@ function numbered(position: Position, move: Move): string {
 
 /**
  * Línea en texto, con números y SAN española: «5. Cxe5 dxe5 6. Dxg4 Cf6».
- * Como mucho `plies` medias jugadas (cuatro); se corta en la primera que no es legal.
+ * Como mucho `plies` medias jugadas (cuatro; el informe usa `shownPlies`); se corta en la primera que no es legal.
  * Deja `position` como estaba.
  */
 export function lineText(position: Position, line: readonly string[], plies = LINE_PLIES): string {
@@ -132,6 +132,33 @@ export function lineText(position: Position, line: readonly string[], plies = LI
     for (let i = 0; i < played; i++) position.unmakeMove();
   }
   return parts.join(" ");
+}
+
+/**
+ * Medias jugadas de la línea que enseña el panel: las cuatro de siempre o,
+ * si la línea captura o corona más tarde, hasta la última de esas jugadas
+ * dentro de las que cuentan para el material. Así la línea demuestra lo que
+ * dice el texto («Dd3+ gana la dama» enseña la captura de la dama, H-08).
+ * Si la línea es más corta o tiene una jugada ilegal, las que se pueden jugar.
+ * Deja `position` como estaba.
+ */
+export function shownPlies(position: Position, line: readonly string[]): number {
+  let last = 0;
+  let played = 0;
+  try {
+    for (const uci of line.slice(0, MATERIAL_PLIES)) {
+      const move = position.moveFromUci(uci);
+      if (move === null) break;
+      const enPassant = position.pieceAt(move.to) === null && position.pieceAt(move.from)?.type === "p" && (move.from & 7) !== (move.to & 7);
+      if (position.pieceAt(move.to) !== null || enPassant || move.promotion !== null) last = played + 1;
+      position.makeMove(move);
+      played++;
+    }
+  } finally {
+    for (let i = 0; i < played; i++) position.unmakeMove();
+  }
+  // Nunca más de las que son legales: `lineText` también se para en la primera que no lo es.
+  return Math.min(Math.max(LINE_PLIES, last), played);
 }
 
 /** Material que gana quien mueve en `position` siguiendo la línea (capturas y coronaciones). Deja `position` como estaba. */
