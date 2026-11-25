@@ -31,7 +31,7 @@ import type { Color, Move, PieceType, Square } from "../core/index.js";
 import { MATE_SCORE, PIECE_VALUES, TranspositionTable, search } from "../engine/index.js";
 import type { SearchLimits, SearchOptions, SearchResult } from "../engine/index.js";
 import { capturedValue, cheapestCapture, exchangeGain, moveBalance } from "./exchange.js";
-import { explainMove, hintForPosition, lineCaptures, lineGain, lineText, refutationOf } from "./explain.js";
+import { explainMove, hintForPosition, lineCaptures, lineGain, lineText, refutationOf, shownPlies } from "./explain.js";
 import type { Hint, Motive } from "./explain.js";
 import {
   agree,
@@ -168,7 +168,8 @@ export interface CoachReport {
   readonly why: string;
   /**
    * Línea de Alfil Beta desde la posición de antes, en SAN española: «5. Cxe5 dxe5 6. Dxg4 Cf6».
-   * Empieza por `alternative` si la hay; si no, por la jugada hecha.
+   * Empieza por `alternative` si la hay; si no, por la jugada hecha. Cuatro medias jugadas o,
+   * si hay capturas más tarde, hasta la última (`shownPlies`): enseña el material que dice el texto.
    */
   readonly line: string;
   /** Líneas del motor en UCI desde la posición de antes: la de su primera opción y la de la jugada hecha. */
@@ -493,6 +494,7 @@ export function analyzeMove(game: CoachGame, move: string, options: AnalyzeOptio
     depth: beforeSearch.depth,
   });
 
+  const shownLine = decision.alternative === null ? decision.lines.played : decision.lines.best;
   return {
     color,
     move: moveInfo,
@@ -507,7 +509,7 @@ export function analyzeMove(game: CoachGame, move: string, options: AnalyzeOptio
     summary: decision.summary,
     findings,
     why: decision.why,
-    line: lineText(position, decision.alternative === null ? decision.lines.played : decision.lines.best),
+    line: lineText(position, shownLine, shownPlies(position, shownLine)),
     lines: decision.lines,
     depth: beforeSearch.depth,
   };

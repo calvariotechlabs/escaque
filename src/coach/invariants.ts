@@ -8,7 +8,7 @@
 import { Position } from "../core/index.js";
 import type { PieceType } from "../core/index.js";
 import type { CoachGame, CoachReport } from "./analyze.js";
-import { lineCaptures } from "./explain.js";
+import { lineCaptures, shownPlies } from "./explain.js";
 import { pawns } from "./text.js";
 
 /** Misma tolerancia que el veredicto «mejor» para jugadas equivalentes. */
@@ -61,10 +61,19 @@ export function checkInvariants(report: CoachReport, game: CoachGame): string[] 
   }
 
   // 4. Ninguna pieza ganada que la línea no capture de verdad.
-  const captured = capturedTypes(report, game, out);
+  const position = replay(game, out);
+  const captured = position === null ? new Set<PieceType>() : capturedTypes(report, position, out);
   for (const match of shown.matchAll(PIECE_CLAIM)) {
     const type = NOUNS[match[1]!]!;
     if (!captured.has(type)) out.push(`«${match[0]}» y ninguna línea captura esa pieza`);
+  }
+
+  // 4b. La línea del panel llega hasta la última captura que cuenta el texto (H-08).
+  if (position !== null) {
+    const panelLine = report.alternative === null ? report.lines.played : report.lines.best;
+    const needed = shownPlies(position, panelLine);
+    const inPanel = report.line.split(" ").filter((token) => token !== "" && !/^\d+[.…]$/.test(token)).length;
+    if (inPanel < needed) out.push(`la línea del panel enseña ${inPanel} medias jugadas y el material se cuenta en ${needed}`);
   }
 
   if (/nadie gana material/.test(shown) && captured.size > 0) out.push("dice que nadie gana material y las líneas capturan");
@@ -94,17 +103,28 @@ export function checkInvariants(report: CoachReport, game: CoachGame): string[] 
   return out;
 }
 
-/** Piezas que se capturan en alguna de las dos líneas del informe. Anota en `out` las líneas ilegales. */
-function capturedTypes(report: CoachReport, game: CoachGame, out: string[]): Set<PieceType> {
-  const position = Position.fromFen(game.fen);
+/** La posición de antes de la jugada; `null` (y lo anota en `out`) si la FEN o una jugada no son válidas. */
+function replay(game: CoachGame, out: string[]): Position | null {
+  let position: Position;
+  try {
+    position = Position.fromFen(game.fen);
+  } catch (error) {
+    out.push(`FEN no válida: ${(error as Error).message}`);
+    return null;
+  }
   for (const uci of game.moves ?? []) {
     const move = position.moveFromUci(uci);
     if (move === null) {
       out.push(`partida ilegal en ${uci}`);
-      return new Set();
+      return null;
     }
     position.makeMove(move);
   }
+  return position;
+}
+
+/** Piezas que se capturan en alguna de las dos líneas del informe, desde `position`. Anota en `out` las líneas ilegales. */
+function capturedTypes(report: CoachReport, position: Position, out: string[]): Set<PieceType> {
   const types = new Set<PieceType>();
   for (const line of [report.lines.best, report.lines.played]) {
     if (line.some((uci) => typeof uci !== "string")) out.push("línea con jugadas que no son texto");
