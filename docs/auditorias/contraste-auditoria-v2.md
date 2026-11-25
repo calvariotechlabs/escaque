@@ -8,10 +8,10 @@
 
 ## 1. Veredicto
 
-**La RC no se cierra todavía: faltan dos arreglos.**
+**La RC no se cierra todavía: falta un arreglo (A-02).**
 
-- Fusionar la PR [#84](https://github.com/calvariotechlabs/escaque/pull/84). Arregla el único defecto que la auditoría reproduce sobre un caso original (13.Dd5+, H-08) y tiene la CI en verde (6 de 6 comprobaciones).
-- Corregir A-02: cuando el «por qué» es la respuesta del rival, el panel enseña la línea de la mejor jugada, no la de la refutación. El texto es correcto, pero no se puede recorrer en el tablero. Es el P1 de la auditoría («enlazar cada afirmación material con la variante completa que la demuestra»). **Decisión de Sergio (24-nov): arreglarlo antes de cerrar la RC**, con diseño previo en Claude Design y después el código. Seguimiento en [#87](https://github.com/calvariotechlabs/escaque/issues/87).
+- ~~Fusionar la PR [#84](https://github.com/calvariotechlabs/escaque/pull/84).~~ Fusionada el 25-nov con el OK de Sergio. Arregla el único defecto que la auditoría reproduce sobre un caso original (13.Dd5+, H-08) y tiene la CI en verde (6 de 6 comprobaciones).
+- Corregir A-02: cuando el «por qué» es la respuesta del rival, el panel enseña la línea de la mejor jugada, no la de la refutación. El texto es correcto, pero no se puede recorrer en el tablero. Es el P1 de la auditoría («enlazar cada afirmación material con la variante completa que la demuestra»). **Decisión de Sergio (24-nov): arreglarlo antes de cerrar la RC.** El diseño ya está aprobado y fusionado (PR #88); falta el código. Seguimiento en [#87](https://github.com/calvariotechlabs/escaque/issues/87).
 - Sigue pendiente de Sergio, como antes de esta auditoría: cabeceras de producción completas (incluido que no haya `noindex`), móvil real, PWA instalada sin conexión y lector de pantalla.
 
 | Criterio de aceptación (informe-rc §12) | Resultado | Evidencia |
@@ -55,8 +55,8 @@ Observación propia, fuera de la auditoría: en 4.Ac4, el resumen dice «Ac4 dej
 
 | Orden | Qué | Tipo | Bloquea la RC | Necesita |
 |---|---|---|---|---|
-| 1 | Fusionar #84 (H-08) | Código ya hecho | **Sí** | OK de Sergio |
-| 2 | Línea de la refutación visible cuando el «por qué» es la respuesta del rival (A-02, #87) | Diseño y luego código | **Sí** (decisión de Sergio, 24-nov) | Diseño en Claude Design |
+| 1 | ~~Fusionar #84 (H-08)~~ Hecho el 25-nov | Código | — | — |
+| 2 | Línea de la refutación visible cuando el «por qué» es la respuesta del rival (A-02, #87) | Código (diseño aprobado en #88) | **Sí** (decisión de Sergio, 24-nov) | — |
 | 3 | `metrics:check` compatible con Node 22 y 24: `--test-reporter=tap` y prueba del lector (A-03); valorar Node 24 en la matriz de CI | Código pequeño | No | — |
 | 4 | Ficha pública al día (commit, 1.167 pruebas, auditorías fechadas y enlazadas). README: citar esta segunda auditoría, corregir la línea 19 y dar las cifras de Difícil como rango (A-05, A-08) | Documentación (la ficha vive en otro repositorio) | No | — |
 | 5 | Cabeceras completas en producción, móvil real, PWA sin conexión y lector de pantalla (A-17) | Prueba manual | Criterio de cabeceras: sí | Sergio |
