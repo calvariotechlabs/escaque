@@ -1,4 +1,4 @@
-/* Escaque · firma «by CalvarioTechLabs» (B5, propuesta). Firma de la cabecera, pie de página y pantalla «Acerca de». Solo tokens de tokens.css e identidad.css. */
+/* Escaque · firma «by Calvario TechLabs» (B5, propuesta). Firma de la cabecera, pie de página y pantalla «Acerca de». Solo tokens de tokens.css e identidad.css. */
 
 /* Marcos de las láminas (solo lienzo) */
 .fc-root{display:flex;flex-direction:column;box-sizing:border-box;background:var(--surface);color:var(--ink);font-family:var(--font-sans)}

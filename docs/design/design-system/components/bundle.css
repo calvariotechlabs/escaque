@@ -268,7 +268,7 @@ section.grupo{display:flex;flex-direction:column;gap:var(--space-4)}
   .contador__punto--hecho{background:CanvasText}
 }
 
-/* Firma «by CalvarioTechLabs», pie y Acerca de (B5, issue #65) */
+/* Firma «by Calvario TechLabs», pie y Acerca de (B5, issue #65) */
 /* Cabecera: la firma va junto al nombre solo desde 720 px de ancho y 500 px de alto */
 .cab-izq{display:flex;align-items:center;gap:var(--space-3);min-width:0}
 
