@@ -34,7 +34,7 @@ Las cifras de la primera tabla **las genera `npm run metrics`** a partir del pro
 
 <!-- metricas:inicio (generado por `npm run metrics`; no editar a mano) -->
 
-Generado el 2026-11-25 sobre el commit `b548b087e194` con `npm run metrics` (datos en [`docs/metricas.json`](docs/metricas.json)).
+Generado el 2026-11-25 sobre el commit `49ec83788444` con `npm run metrics` (datos en [`docs/metricas.json`](docs/metricas.json)).
 
 | Qué | Cifra | Cómo se comprueba |
 | --- | --- | --- |
@@ -42,9 +42,10 @@ Generado el 2026-11-25 sobre el commit `b548b087e194` con `npm run metrics` (dat
 | Pruebas funcionales | **1.209** pruebas en 221 suites (`node --test`, sin las de reloj ni el perft completo) | `npm test`; `npm run metrics:check` en la CI |
 | Lecciones guiadas | **15**: 9 de primeros pasos y 6 de tácticas | Datos en `src/lessons`; `npm run metrics:check` |
 | Posiciones de referencia de perft | **21**, todas exactas (la inicial, Kiwipete, las posiciones 3 a 6 de la Chess Programming Wiki y las «trampa» de Sedlak) | `npm run test:perft` en la CI |
+| Comprobaciones de perft | **109** cifras de nodos exactas (una por posición y profundidad) en el perft completo, que no entra en las 1.209 pruebas funcionales | `npm run test:perft` en la CI |
 | Sitio publicado | 92 ficheros, 832 KB en disco; JS + CSS + HTML suman 193 KB comprimidos con gzip (cada fichero por separado) | `npm run metrics:check` (margen del 5 %) |
 | Banco de 82 posiciones (`despues-75`) | Alfil Beta Difícil: mejor jugada de la referencia en 50 de 82 y equivalente (a menos de 30 cp) en 70; 2 errores de más de 2 peones en tácticas; mantiene 18 de 18 mates. Coach: veredicto igual al de la referencia en 97 de 152 informes (64 %), detecta 20 de 23 errores graves, 3 falsos positivos en 123 jugadas equivalentes y 0 informes con contradicciones | `bench/resultados/despues-75.json` (2026-11-25, commit `b548b087e194`); metodología en `bench/README.md` |
-| Tiempo del banco (depende del equipo) | Difícil: 748 ms de media y 905 ms como máximo. Coach: 108 ms de media, 505 ms el percentil 95 y 910 ms como máximo | Registrado en el mismo fichero; no lo vuelve a medir la CI |
+| Tiempo del banco, por análisis o jugada (depende del equipo) | Difícil (una jugada): 748 ms de media y 905 ms la más lenta. Coach (un análisis completo de una jugada): 108 ms de media, 505 ms el percentil 95 y 910 ms el más lento | Registrado en el mismo fichero; no lo vuelve a medir la CI |
 | Pruebas de extremo a extremo | **102** en 16 ficheros, con Chrome real (teclado, ARIA, SAN, arrastre, PGN, instalación) | CI (trabajo `accesibilidad`) en cada PR; el recuento se registra con `npm run metrics -- --e2e` (2026-11-25) |
 | Velocidad de perft (depende del equipo) | 13,0 millones de nodos por segundo (inicial, profundidad 5: 4.865.609 nodos; Node v22.23.5, 4 núcleos) | Registrado con `npm run metrics -- --rendimiento` (2026-11-24); no lo comprueba la CI |
 
